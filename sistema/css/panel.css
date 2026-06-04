@@ -88,6 +88,8 @@ ul { list-style: none; }
    ESTRUCTURA DEL PANEL (sidebar + topbar + contenido)
    ============================================================ */
 .layout { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+/* La capa oscura del menú móvil debe estar oculta (y fuera del flujo) en escritorio */
+.backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 110; }
 
 .sidebar { background: var(--navy); color: rgba(255,255,255,.75); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
 .sidebar__head { padding: 22px 20px; border-bottom: 1px solid rgba(255,255,255,.08); }
