@@ -67,6 +67,23 @@ export async function signOut() {
   window.location.href = 'login.html';
 }
 
+// Envía un correo con el enlace para restablecer la contraseña
+export async function resetPassword(email, redirectTo) {
+  return supabase.auth.resetPasswordForEmail(email, { redirectTo });
+}
+
+// Define una nueva contraseña (durante el flujo de recuperación)
+export async function updatePassword(newPassword) {
+  return supabase.auth.updateUser({ password: newPassword });
+}
+
+// Avisa cuando el usuario entra por el enlace de recuperación de contraseña
+export function onPasswordRecovery(callback) {
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') callback();
+  });
+}
+
 // Registra una acción en la bitácora de auditoría (no bloquea si falla)
 export async function logAccion(accion, entidad, entidad_id, detalle) {
   try {

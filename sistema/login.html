@@ -42,7 +42,8 @@
             <button type="submit" class="btn btn--primary btn--block" id="btnLogin">Entrar</button>
             <p class="form-msg" id="loginMsg" role="status" aria-live="polite"></p>
           </form>
-          <p class="sub" style="text-align:center;margin-top:18px;">¿Es cliente del bufete? <span class="muted-link" id="toRegister">Cree su cuenta aquí</span></p>
+          <p class="sub" style="text-align:center;margin-top:14px;"><span class="muted-link" id="toRecuperar">¿Olvidó su contraseña?</span></p>
+          <p class="sub" style="text-align:center;margin-top:8px;">¿Es cliente del bufete? <span class="muted-link" id="toRegister">Cree su cuenta aquí</span></p>
         </div>
 
         <!-- REGISTRO DE CLIENTES -->
@@ -69,23 +70,67 @@
             <button type="submit" class="btn btn--navy btn--block" id="btnRegister">Crear cuenta</button>
             <p class="form-msg" id="registerMsg" role="status" aria-live="polite"></p>
           </form>
-          <p class="sub" style="text-align:center;margin-top:18px;"><span class="muted-link" id="toLogin">&larr; Volver a iniciar sesión</span></p>
+          <p class="sub" style="text-align:center;margin-top:18px;"><span class="muted-link" id="toLogin1">&larr; Volver a iniciar sesión</span></p>
+        </div>
+
+        <!-- RECUPERAR: solicitar enlace -->
+        <div id="viewRecuperar" style="display:none;">
+          <h2>Recuperar contraseña</h2>
+          <p class="sub">Ingrese su correo y le enviaremos un enlace para crear una nueva contraseña.</p>
+          <form id="recuperarForm" novalidate>
+            <div class="field">
+              <label for="recEmail">Correo electrónico</label>
+              <input type="email" id="recEmail" autocomplete="email" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block" id="btnRecuperar">Enviar enlace</button>
+            <p class="form-msg" id="recuperarMsg" role="status" aria-live="polite"></p>
+          </form>
+          <p class="sub" style="text-align:center;margin-top:18px;"><span class="muted-link" id="toLogin2">&larr; Volver a iniciar sesión</span></p>
+        </div>
+
+        <!-- RESET: definir nueva contraseña (al llegar desde el enlace del correo) -->
+        <div id="viewReset" style="display:none;">
+          <h2>Nueva contraseña</h2>
+          <p class="sub">Escriba su nueva contraseña para acceder al sistema.</p>
+          <form id="resetForm" novalidate>
+            <div class="field">
+              <label for="newPassword">Nueva contraseña (mínimo 6 caracteres)</label>
+              <input type="password" id="newPassword" autocomplete="new-password" required>
+            </div>
+            <div class="field">
+              <label for="newPassword2">Repita la contraseña</label>
+              <input type="password" id="newPassword2" autocomplete="new-password" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block" id="btnReset">Guardar contraseña</button>
+            <p class="form-msg" id="resetMsg" role="status" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </main>
   </div>
 
   <script type="module">
-    import { signIn, signUp, getSession } from './js/auth.js';
+    import { signIn, signUp, getSession, resetPassword, updatePassword, onPasswordRecovery } from './js/auth.js';
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Si ya hay sesión activa, ir directo al panel
-    getSession().then(s => { if (s) window.location.href = 'index.html'; });
+    const VIEWS = ['viewLogin', 'viewRegister', 'viewRecuperar', 'viewReset'];
+    const show = (id) => VIEWS.forEach(v => document.getElementById(v).style.display = (v === id ? 'block' : 'none'));
 
-    const viewLogin = document.getElementById('viewLogin');
-    const viewRegister = document.getElementById('viewRegister');
-    document.getElementById('toRegister').onclick = () => { viewLogin.style.display='none'; viewRegister.style.display='block'; };
-    document.getElementById('toLogin').onclick = () => { viewRegister.style.display='none'; viewLogin.style.display='block'; };
+    // ¿Llegamos por el enlace de recuperación del correo?
+    const isRecovery = window.location.hash.includes('type=recovery');
+    if (!isRecovery) {
+      // Si ya hay sesión activa, ir directo al panel
+      getSession().then(s => { if (s) window.location.href = 'index.html'; });
+    } else {
+      show('viewReset');
+    }
+    onPasswordRecovery(() => show('viewReset'));
+
+    // Navegación entre vistas
+    document.getElementById('toRegister').onclick = () => show('viewRegister');
+    document.getElementById('toRecuperar').onclick = () => show('viewRecuperar');
+    document.getElementById('toLogin1').onclick = () => show('viewLogin');
+    document.getElementById('toLogin2').onclick = () => show('viewLogin');
 
     // LOGIN
     const loginForm = document.getElementById('loginForm');
@@ -135,6 +180,52 @@
         registerMsg.classList.add('success');
         btn.disabled = false; btn.textContent = 'Crear cuenta';
       }
+    });
+
+    // RECUPERAR: enviar enlace
+    const recuperarForm = document.getElementById('recuperarForm');
+    const recuperarMsg = document.getElementById('recuperarMsg');
+    recuperarForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnRecuperar');
+      recuperarMsg.textContent = ''; recuperarMsg.className = 'form-msg';
+      const email = document.getElementById('recEmail').value.trim();
+      if (!email) { recuperarMsg.textContent = 'Ingrese su correo.'; recuperarMsg.classList.add('error'); return; }
+      btn.disabled = true; btn.textContent = 'Enviando...';
+      const redirectTo = window.location.origin + window.location.pathname;
+      const { error } = await resetPassword(email, redirectTo);
+      btn.disabled = false; btn.textContent = 'Enviar enlace';
+      if (error) {
+        recuperarMsg.textContent = 'No se pudo enviar. Intente de nuevo en unos minutos.';
+        recuperarMsg.classList.add('error');
+        return;
+      }
+      recuperarMsg.textContent = 'Si el correo está registrado, recibirá un enlace para crear su nueva contraseña. Revise también la carpeta de spam.';
+      recuperarMsg.classList.add('success');
+    });
+
+    // RESET: definir nueva contraseña
+    const resetForm = document.getElementById('resetForm');
+    const resetMsg = document.getElementById('resetMsg');
+    resetForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnReset');
+      resetMsg.textContent = ''; resetMsg.className = 'form-msg';
+      const p1 = document.getElementById('newPassword').value;
+      const p2 = document.getElementById('newPassword2').value;
+      if (p1.length < 6) { resetMsg.textContent = 'La contraseña debe tener al menos 6 caracteres.'; resetMsg.classList.add('error'); return; }
+      if (p1 !== p2) { resetMsg.textContent = 'Las contraseñas no coinciden.'; resetMsg.classList.add('error'); return; }
+      btn.disabled = true; btn.textContent = 'Guardando...';
+      const { error } = await updatePassword(p1);
+      if (error) {
+        resetMsg.textContent = 'El enlace expiró o no es válido. Solicite uno nuevo.';
+        resetMsg.classList.add('error');
+        btn.disabled = false; btn.textContent = 'Guardar contraseña';
+        return;
+      }
+      resetMsg.textContent = '¡Contraseña actualizada! Ingresando al sistema...';
+      resetMsg.classList.add('success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 1200);
     });
   </script>
 </body>
