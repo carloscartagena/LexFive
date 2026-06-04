@@ -463,5 +463,24 @@
     </button>
 
     <script src="js/main.js"></script>
+    <script type="module">
+      // Carga dinámica de testimonios aprobados desde el panel (Supabase)
+      import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+      import { SUPABASE_URL, SUPABASE_KEY } from './sistema/js/config.js';
+      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+      const grid = document.querySelector('.testimonials__grid');
+      const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      (async () => {
+        if (!grid) return;
+        const { data, error } = await sb.from('testimonios').select('*').eq('estado', 'aprobado').order('updated_at', { ascending: false }).limit(9);
+        if (error || !data || !data.length) return; // si no hay aprobados, deja los testimonios de ejemplo
+        grid.innerHTML = data.map(t => `
+          <figure class="testimonial">
+            <div class="testimonial__stars" aria-label="${t.calificacion} de 5 estrellas">${'&#9733;'.repeat(t.calificacion)}</div>
+            <blockquote>“${esc(t.texto)}”</blockquote>
+            <figcaption><strong>${esc(t.nombre || 'Cliente')}</strong><span>${esc(t.detalle || 'Cliente')}</span></figcaption>
+          </figure>`).join('');
+      })();
+    </script>
 </body>
 </html>

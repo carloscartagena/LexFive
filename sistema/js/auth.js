@@ -53,11 +53,11 @@ export async function signIn(email, password) {
   return supabase.auth.signInWithPassword({ email, password });
 }
 
-export async function signUp(email, password, nombre) {
+export async function signUp(email, password, nombre, telefono) {
   return supabase.auth.signUp({
     email,
     password,
-    options: { data: { nombre } }
+    options: { data: { nombre, telefono: telefono || null } }
   });
 }
 

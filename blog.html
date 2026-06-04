@@ -200,5 +200,49 @@
     </button>
 
     <script src="js/main.js"></script>
+    <script type="module">
+      // Carga dinámica de artículos publicados desde el panel (Supabase)
+      import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+      import { SUPABASE_URL, SUPABASE_KEY } from './sistema/js/config.js';
+      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+      const grid = document.querySelector('.blog-grid');
+      const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const fmt = d => { try { return new Date(d).toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' }); } catch (e) { return ''; } };
+
+      function showArticle(a) {
+        const ov = document.createElement('div');
+        ov.style.cssText = 'position:fixed;inset:0;background:rgba(14,27,44,.6);display:flex;align-items:flex-start;justify-content:center;padding:40px 18px;z-index:200;overflow-y:auto;';
+        ov.innerHTML = `<div style="background:#fff;max-width:720px;width:100%;border-radius:8px;padding:40px;box-shadow:0 25px 60px rgba(14,27,44,.25);">
+          <span class="tag">${esc(a.categoria || 'General')}</span>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#0e1b2c;margin:14px 0 6px;">${esc(a.titulo)}</h2>
+          <p style="color:#5c6675;font-size:.9rem;margin-bottom:20px;">${fmt(a.fecha)}</p>
+          <div style="color:#1a2330;line-height:1.8;white-space:pre-wrap;">${esc(a.contenido || a.resumen || '')}</div>
+          <button style="margin-top:26px;background:#c2a25a;color:#0e1b2c;border:none;padding:12px 24px;border-radius:5px;font-weight:600;cursor:pointer;">Cerrar</button>
+        </div>`;
+        ov.addEventListener('click', e => { if (e.target === ov || e.target.tagName === 'BUTTON') ov.remove(); });
+        document.body.appendChild(ov);
+      }
+
+      (async () => {
+        if (!grid) return;
+        const { data, error } = await sb.from('articulos').select('*').eq('estado', 'publicado').order('fecha', { ascending: false });
+        if (error || !data || !data.length) return; // si no hay publicados, deja los artículos de ejemplo
+        grid.innerHTML = data.map(a => `
+          <article class="post-card">
+            <div class="post-card__media"></div>
+            <div class="post-card__body">
+              <div class="post-card__meta"><span class="tag">${esc(a.categoria || 'General')}</span><span class="post-card__date">${fmt(a.fecha)}</span></div>
+              <h2 class="post-card__title">${esc(a.titulo)}</h2>
+              <p class="post-card__excerpt">${esc(a.resumen || (a.contenido ? a.contenido.slice(0, 150) + '…' : ''))}</p>
+              <a href="#" class="post-card__link" data-id="${a.id}">Leer más &rarr;</a>
+            </div>
+          </article>`).join('');
+        grid.querySelectorAll('.post-card__link').forEach(link => link.addEventListener('click', e => {
+          e.preventDefault();
+          const art = data.find(x => x.id === link.dataset.id);
+          if (art) showArticle(art);
+        }));
+      })();
+    </script>
 </body>
 </html>

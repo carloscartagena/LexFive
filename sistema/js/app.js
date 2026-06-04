@@ -23,7 +23,10 @@ const ICON = {
   auditoria: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
   audiencia: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
   doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
-  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>'
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
+  alerta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>',
+  estrella: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>',
+  whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.05 24l1.69-6.16a11.9 11.9 0 1 1 4.3 4.2L.05 24zM6.6 20.2l.37.22a9.9 9.9 0 1 0-3.35-3.3l.24.38-1 3.65 3.74-.95z"/></svg>'
 };
 
 const NAV = [
@@ -31,6 +34,7 @@ const NAV = [
   { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
+  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
   { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true }
 ];
@@ -120,6 +124,14 @@ async function loadClientes() {
   state.clientes = data || [];
 }
 
+// Genera un enlace de WhatsApp con un recordatorio de audiencia ya escrito
+function waRecordatorio(p) {
+  const t = encodeURIComponent(
+    `Recordatorio LexFive\nProceso: ${p.caratula}\nAudiencia/plazo: ${fmtDateTime(p.proxima_audiencia)}\nResponsable: ${profName(p.abogado_id)}`
+  );
+  return `https://wa.me/${WHATSAPP}?text=${t}`;
+}
+
 // ============================================================
 //  VISTA: DASHBOARD
 // ============================================================
@@ -133,6 +145,26 @@ async function renderDashboard() {
     .sort((a, b) => new Date(a.proxima_audiencia) - new Date(b.proxima_audiencia));
   const mios = list.filter(p => p.abogado_id === state.profile.id || p.procurador_id === state.profile.id).length;
 
+  // Alertas: audiencias vencidas y dentro de los próximos 7 días
+  const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const vencidas = list.filter(p => p.proxima_audiencia && new Date(p.proxima_audiencia) < ahora && !['archivado', 'concluido'].includes(p.estado))
+    .sort((a, b) => new Date(b.proxima_audiencia) - new Date(a.proxima_audiencia));
+  const urgentes = proximas.filter(p => new Date(p.proxima_audiencia) <= en7);
+
+  const alertRow = (p, cls) => `
+    <div class="alert-row ${cls}">
+      <div><strong>${esc(p.caratula)}</strong><div class="cell-sub">${fmtDateTime(p.proxima_audiencia)} · ${esc(profName(p.abogado_id))}</div></div>
+      <a class="btn btn--ghost btn--sm" target="_blank" rel="noopener" href="${waRecordatorio(p)}">${ICON.whatsapp} Recordar</a>
+    </div>`;
+  const alertasHtml = (vencidas.length || urgentes.length) ? `
+    <div class="card">
+      <div class="card__head"><h3>${ICON.alerta} Alertas de audiencias y plazos</h3></div>
+      <div class="card__body">
+        ${vencidas.length ? `<p class="alert-title alert-title--red">Vencidas (${vencidas.length})</p>${vencidas.slice(0, 5).map(p => alertRow(p, 'alert-row--red')).join('')}` : ''}
+        ${urgentes.length ? `<p class="alert-title alert-title--amber" style="margin-top:${vencidas.length ? '16px' : '0'}">Próximas (7 días) (${urgentes.length})</p>${urgentes.slice(0, 5).map(p => alertRow(p, 'alert-row--amber')).join('')}` : ''}
+      </div>
+    </div>` : '';
+
   content().innerHTML = `
     <div class="stats-grid">
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.procesos}</div></div><div class="metric__num">${list.length}</div><div class="metric__label">Procesos totales</div></div>
@@ -140,6 +172,8 @@ async function renderDashboard() {
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.audiencia}</div></div><div class="metric__num">${proximas.length}</div><div class="metric__label">Audiencias próximas</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.clientes}</div></div><div class="metric__num">${mios}</div><div class="metric__label">Mis procesos</div></div>
     </div>
+
+    ${alertasHtml}
 
     <div class="card">
       <div class="card__head"><h3>Próximas audiencias y plazos</h3></div>
@@ -651,6 +685,98 @@ async function renderMisProcesos() {
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id, true));
 }
 
+function starsHtml(n) {
+  let s = '<span class="stars">';
+  for (let i = 1; i <= 5; i++) s += `<span class="${i <= n ? '' : 'off'}">${ICON.estrella}</span>`;
+  return s + '</span>';
+}
+
+// Vista del CLIENTE para dejar su opinión (se publica tras aprobación del admin)
+async function renderMiOpinion() {
+  loading();
+  const { data } = await supabase.from('testimonios').select('*').eq('autor_id', state.profile.id).order('created_at', { ascending: false }).limit(1);
+  const t = (data && data[0]) || null;
+  let rating = t ? t.calificacion : 5;
+  const estadoMsg = t ? ({
+    pendiente: '<span class="badge badge-borrador">Pendiente</span> Su opinión será revisada por el bufete antes de publicarse.',
+    aprobado: '<span class="badge badge-publicado">Publicada</span> ¡Gracias! Su opinión aparece en nuestra página web.',
+    rechazado: '<span class="badge badge-rol-admin">No publicada</span> Puede editarla y volver a enviarla.'
+  }[t.estado]) : '';
+
+  content().innerHTML = `
+    <div class="card" style="max-width:680px">
+      <div class="card__head"><h3>Mi opinión sobre el servicio</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:18px">Comparta su experiencia con LexFive. Tras la aprobación del bufete, su testimonio podrá aparecer en la página web pública.</p>
+        ${t ? `<p style="margin-bottom:16px">${estadoMsg}</p>` : ''}
+        <div class="field"><label>Su calificación</label>
+          <div class="rating-pick" id="ratingPick">${[1,2,3,4,5].map(i => `<button type="button" data-v="${i}" class="${i <= rating ? 'on' : ''}">${ICON.estrella}</button>`).join('')}</div>
+        </div>
+        <div class="field"><label>Su comentario</label><textarea id="opTexto" style="min-height:120px" placeholder="Cuéntenos cómo fue su experiencia...">${t ? esc(t.texto) : ''}</textarea></div>
+        <div class="field"><label>¿Cómo desea que aparezca su nombre? (opcional)</label><input id="opNombre" value="${t ? esc(t.nombre || '') : esc(state.profile.nombre)}"></div>
+        <button class="btn btn--primary" id="btnOpinion">${t ? 'Actualizar mi opinión' : 'Enviar mi opinión'}</button>
+      </div>
+    </div>`;
+
+  content().querySelectorAll('#ratingPick button').forEach(b => b.onclick = () => {
+    rating = parseInt(b.dataset.v, 10);
+    content().querySelectorAll('#ratingPick button').forEach(x => x.classList.toggle('on', parseInt(x.dataset.v, 10) <= rating));
+  });
+  $('#btnOpinion').onclick = async () => {
+    const texto = $('#opTexto').value.trim();
+    if (!texto) { toast('Escriba su comentario.', 'error'); return; }
+    const payload = { texto, calificacion: rating, nombre: $('#opNombre').value.trim() || state.profile.nombre, detalle: 'Cliente', estado: 'pendiente', updated_at: new Date().toISOString() };
+    $('#btnOpinion').disabled = true;
+    let error;
+    if (t) ({ error } = await supabase.from('testimonios').update(payload).eq('id', t.id));
+    else { payload.autor_id = state.profile.id; ({ error } = await supabase.from('testimonios').insert(payload)); }
+    if (error) { toast('Error: ' + error.message, 'error'); $('#btnOpinion').disabled = false; return; }
+    toast('¡Gracias! Su opinión fue enviada para revisión.', 'success');
+    renderMiOpinion();
+  };
+}
+
+// Vista del ADMIN para moderar (aprobar/rechazar) los testimonios
+async function renderTestimonios() {
+  loading();
+  await loadProfiles();
+  const { data } = await supabase.from('testimonios').select('*').order('created_at', { ascending: false });
+  const list = data || [];
+  content().innerHTML = `
+    <div class="card"><div class="card__head"><h3>Testimonios de clientes</h3></div>
+    <div class="card__body--flush">
+      ${list.length ? `<div class="table-wrap"><table class="data">
+        <thead><tr><th>Cliente</th><th>Opinión</th><th>Calif.</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody>${list.map(t => `<tr class="no-hover">
+          <td class="cell-strong">${esc(t.nombre || profName(t.autor_id))}<div class="cell-sub">${esc(t.detalle || '')}</div></td>
+          <td style="max-width:340px">${esc(t.texto)}</td>
+          <td>${starsHtml(t.calificacion)}</td>
+          <td><span class="badge badge-${t.estado === 'aprobado' ? 'publicado' : (t.estado === 'rechazado' ? 'rol-admin' : 'borrador')}">${t.estado}</span></td>
+          <td style="white-space:nowrap">
+            ${t.estado !== 'aprobado' ? `<button class="btn btn--ghost btn--sm js-ap" data-id="${t.id}">Aprobar</button>` : ''}
+            ${t.estado !== 'rechazado' ? `<button class="btn btn--ghost btn--sm js-re" data-id="${t.id}">Rechazar</button>` : ''}
+            <button class="btn btn--danger btn--sm js-del" data-id="${t.id}">Eliminar</button>
+          </td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="empty">${ICON.estrella}<p>Aún no hay testimonios. Aparecerán aquí cuando los clientes los envíen desde su portal.</p></div>`}
+    </div></div>`;
+
+  const setEstado = async (id, estado) => {
+    const { error } = await supabase.from('testimonios').update({ estado, updated_at: new Date().toISOString() }).eq('id', id);
+    if (error) { toast('Error: ' + error.message, 'error'); return; }
+    await logAccion('moderar', 'testimonio', id, estado);
+    toast(estado === 'aprobado' ? 'Aprobado y publicado en la web.' : 'Testimonio ' + estado + '.', 'success');
+    renderTestimonios();
+  };
+  content().querySelectorAll('.js-ap').forEach(b => b.onclick = () => setEstado(b.dataset.id, 'aprobado'));
+  content().querySelectorAll('.js-re').forEach(b => b.onclick = () => setEstado(b.dataset.id, 'rechazado'));
+  content().querySelectorAll('.js-del').forEach(b => b.onclick = async () => {
+    if (!confirm('¿Eliminar este testimonio?')) return;
+    await supabase.from('testimonios').delete().eq('id', b.dataset.id);
+    await logAccion('eliminar', 'testimonio', b.dataset.id, '');
+    renderTestimonios();
+  });
+}
+
 // ============================================================
 //  Navegación
 // ============================================================
@@ -659,22 +785,25 @@ const VIEWS = {
   procesos: { title: 'Procesos', render: renderProcesos },
   clientes: { title: 'Clientes', render: renderClientes },
   blog: { title: 'Blog', render: renderBlog },
+  testimonios: { title: 'Testimonios', render: renderTestimonios },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
-  misprocesos: { title: 'Mis procesos', render: renderMisProcesos }
+  misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
+  opinion: { title: 'Mi opinión', render: renderMiOpinion }
 };
 
 const CLIENT_NAV = [
-  { key: 'misprocesos', label: 'Mis procesos', icon: ICON.procesos }
+  { key: 'misprocesos', label: 'Mis procesos', icon: ICON.procesos },
+  { key: 'opinion', label: 'Mi opinión', icon: ICON.estrella }
 ];
 
 function navigate(key) {
   const isClient = state.profile.rol === 'cliente';
   if (isClient) {
-    key = 'misprocesos';
+    if (!['misprocesos', 'opinion'].includes(key)) key = 'misprocesos';
   } else {
     if (!VIEWS[key]) key = 'dashboard';
-    if ((key === 'usuarios' || key === 'auditoria') && state.profile.rol !== 'admin') key = 'dashboard';
+    if (['usuarios', 'auditoria', 'testimonios'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
   }
   state.view = key;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
