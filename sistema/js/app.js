@@ -3,7 +3,7 @@
 // ============================================================
 import { supabase } from './supabase.js';
 import { requireAuth, getProfile, signOut, logAccion, can } from './auth.js';
-import { ROLES, ESTADOS, MATERIAS } from './config.js';
+import { ROLES, ESTADOS, MATERIAS, WHATSAPP } from './config.js';
 
 // ---------- Estado global ----------
 const state = {
@@ -272,7 +272,7 @@ async function saveProceso(proc) {
 }
 
 // ---------- Detalle de proceso ----------
-async function openProcesoDetail(id) {
+async function openProcesoDetail(id, readonly = false) {
   openModal('Detalle del proceso', '<div class="loading"><div class="spinner"></div>Cargando...</div>', [], true);
   const { data: p } = await supabase.from('procesos').select('*').eq('id', id).single();
   if (!p) { toast('No se encontró el proceso.', 'error'); closeModal(); return; }
@@ -297,24 +297,27 @@ async function openProcesoDetail(id) {
     ${p.descripcion ? `<div class="detail-item" style="margin-top:14px"><label>Descripción</label><span>${esc(p.descripcion)}</span></div>` : ''}
 
     <h4 class="section-title">Memoriales y documentos</h4>
-    <div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+    ${readonly ? '' : `<div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
       <div style="flex-grow:1;min-width:180px;"><label style="font-size:.8rem;">Subir archivo (PDF, Word, imagen...)</label><input type="file" id="docFile"></div>
       <input id="docNombre" placeholder="Descripción (ej: Memorial de respuesta)" style="flex-grow:1;min-width:180px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
       <button class="btn btn--navy" id="btnUpload">Subir</button>
-    </div>
-    <div id="docList">${renderDocs(docs || [])}</div>
+    </div>`}
+    <div id="docList">${renderDocs(docs || [], readonly)}</div>
 
     <h4 class="section-title">Historial de actuaciones</h4>
-    <div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+    ${readonly ? '' : `<div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
       <input type="date" id="actFecha" value="${new Date().toISOString().slice(0,10)}" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
       <input id="actDesc" placeholder="Describa la actuación o avance..." style="flex-grow:1;min-width:200px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
       <button class="btn btn--navy" id="btnActuacion">Agregar</button>
-    </div>
+    </div>`}
     <ul class="timeline" id="actList">${renderActs(acts || [])}</ul>`;
 
-  const buttons = [{ label: 'Editar', class: 'btn--ghost', onClick: () => procesoForm(p) }];
-  if (can(state.profile, 'delete_proceso')) {
-    buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteProceso(p) });
+  const buttons = [];
+  if (!readonly) {
+    buttons.push({ label: 'Editar', class: 'btn--ghost', onClick: () => procesoForm(p) });
+    if (can(state.profile, 'delete_proceso')) {
+      buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteProceso(p) });
+    }
   }
   buttons.push({ label: 'Cerrar', class: 'btn--primary', onClick: closeModal });
 
@@ -323,8 +326,8 @@ async function openProcesoDetail(id) {
   const foot = $('#modalFoot'); foot.innerHTML = '';
   buttons.forEach(b => { const x = document.createElement('button'); x.className = 'btn ' + b.class; x.textContent = b.label; x.onclick = b.onClick; foot.appendChild(x); });
 
-  // Subir documento
-  $('#btnUpload').onclick = async () => {
+  // Subir documento (solo personal)
+  if ($('#btnUpload')) $('#btnUpload').onclick = async () => {
     const file = $('#docFile').files[0];
     if (!file) { toast('Seleccione un archivo.', 'error'); return; }
     $('#btnUpload').disabled = true; $('#btnUpload').textContent = 'Subiendo...';
@@ -345,8 +348,8 @@ async function openProcesoDetail(id) {
   };
   wireDocs(id);
 
-  // Agregar actuación
-  $('#btnActuacion').onclick = async () => {
+  // Agregar actuación (solo personal)
+  if ($('#btnActuacion')) $('#btnActuacion').onclick = async () => {
     const desc = $('#actDesc').value.trim();
     if (!desc) { toast('Describa la actuación.', 'error'); return; }
     const { error } = await supabase.from('actuaciones').insert({
@@ -360,7 +363,7 @@ async function openProcesoDetail(id) {
   };
 }
 
-function renderDocs(docs) {
+function renderDocs(docs, readonly = false) {
   if (!docs.length) return '<p class="cell-sub" style="padding:6px 0">Aún no hay documentos cargados.</p>';
   return docs.map(d => `
     <div class="doc-row" data-path="${esc(d.storage_path)}" data-id="${d.id}">
@@ -369,7 +372,7 @@ function renderDocs(docs) {
       </div>
       <div style="display:flex;gap:6px;">
         <button class="btn btn--ghost btn--sm js-dl">Descargar</button>
-        ${(d.subido_por === state.profile.id || state.profile.rol === 'admin') ? '<button class="btn btn--danger btn--sm js-del">Eliminar</button>' : ''}
+        ${(!readonly && (d.subido_por === state.profile.id || state.profile.rol === 'admin')) ? '<button class="btn btn--danger btn--sm js-del">Eliminar</button>' : ''}
       </div>
     </div>`).join('');
 }
@@ -569,8 +572,9 @@ async function renderUsuarios() {
         </tr>`).join('')}</tbody></table></div></div>
     </div>
     <div class="card"><div class="card__body">
-      <h3 style="font-family:var(--font-serif);color:var(--navy);margin-bottom:8px;">¿Cómo agregar un nuevo usuario?</h3>
-      <p class="cell-sub">Por seguridad, las nuevas cuentas se crean desde el panel de Supabase: <strong>Authentication → Users → Add user</strong> (correo y contraseña). El usuario aparecerá aquí automáticamente y usted podrá asignarle su rol. También puede usar la opción "Crear cuenta" de la pantalla de login.</p>
+      <h3 style="font-family:var(--font-serif);color:var(--navy);margin-bottom:8px;">Sobre los accesos</h3>
+      <p class="cell-sub" style="margin-bottom:8px;"><strong>Clientes:</strong> cuando alguien se registra desde la pantalla de acceso, entra como <strong>Cliente</strong> y solo ve sus propios procesos (se vinculan por su correo). No ve nada del bufete ni de otros clientes.</p>
+      <p class="cell-sub"><strong>Abogados / Procuradores:</strong> para habilitar a un colega, créele la cuenta en Supabase (<strong>Authentication → Users → Add user</strong>) o pídale que se registre, y aquí cámbiele el rol a Abogado o Procurador.</p>
     </div></div>`;
 
   content().querySelectorAll('.js-rol').forEach(sel => sel.onchange = async () => {
@@ -608,6 +612,46 @@ async function renderAuditoria() {
 }
 
 // ============================================================
+//  PORTAL DEL CLIENTE (solo lectura de sus propios procesos)
+// ============================================================
+async function renderMisProcesos() {
+  loading();
+  const { data } = await supabase.from('procesos').select('*').order('proxima_audiencia', { ascending: true });
+  const procesos = data || [];
+  const ahora = new Date();
+  const proximas = procesos.filter(p => p.proxima_audiencia && new Date(p.proxima_audiencia) >= ahora).length;
+
+  const waMsg = encodeURIComponent(`Hola, soy ${state.profile.nombre}, cliente de LexFive. Deseo hacer una consulta sobre mi proceso.`);
+  const waUrl = `https://wa.me/${WHATSAPP}?text=${waMsg}`;
+
+  content().innerHTML = `
+    <div class="stats-grid">
+      <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.procesos}</div></div><div class="metric__num">${procesos.length}</div><div class="metric__label">Mis procesos</div></div>
+      <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.audiencia}</div></div><div class="metric__num">${proximas}</div><div class="metric__label">Audiencias próximas</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card__head">
+        <h3>Mis procesos</h3>
+        <a class="btn btn--primary btn--sm" href="${waUrl}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+      </div>
+      <div class="card__body--flush">
+        ${procesos.length ? `<div class="table-wrap"><table class="data">
+          <thead><tr><th>Carátula</th><th>Materia</th><th>Estado</th><th>Próx. audiencia</th></tr></thead>
+          <tbody>${procesos.map(p => `
+            <tr data-id="${p.id}">
+              <td class="cell-strong">${esc(p.caratula)}<div class="cell-sub">${esc(p.numero || '')}</div></td>
+              <td><span class="badge badge-mat">${esc(p.materia || '—')}</span></td>
+              <td>${badgeEstado(p.estado)}</td>
+              <td>${p.proxima_audiencia ? fmtDateTime(p.proxima_audiencia) : '—'}</td>
+            </tr>`).join('')}</tbody></table></div>`
+        : `<div class="empty">${ICON.procesos}<p>Aún no hay procesos asociados a su cuenta.<br>Verifique que se registró con el mismo correo que dejó en el bufete, o consúltenos por WhatsApp.</p></div>`}
+      </div>
+    </div>`;
+  content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id, true));
+}
+
+// ============================================================
 //  Navegación
 // ============================================================
 const VIEWS = {
@@ -616,12 +660,22 @@ const VIEWS = {
   clientes: { title: 'Clientes', render: renderClientes },
   blog: { title: 'Blog', render: renderBlog },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
-  auditoria: { title: 'Auditoría', render: renderAuditoria }
+  auditoria: { title: 'Auditoría', render: renderAuditoria },
+  misprocesos: { title: 'Mis procesos', render: renderMisProcesos }
 };
 
+const CLIENT_NAV = [
+  { key: 'misprocesos', label: 'Mis procesos', icon: ICON.procesos }
+];
+
 function navigate(key) {
-  if (!VIEWS[key]) key = 'dashboard';
-  if ((key === 'usuarios' || key === 'auditoria') && state.profile.rol !== 'admin') key = 'dashboard';
+  const isClient = state.profile.rol === 'cliente';
+  if (isClient) {
+    key = 'misprocesos';
+  } else {
+    if (!VIEWS[key]) key = 'dashboard';
+    if ((key === 'usuarios' || key === 'auditoria') && state.profile.rol !== 'admin') key = 'dashboard';
+  }
   state.view = key;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
   $('#pageTitle').textContent = VIEWS[key].title;
@@ -631,7 +685,10 @@ function navigate(key) {
 
 function buildSidebar() {
   const nav = $('#sidebarNav');
-  nav.innerHTML = NAV.filter(n => !n.adminOnly || state.profile.rol === 'admin')
+  const items = state.profile.rol === 'cliente'
+    ? CLIENT_NAV
+    : NAV.filter(n => !n.adminOnly || state.profile.rol === 'admin');
+  nav.innerHTML = items
     .map(n => `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`).join('');
   nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
 }
@@ -660,5 +717,20 @@ function buildSidebar() {
   $('#menuToggle').onclick = () => { $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show'); };
   $('#backdrop').onclick = () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); };
 
-  navigate('dashboard');
+  // Cierre de sesión automático por inactividad (10 minutos)
+  const IDLE_MS = 10 * 60 * 1000;
+  let idleTimer;
+  function resetIdle() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(async () => {
+      alert('Su sesión se cerró automáticamente por 10 minutos de inactividad. Por seguridad, vuelva a iniciar sesión.');
+      await signOut();
+    }, IDLE_MS);
+  }
+  ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(ev =>
+    document.addEventListener(ev, resetIdle, { passive: true }));
+  resetIdle();
+
+  // Vista inicial según el rol
+  navigate(profile.rol === 'cliente' ? 'misprocesos' : 'dashboard');
 })();

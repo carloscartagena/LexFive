@@ -150,6 +150,7 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 .badge-rol-admin { background: #fbecec; color: var(--red); }
 .badge-rol-procurador { background: #eef4fb; color: #2a5b8f; }
 .badge-rol-abogado { background: #f3efe4; color: var(--gold-dark); }
+.badge-rol-cliente { background: #eef7f1; color: var(--green); }
 .badge-mat { background: var(--bg); color: var(--navy); }
 .badge-estado { background: #eef7f1; color: var(--green); }
 .badge-estado.archivado, .badge-estado.concluido { background: #eef0f3; color: var(--muted); }

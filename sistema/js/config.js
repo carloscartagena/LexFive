@@ -10,8 +10,12 @@ export const SUPABASE_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
 export const ROLES = {
   admin:      'Administrador',
   procurador: 'Procurador',
-  abogado:    'Abogado'
+  abogado:    'Abogado',
+  cliente:    'Cliente'
 };
+
+// Número de WhatsApp del bufete (para consultas y recordatorios)
+export const WHATSAPP = '59178360469';
 
 export const ESTADOS = {
   en_tramite: 'En trámite',
