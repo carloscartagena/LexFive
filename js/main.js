@@ -1,0 +1,312 @@
+/* =========================================================
+   Vargas & Asociados — JavaScript principal
+   ========================================================= */
+(function () {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        /* ---------- Año actual en el footer ---------- */
+        var yearEl = document.getElementById('year');
+        if (yearEl) { yearEl.textContent = new Date().getFullYear(); }
+
+        /* ---------- Menú móvil ---------- */
+        var navToggle = document.getElementById('navToggle');
+        var nav = document.getElementById('nav');
+
+        function closeMenu() {
+            if (!nav || !navToggle) return;
+            nav.classList.remove('is-open');
+            navToggle.classList.remove('is-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+            navToggle.setAttribute('aria-label', 'Abrir menú');
+            document.body.style.overflow = '';
+        }
+
+        if (navToggle && nav) {
+            navToggle.addEventListener('click', function () {
+                var isOpen = nav.classList.toggle('is-open');
+                navToggle.classList.toggle('is-open', isOpen);
+                navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                navToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            });
+
+            // Cerrar al hacer clic en un enlace
+            nav.querySelectorAll('.nav__link').forEach(function (link) {
+                link.addEventListener('click', closeMenu);
+            });
+
+            // Cerrar con la tecla Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { closeMenu(); }
+            });
+
+            // Cerrar al hacer clic fuera del menú
+            document.addEventListener('click', function (e) {
+                if (nav.classList.contains('is-open') &&
+                    !nav.contains(e.target) && !navToggle.contains(e.target)) {
+                    closeMenu();
+                }
+            });
+        }
+
+        /* ---------- Header con sombra al hacer scroll ---------- */
+        var header = document.getElementById('header');
+        function onScrollHeader() {
+            if (!header) return;
+            header.classList.toggle('is-scrolled', window.scrollY > 10);
+        }
+        onScrollHeader();
+
+        /* ---------- Botón volver arriba ---------- */
+        var backToTop = document.getElementById('backToTop');
+        function onScrollBackTop() {
+            if (!backToTop) return;
+            backToTop.classList.toggle('is-visible', window.scrollY > 500);
+        }
+        if (backToTop) {
+            backToTop.addEventListener('click', function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        /* ---------- Resaltado de la sección activa en el nav ---------- */
+        var sections = document.querySelectorAll('main section[id]');
+        var navLinks = document.querySelectorAll('.nav__link');
+        function highlightNav() {
+            var current = '';
+            var offset = 120;
+            sections.forEach(function (section) {
+                if (window.scrollY >= section.offsetTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(function (link) {
+                var href = link.getAttribute('href');
+                link.classList.toggle('is-active', href === '#' + current);
+            });
+        }
+
+        /* ---------- Scroll handler unificado (rendimiento) ---------- */
+        var ticking = false;
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(function () {
+                    onScrollHeader();
+                    onScrollBackTop();
+                    highlightNav();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+
+        /* ---------- Animaciones de aparición al hacer scroll ---------- */
+        var revealTargets = document.querySelectorAll(
+            '.area-card, .member, .testimonial, .stat, .about__content, .about__media, .contact__info, .contact__form, .section__head'
+        );
+        revealTargets.forEach(function (el) { el.classList.add('reveal'); });
+
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry, index) {
+                    if (entry.isIntersecting) {
+                        // Pequeño retraso escalonado para un efecto más elegante
+                        var delay = (index % 4) * 90;
+                        setTimeout(function () {
+                            entry.target.classList.add('is-visible');
+                        }, delay);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+            revealTargets.forEach(function (el) { observer.observe(el); });
+        } else {
+            // Sin soporte: mostrar todo directamente
+            revealTargets.forEach(function (el) { el.classList.add('is-visible'); });
+        }
+
+        /* ---------- Contador animado de estadísticas ---------- */
+        var counters = document.querySelectorAll('.stat__number');
+        function animateCounter(el) {
+            var target = parseInt(el.getAttribute('data-target'), 10) || 0;
+            var duration = 1800;
+            var startTime = null;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                var progress = Math.min((timestamp - startTime) / duration, 1);
+                // easing (easeOutQuart)
+                var eased = 1 - Math.pow(1 - progress, 4);
+                var value = Math.floor(eased * target);
+                el.textContent = value.toLocaleString('es-MX');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    el.textContent = target.toLocaleString('es-MX');
+                }
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        if ('IntersectionObserver' in window && counters.length) {
+            var counterObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        animateCounter(entry.target);
+                        counterObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            counters.forEach(function (c) { counterObserver.observe(c); });
+        } else {
+            counters.forEach(function (c) {
+                c.textContent = (parseInt(c.getAttribute('data-target'), 10) || 0).toString();
+            });
+        }
+
+        /* ---------- Validación del formulario de contacto ---------- */
+        var form = document.getElementById('contactForm');
+        var feedback = document.getElementById('formFeedback');
+
+        function setError(field, message) {
+            var wrapper = field.closest('.field');
+            if (wrapper) { wrapper.classList.add('has-error'); }
+            var errorEl = form.querySelector('[data-error-for="' + field.id + '"]');
+            if (errorEl) { errorEl.textContent = message; }
+        }
+
+        function clearError(field) {
+            var wrapper = field.closest('.field');
+            if (wrapper) { wrapper.classList.remove('has-error'); }
+            var errorEl = form.querySelector('[data-error-for="' + field.id + '"]');
+            if (errorEl) { errorEl.textContent = ''; }
+        }
+
+        function isValidEmail(value) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        }
+
+        if (form) {
+            // Limpiar error al escribir
+            form.querySelectorAll('input, select, textarea').forEach(function (field) {
+                field.addEventListener('input', function () { clearError(field); });
+            });
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var valid = true;
+                if (feedback) { feedback.textContent = ''; feedback.className = 'form__feedback'; }
+
+                var nombre = document.getElementById('nombre');
+                var email = document.getElementById('email');
+                var mensaje = document.getElementById('mensaje');
+                var privacidad = document.getElementById('privacidad');
+
+                if (!nombre.value.trim()) { setError(nombre, 'Por favor, indique su nombre.'); valid = false; }
+                if (!email.value.trim()) {
+                    setError(email, 'Por favor, indique su correo.'); valid = false;
+                } else if (!isValidEmail(email.value.trim())) {
+                    setError(email, 'Ingrese un correo electrónico válido.'); valid = false;
+                }
+                if (!mensaje.value.trim()) { setError(mensaje, 'Por favor, describa brevemente su caso.'); valid = false; }
+                if (privacidad && !privacidad.checked) {
+                    if (feedback) {
+                        feedback.textContent = 'Debe aceptar el aviso de privacidad para continuar.';
+                        feedback.className = 'form__feedback is-error';
+                    }
+                    valid = false;
+                }
+
+                if (!valid) {
+                    var firstError = form.querySelector('.has-error input, .has-error select, .has-error textarea');
+                    if (firstError) { firstError.focus(); }
+                    return;
+                }
+
+                var submitBtn = form.querySelector('button[type="submit"]');
+                var accessKey = form.querySelector('input[name="access_key"]');
+                var keyConfigured = accessKey && accessKey.value &&
+                                    accessKey.value.indexOf('REEMPLAZA') === -1;
+
+                function showSuccess() {
+                    form.reset();
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Enviar solicitud'; }
+                    if (feedback) {
+                        feedback.textContent = '¡Gracias! Hemos recibido su solicitud y le contactaremos a la brevedad.';
+                        feedback.className = 'form__feedback is-success';
+                    }
+                }
+                function showFail() {
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Enviar solicitud'; }
+                    if (feedback) {
+                        feedback.textContent = 'Hubo un problema al enviar. Inténtelo de nuevo o escríbanos a alba23meira@gmail.com.';
+                        feedback.className = 'form__feedback is-error';
+                    }
+                }
+
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Enviando...'; }
+
+                // Si aún no se ha configurado la clave de Web3Forms, mostramos
+                // un envío simulado para no romper el sitio en pruebas.
+                if (!keyConfigured) {
+                    setTimeout(showSuccess, 800);
+                    return;
+                }
+
+                // Envío real a Web3Forms
+                var payload = {};
+                new FormData(form).forEach(function (value, key) { payload[key] = value; });
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (data && data.success) { showSuccess(); }
+                    else { showFail(); }
+                })
+                .catch(function () { showFail(); });
+            });
+        }
+
+        /* ---------- Acordeón de Preguntas frecuentes (FAQ) ---------- */
+        var faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(function (item) {
+            var btn = item.querySelector('.faq-item__q');
+            var answer = item.querySelector('.faq-item__a');
+            if (!btn || !answer) return;
+
+            btn.setAttribute('aria-expanded', 'false');
+            btn.addEventListener('click', function () {
+                var isOpen = item.classList.contains('is-open');
+
+                // Cerrar los demás (comportamiento tipo acordeón)
+                faqItems.forEach(function (other) {
+                    if (other !== item) {
+                        other.classList.remove('is-open');
+                        var oa = other.querySelector('.faq-item__a');
+                        var ob = other.querySelector('.faq-item__q');
+                        if (oa) { oa.style.maxHeight = null; }
+                        if (ob) { ob.setAttribute('aria-expanded', 'false'); }
+                    }
+                });
+
+                if (isOpen) {
+                    item.classList.remove('is-open');
+                    answer.style.maxHeight = null;
+                    btn.setAttribute('aria-expanded', 'false');
+                } else {
+                    item.classList.add('is-open');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    btn.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
+    });
+})();

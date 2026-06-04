@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LexFive, bufete de abogados en El Alto, Bolivia. Asesoría legal experta en derecho laboral, civil, penal y familiar. Defendemos sus derechos con experiencia y compromiso.">
+    <meta name="keywords" content="abogados El Alto, bufete de abogados Bolivia, LexFive, derecho laboral, derecho civil, derecho penal, derecho familiar, asesoría legal">
+    <meta name="author" content="LexFive">
+
+    <!-- Open Graph / Redes sociales -->
+    <meta property="og:title" content="LexFive | Bufete de Abogados">
+    <meta property="og:description" content="Defendemos sus derechos con experiencia, ética y compromiso. Asesoría legal en El Alto, Bolivia.">
+    <meta property="og:type" content="website">
+
+    <title>LexFive | Bufete de Abogados en El Alto</title>
+
+    <!-- Tipografías -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<!-- Para cambiar la paleta de color, añade una clase al body:
+     theme-charcoal (negro/dorado), theme-emerald (verde/dorado) o theme-burgundy (vino/dorado).
+     Ejemplo: <body class="theme-emerald"> -->
+<body>
+
+    <!-- ===== Barra superior de contacto ===== -->
+    <div class="topbar">
+        <div class="container topbar__inner">
+            <div class="topbar__contact">
+                <a href="tel:+59178360469" aria-label="Teléfono">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79a15.5 15.5 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.02l-2.2 2.2Z"/></svg>
+                    +591 78360469
+                </a>
+                <a href="mailto:alba23meira@gmail.com" aria-label="Correo electrónico">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/></svg>
+                    alba23meira@gmail.com
+                </a>
+            </div>
+            <div class="topbar__hours">
+                <span>Lun &ndash; Vie: 9:00 &ndash; 18:00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Encabezado / Navegación ===== -->
+    <header class="header" id="header">
+        <div class="container header__inner">
+            <a href="index.html" class="logo">
+                <span class="logo__mark">L5</span>
+                <span class="logo__text">
+                    <strong>LexFive</strong>
+                    <small>Abogados</small>
+                </span>
+            </a>
+
+            <nav class="nav" id="nav" aria-label="Navegación principal">
+                <ul class="nav__list">
+                    <li><a href="#inicio" class="nav__link">Inicio</a></li>
+                    <li><a href="#areas" class="nav__link">Áreas</a></li>
+                    <li><a href="#nosotros" class="nav__link">Nosotros</a></li>
+                    <li><a href="casos.html" class="nav__link">Casos de éxito</a></li>
+                    <li><a href="blog.html" class="nav__link">Blog</a></li>
+                    <li><a href="faq.html" class="nav__link">FAQ</a></li>
+                    <li><a href="#contacto" class="nav__link nav__link--cta">Contáctenos</a></li>
+                </ul>
+            </nav>
+
+            <button class="nav__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===== Hero ===== -->
+        <section class="hero" id="inicio">
+            <div class="hero__overlay"></div>
+            <div class="container hero__content">
+                <p class="hero__eyebrow">Bufete de abogados &middot; El Alto, Bolivia</p>
+                <h1 class="hero__title">Defendemos sus derechos con<br><em>experiencia y compromiso</em></h1>
+                <p class="hero__subtitle">En LexFive ofrecemos soluciones legales claras, estratégicas y a la medida de cada cliente en materia laboral, civil, penal y familiar. Su tranquilidad es nuestra prioridad.</p>
+                <div class="hero__actions">
+                    <a href="#contacto" class="btn btn--primary">Solicitar consulta</a>
+                    <a href="#areas" class="btn btn--ghost">Nuestras áreas</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Indicadores / Stats ===== -->
+        <section class="stats">
+            <div class="container stats__grid">
+                <div class="stat">
+                    <span class="stat__number" data-target="15">0</span><span class="stat__plus">+</span>
+                    <p class="stat__label">Años de experiencia</p>
+                </div>
+                <div class="stat">
+                    <span class="stat__number" data-target="800">0</span><span class="stat__plus">+</span>
+                    <p class="stat__label">Casos atendidos</p>
+                </div>
+                <div class="stat">
+                    <span class="stat__number" data-target="95">0</span><span class="stat__plus">%</span>
+                    <p class="stat__label">Clientes satisfechos</p>
+                </div>
+                <div class="stat">
+                    <span class="stat__number" data-target="4">0</span>
+                    <p class="stat__label">Áreas de práctica</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Áreas de práctica ===== -->
+        <section class="section areas" id="areas">
+            <div class="container">
+                <header class="section__head">
+                    <p class="section__eyebrow">Lo que hacemos</p>
+                    <h2 class="section__title">Áreas de práctica</h2>
+                    <p class="section__lead">Equipos especializados en cada materia para garantizar la mejor defensa de sus intereses.</p>
+                </header>
+
+                <div class="areas__grid">
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Laboral</h3>
+                        <p class="area-card__text">Asesoría a empleadores y trabajadores: despidos, beneficios sociales, reincorporaciones y conflictos laborales.</p>
+                    </article>
+
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v18M5 8l7-5 7 5M4 21h16M7 12l-2 5h4l-2-5Zm10 0-2 5h4l-2-5Z"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Civil</h3>
+                        <p class="area-card__text">Contratos, propiedad, responsabilidad civil, arrendamientos y resolución de conflictos patrimoniales.</p>
+                    </article>
+
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Penal</h3>
+                        <p class="area-card__text">Defensa penal estratégica, asesoría en investigaciones y representación en todas las etapas del proceso.</p>
+                    </article>
+
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-4.35-9-8.5A5 5 0 0 1 12 6a5 5 0 0 1 9 6.5C19 16.65 12 21 12 21Z"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Familiar</h3>
+                        <p class="area-card__text">Divorcios, asistencia familiar, custodia, filiación, sucesiones y testamentos con trato cercano.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Sobre nosotros ===== -->
+        <section class="section about" id="nosotros">
+            <div class="container about__grid">
+                <div class="about__media">
+                    <div class="about__image" role="img" aria-label="Equipo del bufete LexFive"></div>
+                    <div class="about__badge">
+                        <strong>15+</strong>
+                        <span>años defendiendo<br>la justicia</span>
+                    </div>
+                </div>
+                <div class="about__content">
+                    <p class="section__eyebrow">Sobre el bufete</p>
+                    <h2 class="section__title">Un equipo comprometido con la excelencia jurídica</h2>
+                    <p>En <strong>LexFive</strong> creemos que cada cliente merece una atención personalizada y una defensa rigurosa. Acompañamos a personas y empresas de El Alto y La Paz en los momentos legales más decisivos, siempre con transparencia y ética profesional.</p>
+                    <ul class="about__list">
+                        <li><span class="check" aria-hidden="true"></span> Atención personalizada y comunicación constante</li>
+                        <li><span class="check" aria-hidden="true"></span> Estrategias legales orientadas a resultados</li>
+                        <li><span class="check" aria-hidden="true"></span> Honorarios claros y transparentes</li>
+                        <li><span class="check" aria-hidden="true"></span> Confidencialidad absoluta en cada caso</li>
+                    </ul>
+                    <a href="#equipo" class="btn btn--primary">Conozca al equipo</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Equipo ===== -->
+        <section class="section team" id="equipo">
+            <div class="container">
+                <header class="section__head">
+                    <p class="section__eyebrow">Nuestros profesionales</p>
+                    <h2 class="section__title">Equipo de abogados</h2>
+                    <p class="section__lead">Especialistas dedicados que combinan experiencia, rigor y cercanía con cada cliente.</p>
+                </header>
+
+                <div class="team__grid">
+                    <article class="member">
+                        <div class="member__photo member__photo--1"></div>
+                        <div class="member__info">
+                            <h3 class="member__name">Dra. Alba Meira</h3>
+                            <p class="member__role">Socia Fundadora &middot; Derecho Laboral</p>
+                            <p class="member__bio">Abogada con amplia trayectoria en defensa de derechos laborales y asesoría a empresas.</p>
+                        </div>
+                    </article>
+
+                    <article class="member">
+                        <div class="member__photo member__photo--2"></div>
+                        <div class="member__info">
+                            <h3 class="member__name">Abg. [Nombre]</h3>
+                            <p class="member__role">Derecho Familiar y Civil</p>
+                            <p class="member__bio">Especialista en mediación familiar y resolución de conflictos con enfoque humano.</p>
+                        </div>
+                    </article>
+
+                    <article class="member">
+                        <div class="member__photo member__photo--3"></div>
+                        <div class="member__info">
+                            <h3 class="member__name">Abg. [Nombre]</h3>
+                            <p class="member__role">Derecho Penal</p>
+                            <p class="member__bio">Defensa penal estratégica con experiencia en litigio oral y procesos complejos.</p>
+                        </div>
+                    </article>
+
+                    <article class="member">
+                        <div class="member__photo member__photo--4"></div>
+                        <div class="member__info">
+                            <h3 class="member__name">Abg. [Nombre]</h3>
+                            <p class="member__role">Derecho Civil</p>
+                            <p class="member__bio">Asesoría integral en contratos, propiedad y asuntos patrimoniales.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Testimonios ===== -->
+        <section class="section testimonials" id="testimonios">
+            <div class="container">
+                <header class="section__head">
+                    <p class="section__eyebrow section__eyebrow--light">Lo que dicen de nosotros</p>
+                    <h2 class="section__title section__title--light">Testimonios de clientes</h2>
+                </header>
+
+                <div class="testimonials__grid">
+                    <figure class="testimonial">
+                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <blockquote>“El acompañamiento durante todo el proceso fue impecable. Me explicaron cada paso y siempre sentí que mis intereses estaban protegidos.”</blockquote>
+                        <figcaption><strong>Carlos J.</strong><span>Caso laboral</span></figcaption>
+                    </figure>
+
+                    <figure class="testimonial">
+                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <blockquote>“Profesionales serios y humanos. Resolvieron un caso familiar muy delicado con discreción y excelentes resultados.”</blockquote>
+                        <figcaption><strong>Laura F.</strong><span>Caso familiar</span></figcaption>
+                    </figure>
+
+                    <figure class="testimonial">
+                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <blockquote>“Su asesoría fue clara y oportuna. Recomiendo ampliamente al equipo de LexFive por su compromiso.”</blockquote>
+                        <figcaption><strong>Mario R.</strong><span>Caso civil</span></figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Contacto ===== -->
+        <section class="section contact" id="contacto">
+            <div class="container contact__grid">
+                <div class="contact__info">
+                    <p class="section__eyebrow">Hablemos</p>
+                    <h2 class="section__title">Solicite una consulta</h2>
+                    <p class="contact__lead">Cuéntenos su situación y un abogado de nuestro equipo se pondrá en contacto con usted. La primera valoración es sin compromiso.</p>
+
+                    <ul class="contact__details">
+                        <li>
+                            <span class="contact__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+                            </span>
+                            <div><strong>Oficina</strong><br>Calle 12 Uruguay esq. Raúl Salmón, zona 12 de Octubre, Edificio Señor de Mayo N.&deg; 85, planta baja, oficina 1-A. El Alto, Bolivia.</div>
+                        </li>
+                        <li>
+                            <span class="contact__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.62 10.79a15.5 15.5 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24 11.36 11.36 0 0 0 3.57.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.36 11.36 0 0 0 .57 3.57 1 1 0 0 1-.25 1.02l-2.2 2.2Z"/></svg>
+                            </span>
+                            <div><strong>Teléfono / WhatsApp</strong><br><a href="tel:+59178360469">+591 78360469</a></div>
+                        </li>
+                        <li>
+                            <span class="contact__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/></svg>
+                            </span>
+                            <div><strong>Correo</strong><br><a href="mailto:alba23meira@gmail.com">alba23meira@gmail.com</a></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Formulario conectado a Web3Forms.
+                     IMPORTANTE: reemplaza el valor de "access_key" por tu clave gratuita.
+                     Consíguela en https://web3forms.com (solo ingresas tu correo alba23meira@gmail.com). -->
+                <form class="contact__form" id="contactForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
+                    <input type="hidden" name="access_key" value="REEMPLAZA_CON_TU_ACCESS_KEY">
+                    <input type="hidden" name="subject" value="Nueva consulta desde el sitio web de LexFive">
+                    <input type="hidden" name="from_name" value="Sitio web LexFive">
+                    <!-- Honeypot anti-spam (no tocar) -->
+                    <input type="checkbox" name="botcheck" class="hp" style="display:none !important;" tabindex="-1" autocomplete="off">
+
+                    <div class="field">
+                        <label for="nombre">Nombre completo *</label>
+                        <input type="text" id="nombre" name="nombre" required autocomplete="name">
+                        <span class="field__error" data-error-for="nombre"></span>
+                    </div>
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="email">Correo electrónico *</label>
+                            <input type="email" id="email" name="email" required autocomplete="email">
+                            <span class="field__error" data-error-for="email"></span>
+                        </div>
+                        <div class="field">
+                            <label for="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" autocomplete="tel">
+                            <span class="field__error" data-error-for="telefono"></span>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="area">Área de interés</label>
+                        <select id="area" name="area">
+                            <option value="">Seleccione un área</option>
+                            <option>Derecho Laboral</option>
+                            <option>Derecho Civil</option>
+                            <option>Derecho Penal</option>
+                            <option>Derecho Familiar</option>
+                            <option>Otro</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="mensaje">Describa su caso *</label>
+                        <textarea id="mensaje" name="mensaje" rows="4" required></textarea>
+                        <span class="field__error" data-error-for="mensaje"></span>
+                    </div>
+                    <label class="field-check">
+                        <input type="checkbox" id="privacidad" name="privacidad" required>
+                        <span>Acepto el aviso de privacidad y el tratamiento de mis datos. *</span>
+                    </label>
+                    <button type="submit" class="btn btn--primary btn--block">Enviar solicitud</button>
+                    <p class="form__feedback" id="formFeedback" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== Pie de página ===== -->
+    <footer class="footer">
+        <div class="container footer__grid">
+            <div class="footer__brand">
+                <a href="index.html" class="logo logo--light">
+                    <span class="logo__mark">L5</span>
+                    <span class="logo__text">
+                        <strong>LexFive</strong>
+                        <small>Abogados</small>
+                    </span>
+                </a>
+                <p>Soluciones legales con experiencia, ética y compromiso. Su confianza es nuestro mayor patrimonio.</p>
+            </div>
+            <div class="footer__col">
+                <h4>Enlaces</h4>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#areas">Áreas de práctica</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="casos.html">Casos de éxito</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="faq.html">Preguntas frecuentes</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Áreas</h4>
+                <ul>
+                    <li><a href="#areas">Laboral</a></li>
+                    <li><a href="#areas">Civil</a></li>
+                    <li><a href="#areas">Penal</a></li>
+                    <li><a href="#areas">Familiar</a></li>
+                </ul>
+            </div>
+            <div class="footer__col">
+                <h4>Contacto</h4>
+                <ul class="footer__contact">
+                    <li>Calle 12 Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.&deg; 85, of. 1-A. El Alto, Bolivia.</li>
+                    <li><a href="tel:+59178360469">+591 78360469</a></li>
+                    <li><a href="mailto:alba23meira@gmail.com">alba23meira@gmail.com</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="container footer__bottom-inner">
+                <p>&copy; <span id="year"></span> LexFive. Todos los derechos reservados.</p>
+                <p class="footer__legal"><a href="#">Aviso de privacidad</a> &middot; <a href="#">Términos y condiciones</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botón volver arriba -->
+    <button class="back-to-top" id="backToTop" aria-label="Volver arriba">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+    </button>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
