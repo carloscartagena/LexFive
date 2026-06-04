@@ -335,8 +335,9 @@ ul { list-style: none; }
 
 /* ---------- Equipo ---------- */
 .team { background: var(--bg); }
-.team__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+.team__grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; }
 .member {
+    flex: 0 1 calc(33.333% - 19px);
     background: var(--white);
     border: 1px solid var(--line);
     border-radius: var(--radius);
@@ -350,17 +351,20 @@ ul { list-style: none; }
     position: relative;
 }
 .member__photo::after {
-    content: "\1F464";
+    content: attr(data-initials);
     position: absolute; inset: 0;
     display: grid; place-items: center;
-    font-size: 4rem;
-    opacity: 0.25;
-    filter: grayscale(1) brightness(2.5);
+    font-family: var(--font-serif);
+    font-size: 2.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: rgba(231, 211, 161, 0.92);
 }
 .member__photo--1 { background: linear-gradient(135deg, #1f3450, #0e1b2c); }
 .member__photo--2 { background: linear-gradient(135deg, #2a3f59, #16273d); }
 .member__photo--3 { background: linear-gradient(135deg, #243a54, #11203a); }
 .member__photo--4 { background: linear-gradient(135deg, #2d4156, #18293f); }
+.member__photo--5 { background: linear-gradient(135deg, #28405a, #142639); }
 .member__info { padding: 22px 22px 26px; }
 .member__name { font-family: var(--font-serif); font-size: 1.32rem; font-weight: 600; color: var(--navy); }
 .member__role { color: var(--gold-dark); font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; margin: 4px 0 12px; }
@@ -490,7 +494,7 @@ ul { list-style: none; }
     .about__grid, .contact__grid { grid-template-columns: 1fr; gap: 48px; }
     .about__media { max-width: 420px; margin: 0 auto; }
     .areas__grid, .testimonials__grid { grid-template-columns: repeat(2, 1fr); }
-    .team__grid { grid-template-columns: repeat(2, 1fr); }
+    .member { flex-basis: calc(50% - 14px); }
     .footer__grid { grid-template-columns: 1fr 1fr; }
 }
 
@@ -527,7 +531,8 @@ ul { list-style: none; }
 }
 
 @media (max-width: 520px) {
-    .areas__grid, .testimonials__grid, .team__grid, .footer__grid { grid-template-columns: 1fr; }
+    .areas__grid, .testimonials__grid, .footer__grid { grid-template-columns: 1fr; }
+    .member { flex-basis: 100%; }
     .field-row { grid-template-columns: 1fr; }
     .hero { min-height: 80vh; }
     .hero__actions { flex-direction: column; }
@@ -722,4 +727,52 @@ body.theme-burgundy {
 }
 @media (max-width: 520px) {
     .blog-grid { grid-template-columns: 1fr; }
+}
+
+
+/* =========================================================
+   BOTÓN FLOTANTE DE WHATSAPP
+   ========================================================= */
+.whatsapp-float {
+    position: fixed;
+    bottom: 28px; left: 28px;
+    width: 56px; height: 56px;
+    background: #25d366;
+    color: #ffffff;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45);
+    z-index: 95;
+    transition: transform var(--transition), box-shadow var(--transition);
+    animation: wa-pulse 2.6s infinite;
+}
+.whatsapp-float:hover { transform: scale(1.08); }
+.whatsapp-float svg { width: 30px; height: 30px; }
+@keyframes wa-pulse {
+    0%   { box-shadow: 0 8px 24px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0.5); }
+    70%  { box-shadow: 0 8px 24px rgba(37,211,102,0.45), 0 0 0 16px rgba(37,211,102,0); }
+    100% { box-shadow: 0 8px 24px rgba(37,211,102,0.45), 0 0 0 0 rgba(37,211,102,0); }
+}
+
+/* =========================================================
+   MAPA DE UBICACIÓN (sección de contacto)
+   ========================================================= */
+.contact__map {
+    margin-top: 30px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+}
+.contact__map iframe {
+    width: 100%;
+    height: 230px;
+    border: 0;
+    display: block;
+}
+
+@media (max-width: 520px) {
+    .whatsapp-float { width: 50px; height: 50px; bottom: 20px; left: 20px; }
+    .whatsapp-float svg { width: 26px; height: 26px; }
 }
