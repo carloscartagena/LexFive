@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel · Sistema LexFive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__head">
+        <a href="../index.html" class="logo">
+          <span class="logo__mark">L5</span>
+          <span class="logo__text"><strong>LexFive</strong><small>Sistema</small></span>
+        </a>
+      </div>
+      <nav class="sidebar__nav" id="sidebarNav"><!-- generado por JS --></nav>
+      <div class="sidebar__foot">
+        <div class="user-chip">
+          <div class="avatar" id="userAvatar">--</div>
+          <div class="user-chip__info">
+            <strong id="userName">...</strong>
+            <span id="userRol"></span>
+          </div>
+        </div>
+        <button class="btn btn--ghost btn--sm btn--block" id="btnLogout">Cerrar sesión</button>
+      </div>
+    </aside>
+    <div class="backdrop" id="backdrop"></div>
+
+    <!-- Principal -->
+    <div class="main">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="menu-toggle btn btn--ghost btn--sm" id="menuToggle" aria-label="Menú">&#9776;</button>
+          <h1 id="pageTitle">Panel</h1>
+        </div>
+        <div class="topbar__actions" id="topbarActions"></div>
+      </header>
+      <main class="content" id="content">
+        <div class="loading"><div class="spinner"></div>Cargando...</div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal genérico -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal" role="dialog" aria-modal="true">
+      <div class="modal__head"><h3 id="modalTitle">Título</h3><button class="modal__close" id="modalClose" aria-label="Cerrar">&times;</button></div>
+      <div class="modal__body" id="modalBody"></div>
+      <div class="modal__foot" id="modalFoot"></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
