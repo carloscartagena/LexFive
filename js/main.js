@@ -333,9 +333,34 @@
             });
         });
 
-        /* ---------- Botón flotante de WhatsApp (contacto unificado) ----------
-           El botón enlaza directamente al WhatsApp del bufete; ya no abre un
-           menú con los cinco abogados. */
+        /* ---------- Botón flotante de WhatsApp (elige a qué abogado escribir) ---------- */
+        var waFloat = document.querySelector('.whatsapp-float');
+        if (waFloat) {
+            var abogados = [
+                { n: 'Abg. Carlos Cartagena', w: '59178360469' },
+                { n: 'Abg. Jose Gutiérrez', w: '59169915219' },
+                { n: 'Abg. Jose Antelo', w: '59175216613' },
+                { n: 'Abg. Douglas Candia', w: '59168173978' },
+                { n: 'Abg. Iván Payrumani', w: '59179145231' }
+            ];
+            var waMsg = encodeURIComponent('Hola, deseo una consulta legal con LexFive.');
+            var waMenu = document.createElement('div');
+            waMenu.className = 'wa-menu';
+            waMenu.innerHTML = '<p class="wa-menu__title">Escríbanos por WhatsApp</p>' +
+                abogados.map(function (a) {
+                    return '<a href="https://wa.me/' + a.w + '?text=' + waMsg + '" target="_blank" rel="noopener">' + a.n + '</a>';
+                }).join('');
+            document.body.appendChild(waMenu);
+            waFloat.addEventListener('click', function (e) {
+                e.preventDefault();
+                waMenu.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!waMenu.contains(e.target) && !waFloat.contains(e.target)) {
+                    waMenu.classList.remove('open');
+                }
+            });
+        }
 
     });
 })();
