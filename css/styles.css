@@ -778,9 +778,5 @@ body.theme-burgundy {
 }
 
 
-/* Enlace "Acceso al sistema": oculto en escritorio (está en la barra superior),
-   visible dentro del menú hamburguesa en móvil */
-.nav__item--access { display: none; }
-@media (max-width: 768px) {
-    .nav__item--access { display: block; }
-}
+/* Enlace de registro/acceso: visible en el menú en todos los tamaños */
+.nav__item--access { display: block; }
