@@ -208,6 +208,7 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 @media (max-width: 900px) {
   .login-wrap { grid-template-columns: 1fr; }
   .login-aside { display: none; }
+  .login-main { place-items: start center; padding: 32px 20px; }
   .stats-grid { grid-template-columns: repeat(2,1fr); }
 }
 @media (max-width: 760px) {

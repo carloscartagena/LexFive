@@ -776,3 +776,11 @@ body.theme-burgundy {
     .whatsapp-float { width: 50px; height: 50px; bottom: 20px; left: 20px; }
     .whatsapp-float svg { width: 26px; height: 26px; }
 }
+
+
+/* Enlace "Acceso al sistema": oculto en escritorio (está en la barra superior),
+   visible dentro del menú hamburguesa en móvil */
+.nav__item--access { display: none; }
+@media (max-width: 768px) {
+    .nav__item--access { display: block; }
+}
