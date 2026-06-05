@@ -108,6 +108,17 @@ function optionsProfiles(selected) {
   return '<option value="">— Sin asignar —</option>' + state.profiles.filter(p => p.activo)
     .map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${esc(p.nombre)} (${ROLES[p.rol] || p.rol})</option>`).join('');
 }
+
+function checkboxesProfiles(selected, cls) {
+  const sel = selected || [];
+  const staff = state.profiles.filter(p => p.activo && ['admin', 'procurador', 'abogado'].includes(p.rol));
+  if (!staff.length) return '<span class="cell-sub">No hay personal disponible.</span>';
+  return staff.map(p => `<label class="chk"><input type="checkbox" class="${cls}" value="${p.id}" ${sel.includes(p.id) ? 'checked' : ''}> ${esc(p.nombre)} <span class="chk-rol">(${ROLES[p.rol] || p.rol})</span></label>`).join('');
+}
+function namesFromIds(ids) {
+  if (!ids || !ids.length) return null;
+  return ids.map(profName).join(', ');
+}
 function optionsClientes(selected) {
   return '<option value="">— Sin cliente —</option>' + state.clientes
     .map(c => `<option value="${c.id}" ${c.id === selected ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('');
@@ -157,7 +168,7 @@ async function renderDashboard() {
   const ahora = new Date();
   const proximas = list.filter(p => p.proxima_audiencia && new Date(p.proxima_audiencia) >= ahora)
     .sort((a, b) => new Date(a.proxima_audiencia) - new Date(b.proxima_audiencia));
-  const mios = list.filter(p => p.abogado_id === state.profile.id || p.procurador_id === state.profile.id).length;
+  const mios = list.filter(p => p.abogado_id === state.profile.id || p.procurador_id === state.profile.id || (p.abogados_ids || []).includes(state.profile.id) || (p.procuradores_ids || []).includes(state.profile.id)).length;
 
   // Alertas: audiencias vencidas y dentro de los próximos 7 días
   const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -199,7 +210,7 @@ async function renderDashboard() {
               <td class="cell-strong">${esc(p.caratula)}</td>
               <td><span class="badge badge-mat">${esc(p.materia || '—')}</span></td>
               <td>${fmtDateTime(p.proxima_audiencia)}</td>
-              <td>${esc(profName(p.abogado_id))}</td>
+              <td>${esc(namesFromIds(p.abogados_ids) || profName(p.abogado_id))}</td>
             </tr>`).join('')}</tbody></table></div>`
         : `<div class="empty">${ICON.audiencia}<p>No hay audiencias ni plazos próximos registrados.</p></div>`}
       </div>
@@ -245,7 +256,7 @@ async function renderProcesos() {
           <td class="cell-strong">${esc(p.caratula)}<div class="cell-sub">${esc(p.numero || 'Sin número')}</div></td>
           <td><span class="badge badge-mat">${esc(p.materia || '—')}</span></td>
           <td>${p.tipo === 'administrativo' ? 'Administrativo' : 'Judicial'}</td>
-          <td>${esc(profName(p.abogado_id))}</td>
+          <td>${esc(namesFromIds(p.abogados_ids) || profName(p.abogado_id))}</td>
           <td>${badgeEstado(p.estado)}</td>
           <td>${p.proxima_audiencia ? fmtDateTime(p.proxima_audiencia) : '—'}</td>
         </tr>`).join('')}</tbody></table></div>`
@@ -275,9 +286,10 @@ function procesoForm(proc = null) {
       <div class="field"><label>Cliente</label><select id="pf_cliente">${optionsClientes(p.cliente_id)}</select></div>
       <div class="field"><label>Parte contraria</label><input id="pf_contraria" value="${esc(p.parte_contraria || '')}"></div>
     </div>
+    <div class="field"><label>...o registrar un cliente nuevo (nombre completo)</label><input id="pf_cliente_nuevo" placeholder="Se creará y aparecerá en la pestaña Clientes"></div>
     <div class="field-row">
-      <div class="field"><label>Abogado responsable</label><select id="pf_abogado">${optionsProfiles(p.abogado_id)}</select></div>
-      <div class="field"><label>Procurador asignado</label><select id="pf_procurador">${optionsProfiles(p.procurador_id)}</select></div>
+      <div class="field"><label>Abogados a cargo (puede elegir varios)</label><div class="chk-grid">${checkboxesProfiles(p.abogados_ids, 'pf-abo')}</div></div>
+      <div class="field"><label>Procuradores asignados (puede elegir varios)</label><div class="chk-grid">${checkboxesProfiles(p.procuradores_ids, 'pf-proc')}</div></div>
     </div>
     <div class="field-row">
       <div class="field"><label>Fecha de inicio</label><input type="date" id="pf_inicio" value="${p.fecha_inicio || (proc ? '' : new Date().toISOString().slice(0,10))}"></div>
@@ -296,6 +308,16 @@ async function saveProceso(proc) {
   const caratula = $('#pf_caratula').value.trim();
   if (!caratula) { toast('La carátula es obligatoria.', 'error'); return; }
   const aud = $('#pf_audiencia').value;
+  const abogados_ids = Array.from(document.querySelectorAll('.pf-abo:checked')).map(c => c.value);
+  const procuradores_ids = Array.from(document.querySelectorAll('.pf-proc:checked')).map(c => c.value);
+  $('#pf_save').disabled = true;
+  let clienteId = $('#pf_cliente').value || null;
+  const nuevoCliente = $('#pf_cliente_nuevo').value.trim();
+  if (nuevoCliente) {
+    const { data: cliNuevo, error: cErr } = await supabase.from('clientes').insert({ nombre: nuevoCliente, created_by: state.profile.id }).select('id').single();
+    if (cErr) { toast('Error al crear el cliente: ' + cErr.message, 'error'); $('#pf_save').disabled = false; return; }
+    clienteId = cliNuevo.id;
+  }
   const payload = {
     caratula,
     numero: $('#pf_numero').value.trim() || null,
@@ -304,10 +326,12 @@ async function saveProceso(proc) {
     materia: $('#pf_materia').value || null,
     estado: $('#pf_estado').value,
     juzgado: $('#pf_juzgado').value.trim() || null,
-    cliente_id: $('#pf_cliente').value || null,
+    cliente_id: clienteId,
     parte_contraria: $('#pf_contraria').value.trim() || null,
-    abogado_id: $('#pf_abogado').value || null,
-    procurador_id: $('#pf_procurador').value || null,
+    abogados_ids: abogados_ids,
+    procuradores_ids: procuradores_ids,
+    abogado_id: abogados_ids[0] || null,
+    procurador_id: procuradores_ids[0] || null,
     fecha_inicio: $('#pf_inicio').value || null,
     proxima_audiencia: aud ? new Date(aud).toISOString() : null,
     descripcion: $('#pf_desc').value.trim() || null
@@ -358,8 +382,8 @@ async function openProcesoDetail(id, readonly = false) {
       <div class="detail-item"><label>Estado</label><span>${badgeEstado(p.estado)}</span></div>
       <div class="detail-item"><label>Cliente</label><span>${esc(clienteName(p.cliente_id))}</span></div>
       <div class="detail-item"><label>Parte contraria</label><span>${esc(p.parte_contraria || '—')}</span></div>
-      <div class="detail-item"><label>Abogado responsable</label><span>${esc(profName(p.abogado_id))}</span></div>
-      <div class="detail-item"><label>Procurador</label><span>${esc(profName(p.procurador_id))}</span></div>
+      <div class="detail-item"><label>Abogados a cargo</label><span>${esc(namesFromIds(p.abogados_ids) || profName(p.abogado_id))}</span></div>
+      <div class="detail-item"><label>Procuradores</label><span>${esc(namesFromIds(p.procuradores_ids) || profName(p.procurador_id))}</span></div>
       <div class="detail-item"><label>Fecha de inicio</label><span>${fmtDate(p.fecha_inicio)}</span></div>
       <div class="detail-item"><label>Próxima audiencia / plazo</label><span>${fmtDateTime(p.proxima_audiencia)}</span></div>
     </div>

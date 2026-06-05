@@ -312,11 +312,11 @@
         var waFloat = document.querySelector('.whatsapp-float');
         if (waFloat) {
             var abogados = [
-                { n: 'Dr. Carlos Cartagena', w: '59178360469' },
-                { n: 'Dr. Jose Corwin', w: '59169915219' },
-                { n: 'Dr. Jose Antonio', w: '59175216613' },
-                { n: 'Dr. Douglas Yamil', w: '59168173978' },
-                { n: 'Dr. Henry Iván', w: '59179145231' }
+                { n: 'Abg. Carlos Cartagena', w: '59178360469' },
+                { n: 'Abg. Jose Corwin', w: '59169915219' },
+                { n: 'Abg. Jose Antonio', w: '59175216613' },
+                { n: 'Abg. Douglas Yamil', w: '59168173978' },
+                { n: 'Abg. Henry Iván', w: '59179145231' }
             ];
             var waMsg = encodeURIComponent('Hola, deseo una consulta legal con LexFive.');
             var waMenu = document.createElement('div');

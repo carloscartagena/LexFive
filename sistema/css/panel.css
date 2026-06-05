@@ -247,3 +247,9 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 .rating-pick button { background: none; border: none; color: var(--line); padding: 0; }
 .rating-pick button svg { width: 28px; height: 28px; }
 .rating-pick button.on { color: var(--gold); }
+
+/* Selección múltiple de abogados/procuradores */
+.chk-grid { display:flex; flex-direction:column; gap:6px; max-height:140px; overflow-y:auto; border:1.5px solid var(--line); border-radius:8px; padding:10px; }
+.chk { display:flex; align-items:center; gap:8px; font-size:.9rem; font-weight:500; cursor:pointer; }
+.chk input { width:16px; height:16px; accent-color: var(--gold-dark); }
+.chk-rol { color: var(--muted); font-size:.8rem; }

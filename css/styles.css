@@ -827,3 +827,7 @@ body.theme-burgundy {
 .wa-menu a { display: block; padding: 10px 12px; border-radius: 8px; color: var(--ink); font-size: .9rem; font-weight: 500; transition: background .15s; }
 .wa-menu a:hover { background: #eef7f1; color: #1da851; }
 @media (max-width: 520px) { .wa-menu { bottom: 84px; left: 20px; } }
+
+/* Especialidades del equipo (debajo de "Socio Fundador") */
+.member__role { margin: 6px 0 1px; }
+.member__areas { color: var(--ink); font-size: .9rem; font-weight: 500; margin-bottom: 12px; }
