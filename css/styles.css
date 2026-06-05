@@ -781,3 +781,49 @@ body.theme-burgundy {
 
 /* Enlace de registro/acceso: visible en el menú en todos los tamaños */
 .nav__item--access { display: block; }
+
+
+/* ============================================================
+   AJUSTES: áreas centradas (con soporte de imagen de fondo),
+   fotos de equipo, testimonios centrados y WhatsApp de los 5 abogados
+   ============================================================ */
+
+/* --- Áreas de práctica: icono y texto centrados --- */
+.area-card { text-align: center; position: relative; overflow: hidden; }
+.area-card__icon { margin-left: auto; margin-right: auto; }
+.area-card > * { position: relative; z-index: 1; }
+/* Si agregas una imagen de fondo con  style="background-image:url('assets/areas/laboral.jpg')"
+   se aplica un velo oscuro y el texto se vuelve claro automáticamente. */
+.area-card[style*="background-image"] { background-size: cover; background-position: center; border-color: transparent; }
+.area-card[style*="background-image"]::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(14,27,44,.82), rgba(14,27,44,.88)); z-index: 0; }
+.area-card[style*="background-image"] .area-card__title { color: #fff; }
+.area-card[style*="background-image"] .area-card__text { color: rgba(255,255,255,.85); }
+.area-card[style*="background-image"] .area-card__icon { background: rgba(255,255,255,.14); }
+.area-card[style*="background-image"] .area-card__icon svg { color: var(--gold-light); }
+
+/* --- Equipo: nombres centrados + foto real (si existe el archivo) --- */
+.member__info { text-align: center; }
+.member__photo { position: relative; overflow: hidden; }
+.member__photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
+
+/* --- Testimonios: estrellas, texto y nombre centrados --- */
+.testimonial { text-align: center; }
+
+/* --- WhatsApp directo (sección de contacto) --- */
+.wa-direct { margin-top: 28px; }
+.wa-direct__title { font-weight: 600; color: var(--navy); margin-bottom: 12px; }
+.wa-direct__list { display: flex; flex-wrap: wrap; gap: 10px; }
+.wa-btn { display: inline-flex; align-items: center; padding: 9px 16px; border-radius: 30px; background: #25d366; color: #fff; font-size: .86rem; font-weight: 600; transition: .2s; }
+.wa-btn:hover { background: #1da851; transform: translateY(-2px); }
+
+/* --- Footer: título de WhatsApp --- */
+.footer__wa-title { color: var(--gold-light); font-weight: 600; margin-top: 8px; }
+
+/* --- Menú flotante de WhatsApp (elige a cuál de los 5 abogados escribir) --- */
+.wa-menu { position: fixed; bottom: 92px; left: 28px; width: 250px; background: #fff; border-radius: 12px; box-shadow: 0 12px 35px rgba(14,27,44,.22); padding: 10px; display: none; z-index: 96; }
+.wa-menu.open { display: block; animation: waPop .2s ease; }
+@keyframes waPop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.wa-menu__title { font-weight: 700; color: var(--navy); font-size: .9rem; padding: 6px 10px 10px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+.wa-menu a { display: block; padding: 10px 12px; border-radius: 8px; color: var(--ink); font-size: .9rem; font-weight: 500; transition: background .15s; }
+.wa-menu a:hover { background: #eef7f1; color: #1da851; }
+@media (max-width: 520px) { .wa-menu { bottom: 84px; left: 20px; } }

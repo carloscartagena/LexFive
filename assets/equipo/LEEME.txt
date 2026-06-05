@@ -1,0 +1,20 @@
+FOTOS DEL EQUIPO DE ABOGADOS
+============================
+
+Coloca aquí las fotos de los abogados con EXACTAMENTE estos nombres
+(formato .jpg, de preferencia cuadradas, ~600x600 px):
+
+  cartagena.jpg   -> Dr. Zenón Carlos Cartagena Álvarez
+  corwin.jpg      -> Dr. Jose Corwin Gutiérrez Herrera
+  antelo.jpg      -> Dr. Jose Antonio Antelo Acho
+  candia.jpg      -> Dr. Douglas Yamil Candia Fernández
+  payrumani.jpg   -> Dr. Henry Iván Payrumani
+
+Cómo subirlas desde GitHub:
+1. Entra a esta carpeta en tu repositorio: assets/equipo
+2. Pulsa "Add file" -> "Upload files"
+3. Arrastra las fotos con esos nombres y pulsa "Commit changes".
+
+Mientras no exista la foto, la tarjeta muestra automáticamente las
+iniciales del abogado (no se rompe nada). Apenas subas la imagen con
+el nombre correcto, aparecerá sola en la página.

@@ -17,6 +17,15 @@ export const ROLES = {
 // Número de WhatsApp del bufete (para consultas y recordatorios)
 export const WHATSAPP = '59178360469';
 
+// Los 5 abogados del bufete (para recordatorios por WhatsApp a todos)
+export const ABOGADOS = [
+  { nombre: 'Dr. Carlos Cartagena', wa: '59178360469' },
+  { nombre: 'Dr. Jose Corwin',      wa: '59169915219' },
+  { nombre: 'Dr. Jose Antonio',     wa: '59175216613' },
+  { nombre: 'Dr. Douglas Yamil',    wa: '59168173978' },
+  { nombre: 'Dr. Henry Iván',       wa: '59179145231' }
+];
+
 export const ESTADOS = {
   en_tramite: 'En trámite',
   con_resolucion: 'Con resolución',

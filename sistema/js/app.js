@@ -3,7 +3,7 @@
 // ============================================================
 import { supabase } from './supabase.js';
 import { requireAuth, getProfile, signOut, logAccion, can } from './auth.js';
-import { ROLES, ESTADOS, MATERIAS, WHATSAPP } from './config.js';
+import { ROLES, ESTADOS, MATERIAS, WHATSAPP, ABOGADOS } from './config.js';
 
 // ---------- Estado global ----------
 const state = {
@@ -132,6 +132,19 @@ function waRecordatorio(p) {
   return `https://wa.me/${WHATSAPP}?text=${t}`;
 }
 
+// Abre un modal para enviar el recordatorio por WhatsApp a los 5 abogados
+function recordarPorWhatsApp(p) {
+  const enc = encodeURIComponent(
+    `Recordatorio LexFive\nProceso: ${p.caratula}\nAudiencia/plazo: ${fmtDateTime(p.proxima_audiencia)}\nResponsable: ${profName(p.abogado_id)}`
+  );
+  const body = `
+    <p class="cell-sub" style="margin-bottom:14px">Toque cada botón para enviar el recordatorio por WhatsApp a cada abogado del equipo:</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${ABOGADOS.map(a => `<a class="btn" style="justify-content:flex-start;background:#25d366;color:#fff;border-color:#25d366" target="_blank" rel="noopener" href="https://wa.me/${a.wa}?text=${enc}">Enviar a ${esc(a.nombre)}</a>`).join('')}
+    </div>`;
+  openModal('Recordar audiencia / plazo', body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }]);
+}
+
 // ============================================================
 //  VISTA: DASHBOARD
 // ============================================================
@@ -154,7 +167,7 @@ async function renderDashboard() {
   const alertRow = (p, cls) => `
     <div class="alert-row ${cls}">
       <div><strong>${esc(p.caratula)}</strong><div class="cell-sub">${fmtDateTime(p.proxima_audiencia)} · ${esc(profName(p.abogado_id))}</div></div>
-      <a class="btn btn--ghost btn--sm" target="_blank" rel="noopener" href="${waRecordatorio(p)}">${ICON.whatsapp} Recordar</a>
+      <button class="btn btn--ghost btn--sm js-recordar" data-id="${p.id}">${ICON.whatsapp} Recordar a los 5</button>
     </div>`;
   const alertasHtml = (vencidas.length || urgentes.length) ? `
     <div class="card">
@@ -192,6 +205,11 @@ async function renderDashboard() {
     </div>`;
 
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id));
+  content().querySelectorAll('.js-recordar').forEach(btn => btn.onclick = (e) => {
+    e.stopPropagation();
+    const p = list.find(x => x.id === btn.dataset.id);
+    if (p) recordarPorWhatsApp(p);
+  });
 }
 
 // ============================================================

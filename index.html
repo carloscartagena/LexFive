@@ -94,15 +94,15 @@
         <section class="stats">
             <div class="container stats__grid">
                 <div class="stat">
-                    <span class="stat__number" data-target="15">0</span><span class="stat__plus">+</span>
-                    <p class="stat__label">Años de experiencia</p>
+                    <span class="stat__number" data-target="1">0</span>
+                    <p class="stat__label">Año de experiencia</p>
                 </div>
                 <div class="stat">
                     <span class="stat__number" data-target="5">0</span>
                     <p class="stat__label">Abogados especialistas</p>
                 </div>
                 <div class="stat">
-                    <span class="stat__number" data-target="8">0</span>
+                    <span class="stat__number" data-target="12">0</span>
                     <p class="stat__label">Áreas de práctica</p>
                 </div>
                 <div class="stat">
@@ -185,6 +185,38 @@
                         <h3 class="area-card__title">Derecho Deportivo</h3>
                         <p class="area-card__text">Contratos deportivos, transferencias, régimen disciplinario y representación de atletas y clubes.</p>
                     </article>
+
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Constitucional</h3>
+                        <p class="area-card__text">Amparos, acciones de libertad y de protección, y defensa de derechos fundamentales.</p>
+                    </article>
+
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M9 7h2m-2 4h2m-2 4h2m4-8h.01M15 11h.01M15 15h.01"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Administrativo</h3>
+                        <p class="area-card__text">Trámites ante entidades públicas, procesos administrativos y contrataciones estatales.</p>
+                    </article>
+
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Tributario</h3>
+                        <p class="area-card__text">Planeación fiscal, defensa ante impuestos, auditorías y cumplimiento de obligaciones.</p>
+                    </article>
+
+                    <article class="area-card">
+                        <div class="area-card__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></svg>
+                        </div>
+                        <h3 class="area-card__title">Derecho Comercial</h3>
+                        <p class="area-card__text">Constitución de empresas, contratos mercantiles, sociedades y asesoría a negocios.</p>
+                    </article>
                 </div>
             </div>
         </section>
@@ -195,8 +227,8 @@
                 <div class="about__media">
                     <div class="about__image" role="img" aria-label="Equipo del bufete LexFive"></div>
                     <div class="about__badge">
-                        <strong>15+</strong>
-                        <span>años defendiendo<br>la justicia</span>
+                        <strong>1</strong>
+                        <span>año defendiendo<br>la justicia</span>
                     </div>
                 </div>
                 <div class="about__content">
@@ -225,7 +257,10 @@
 
                 <div class="team__grid">
                     <article class="member">
-                        <div class="member__photo member__photo--1" data-initials="ZC"></div>
+                        <div class="member__photo member__photo--1" data-initials="ZC">
+                            <!-- Para poner la foto: deja un archivo en assets/equipo/cartagena.jpg (o cambia el src) -->
+                            <img class="member__photo-img" src="assets/equipo/cartagena.jpg" alt="Dr. Zenón Carlos Cartagena Álvarez" onerror="this.remove()">
+                        </div>
                         <div class="member__info">
                             <h3 class="member__name">Dr. Zenón Carlos Cartagena Álvarez</h3>
                             <p class="member__role">Socio Fundador &middot; Derecho Laboral e Informático</p>
@@ -234,37 +269,45 @@
                     </article>
 
                     <article class="member">
-                        <div class="member__photo member__photo--2" data-initials="JG"></div>
+                        <div class="member__photo member__photo--2" data-initials="JG">
+                            <img class="member__photo-img" src="assets/equipo/corwin.jpg" alt="Dr. Jose Corwin Gutiérrez Herrera" onerror="this.remove()">
+                        </div>
                         <div class="member__info">
-                            <h3 class="member__name">Jose Corwin Gutiérrez Herrera</h3>
-                            <p class="member__role">Derecho de Familia, Minero y Agrario</p>
+                            <h3 class="member__name">Dr. Jose Corwin Gutiérrez Herrera</h3>
+                            <p class="member__role">Socio Fundador &middot; Derecho de Familia, Minero y Agrario</p>
                             <p class="member__bio">Especialista en asuntos de familia, minería y derecho agrario, con un enfoque cercano y orientado a soluciones.</p>
                         </div>
                     </article>
 
                     <article class="member">
-                        <div class="member__photo member__photo--3" data-initials="JA"></div>
+                        <div class="member__photo member__photo--3" data-initials="JA">
+                            <img class="member__photo-img" src="assets/equipo/antelo.jpg" alt="Dr. Jose Antonio Antelo Acho" onerror="this.remove()">
+                        </div>
                         <div class="member__info">
-                            <h3 class="member__name">Jose Antonio Antelo Acho</h3>
-                            <p class="member__role">Derecho Penal</p>
+                            <h3 class="member__name">Dr. Jose Antonio Antelo Acho</h3>
+                            <p class="member__role">Socio Fundador &middot; Derecho Penal</p>
                             <p class="member__bio">Defensa penal estratégica con sólida experiencia en litigio y representación en todas las etapas del proceso.</p>
                         </div>
                     </article>
 
                     <article class="member">
-                        <div class="member__photo member__photo--4" data-initials="DC"></div>
+                        <div class="member__photo member__photo--4" data-initials="DC">
+                            <img class="member__photo-img" src="assets/equipo/candia.jpg" alt="Dr. Douglas Yamil Candia Fernández" onerror="this.remove()">
+                        </div>
                         <div class="member__info">
-                            <h3 class="member__name">Douglas Yamil Candia Fernández</h3>
-                            <p class="member__role">Derecho Penal y otras áreas</p>
+                            <h3 class="member__name">Dr. Douglas Yamil Candia Fernández</h3>
+                            <p class="member__role">Socio Fundador &middot; Derecho Penal y otras áreas</p>
                             <p class="member__bio">Abogado versátil en materia penal y diversas áreas del derecho, atento a las necesidades de cada cliente.</p>
                         </div>
                     </article>
 
                     <article class="member">
-                        <div class="member__photo member__photo--5" data-initials="HP"></div>
+                        <div class="member__photo member__photo--5" data-initials="HP">
+                            <img class="member__photo-img" src="assets/equipo/payrumani.jpg" alt="Dr. Henry Iván Payrumani" onerror="this.remove()">
+                        </div>
                         <div class="member__info">
-                            <h3 class="member__name">Henry Iván Payrumani</h3>
-                            <p class="member__role">Derecho Deportivo</p>
+                            <h3 class="member__name">Dr. Henry Iván Payrumani</h3>
+                            <p class="member__role">Socio Fundador &middot; Derecho Deportivo</p>
                             <p class="member__bio">Especialista en derecho deportivo: contratos, transferencias, disciplina y representación de atletas y clubes.</p>
                         </div>
                     </article>
@@ -330,6 +373,17 @@
                             <div><strong>Correo</strong><br><a href="mailto:alba23meira@gmail.com">alba23meira@gmail.com</a></div>
                         </li>
                     </ul>
+
+                    <div class="wa-direct">
+                        <p class="wa-direct__title">O escríbanos directo por WhatsApp:</p>
+                        <div class="wa-direct__list">
+                            <a class="wa-btn" target="_blank" rel="noopener" href="https://wa.me/59178360469?text=Hola%2C%20deseo%20una%20consulta%20legal%20con%20LexFive.">Dr. Carlos Cartagena</a>
+                            <a class="wa-btn" target="_blank" rel="noopener" href="https://wa.me/59169915219?text=Hola%2C%20deseo%20una%20consulta%20legal%20con%20LexFive.">Dr. Jose Corwin</a>
+                            <a class="wa-btn" target="_blank" rel="noopener" href="https://wa.me/59175216613?text=Hola%2C%20deseo%20una%20consulta%20legal%20con%20LexFive.">Dr. Jose Antonio</a>
+                            <a class="wa-btn" target="_blank" rel="noopener" href="https://wa.me/59168173978?text=Hola%2C%20deseo%20una%20consulta%20legal%20con%20LexFive.">Dr. Douglas Yamil</a>
+                            <a class="wa-btn" target="_blank" rel="noopener" href="https://wa.me/59179145231?text=Hola%2C%20deseo%20una%20consulta%20legal%20con%20LexFive.">Dr. Henry Iván</a>
+                        </div>
+                    </div>
 
                     <div class="contact__map">
                         <iframe
@@ -439,8 +493,13 @@
                 <h4>Contacto</h4>
                 <ul class="footer__contact">
                     <li>Calle 12 Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.&deg; 85, of. 1-A. El Alto, Bolivia.</li>
-                    <li><a href="tel:+59178360469">+591 78360469</a></li>
                     <li><a href="mailto:alba23meira@gmail.com">alba23meira@gmail.com</a></li>
+                    <li class="footer__wa-title">WhatsApp directo:</li>
+                    <li><a href="https://wa.me/59178360469" target="_blank" rel="noopener">Dr. Carlos Cartagena &middot; 78360469</a></li>
+                    <li><a href="https://wa.me/59169915219" target="_blank" rel="noopener">Dr. Jose Corwin &middot; 69915219</a></li>
+                    <li><a href="https://wa.me/59175216613" target="_blank" rel="noopener">Dr. Jose Antonio &middot; 75216613</a></li>
+                    <li><a href="https://wa.me/59168173978" target="_blank" rel="noopener">Dr. Douglas Yamil &middot; 68173978</a></li>
+                    <li><a href="https://wa.me/59179145231" target="_blank" rel="noopener">Dr. Henry Iván &middot; 79145231</a></li>
                 </ul>
             </div>
         </div>

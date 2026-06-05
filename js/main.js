@@ -1,5 +1,5 @@
 /* =========================================================
-   Vargas & Asociados — JavaScript principal
+   LexFive — JavaScript principal
    ========================================================= */
 (function () {
     'use strict';
@@ -307,6 +307,35 @@
                 }
             });
         });
+
+        /* ---------- Menú flotante de WhatsApp (elige entre los 5 abogados) ---------- */
+        var waFloat = document.querySelector('.whatsapp-float');
+        if (waFloat) {
+            var abogados = [
+                { n: 'Dr. Carlos Cartagena', w: '59178360469' },
+                { n: 'Dr. Jose Corwin', w: '59169915219' },
+                { n: 'Dr. Jose Antonio', w: '59175216613' },
+                { n: 'Dr. Douglas Yamil', w: '59168173978' },
+                { n: 'Dr. Henry Iván', w: '59179145231' }
+            ];
+            var waMsg = encodeURIComponent('Hola, deseo una consulta legal con LexFive.');
+            var waMenu = document.createElement('div');
+            waMenu.className = 'wa-menu';
+            waMenu.innerHTML = '<p class="wa-menu__title">Escríbanos por WhatsApp</p>' +
+                abogados.map(function (a) {
+                    return '<a href="https://wa.me/' + a.w + '?text=' + waMsg + '" target="_blank" rel="noopener">' + a.n + '</a>';
+                }).join('');
+            document.body.appendChild(waMenu);
+            waFloat.addEventListener('click', function (e) {
+                e.preventDefault();
+                waMenu.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!waMenu.contains(e.target) && !waFloat.contains(e.target)) {
+                    waMenu.classList.remove('open');
+                }
+            });
+        }
 
     });
 })();
