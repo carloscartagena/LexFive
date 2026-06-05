@@ -508,6 +508,7 @@ ul { list-style: none; }
         top: 0; right: -100%;
         width: min(82%, 340px);
         height: 100vh;
+        overflow-y: auto;
         background: var(--navy);
         padding: 100px 30px 40px;
         transition: right var(--transition);

@@ -126,6 +126,9 @@
     }
     onPasswordRecovery(() => show('viewReset'));
 
+    // Si llega con ?registro=1 (desde el botón "Registro" de la web), abrir el formulario de registro
+    if (new URLSearchParams(window.location.search).get('registro') === '1') show('viewRegister');
+
     // Navegación entre vistas
     document.getElementById('toRegister').onclick = () => show('viewRegister');
     document.getElementById('toRecuperar').onclick = () => show('viewRecuperar');
