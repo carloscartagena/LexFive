@@ -57,7 +57,10 @@ export async function signUp(email, password, nombre, telefono) {
   return supabase.auth.signUp({
     email,
     password,
-    options: { data: { nombre, telefono: telefono || null } }
+    // 'tipo: cliente' permite que el trigger de la base de datos cree
+    // automáticamente la ficha en la tabla "clientes" (vinculada por correo),
+    // para que el nuevo cliente aparezca en el panel del administrador.
+    options: { data: { nombre, telefono: telefono || null, tipo: 'cliente' } }
   });
 }
 

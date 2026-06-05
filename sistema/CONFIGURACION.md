@@ -12,9 +12,11 @@ Frontend estático (HTML/CSS/JS) + backend en **Supabase** (base de datos, login
    - Esto crea las tablas (procesos, clientes, documentos, etc.), las reglas de acceso por rol y el "bucket" de almacenamiento para los memoriales.
 4. Ejecuta, **en orden**, el resto de scripts de la carpeta `db/` (cada uno una sola vez):
    `02_portal_clientes.sql`, `03_blog_alertas_testimonios.sql`, `04_modelos_nurej.sql`,
-   `05_multiples_abogados.sql` y `06_consultas.sql`.
+   `05_multiples_abogados.sql`, `06_consultas.sql` y `07_sync_clientes.sql`.
    - `06_consultas.sql` crea la tabla de la **bandeja "Consultas"**: cada mensaje del formulario
      de contacto de la web queda guardado y aparece en la pestaña **Consultas** del panel.
+   - `07_sync_clientes.sql` hace que **cada persona que se registre como cliente** aparezca
+     automáticamente en la pestaña **Clientes** (y agrega a los que ya se habían registrado).
 
 ### 2. Ajustar el inicio de sesión por correo
 En **Authentication → Providers → Email**, elige una de estas opciones:
@@ -68,6 +70,7 @@ db/
   04_modelos_nurej.sql           Biblioteca de modelos y campo NUREJ
   05_multiples_abogados.sql      Varios abogados/procuradores por proceso
   06_consultas.sql               Bandeja "Consultas" (formulario de contacto)
+  07_sync_clientes.sql           Crea la ficha de cliente al registrarse (panel)
 ```
 
 ## 📨 Bandeja de "Consultas"
