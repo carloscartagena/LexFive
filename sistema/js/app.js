@@ -414,7 +414,8 @@ async function openProcesoDetail(id, readonly = false) {
       <input id="actDesc" placeholder="Describa la actuación o avance..." style="flex-grow:1;min-width:200px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
       <button class="btn btn--navy" id="btnActuacion">Agregar</button>
     </div>`}
-    <ul class="timeline" id="actList">${renderActs(acts || [])}</ul>`;
+    <ul class="timeline" id="actList">${renderActs(acts || [])}</ul>
+    ${state.profile.rol === 'cliente' ? `<div class="card" id="opinionProc" style="margin-top:18px"></div>` : ''}`;
 
   const buttons = [];
   if (!readonly) {
@@ -465,6 +466,9 @@ async function openProcesoDetail(id, readonly = false) {
     $('#actList').innerHTML = renderActs(na || []); $('#actDesc').value = '';
     toast('Actuación registrada.', 'success');
   };
+
+  // Para el cliente: widget de "Mi opinión" dentro del propio proceso
+  if (state.profile.rol === 'cliente') mountOpinion($('#opinionProc'));
 }
 
 function renderDocs(docs, readonly = false) {
@@ -751,8 +755,11 @@ async function renderMisProcesos() {
             </tr>`).join('')}</tbody></table></div>`
         : `<div class="empty">${ICON.procesos}<p>Aún no hay procesos asociados a su cuenta.<br>Verifique que se registró con el mismo correo que dejó en el bufete, o consúltenos por WhatsApp.</p></div>`}
       </div>
-    </div>`;
+    </div>
+
+    <div class="card" id="opinionDash" style="margin-top:18px"></div>`;
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id, true));
+  mountOpinion($('#opinionDash'));
 }
 
 function starsHtml(n) {
@@ -761,49 +768,60 @@ function starsHtml(n) {
   return s + '</span>';
 }
 
-// Vista del CLIENTE para dejar su opinión (se publica tras aprobación del admin)
-async function renderMiOpinion() {
-  loading();
-  const { data } = await supabase.from('testimonios').select('*').eq('autor_id', state.profile.id).order('created_at', { ascending: false }).limit(1);
+// Widget reutilizable de "Mi opinión": se monta en el dashboard del cliente,
+// dentro de cada proceso y en la vista dedicada. Usa selectores por clase y
+// queda aislado en su contenedor, por lo que puede mostrarse en varios sitios
+// a la vez sin colisiones de IDs. El cliente tiene UNA opinión (sobre el
+// servicio del bufete) que se edita desde cualquiera de esos lugares.
+async function mountOpinion(el) {
+  if (!el) return;
+  el.innerHTML = '<div class="card__body"><p class="cell-sub">Cargando su opinión...</p></div>';
+  const { data } = await supabase.from('testimonios').select('*')
+    .eq('autor_id', state.profile.id).order('created_at', { ascending: false }).limit(1);
   const t = (data && data[0]) || null;
   let rating = t ? t.calificacion : 5;
   const estadoMsg = t ? ({
     pendiente: '<span class="badge badge-borrador">Pendiente</span> Su opinión será revisada por el bufete antes de publicarse.',
-    aprobado: '<span class="badge badge-publicado">Publicada</span> ¡Gracias! Su opinión aparece en nuestra página web.',
+    aprobado: '<span class="badge badge-publicado">Publicada</span> ¡Gracias! Su opinión ya aparece en nuestra página web.',
     rechazado: '<span class="badge badge-rol-admin">No publicada</span> Puede editarla y volver a enviarla.'
   }[t.estado]) : '';
 
-  content().innerHTML = `
-    <div class="card" style="max-width:680px">
-      <div class="card__head"><h3>Mi opinión sobre el servicio</h3></div>
-      <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:18px">Comparta su experiencia con LexFive. Tras la aprobación del bufete, su testimonio podrá aparecer en la página web pública.</p>
-        ${t ? `<p style="margin-bottom:16px">${estadoMsg}</p>` : ''}
-        <div class="field"><label>Su calificación</label>
-          <div class="rating-pick" id="ratingPick">${[1,2,3,4,5].map(i => `<button type="button" data-v="${i}" class="${i <= rating ? 'on' : ''}">${ICON.estrella}</button>`).join('')}</div>
-        </div>
-        <div class="field"><label>Su comentario</label><textarea id="opTexto" style="min-height:120px" placeholder="Cuéntenos cómo fue su experiencia...">${t ? esc(t.texto) : ''}</textarea></div>
-        <div class="field"><label>¿Cómo desea que aparezca su nombre? (opcional)</label><input id="opNombre" value="${t ? esc(t.nombre || '') : esc(state.profile.nombre)}"></div>
-        <button class="btn btn--primary" id="btnOpinion">${t ? 'Actualizar mi opinión' : 'Enviar mi opinión'}</button>
+  el.innerHTML = `
+    <div class="card__head"><h3>Mi opinión sobre el servicio</h3></div>
+    <div class="card__body">
+      <p class="cell-sub" style="margin-bottom:14px">Califique la atención recibida de su(s) abogado(s). Tras la aprobación del bufete, su testimonio aparecerá en la página web pública.</p>
+      ${t ? `<p style="margin-bottom:14px">${estadoMsg}</p>` : ''}
+      <div class="field"><label>Su calificación</label>
+        <div class="rating-pick js-rate">${[1,2,3,4,5].map(i => `<button type="button" data-v="${i}" class="${i <= rating ? 'on' : ''}">${ICON.estrella}</button>`).join('')}</div>
       </div>
+      <div class="field"><label>Su comentario</label><textarea class="js-texto" style="min-height:110px" placeholder="Cuéntenos cómo fue su experiencia...">${t ? esc(t.texto) : ''}</textarea></div>
+      <div class="field"><label>¿Cómo desea que aparezca su nombre? (opcional)</label><input class="js-nombre" value="${t ? esc(t.nombre || '') : esc(state.profile.nombre)}"></div>
+      <button class="btn btn--primary js-send">${t ? 'Actualizar mi opinión' : 'Enviar mi opinión'}</button>
     </div>`;
 
-  content().querySelectorAll('#ratingPick button').forEach(b => b.onclick = () => {
+  el.querySelectorAll('.js-rate button').forEach(b => b.onclick = () => {
     rating = parseInt(b.dataset.v, 10);
-    content().querySelectorAll('#ratingPick button').forEach(x => x.classList.toggle('on', parseInt(x.dataset.v, 10) <= rating));
+    el.querySelectorAll('.js-rate button').forEach(x => x.classList.toggle('on', parseInt(x.dataset.v, 10) <= rating));
   });
-  $('#btnOpinion').onclick = async () => {
-    const texto = $('#opTexto').value.trim();
+  el.querySelector('.js-send').onclick = async () => {
+    const texto = el.querySelector('.js-texto').value.trim();
     if (!texto) { toast('Escriba su comentario.', 'error'); return; }
-    const payload = { texto, calificacion: rating, nombre: $('#opNombre').value.trim() || state.profile.nombre, detalle: 'Cliente', estado: 'pendiente', updated_at: new Date().toISOString() };
-    $('#btnOpinion').disabled = true;
+    const payload = { texto, calificacion: rating, nombre: el.querySelector('.js-nombre').value.trim() || state.profile.nombre, detalle: 'Cliente', estado: 'pendiente', updated_at: new Date().toISOString() };
+    const btn = el.querySelector('.js-send'); btn.disabled = true;
     let error;
     if (t) ({ error } = await supabase.from('testimonios').update(payload).eq('id', t.id));
     else { payload.autor_id = state.profile.id; ({ error } = await supabase.from('testimonios').insert(payload)); }
-    if (error) { toast('Error: ' + error.message, 'error'); $('#btnOpinion').disabled = false; return; }
+    if (error) { toast('Error: ' + error.message, 'error'); btn.disabled = false; return; }
     toast('¡Gracias! Su opinión fue enviada para revisión.', 'success');
-    renderMiOpinion();
+    mountOpinion(el);
   };
+}
+
+// Vista del CLIENTE dedicada a dejar su opinión
+async function renderMiOpinion() {
+  loading();
+  content().innerHTML = `<div class="card" style="max-width:680px" id="opinionCard"></div>`;
+  await mountOpinion($('#opinionCard'));
 }
 
 // Vista del ADMIN para moderar (aprobar/rechazar) los testimonios
