@@ -26,7 +26,8 @@ const ICON = {
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>',
   alerta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>',
   estrella: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>',
-  whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.05 24l1.69-6.16a11.9 11.9 0 1 1 4.3 4.2L.05 24zM6.6 20.2l.37.22a9.9 9.9 0 1 0-3.35-3.3l.24.38-1 3.65 3.74-.95z"/></svg>'
+  whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.05 24l1.69-6.16a11.9 11.9 0 1 1 4.3 4.2L.05 24zM6.6 20.2l.37.22a9.9 9.9 0 1 0-3.35-3.3l.24.38-1 3.65 3.74-.95z"/></svg>',
+  consultas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>'
 };
 
 const NAV = [
@@ -34,6 +35,7 @@ const NAV = [
   { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
   { key: 'modelos', label: 'Modelos', icon: ICON.doc },
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
+  { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
@@ -170,6 +172,13 @@ async function renderDashboard() {
     .sort((a, b) => new Date(a.proxima_audiencia) - new Date(b.proxima_audiencia));
   const mios = list.filter(p => p.abogado_id === state.profile.id || p.procurador_id === state.profile.id || (p.abogados_ids || []).includes(state.profile.id) || (p.procuradores_ids || []).includes(state.profile.id)).length;
 
+  // Consultas nuevas recibidas desde el formulario de contacto de la web
+  let consultasNuevas = 0;
+  try {
+    const { count } = await supabase.from('consultas').select('id', { count: 'exact', head: true }).eq('estado', 'nueva');
+    consultasNuevas = count || 0;
+  } catch (e) { consultasNuevas = 0; }
+
   // Alertas: audiencias vencidas y dentro de los próximos 7 días
   const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
   const vencidas = list.filter(p => p.proxima_audiencia && new Date(p.proxima_audiencia) < ahora && !['archivado', 'concluido'].includes(p.estado))
@@ -196,6 +205,7 @@ async function renderDashboard() {
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dashboard}</div></div><div class="metric__num">${activos}</div><div class="metric__label">Procesos activos</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.audiencia}</div></div><div class="metric__num">${proximas.length}</div><div class="metric__label">Audiencias próximas</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.clientes}</div></div><div class="metric__num">${mios}</div><div class="metric__label">Mis procesos</div></div>
+      <div class="metric" id="mConsultas" style="cursor:pointer"><div class="metric__top"><div class="metric__icon">${ICON.consultas}</div></div><div class="metric__num">${consultasNuevas}</div><div class="metric__label">Consultas nuevas</div></div>
     </div>
 
     ${alertasHtml}
@@ -222,6 +232,7 @@ async function renderDashboard() {
     const p = list.find(x => x.id === btn.dataset.id);
     if (p) recordarPorWhatsApp(p);
   });
+  const mc = $('#mConsultas'); if (mc) mc.onclick = () => navigate('consultas');
 }
 
 // ============================================================
@@ -912,6 +923,120 @@ async function renderModelos() {
 }
 
 // ============================================================
+//  VISTA: CONSULTAS (bandeja del formulario de contacto de la web)
+// ============================================================
+function consultaNombre(c) {
+  return [c.nombre, c.apellido].filter(Boolean).join(' ') || '—';
+}
+function consultaEstadoBadge(estado) {
+  const map = {
+    nueva: '<span class="badge badge-borrador">Nueva</span>',
+    atendida: '<span class="badge badge-publicado">Atendida</span>',
+    archivada: '<span class="badge badge-off">Archivada</span>'
+  };
+  return map[estado] || `<span class="badge">${esc(estado || '—')}</span>`;
+}
+// Construye un enlace de WhatsApp a partir de un teléfono (añade 591 si hace falta)
+function waLinkTel(tel, texto) {
+  const digits = (tel || '').replace(/\D/g, '');
+  if (!digits) return null;
+  const full = digits.length <= 8 ? '591' + digits : digits;
+  return `https://wa.me/${full}${texto ? '?text=' + encodeURIComponent(texto) : ''}`;
+}
+
+async function renderConsultas() {
+  loading();
+  const { data, error } = await supabase.from('consultas').select('*').order('created_at', { ascending: false });
+  if (error) {
+    content().innerHTML = `<div class="card"><div class="card__body"><div class="empty">${ICON.consultas}
+      <p>No se pudo cargar la bandeja de consultas.<br>Verifique que ejecutó el script <strong>db/06_consultas.sql</strong> en Supabase.</p></div></div></div>`;
+    return;
+  }
+  const list = data || [];
+  const nuevas = list.filter(c => c.estado === 'nueva').length;
+  content().innerHTML = `
+    <div class="toolbar">
+      <input type="search" id="qCons" placeholder="Buscar por nombre, correo, mensaje...">
+      <select id="fEstadoCons">
+        <option value="">Todos los estados</option>
+        <option value="nueva">Nuevas (${nuevas})</option>
+        <option value="atendida">Atendidas</option>
+        <option value="archivada">Archivadas</option>
+      </select>
+      <div class="spacer"></div>
+    </div>
+    <div class="card"><div class="card__body--flush"><div id="consTable"></div></div></div>`;
+
+  function paint() {
+    const q = ($('#qCons').value || '').toLowerCase();
+    const fe = $('#fEstadoCons').value;
+    const rows = list.filter(c =>
+      (!fe || c.estado === fe) &&
+      (!q || [c.nombre, c.apellido, c.email, c.telefono, c.area, c.mensaje].some(v => (v || '').toLowerCase().includes(q))));
+    $('#consTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
+      <thead><tr><th>Fecha</th><th>Nombre</th><th>Contacto</th><th>Área</th><th>Estado</th></tr></thead>
+      <tbody>${rows.map(c => `
+        <tr data-id="${c.id}">
+          <td>${fmtDateTime(c.created_at)}</td>
+          <td class="cell-strong">${esc(consultaNombre(c))}<div class="cell-sub">${esc((c.mensaje || '').slice(0, 60))}${(c.mensaje || '').length > 60 ? '…' : ''}</div></td>
+          <td>${esc(c.email || c.telefono || '—')}</td>
+          <td>${c.area ? `<span class="badge badge-mat">${esc(c.area)}</span>` : '—'}</td>
+          <td>${consultaEstadoBadge(c.estado)}</td>
+        </tr>`).join('')}</tbody></table></div>`
+      : `<div class="empty">${ICON.consultas}<p>No hay consultas que coincidan.<br>Las consultas enviadas desde el formulario de contacto de la web aparecerán aquí.</p></div>`;
+    $('#consTable').querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => {
+      const c = list.find(x => x.id === tr.dataset.id); openConsultaDetail(c);
+    });
+  }
+  paint();
+  $('#qCons').oninput = paint;
+  $('#fEstadoCons').onchange = paint;
+}
+
+function openConsultaDetail(c) {
+  const wa = waLinkTel(c.telefono, `Hola ${c.nombre || ''}, le escribimos de LexFive en respuesta a su consulta.`);
+  const mailHref = c.email ? `mailto:${esc(c.email)}?subject=${encodeURIComponent('Su consulta a LexFive')}` : null;
+  const body = `
+    <div class="detail-grid">
+      <div class="detail-item"><label>Nombre</label><span>${esc(consultaNombre(c))}</span></div>
+      <div class="detail-item"><label>Estado</label><span>${consultaEstadoBadge(c.estado)}</span></div>
+      <div class="detail-item"><label>Correo</label><span>${c.email ? `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>` : '—'}</span></div>
+      <div class="detail-item"><label>Teléfono</label><span>${esc(c.telefono || '—')}</span></div>
+      <div class="detail-item"><label>Área de interés</label><span>${esc(c.area || '—')}</span></div>
+      <div class="detail-item"><label>Recibida</label><span>${fmtDateTime(c.created_at)}</span></div>
+    </div>
+    <div class="detail-item" style="margin-top:14px"><label>Mensaje</label><span style="white-space:pre-wrap">${esc(c.mensaje || '')}</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
+      ${wa ? `<a class="btn btn--sm" style="background:#25d366;color:#fff;border-color:#25d366" target="_blank" rel="noopener" href="${wa}">${ICON.whatsapp} Responder por WhatsApp</a>` : ''}
+      ${mailHref ? `<a class="btn btn--ghost btn--sm" href="${mailHref}">Responder por correo</a>` : ''}
+    </div>`;
+
+  const buttons = [];
+  if (c.estado !== 'atendida') buttons.push({ label: 'Marcar atendida', class: 'btn--navy', onClick: () => setConsultaEstado(c, 'atendida') });
+  if (c.estado !== 'archivada') buttons.push({ label: 'Archivar', class: 'btn--ghost', onClick: () => setConsultaEstado(c, 'archivada') });
+  if (c.estado !== 'nueva') buttons.push({ label: 'Marcar nueva', class: 'btn--ghost', onClick: () => setConsultaEstado(c, 'nueva') });
+  if (state.profile.rol === 'admin') buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteConsulta(c) });
+  buttons.push({ label: 'Cerrar', class: 'btn--primary', onClick: closeModal });
+
+  openModal('Consulta de ' + consultaNombre(c), body, buttons, true);
+}
+
+async function setConsultaEstado(c, estado) {
+  const { error } = await supabase.from('consultas').update({ estado }).eq('id', c.id);
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+  await logAccion('consulta_' + estado, 'consulta', c.id, consultaNombre(c));
+  closeModal(); toast('Consulta actualizada.', 'success'); renderConsultas();
+}
+
+async function deleteConsulta(c) {
+  if (!confirm('¿Eliminar definitivamente esta consulta?')) return;
+  const { error } = await supabase.from('consultas').delete().eq('id', c.id);
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+  await logAccion('eliminar', 'consulta', c.id, consultaNombre(c));
+  closeModal(); toast('Consulta eliminada.', 'success'); renderConsultas();
+}
+
+// ============================================================
 //  Navegación
 // ============================================================
 const VIEWS = {
@@ -919,6 +1044,7 @@ const VIEWS = {
   procesos: { title: 'Procesos', render: renderProcesos },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
   clientes: { title: 'Clientes', render: renderClientes },
+  consultas: { title: 'Consultas recibidas', render: renderConsultas },
   blog: { title: 'Blog', render: renderBlog },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
   usuarios: { title: 'Usuarios', render: renderUsuarios },

@@ -10,6 +10,11 @@ Frontend estático (HTML/CSS/JS) + backend en **Supabase** (base de datos, login
 2. Menú lateral → **SQL Editor** → **New query**.
 3. Abre el archivo `db/schema.sql` (de este repositorio), copia **todo** su contenido, pégalo y pulsa **Run**.
    - Esto crea las tablas (procesos, clientes, documentos, etc.), las reglas de acceso por rol y el "bucket" de almacenamiento para los memoriales.
+4. Ejecuta, **en orden**, el resto de scripts de la carpeta `db/` (cada uno una sola vez):
+   `02_portal_clientes.sql`, `03_blog_alertas_testimonios.sql`, `04_modelos_nurej.sql`,
+   `05_multiples_abogados.sql` y `06_consultas.sql`.
+   - `06_consultas.sql` crea la tabla de la **bandeja "Consultas"**: cada mensaje del formulario
+     de contacto de la web queda guardado y aparece en la pestaña **Consultas** del panel.
 
 ### 2. Ajustar el inicio de sesión por correo
 En **Authentication → Providers → Email**, elige una de estas opciones:
@@ -57,8 +62,20 @@ sistema/
     auth.js         Sesión, roles y auditoría
     app.js          Lógica del panel (procesos, clientes, blog, usuarios...)
 db/
-  schema.sql        Script de base de datos
+  schema.sql                     Script base de la base de datos
+  02_portal_clientes.sql         Rol "cliente" y aislamiento de datos
+  03_blog_alertas_testimonios.sql Blog público, teléfono y testimonios
+  04_modelos_nurej.sql           Biblioteca de modelos y campo NUREJ
+  05_multiples_abogados.sql      Varios abogados/procuradores por proceso
+  06_consultas.sql               Bandeja "Consultas" (formulario de contacto)
 ```
+
+## 📨 Bandeja de "Consultas"
+- Los mensajes enviados desde el formulario de contacto de la web pública se guardan en la
+  pestaña **Consultas** del panel (visible para todo el personal: admin, procurador y abogado).
+- Cada consulta puede marcarse como **Atendida** o **Archivarse**, y se puede responder al
+  cliente con un toque por **WhatsApp** o **correo**. Solo el administrador puede eliminarlas.
+- Si además configuró la clave de Web3Forms, seguirá llegando una copia por correo.
 
 ## ⚠️ Notas de seguridad
 - En `sistema/js/config.js` solo va la **clave pública** (segura para el navegador).

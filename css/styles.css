@@ -452,7 +452,7 @@ ul { list-style: none; }
 
 /* ---------- Footer ---------- */
 .footer { background: var(--navy); color: rgba(255,255,255,0.7); padding-top: 72px; }
-.footer__grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.4fr; gap: 40px; padding-bottom: 56px; }
+.footer__grid { display: grid; grid-template-columns: 1.6fr 1fr 1.4fr; gap: 40px; padding-bottom: 56px; }
 .footer__brand .logo { margin-bottom: 18px; }
 .footer__brand p { font-size: 0.95rem; max-width: 320px; }
 .footer__col h4 { color: var(--white); font-family: var(--font-serif); font-size: 1.2rem; font-weight: 600; margin-bottom: 18px; }
@@ -815,18 +815,6 @@ body.theme-burgundy {
 .wa-direct__list { display: flex; flex-wrap: wrap; gap: 10px; }
 .wa-btn { display: inline-flex; align-items: center; padding: 9px 16px; border-radius: 30px; background: #25d366; color: #fff; font-size: .86rem; font-weight: 600; transition: .2s; }
 .wa-btn:hover { background: #1da851; transform: translateY(-2px); }
-
-/* --- Footer: título de WhatsApp --- */
-.footer__wa-title { color: var(--gold-light); font-weight: 600; margin-top: 8px; }
-
-/* --- Menú flotante de WhatsApp (elige a cuál de los 5 abogados escribir) --- */
-.wa-menu { position: fixed; bottom: 92px; left: 28px; width: 250px; background: #fff; border-radius: 12px; box-shadow: 0 12px 35px rgba(14,27,44,.22); padding: 10px; display: none; z-index: 96; }
-.wa-menu.open { display: block; animation: waPop .2s ease; }
-@keyframes waPop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.wa-menu__title { font-weight: 700; color: var(--navy); font-size: .9rem; padding: 6px 10px 10px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
-.wa-menu a { display: block; padding: 10px 12px; border-radius: 8px; color: var(--ink); font-size: .9rem; font-weight: 500; transition: background .15s; }
-.wa-menu a:hover { background: #eef7f1; color: #1da851; }
-@media (max-width: 520px) { .wa-menu { bottom: 84px; left: 20px; } }
 
 /* Especialidades del equipo (debajo de "Socio Fundador") */
 .member__role { margin: 6px 0 1px; }

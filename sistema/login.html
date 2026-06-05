@@ -52,8 +52,12 @@
           <p class="sub">Regístrese para dar seguimiento a sus procesos. <strong>Importante:</strong> use el mismo correo que dejó registrado en el bufete, así verá sus casos automáticamente.</p>
           <form id="registerForm" novalidate>
             <div class="field">
-              <label for="rNombre">Nombre completo</label>
-              <input type="text" id="rNombre" autocomplete="name" required>
+              <label for="rNombre">Nombre</label>
+              <input type="text" id="rNombre" autocomplete="given-name" required>
+            </div>
+            <div class="field">
+              <label for="rApellido">Apellido</label>
+              <input type="text" id="rApellido" autocomplete="family-name" required>
             </div>
             <div class="field">
               <label for="rEmail">Correo electrónico</label>
@@ -163,11 +167,13 @@
       e.preventDefault();
       const btn = document.getElementById('btnRegister');
       registerMsg.textContent = ''; registerMsg.className = 'form-msg';
-      const nombre = document.getElementById('rNombre').value.trim();
+      const nombreParte = document.getElementById('rNombre').value.trim();
+      const apellidoParte = document.getElementById('rApellido').value.trim();
+      const nombre = [nombreParte, apellidoParte].filter(Boolean).join(' ');
       const email = document.getElementById('rEmail').value.trim();
       const telefono = document.getElementById('rTelefono').value.trim();
       const password = document.getElementById('rPassword').value;
-      if (!nombre || !email || password.length < 6) { registerMsg.textContent = 'Revise los datos (contraseña mínima de 6).'; registerMsg.classList.add('error'); return; }
+      if (!nombreParte || !apellidoParte || !email || password.length < 6) { registerMsg.textContent = 'Revise los datos (nombre, apellido y contraseña mínima de 6).'; registerMsg.classList.add('error'); return; }
       btn.disabled = true; btn.textContent = 'Creando...';
       const { data, error } = await signUp(email, password, nombre, telefono);
       if (error) {

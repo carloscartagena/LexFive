@@ -201,11 +201,13 @@
                 if (feedback) { feedback.textContent = ''; feedback.className = 'form__feedback'; }
 
                 var nombre = document.getElementById('nombre');
+                var apellido = document.getElementById('apellido');
                 var email = document.getElementById('email');
                 var mensaje = document.getElementById('mensaje');
                 var privacidad = document.getElementById('privacidad');
 
                 if (!nombre.value.trim()) { setError(nombre, 'Por favor, indique su nombre.'); valid = false; }
+                if (apellido && !apellido.value.trim()) { setError(apellido, 'Por favor, indique su apellido.'); valid = false; }
                 if (!email.value.trim()) {
                     setError(email, 'Por favor, indique su correo.'); valid = false;
                 } else if (!isValidEmail(email.value.trim())) {
@@ -249,28 +251,51 @@
 
                 if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Enviando...'; }
 
-                // Si aún no se ha configurado la clave de Web3Forms, mostramos
-                // un envío simulado para no romper el sitio en pruebas.
-                if (!keyConfigured) {
-                    setTimeout(showSuccess, 800);
-                    return;
+                /* Datos de la consulta (nombre y apellido por separado). */
+                var telefonoEl = document.getElementById('telefono');
+                var areaEl = document.getElementById('area');
+                var consulta = {
+                    nombre: nombre.value.trim(),
+                    apellido: apellido ? apellido.value.trim() : null,
+                    email: email.value.trim(),
+                    telefono: telefonoEl && telefonoEl.value.trim() ? telefonoEl.value.trim() : null,
+                    area: areaEl && areaEl.value ? areaEl.value : null,
+                    mensaje: mensaje.value.trim()
+                };
+
+                /* 1) Almacenamiento principal: la bandeja "Consultas" del panel (Supabase). */
+                var saveConsulta = (window.LexFive && typeof window.LexFive.guardarConsulta === 'function')
+                    ? Promise.resolve(window.LexFive.guardarConsulta(consulta))
+                    : Promise.resolve({ skipped: true });
+
+                /* 2) Aviso por correo con Web3Forms (si la clave está configurada). */
+                function enviarCorreo() {
+                    if (!keyConfigured) { return Promise.resolve({ skipped: true }); }
+                    var payload = {};
+                    new FormData(form).forEach(function (value, key) { payload[key] = value; });
+                    return fetch(form.action, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(function (response) { return response.json(); })
+                    .catch(function () { return { success: false }; });
                 }
 
-                // Envío real a Web3Forms
-                var payload = {};
-                new FormData(form).forEach(function (value, key) { payload[key] = value; });
-
-                fetch(form.action, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(payload)
-                })
-                .then(function (response) { return response.json(); })
-                .then(function (data) {
-                    if (data && data.success) { showSuccess(); }
-                    else { showFail(); }
-                })
-                .catch(function () { showFail(); });
+                saveConsulta
+                    .then(function (res) {
+                        var savedOk = !!(res && !res.error && !res.skipped);
+                        var saveSkipped = !!(res && res.skipped);
+                        return enviarCorreo().then(function (mail) {
+                            var mailOk = !!(mail && mail.success);
+                            var mailSkipped = !!(mail && mail.skipped);
+                            // Éxito si se guardó en el panel, si se envió el correo,
+                            // o si no hay backend disponible (modo demostración).
+                            if (savedOk || mailOk || (saveSkipped && mailSkipped)) { showSuccess(); }
+                            else { showFail(); }
+                        });
+                    })
+                    .catch(function () { showFail(); });
             });
         }
 
@@ -308,34 +333,9 @@
             });
         });
 
-        /* ---------- Menú flotante de WhatsApp (elige entre los 5 abogados) ---------- */
-        var waFloat = document.querySelector('.whatsapp-float');
-        if (waFloat) {
-            var abogados = [
-                { n: 'Abg. Carlos Cartagena', w: '59178360469' },
-                { n: 'Abg. Jose Corwin', w: '59169915219' },
-                { n: 'Abg. Jose Antonio', w: '59175216613' },
-                { n: 'Abg. Douglas Yamil', w: '59168173978' },
-                { n: 'Abg. Henry Iván', w: '59179145231' }
-            ];
-            var waMsg = encodeURIComponent('Hola, deseo una consulta legal con LexFive.');
-            var waMenu = document.createElement('div');
-            waMenu.className = 'wa-menu';
-            waMenu.innerHTML = '<p class="wa-menu__title">Escríbanos por WhatsApp</p>' +
-                abogados.map(function (a) {
-                    return '<a href="https://wa.me/' + a.w + '?text=' + waMsg + '" target="_blank" rel="noopener">' + a.n + '</a>';
-                }).join('');
-            document.body.appendChild(waMenu);
-            waFloat.addEventListener('click', function (e) {
-                e.preventDefault();
-                waMenu.classList.toggle('open');
-            });
-            document.addEventListener('click', function (e) {
-                if (!waMenu.contains(e.target) && !waFloat.contains(e.target)) {
-                    waMenu.classList.remove('open');
-                }
-            });
-        }
+        /* ---------- Botón flotante de WhatsApp (contacto unificado) ----------
+           El botón enlaza directamente al WhatsApp del bufete; ya no abre un
+           menú con los cinco abogados. */
 
     });
 })();
