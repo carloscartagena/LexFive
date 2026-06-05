@@ -32,6 +32,7 @@ const ICON = {
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
   { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
+  { key: 'modelos', label: 'Modelos', icon: ICON.doc },
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
@@ -262,8 +263,9 @@ function procesoForm(proc = null) {
     <div class="field"><label>Carátula / Nombre del proceso *</label><input id="pf_caratula" value="${esc(p.caratula || '')}"></div>
     <div class="field-row">
       <div class="field"><label>N.º de proceso / expediente</label><input id="pf_numero" value="${esc(p.numero || '')}"></div>
-      <div class="field"><label>Tipo</label><select id="pf_tipo"><option value="judicial" ${p.tipo !== 'administrativo' ? 'selected' : ''}>Judicial</option><option value="administrativo" ${p.tipo === 'administrativo' ? 'selected' : ''}>Administrativo</option></select></div>
+      <div class="field"><label>NUREJ</label><input id="pf_nurej" value="${esc(p.nurej || '')}" placeholder="Número Único de Registro Judicial"></div>
     </div>
+    <div class="field"><label>Tipo</label><select id="pf_tipo"><option value="judicial" ${p.tipo !== 'administrativo' ? 'selected' : ''}>Judicial</option><option value="administrativo" ${p.tipo === 'administrativo' ? 'selected' : ''}>Administrativo</option></select></div>
     <div class="field-row">
       <div class="field"><label>Materia</label><select id="pf_materia"><option value="">—</option>${MATERIAS.map(m => `<option ${p.materia === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
       <div class="field"><label>Estado</label><select id="pf_estado">${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}" ${p.estado === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
@@ -278,10 +280,11 @@ function procesoForm(proc = null) {
       <div class="field"><label>Procurador asignado</label><select id="pf_procurador">${optionsProfiles(p.procurador_id)}</select></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Fecha de inicio</label><input type="date" id="pf_inicio" value="${p.fecha_inicio || ''}"></div>
+      <div class="field"><label>Fecha de inicio</label><input type="date" id="pf_inicio" value="${p.fecha_inicio || (proc ? '' : new Date().toISOString().slice(0,10))}"></div>
       <div class="field"><label>Próxima audiencia / plazo</label><input type="datetime-local" id="pf_audiencia" value="${p.proxima_audiencia ? new Date(p.proxima_audiencia).toISOString().slice(0,16) : ''}"></div>
     </div>
-    <div class="field"><label>Descripción</label><textarea id="pf_desc">${esc(p.descripcion || '')}</textarea></div>`;
+    <div class="field"><label>Descripción</label><textarea id="pf_desc">${esc(p.descripcion || '')}</textarea></div>
+    ${proc ? '' : `<div class="field"><label>Primer memorial (opcional)</label><input type="file" id="pf_memorial"><span class="cell-sub" style="display:block;margin-top:4px;">Se adjuntará al proceso al guardarlo.</span></div>`}`;
 
   openModal(proc ? 'Editar proceso' : 'Nuevo proceso', body, [
     { label: 'Cancelar', class: 'btn--ghost', onClick: closeModal },
@@ -296,6 +299,7 @@ async function saveProceso(proc) {
   const payload = {
     caratula,
     numero: $('#pf_numero').value.trim() || null,
+    nurej: $('#pf_nurej').value.trim() || null,
     tipo: $('#pf_tipo').value,
     materia: $('#pf_materia').value || null,
     estado: $('#pf_estado').value,
@@ -315,7 +319,19 @@ async function saveProceso(proc) {
     ({ error } = await supabase.from('procesos').update(payload).eq('id', proc.id));
   } else {
     payload.created_by = state.profile.id;
-    ({ error } = await supabase.from('procesos').insert(payload));
+    const { data: nuevo, error: insErr } = await supabase.from('procesos').insert(payload).select('id').single();
+    error = insErr;
+    if (!error && nuevo) {
+      const fileInput = document.getElementById('pf_memorial');
+      const file = fileInput && fileInput.files[0];
+      if (file) {
+        const path = `${nuevo.id}/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
+        const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+        if (!upErr) {
+          await supabase.from('documentos').insert({ proceso_id: nuevo.id, nombre: file.name, tipo: 'memorial', storage_path: path, subido_por: state.profile.id });
+        }
+      }
+    }
   }
   if (error) { toast('Error al guardar: ' + error.message, 'error'); $('#pf_save').disabled = false; return; }
   await logAccion(proc ? 'editar' : 'crear', 'proceso', proc ? proc.id : caratula, caratula);
@@ -336,6 +352,7 @@ async function openProcesoDetail(id, readonly = false) {
   const detail = `
     <div class="detail-grid">
       <div class="detail-item"><label>N.º de proceso</label><span>${esc(p.numero || '—')}</span></div>
+      <div class="detail-item"><label>NUREJ</label><span>${esc(p.nurej || '—')}</span></div>
       <div class="detail-item"><label>Materia</label><span>${esc(p.materia || '—')} · ${p.tipo === 'administrativo' ? 'Administrativo' : 'Judicial'}</span></div>
       <div class="detail-item"><label>Juzgado / Entidad</label><span>${esc(p.juzgado || '—')}</span></div>
       <div class="detail-item"><label>Estado</label><span>${badgeEstado(p.estado)}</span></div>
@@ -796,11 +813,87 @@ async function renderTestimonios() {
 }
 
 // ============================================================
+//  VISTA: MODELOS DE MEMORIALES (biblioteca reutilizable, solo personal)
+// ============================================================
+async function renderModelos() {
+  loading();
+  const { data } = await supabase.from('modelos').select('*').order('created_at', { ascending: false });
+  const list = data || [];
+  content().innerHTML = `
+    <div class="card">
+      <div class="card__head"><h3>Subir un modelo de memorial</h3></div>
+      <div class="card__body">
+        <div class="field-row">
+          <div class="field"><label>Nombre del modelo *</label><input id="md_nombre" placeholder="Ej: Memorial de demanda laboral"></div>
+          <div class="field"><label>Categoría</label><input id="md_cat" placeholder="Ej: Laboral"></div>
+        </div>
+        <div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+          <div style="flex-grow:1;min-width:200px;"><label>Archivo (Word, PDF, etc.)</label><input type="file" id="md_file"></div>
+          <button class="btn btn--primary" id="md_subir">Subir modelo</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card__head"><h3>Biblioteca de modelos (${list.length})</h3>
+        <input type="search" id="md_q" placeholder="Buscar modelo..." style="padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;">
+      </div>
+      <div class="card__body--flush"><div id="md_list"></div></div>
+    </div>`;
+
+  function paint() {
+    const q = ($('#md_q').value || '').toLowerCase();
+    const rows = list.filter(m => !q || [m.nombre, m.categoria].some(v => (v || '').toLowerCase().includes(q)));
+    $('#md_list').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
+      <thead><tr><th>Nombre</th><th>Categoría</th><th>Fecha</th><th>Subido por</th><th>Acciones</th></tr></thead>
+      <tbody>${rows.map(m => `<tr class="no-hover">
+        <td class="cell-strong">${esc(m.nombre)}</td>
+        <td>${esc(m.categoria || '—')}</td>
+        <td>${fmtDate(m.created_at)}</td>
+        <td>${esc(profName(m.subido_por))}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn--ghost btn--sm js-dl" data-path="${esc(m.storage_path)}">Descargar</button>
+          <button class="btn btn--danger btn--sm js-del" data-id="${m.id}" data-path="${esc(m.storage_path)}">Eliminar</button>
+        </td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="empty">${ICON.doc}<p>Aún no hay modelos. Suba el primero arriba.</p></div>`;
+    $('#md_list').querySelectorAll('.js-dl').forEach(b => b.onclick = async () => {
+      const { data: d, error } = await supabase.storage.from('documentos').createSignedUrl(b.dataset.path, 120);
+      if (error) { toast('No se pudo generar el enlace.', 'error'); return; }
+      window.open(d.signedUrl, '_blank');
+    });
+    $('#md_list').querySelectorAll('.js-del').forEach(b => b.onclick = async () => {
+      if (!confirm('¿Eliminar este modelo?')) return;
+      await supabase.storage.from('documentos').remove([b.dataset.path]);
+      await supabase.from('modelos').delete().eq('id', b.dataset.id);
+      await logAccion('eliminar', 'modelo', b.dataset.id, '');
+      renderModelos();
+    });
+  }
+  paint();
+  $('#md_q').oninput = paint;
+  $('#md_subir').onclick = async () => {
+    const nombre = $('#md_nombre').value.trim();
+    const file = $('#md_file').files[0];
+    if (!nombre) { toast('Ponga un nombre al modelo.', 'error'); return; }
+    if (!file) { toast('Seleccione un archivo.', 'error'); return; }
+    $('#md_subir').disabled = true; $('#md_subir').textContent = 'Subiendo...';
+    const path = `modelos/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
+    const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+    if (upErr) { toast('Error al subir: ' + upErr.message, 'error'); $('#md_subir').disabled = false; $('#md_subir').textContent = 'Subir modelo'; return; }
+    const { error: insErr } = await supabase.from('modelos').insert({ nombre, categoria: $('#md_cat').value.trim() || null, storage_path: path, subido_por: state.profile.id });
+    if (insErr) { toast('Error: ' + insErr.message, 'error'); $('#md_subir').disabled = false; $('#md_subir').textContent = 'Subir modelo'; return; }
+    await logAccion('subir', 'modelo', nombre, nombre);
+    toast('Modelo guardado.', 'success');
+    renderModelos();
+  };
+}
+
+// ============================================================
 //  Navegación
 // ============================================================
 const VIEWS = {
   dashboard: { title: 'Panel general', render: renderDashboard },
   procesos: { title: 'Procesos', render: renderProcesos },
+  modelos: { title: 'Modelos de memoriales', render: renderModelos },
   clientes: { title: 'Clientes', render: renderClientes },
   blog: { title: 'Blog', render: renderBlog },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
