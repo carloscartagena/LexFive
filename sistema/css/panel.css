@@ -253,3 +253,21 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 .chk { display:flex; align-items:center; gap:8px; font-size:.9rem; font-weight:500; cursor:pointer; }
 .chk input { width:16px; height:16px; accent-color: var(--gold-dark); }
 .chk-rol { color: var(--muted); font-size:.8rem; }
+
+
+/* ---------- Modelos agrupados por área del derecho ---------- */
+.md-group { border-bottom: 1px solid var(--line); }
+.md-group:last-child { border-bottom: none; }
+.md-group__head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; background: var(--bg);
+    font-family: var(--font-serif, Georgia, serif);
+    font-weight: 700; color: var(--navy, #0e1b2c); font-size: 1.02rem;
+    border-bottom: 1px solid var(--line);
+}
+.md-group__count {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 24px; height: 22px; padding: 0 8px;
+    background: var(--navy, #0e1b2c); color: #fff;
+    border-radius: 11px; font-size: .76rem; font-weight: 600;
+}

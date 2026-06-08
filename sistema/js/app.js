@@ -872,42 +872,86 @@ async function renderModelos() {
   loading();
   const { data } = await supabase.from('modelos').select('*').order('created_at', { ascending: false });
   const list = data || [];
+
+  // Áreas disponibles para clasificar los modelos (materias del derecho)
+  const areaOptions = MATERIAS.map(m => `<option>${m}</option>`).join('');
+
   content().innerHTML = `
     <div class="card">
-      <div class="card__head"><h3>Subir un modelo de memorial</h3></div>
+      <div class="card__head"><h3>Subir modelos de memoriales</h3></div>
       <div class="card__body">
         <div class="field-row">
-          <div class="field"><label>Nombre del modelo *</label><input id="md_nombre" placeholder="Ej: Memorial de demanda laboral"></div>
-          <div class="field"><label>Categoría</label><input id="md_cat" placeholder="Ej: Laboral"></div>
+          <div class="field"><label>Área del derecho *</label>
+            <select id="md_area"><option value="">Seleccione un área</option>${areaOptions}</select>
+          </div>
+          <div class="field"><label>Nombre (opcional)</label>
+            <input id="md_nombre" placeholder="Si sube un solo archivo. Si deja vacío, se usa el nombre del archivo.">
+          </div>
         </div>
-        <div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-          <div style="flex-grow:1;min-width:200px;"><label>Archivo (Word, PDF, etc.)</label><input type="file" id="md_file"></div>
-          <button class="btn btn--primary" id="md_subir">Subir modelo</button>
+        <div class="field-row">
+          <div class="field">
+            <label>Archivos (puede elegir varios)</label>
+            <input type="file" id="md_file" multiple>
+            <span class="cell-sub" style="display:block;margin-top:4px;">Word, PDF, imágenes, etc. Mantenga Ctrl/Cmd para elegir varios.</span>
+          </div>
+          <div class="field">
+            <label>...o una carpeta completa</label>
+            <input type="file" id="md_folder" webkitdirectory directory multiple>
+            <span class="cell-sub" style="display:block;margin-top:4px;">Se subirán todos los archivos de la carpeta al área elegida.</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn--primary" id="md_subir">Subir al área seleccionada</button>
+          <span class="cell-sub" id="md_progreso"></span>
         </div>
       </div>
     </div>
     <div class="card">
       <div class="card__head"><h3>Biblioteca de modelos (${list.length})</h3>
-        <input type="search" id="md_q" placeholder="Buscar modelo..." style="padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select id="md_farea" style="padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;">
+            <option value="">Todas las áreas</option>${areaOptions}
+          </select>
+          <input type="search" id="md_q" placeholder="Buscar modelo..." style="padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;">
+        </div>
       </div>
       <div class="card__body--flush"><div id="md_list"></div></div>
     </div>`;
 
+  const SIN_AREA = 'Sin área';
+
   function paint() {
     const q = ($('#md_q').value || '').toLowerCase();
-    const rows = list.filter(m => !q || [m.nombre, m.categoria].some(v => (v || '').toLowerCase().includes(q)));
-    $('#md_list').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
-      <thead><tr><th>Nombre</th><th>Categoría</th><th>Fecha</th><th>Subido por</th><th>Acciones</th></tr></thead>
-      <tbody>${rows.map(m => `<tr class="no-hover">
-        <td class="cell-strong">${esc(m.nombre)}</td>
-        <td>${esc(m.categoria || '—')}</td>
-        <td>${fmtDate(m.created_at)}</td>
-        <td>${esc(profName(m.subido_por))}</td>
-        <td style="white-space:nowrap">
-          <button class="btn btn--ghost btn--sm js-dl" data-path="${esc(m.storage_path)}">Descargar</button>
-          <button class="btn btn--danger btn--sm js-del" data-id="${m.id}" data-path="${esc(m.storage_path)}">Eliminar</button>
-        </td></tr>`).join('')}</tbody></table></div>`
-      : `<div class="empty">${ICON.doc}<p>Aún no hay modelos. Suba el primero arriba.</p></div>`;
+    const fa = $('#md_farea').value;
+    const rows = list.filter(m =>
+      (!fa || (m.categoria || '') === fa) &&
+      (!q || [m.nombre, m.categoria].some(v => (v || '').toLowerCase().includes(q))));
+
+    if (!rows.length) {
+      $('#md_list').innerHTML = `<div class="empty">${ICON.doc}<p>No hay modelos que coincidan. Suba el primero arriba.</p></div>`;
+      return;
+    }
+
+    // Agrupar por área
+    const grupos = {};
+    rows.forEach(m => { const a = m.categoria || SIN_AREA; (grupos[a] = grupos[a] || []).push(m); });
+    const ordenadas = Object.keys(grupos).sort((a, b) => a.localeCompare(b, 'es'));
+
+    $('#md_list').innerHTML = ordenadas.map(area => `
+      <div class="md-group">
+        <div class="md-group__head">${esc(area)} <span class="md-group__count">${grupos[area].length}</span></div>
+        <div class="table-wrap"><table class="data">
+          <thead><tr><th>Nombre</th><th>Fecha</th><th>Subido por</th><th>Acciones</th></tr></thead>
+          <tbody>${grupos[area].map(m => `<tr class="no-hover">
+            <td class="cell-strong">${esc(m.nombre)}</td>
+            <td>${fmtDate(m.created_at)}</td>
+            <td>${esc(profName(m.subido_por))}</td>
+            <td style="white-space:nowrap">
+              <button class="btn btn--ghost btn--sm js-dl" data-path="${esc(m.storage_path)}">Descargar</button>
+              <button class="btn btn--danger btn--sm js-del" data-id="${m.id}" data-path="${esc(m.storage_path)}">Eliminar</button>
+            </td></tr>`).join('')}</tbody></table></div>
+      </div>`).join('');
+
     $('#md_list').querySelectorAll('.js-dl').forEach(b => b.onclick = async () => {
       const { data: d, error } = await supabase.storage.from('documentos').createSignedUrl(b.dataset.path, 120);
       if (error) { toast('No se pudo generar el enlace.', 'error'); return; }
@@ -923,19 +967,42 @@ async function renderModelos() {
   }
   paint();
   $('#md_q').oninput = paint;
+  $('#md_farea').onchange = paint;
+
   $('#md_subir').onclick = async () => {
-    const nombre = $('#md_nombre').value.trim();
-    const file = $('#md_file').files[0];
-    if (!nombre) { toast('Ponga un nombre al modelo.', 'error'); return; }
-    if (!file) { toast('Seleccione un archivo.', 'error'); return; }
-    $('#md_subir').disabled = true; $('#md_subir').textContent = 'Subiendo...';
-    const path = `modelos/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
-    const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
-    if (upErr) { toast('Error al subir: ' + upErr.message, 'error'); $('#md_subir').disabled = false; $('#md_subir').textContent = 'Subir modelo'; return; }
-    const { error: insErr } = await supabase.from('modelos').insert({ nombre, categoria: $('#md_cat').value.trim() || null, storage_path: path, subido_por: state.profile.id });
-    if (insErr) { toast('Error: ' + insErr.message, 'error'); $('#md_subir').disabled = false; $('#md_subir').textContent = 'Subir modelo'; return; }
-    await logAccion('subir', 'modelo', nombre, nombre);
-    toast('Modelo guardado.', 'success');
+    const area = $('#md_area').value;
+    if (!area) { toast('Seleccione el área del derecho.', 'error'); return; }
+
+    // Reunir los archivos: de la carpeta y/o de la selección de archivos sueltos
+    const archivos = [...($('#md_folder').files || []), ...($('#md_file').files || [])];
+    if (!archivos.length) { toast('Seleccione archivos o una carpeta.', 'error'); return; }
+
+    const nombreManual = $('#md_nombre').value.trim();
+    const btn = $('#md_subir'); const prog = $('#md_progreso');
+    btn.disabled = true; btn.textContent = 'Subiendo...';
+
+    let ok = 0, fallos = 0;
+    for (let i = 0; i < archivos.length; i++) {
+      const file = archivos[i];
+      prog.textContent = `Subiendo ${i + 1} de ${archivos.length}...`;
+      // El nombre manual solo se usa si se sube un único archivo; si no, el del archivo.
+      const baseName = (archivos.length === 1 && nombreManual)
+        ? nombreManual
+        : file.name.replace(/\.[^.]+$/, '');
+      const safe = file.name.replace(/[^\w.\-]/g, '_');
+      const path = `modelos/${area.toLowerCase()}/${Date.now()}_${i}_${safe}`;
+      const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+      if (upErr) { fallos++; continue; }
+      const { error: insErr } = await supabase.from('modelos').insert({
+        nombre: baseName, categoria: area, storage_path: path, subido_por: state.profile.id
+      });
+      if (insErr) { fallos++; await supabase.storage.from('documentos').remove([path]); continue; }
+      ok++;
+    }
+    await logAccion('subir', 'modelo', area, `${ok} modelo(s) en ${area}`);
+    prog.textContent = '';
+    if (ok) toast(`${ok} modelo(s) subido(s) a ${area}.${fallos ? ' ' + fallos + ' con error.' : ''}`, fallos ? 'error' : 'success');
+    else toast('No se pudo subir ningún archivo.', 'error');
     renderModelos();
   };
 }

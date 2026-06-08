@@ -154,11 +154,22 @@ def build_blocks():
          "Si no ve la bandeja")
 
     h1("8. Modelos de memoriales")
-    p("Una biblioteca reutilizable de plantillas (Word, PDF, etc.) para el equipo.")
+    p("Una biblioteca reutilizable de plantillas (Word, PDF, imágenes, etc.) para el equipo, "
+      "organizada por área del derecho.")
+    h2("Subir modelos")
+    stp([
+        "Elija el «Área del derecho» (Laboral, Civil, Penal, Familia, etc.).",
+        "Suba varios archivos a la vez, o una carpeta completa: todos quedarán clasificados "
+        "en el área elegida.",
+        "Si sube un solo archivo puede ponerle un nombre; si sube varios o una carpeta, se "
+        "usa el nombre de cada archivo.",
+        "Pulse «Subir al área seleccionada»; una barra indica el avance.",
+    ])
+    h2("Biblioteca")
     bul([
-        "Suba un modelo con su nombre y categoría, y el archivo correspondiente.",
+        "Los modelos se muestran agrupados por área, con un contador por cada una.",
+        "Filtre por área o use el buscador por nombre.",
         "Descargue cualquier modelo cuando lo necesite, o elimínelo si ya no sirve.",
-        "Use el buscador para filtrar por nombre o categoría.",
     ])
 
     h1("9. Blog")

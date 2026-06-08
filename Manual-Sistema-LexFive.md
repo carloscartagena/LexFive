@@ -120,11 +120,20 @@ Cada mensaje enviado desde el formulario de contacto de la web pública llega a 
 
 ## 8. Modelos de memoriales
 
-Una biblioteca reutilizable de plantillas (Word, PDF, etc.) para el equipo.
+Una biblioteca reutilizable de plantillas (Word, PDF, imágenes, etc.) para el equipo, organizada por área del derecho.
 
-- Suba un modelo con su nombre y categoría, y el archivo correspondiente.
+### Subir modelos
+
+1. Elija el «Área del derecho» (Laboral, Civil, Penal, Familia, etc.).
+2. Suba varios archivos a la vez, o una carpeta completa: todos quedarán clasificados en el área elegida.
+3. Si sube un solo archivo puede ponerle un nombre; si sube varios o una carpeta, se usa el nombre de cada archivo.
+4. Pulse «Subir al área seleccionada»; una barra indica el avance.
+
+### Biblioteca
+
+- Los modelos se muestran agrupados por área, con un contador por cada una.
+- Filtre por área o use el buscador por nombre.
 - Descargue cualquier modelo cuando lo necesite, o elimínelo si ya no sirve.
-- Use el buscador para filtrar por nombre o categoría.
 
 ## 9. Blog
 
