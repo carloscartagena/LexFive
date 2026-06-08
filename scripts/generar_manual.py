@@ -25,6 +25,14 @@ import time
 VERSION = "junio de 2026"
 SITIO = "lexfive.netlify.app"
 
+# Título del documento (parametrizable para reutilizar el motor en otros
+# documentos, p. ej. la guía de cuentas). Por defecto: el manual del sistema.
+DOC_TITLE = "Manual del Sistema"
+DOC_SUBTITLE = "Guía completa de uso y gestión"
+DOC_INTRO = ("Sitio web público, panel de gestión de procesos, bandeja de consultas y "
+             "portal del cliente.")
+DOC_HEADER = "Manual del Sistema"
+
 # ============================================================
 #  MODELO DE CONTENIDO (bloques)
 #  Tipos: ('h1',txt) ('h2',txt) ('p',txt) ('bullets',[..])
@@ -451,10 +459,9 @@ class PDF:
         self._txt(ML, PH - 252, "LexFive", 'F2', 42, WHITE)
         self._txt(ML + 3, PH - 274, "A B O G A D O S", 'F1', 12, GOLD)
         self._rect(ML, PH - 302, 120, 3, GOLD)
-        self._txt(ML, PH - 362, "Manual del Sistema", 'F2', 30, WHITE)
-        self._txt(ML, PH - 394, "Guía completa de uso y gestión", 'F1', 14, GOLD)
-        sub = ("Sitio web público, panel de gestión de procesos, bandeja de consultas y "
-               "portal del cliente.")
+        self._txt(ML, PH - 362, DOC_TITLE, 'F2', 30, WHITE)
+        self._txt(ML, PH - 394, DOC_SUBTITLE, 'F1', 14, GOLD)
+        sub = DOC_INTRO
         for i, ln in enumerate(wrap(sub, 11, 'F1', CW - 120)):
             self._txt(ML, PH - 432 - i * 16, ln, 'F1', 11, (0.78, 0.82, 0.88))
         self._txt(ML, 92, "Versión del manual: %s" % VERSION, 'F1', 10, (0.7, 0.74, 0.8))
@@ -469,7 +476,7 @@ class PDF:
         self._rect(bx, by, 18, 18, GOLD)
         self._txt(bx + 9, by + 5, "L5", 'F2', 9, NAVY, 'center')
         self._txt(bx + 26, by + 5, "LexFive Abogados", 'F2', 9.5, NAVY)
-        self._txt(PW - MR, by + 5, "Manual del Sistema", 'F1', 8.5, MUTED, 'right')
+        self._txt(PW - MR, by + 5, DOC_HEADER, 'F1', 8.5, MUTED, 'right')
         self._rule(ML, PH - 60, CW, GOLD, 0.8)
         self._rule(ML, MB + 4, CW, (0.9, 0.9, 0.9), 0.6)
         self._txt(PW / 2, MB - 6, "Página %d" % self.content_no, 'F1', 8, MUTED, 'center')
@@ -651,8 +658,8 @@ def render_pdf(blocks, path):
 #  RENDERIZADOR MARKDOWN
 # ============================================================
 def render_md(blocks, path):
-    out = ["# Manual del Sistema — LexFive Abogados", "",
-           "_Guía completa de uso y gestión · Versión: %s · %s_" % (VERSION, SITIO), "",
+    out = ["# %s — LexFive Abogados" % DOC_TITLE, "",
+           "_%s · Versión: %s · %s_" % (DOC_SUBTITLE, VERSION, SITIO), "",
            "## Contenido", ""]
     for b in blocks:
         if b[0] == 'h1':
@@ -714,10 +721,10 @@ def _para(runs, before=0, after=80, ind=0, shade=None):
 
 def render_docx(blocks, path):
     body = []
-    body.append(_para([_run("Manual del Sistema — LexFive Abogados", True, 44, "0E1B2C")],
+    body.append(_para([_run("%s — LexFive Abogados" % DOC_TITLE, True, 44, "0E1B2C")],
                       before=0, after=60))
-    body.append(_para([_run("Guía completa de uso y gestión · Versión: %s · %s"
-                            % (VERSION, SITIO), False, 20, "5C6675", italic=True)], after=160))
+    body.append(_para([_run("%s · Versión: %s · %s"
+                            % (DOC_SUBTITLE, VERSION, SITIO), False, 20, "5C6675", italic=True)], after=160))
     body.append(_para([_run("Contenido", True, 30, "0E1B2C")], before=80, after=80))
     for b in blocks:
         if b[0] == 'h1':
