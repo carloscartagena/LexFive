@@ -10,6 +10,7 @@ const state = {
   profile: null,
   profiles: [],   // todos los usuarios (para mapear nombres y selects)
   clientes: [],   // cache de clientes
+  categorias: [], // áreas del derecho (dinámicas, desde la tabla "categorias")
   view: 'dashboard'
 };
 
@@ -138,6 +139,69 @@ async function loadClientes() {
   state.clientes = data || [];
 }
 
+// ---------- Categorías / áreas del derecho (dinámicas) ----------
+// Carga las áreas desde la tabla "categorias". Si la tabla aún no existe
+// (no se ejecutó 08_categorias.sql), usa la lista por defecto como respaldo.
+async function loadCategorias() {
+  const { data, error } = await supabase.from('categorias').select('nombre').order('nombre');
+  if (error || !data) {
+    state.categorias = [...MATERIAS];
+  } else {
+    state.categorias = data.map(c => c.nombre);
+  }
+}
+
+// Devuelve las <option> de áreas, marcando la seleccionada y agregando
+// siempre la opción especial para crear una nueva categoría.
+function categoriaOptions(selected, { includeNueva = true } = {}) {
+  const sel = selected || '';
+  // Si el valor guardado ya no está en la lista, lo incluimos igual para no perderlo
+  const lista = state.categorias.includes(sel) || !sel ? state.categorias : [sel, ...state.categorias];
+  let html = lista.map(c => `<option value="${esc(c)}" ${c === sel ? 'selected' : ''}>${esc(c)}</option>`).join('');
+  if (includeNueva) html += '<option value="__nueva__">➕ Crear nueva categoría...</option>';
+  return html;
+}
+
+// Crea una categoría nueva en la base de datos (evita duplicados) y la deja
+// disponible en el estado para que aparezca en todas las listas.
+async function crearCategoria(nombre) {
+  const limpio = (nombre || '').trim();
+  if (!limpio) return null;
+  const yaExiste = state.categorias.find(c => c.toLowerCase() === limpio.toLowerCase());
+  if (yaExiste) return yaExiste;
+  const { error } = await supabase.from('categorias').insert({ nombre: limpio });
+  if (error && !String(error.message || '').toLowerCase().includes('duplicate')) {
+    toast('No se pudo crear la categoría: ' + error.message, 'error');
+    return null;
+  }
+  await logAccion('crear', 'categoria', limpio, limpio);
+  await loadCategorias();
+  return limpio;
+}
+
+// Conecta un <select> de áreas para que, al elegir "Crear nueva categoría",
+// pida el nombre, la guarde y la deje seleccionada (y refresque otros selects).
+function wireCategoriaSelect(sel) {
+  if (!sel) return;
+  sel.dataset.prev = sel.value;
+  sel.addEventListener('change', async () => {
+    if (sel.value !== '__nueva__') { sel.dataset.prev = sel.value; return; }
+    const nombre = prompt('Nombre de la nueva área del derecho:');
+    const creada = await crearCategoria(nombre);
+    // Reconstruye TODOS los selects de categoría abiertos para incluir la nueva
+    document.querySelectorAll('select.js-categoria').forEach(s => {
+      const val = s === sel ? (creada || s.dataset.prev || '') : s.value;
+      const blank = s.dataset.includeBlank === '1'
+        ? `<option value="">${esc(s.dataset.blankLabel || '—')}</option>`
+        : '';
+      s.innerHTML = blank + categoriaOptions(val);
+      s.value = val;
+      s.dataset.prev = val;
+    });
+    if (creada) toast(`Categoría "${creada}" creada.`, 'success');
+  });
+}
+
 // Genera un enlace de WhatsApp con un recordatorio de audiencia ya escrito
 function waRecordatorio(p) {
   const t = encodeURIComponent(
@@ -241,13 +305,14 @@ async function renderDashboard() {
 async function renderProcesos() {
   loading();
   await loadClientes();
+  await loadCategorias();
   const { data } = await supabase.from('procesos').select('*').order('created_at', { ascending: false });
   const procesos = data || [];
 
   content().innerHTML = `
     <div class="toolbar">
       <input type="search" id="qProc" placeholder="Buscar por carátula, número, juzgado...">
-      <select id="fMateria"><option value="">Todas las materias</option>${MATERIAS.map(m => `<option>${m}</option>`).join('')}</select>
+      <select id="fMateria"><option value="">Todas las materias</option>${state.categorias.map(m => `<option>${esc(m)}</option>`).join('')}</select>
       <select id="fEstado"><option value="">Todos los estados</option>${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
       <div class="spacer"></div>
       <button class="btn btn--primary" id="btnNuevoProc">${ICON.plus} Nuevo proceso</button>
@@ -289,7 +354,7 @@ function procesoForm(proc = null) {
     </div>
     <div class="field"><label>Tipo</label><select id="pf_tipo"><option value="judicial" ${p.tipo !== 'administrativo' ? 'selected' : ''}>Judicial</option><option value="administrativo" ${p.tipo === 'administrativo' ? 'selected' : ''}>Administrativo</option></select></div>
     <div class="field-row">
-      <div class="field"><label>Materia</label><select id="pf_materia"><option value="">—</option>${MATERIAS.map(m => `<option ${p.materia === m ? 'selected' : ''}>${m}</option>`).join('')}</select></div>
+      <div class="field"><label>Materia</label><select id="pf_materia" class="js-categoria" data-include-blank="1"><option value="">—</option>${categoriaOptions(p.materia)}</select></div>
       <div class="field"><label>Estado</label><select id="pf_estado">${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}" ${p.estado === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
     </div>
     <div class="field"><label>Juzgado / Entidad</label><input id="pf_juzgado" value="${esc(p.juzgado || '')}"></div>
@@ -313,6 +378,7 @@ function procesoForm(proc = null) {
     { label: 'Cancelar', class: 'btn--ghost', onClick: closeModal },
     { label: 'Guardar', class: 'btn--primary', id: 'pf_save', onClick: () => saveProceso(proc) }
   ], true);
+  wireCategoriaSelect($('#pf_materia'));
 }
 
 async function saveProceso(proc) {
@@ -870,11 +936,12 @@ async function renderTestimonios() {
 // ============================================================
 async function renderModelos() {
   loading();
+  await loadCategorias();
   const { data } = await supabase.from('modelos').select('*').order('created_at', { ascending: false });
   const list = data || [];
 
-  // Áreas disponibles para clasificar los modelos (materias del derecho)
-  const areaOptions = MATERIAS.map(m => `<option>${m}</option>`).join('');
+  // Áreas disponibles para clasificar los modelos (categorías dinámicas)
+  const areaOptions = state.categorias.map(m => `<option>${esc(m)}</option>`).join('');
 
   content().innerHTML = `
     <div class="card">
@@ -882,7 +949,7 @@ async function renderModelos() {
       <div class="card__body">
         <div class="field-row">
           <div class="field"><label>Área del derecho *</label>
-            <select id="md_area"><option value="">Seleccione un área</option>${areaOptions}</select>
+            <select id="md_area" class="js-categoria" data-include-blank="1" data-blank-label="Seleccione un área"><option value="">Seleccione un área</option>${categoriaOptions('')}</select>
           </div>
           <div class="field"><label>Nombre (opcional)</label>
             <input id="md_nombre" placeholder="Si sube un solo archivo. Si deja vacío, se usa el nombre del archivo.">
@@ -968,6 +1035,7 @@ async function renderModelos() {
   paint();
   $('#md_q').oninput = paint;
   $('#md_farea').onchange = paint;
+  wireCategoriaSelect($('#md_area'));
 
   $('#md_subir').onclick = async () => {
     const area = $('#md_area').value;

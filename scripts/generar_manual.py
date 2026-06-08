@@ -107,7 +107,8 @@ def build_blocks():
     stp([
         "Pulse «Nuevo proceso» (o haga clic sobre un proceso existente para editarlo).",
         "Complete los datos: carátula, número/NUREJ, materia, estado, parte contraria y la "
-        "próxima audiencia.",
+        "próxima audiencia. En «Materia» puede elegir «Crear nueva categoría...» para agregar "
+        "un área del derecho que no esté en la lista; quedará disponible en todo el sistema.",
         "Asigne uno o varios abogados y procuradores a cargo.",
         "Vincule un cliente existente o registre uno nuevo directamente desde el formulario.",
         "Guarde. El proceso queda registrado y visible para el equipo asignado.",
@@ -159,6 +160,9 @@ def build_blocks():
     h2("Subir modelos")
     stp([
         "Elija el «Área del derecho» (Laboral, Civil, Penal, Familia, etc.).",
+        "Si necesita un área que no está en la lista, elija «Crear nueva categoría...», "
+        "escriba su nombre y quedará disponible al instante en todo el sistema (procesos y "
+        "modelos).",
         "Suba varios archivos a la vez, o una carpeta completa: todos quedarán clasificados "
         "en el área elegida.",
         "Si sube un solo archivo puede ponerle un nombre; si sube varios o una carpeta, se "
@@ -240,6 +244,8 @@ def build_blocks():
         "04_modelos_nurej.sql — biblioteca de modelos y campo NUREJ.",
         "05_multiples_abogados.sql — varios abogados/procuradores por proceso.",
         "06_consultas.sql — bandeja de Consultas (formulario de contacto).",
+        "07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.",
+        "08_categorias.sql — áreas del derecho dinámicas (crear categorías desde el panel).",
     ])
     h2("Conexión y correo")
     bul([

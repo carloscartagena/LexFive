@@ -81,7 +81,7 @@ La pestaña «Procesos» es el corazón del sistema. Allí se registra y da segu
 ### Crear o editar un proceso
 
 1. Pulse «Nuevo proceso» (o haga clic sobre un proceso existente para editarlo).
-2. Complete los datos: carátula, número/NUREJ, materia, estado, parte contraria y la próxima audiencia.
+2. Complete los datos: carátula, número/NUREJ, materia, estado, parte contraria y la próxima audiencia. En «Materia» puede elegir «Crear nueva categoría...» para agregar un área del derecho que no esté en la lista; quedará disponible en todo el sistema.
 3. Asigne uno o varios abogados y procuradores a cargo.
 4. Vincule un cliente existente o registre uno nuevo directamente desde el formulario.
 5. Guarde. El proceso queda registrado y visible para el equipo asignado.
@@ -125,9 +125,10 @@ Una biblioteca reutilizable de plantillas (Word, PDF, imágenes, etc.) para el e
 ### Subir modelos
 
 1. Elija el «Área del derecho» (Laboral, Civil, Penal, Familia, etc.).
-2. Suba varios archivos a la vez, o una carpeta completa: todos quedarán clasificados en el área elegida.
-3. Si sube un solo archivo puede ponerle un nombre; si sube varios o una carpeta, se usa el nombre de cada archivo.
-4. Pulse «Subir al área seleccionada»; una barra indica el avance.
+2. Si necesita un área que no está en la lista, elija «Crear nueva categoría...», escriba su nombre y quedará disponible al instante en todo el sistema (procesos y modelos).
+3. Suba varios archivos a la vez, o una carpeta completa: todos quedarán clasificados en el área elegida.
+4. Si sube un solo archivo puede ponerle un nombre; si sube varios o una carpeta, se usa el nombre de cada archivo.
+5. Pulse «Subir al área seleccionada»; una barra indica el avance.
 
 ### Biblioteca
 
@@ -197,6 +198,8 @@ En la carpeta db/ del repositorio están los scripts SQL. Se ejecutan UNA sola v
 - 04_modelos_nurej.sql — biblioteca de modelos y campo NUREJ.
 - 05_multiples_abogados.sql — varios abogados/procuradores por proceso.
 - 06_consultas.sql — bandeja de Consultas (formulario de contacto).
+- 07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.
+- 08_categorias.sql — áreas del derecho dinámicas (crear categorías desde el panel).
 
 ### Conexión y correo
 
