@@ -4,7 +4,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R] /Count 9 >>
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R] /Count 10 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
@@ -265,7 +265,7 @@ ET
 BT
 /F1 10.50 Tf
 533.44 577.89 Td
-(4) Tj
+(5) Tj
 ET
 0.800 0.820 0.850 rg
 BT
@@ -319,7 +319,7 @@ ET
 BT
 /F1 10.50 Tf
 533.44 523.89 Td
-(5) Tj
+(6) Tj
 ET
 0.800 0.820 0.850 rg
 BT
@@ -799,7 +799,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Length 5860 >>
+<< /Length 5987 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -880,259 +880,259 @@ ET
 BT
 /F1 10.50 Tf
 74.00 662.39 Td
+(No se preocupe si esto ocurre mientras redacta: el sistema guarda automáticamente lo que escribe) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 647.89 Td
+(\(descripción del caso, datos del proceso, una actuación, etc.\). Al volver a abrir ese mismo) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 633.39 Td
+(formulario, le ofrecerá «Recuperar» lo que había dejado.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 616.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 616.89 Td
 (Use el botón «Cerrar sesión» al terminar, sobre todo en equipos compartidos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 645.89 Td
+60.00 600.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 645.89 Td
+74.00 600.39 Td
 (Si olvidó su contraseña, solicite ayuda al administrador del sistema.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 608.89 Td
+56.00 563.39 Td
 (4. Panel general \(Dashboard\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 600.89 m 539.28 600.89 l S
+56.00 555.39 m 539.28 555.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 574.39 Td
+56.00 528.89 Td
 (Es la primera pantalla del personal. Muestra un resumen con tarjetas \(métricas\) y accesos rápidos:) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 552.89 Td
+60.00 507.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 552.89 Td
+74.00 507.39 Td
 (Procesos totales y procesos activos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 536.39 Td
+60.00 490.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 536.39 Td
+74.00 490.89 Td
 (Audiencias próximas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 519.89 Td
+60.00 474.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 519.89 Td
+74.00 474.39 Td
 (Mis procesos: los casos en los que usted está asignado.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 503.39 Td
+60.00 457.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 503.39 Td
+74.00 457.89 Td
 (Consultas nuevas: mensajes del formulario web aún sin atender. Al hacer clic en esta tarjeta se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 488.89 Td
+74.00 443.39 Td
 (abre directamente la bandeja de Consultas.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 451.89 Td
+56.00 406.39 Td
 (5. Procesos \(casos\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 443.89 m 539.28 443.89 l S
+56.00 398.39 m 539.28 398.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 417.39 Td
+56.00 371.89 Td
 (La pestaña «Procesos» es el corazón del sistema. Allí se registra y da seguimiento a cada caso.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 388.39 Td
+56.00 342.89 Td
 (Crear o editar un proceso) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 367.89 Td
+58.00 322.39 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 367.89 Td
+78.00 322.39 Td
 (Pulse «Nuevo proceso» \(o haga clic sobre un proceso existente para editarlo\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 350.39 Td
+58.00 304.89 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 350.39 Td
+78.00 304.89 Td
 (Complete los datos: carátula, número/NUREJ, materia, estado, parte contraria y la próxima) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 335.89 Td
+78.00 290.39 Td
 (audiencia. En «Materia» puede elegir «Crear nueva categoría...» para agregar un área del) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 321.39 Td
+78.00 275.89 Td
 (derecho que no esté en la lista; quedará disponible en todo el sistema.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 303.89 Td
+58.00 258.39 Td
 (3.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 303.89 Td
+78.00 258.39 Td
 (Asigne uno o varios abogados y procuradores a cargo.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 286.39 Td
+58.00 240.89 Td
 (4.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 286.39 Td
+78.00 240.89 Td
 (Vincule un cliente existente o registre uno nuevo directamente desde el formulario.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 268.89 Td
+58.00 223.39 Td
 (5.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 268.89 Td
+78.00 223.39 Td
 (Guarde. El proceso queda registrado y visible para el equipo asignado.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 143.39 483.28 72.00 re
+f
+0.760 0.635 0.353 rg
+56.00 143.39 4.00 72.00 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 195.89 Td
+(Autoguardado) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 182.39 Td
+(Mientras escribe \(sobre todo descripciones largas o un memorial\), el sistema guarda un borrador) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 168.89 Td
+(automático en su equipo. Si la sesión se cierra o cierra el navegador, al reabrir el formulario podrá) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 155.39 Td
+(«Recuperar» lo que había dejado y solo completar lo que falte. Al guardar, el borrador se descarta.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 238.89 Td
+56.00 111.39 Td
 (Documentos y actuaciones) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 218.39 Td
+60.00 90.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 218.39 Td
+74.00 90.89 Td
 (Documentos generales del proceso: en «Memoriales y documentos» puede subir y descargar) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 203.89 Td
+74.00 76.39 Td
 (archivos sueltos \(carátula, poder, anexos, etc.\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 187.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 187.39 Td
-(Historial de actuaciones: registre cada paso del proceso con su fecha y una descripción \(por) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 172.89 Td
-(ejemplo, «Respuesta del juzgado» o «Nuevo memorial presentado»\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 156.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 156.39 Td
-(A cada paso del historial puede adjuntar uno o varios archivos: así sube la respuesta recibida del) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 141.89 Td
-(juzgado y, junto a ella, el nuevo memorial que se presentará.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 125.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 125.39 Td
-(El cliente del caso ve su historial en modo lectura: puede abrir y descargar la respuesta del juzgado) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 110.89 Td
-(y el nuevo memorial, pero no modificar nada.) Tj
 ET
 
 endstream
@@ -1141,7 +1141,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Length 5395 >>
+<< /Length 5538 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1176,284 +1176,287 @@ BT
 281.85 52.00 Td
 (Página 4) Tj
 ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 757.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 757.39 Td
+(Historial de actuaciones: registre cada paso del proceso con su fecha y una descripción \(por) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 742.89 Td
+(ejemplo, «Respuesta del juzgado» o «Nuevo memorial presentado»\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 726.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 726.39 Td
+(A cada paso del historial puede adjuntar uno o varios archivos: así sube la respuesta recibida del) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 711.89 Td
+(juzgado y, junto a ella, el nuevo memorial que se presentará.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 695.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 695.39 Td
+(El cliente del caso ve su historial en modo lectura: puede abrir y descargar la respuesta del juzgado) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 680.89 Td
+(y el nuevo memorial, pero no modificar nada.) Tj
+ET
 0.965 0.957 0.937 rg
-56.00 713.39 483.28 58.50 re
+56.00 615.39 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 713.39 4.00 58.50 re
+56.00 615.39 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 752.39 Td
+71.00 654.39 Td
 (Cuidado) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 738.89 Td
+71.00 640.89 Td
 (Solo el administrador puede eliminar un proceso de forma definitiva. La eliminación no se puede) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 725.39 Td
+71.00 627.39 Td
 (deshacer.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 673.39 Td
+56.00 575.39 Td
 (6. Clientes) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 665.39 m 539.28 665.39 l S
+56.00 567.39 m 539.28 567.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 638.89 Td
+56.00 540.89 Td
 (En «Clientes» se administra la cartera de personas o empresas atendidas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 617.39 Td
+60.00 519.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 617.39 Td
+74.00 519.39 Td
 (Cree o edite un cliente con su nombre/razón social, documento \(CI/NIT\), teléfono, correo, dirección) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 602.89 Td
+74.00 504.89 Td
 (y notas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 586.39 Td
+60.00 488.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 586.39 Td
+74.00 488.39 Td
 (El correo es clave: es lo que permite que, al registrarse en el portal, el cliente vea sus propios) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 571.89 Td
+74.00 473.89 Td
 (procesos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 555.39 Td
+60.00 457.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 555.39 Td
+74.00 457.39 Td
 (Use el buscador para encontrar un cliente por nombre, documento, correo o teléfono.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 518.39 Td
+56.00 420.39 Td
 (7. Bandeja de Consultas) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 510.39 m 539.28 510.39 l S
+56.00 412.39 m 539.28 412.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 483.89 Td
+56.00 385.89 Td
 (Cada mensaje enviado desde el formulario de contacto de la web pública llega a esta bandeja \(y, si el) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 469.39 Td
+56.00 371.39 Td
 (correo está configurado, también se envía una copia por correo\). Así ninguna consulta se pierde.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 440.39 Td
+56.00 342.39 Td
 (Cómo trabajar las consultas) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 419.89 Td
+58.00 321.89 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 419.89 Td
+78.00 321.89 Td
 (Abra la pestaña «Consultas». Verá la lista ordenada de la más reciente a la más antigua.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 402.39 Td
+58.00 304.39 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 402.39 Td
+78.00 304.39 Td
 (Use el buscador o el filtro por estado \(Nuevas, Atendidas, Archivadas\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 384.89 Td
+58.00 286.89 Td
 (3.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 384.89 Td
+78.00 286.89 Td
 (Haga clic en una consulta para ver el mensaje completo y los datos de contacto.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 367.39 Td
+58.00 269.39 Td
 (4.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 367.39 Td
+78.00 269.39 Td
 (Responda con un toque: botón «Responder por WhatsApp» o «Responder por correo».) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 349.89 Td
+58.00 251.89 Td
 (5.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 349.89 Td
+78.00 251.89 Td
 (Marque la consulta como «Atendida» cuando la haya gestionado, o «Archivar» si ya no es) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 335.39 Td
+78.00 237.39 Td
 (relevante. Puede volver a marcarla como «Nueva» si lo necesita.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 312.89 Td
+60.00 214.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 312.89 Td
+74.00 214.89 Td
 (Estados: Nueva \(recién llegada\), Atendida \(ya gestionada\) y Archivada.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 296.39 Td
+60.00 198.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 296.39 Td
+74.00 198.39 Td
 (Todo el personal puede ver y gestionar las consultas; solo el administrador puede eliminarlas.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 230.89 483.28 58.50 re
+56.00 132.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 230.89 4.00 58.50 re
+56.00 132.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 269.89 Td
+71.00 171.89 Td
 (Si no ve la bandeja) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 256.39 Td
+71.00 158.39 Td
 (Si la pestaña «Consultas» no aparece o da error, es porque falta ejecutar una sola vez el script) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 242.89 Td
+71.00 144.89 Td
 (db/06_consultas.sql en Supabase. Vea la sección 15.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 190.89 Td
-(8. Modelos de memoriales) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 182.89 m 539.28 182.89 l S
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 156.39 Td
-(Una biblioteca reutilizable de plantillas \(Word, PDF, imágenes, etc.\) para el equipo, organizada por área) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 141.89 Td
-(del derecho.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 12.00 Tf
-56.00 112.89 Td
-(Subir modelos) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 92.39 Td
-(1.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 92.39 Td
-(Elija el «Área del derecho» \(Laboral, Civil, Penal, Familia, etc.\).) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 74.89 Td
-(2.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 74.89 Td
-(Si necesita un área que no está en la lista, elija «Crear nueva categoría...», escriba su nombre y) Tj
 ET
 
 endstream
@@ -1462,7 +1465,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 4969 >>
+<< /Length 5166 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1497,278 +1500,290 @@ BT
 281.85 52.00 Td
 (Página 5) Tj
 ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 757.39 Td
-(quedará disponible al instante en todo el sistema \(procesos y modelos\).) Tj
-ET
 0.055 0.106 0.173 rg
 BT
-/F2 10.50 Tf
-58.00 739.89 Td
-(3.) Tj
+/F2 16.00 Tf
+56.00 741.89 Td
+(8. Modelos de memoriales) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 733.89 m 539.28 733.89 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 707.39 Td
+(Una biblioteca reutilizable de plantillas \(Word, PDF, imágenes, etc.\) para el equipo, organizada por área) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 739.89 Td
-(Suba varios archivos a la vez, o una carpeta completa: todos quedarán clasificados en el área) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 725.39 Td
-(elegida.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 707.89 Td
-(4.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 707.89 Td
-(Si sube un solo archivo puede ponerle un nombre; si sube varios o una carpeta, se usa el nombre) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 693.39 Td
-(de cada archivo.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 675.89 Td
-(5.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 675.89 Td
-(Pulse «Subir al área seleccionada»; una barra indica el avance.) Tj
+56.00 692.89 Td
+(del derecho.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 645.89 Td
-(Biblioteca) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 625.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 625.39 Td
-(Los modelos se muestran agrupados por área, con un contador por cada una.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 608.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 608.89 Td
-(Filtre por área o use el buscador por nombre.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 592.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 592.39 Td
-(Descargue cualquier modelo cuando lo necesite, o elimínelo si ya no sirve.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 555.39 Td
-(9. Blog) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 547.39 m 539.28 547.39 l S
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 520.89 Td
-(Permite publicar artículos jurídicos que aparecen en la página pública \(blog.html\).) Tj
+56.00 663.89 Td
+(Subir modelos) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 499.39 Td
+58.00 643.39 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 499.39 Td
-(Pulse «Nuevo artículo».) Tj
+78.00 643.39 Td
+(Elija el «Área del derecho» \(Laboral, Civil, Penal, Familia, etc.\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 481.89 Td
+58.00 625.89 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 481.89 Td
-(Escriba el título, la categoría, un resumen y el contenido.) Tj
+78.00 625.89 Td
+(Si necesita un área que no está en la lista, elija «Crear nueva categoría...», escriba su nombre y) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 611.39 Td
+(quedará disponible al instante en todo el sistema \(procesos y modelos\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 464.39 Td
+58.00 593.89 Td
 (3.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 464.39 Td
-(Elija el estado: «Borrador» \(no se publica\) o «Publicado» \(aparece en la web\).) Tj
+78.00 593.89 Td
+(Suba varios archivos a la vez, o una carpeta completa: todos quedarán clasificados en el área) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 579.39 Td
+(elegida.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 446.89 Td
+58.00 561.89 Td
 (4.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 446.89 Td
+78.00 561.89 Td
+(Si sube un solo archivo puede ponerle un nombre; si sube varios o una carpeta, se usa el nombre) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 547.39 Td
+(de cada archivo.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 529.89 Td
+(5.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 529.89 Td
+(Pulse «Subir al área seleccionada»; una barra indica el avance.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 499.89 Td
+(Biblioteca) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 479.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 479.39 Td
+(Los modelos se muestran agrupados por área, con un contador por cada una.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 462.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 462.89 Td
+(Filtre por área o use el buscador por nombre.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 446.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 446.39 Td
+(Descargue cualquier modelo cuando lo necesite, o elimínelo si ya no sirve.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 409.39 Td
+(9. Blog) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 401.39 m 539.28 401.39 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 374.89 Td
+(Permite publicar artículos jurídicos que aparecen en la página pública \(blog.html\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 353.39 Td
+(1.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 353.39 Td
+(Pulse «Nuevo artículo».) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 335.89 Td
+(2.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 335.89 Td
+(Escriba el título, la categoría, un resumen y el contenido.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 318.39 Td
+(3.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 318.39 Td
+(Elija el estado: «Borrador» \(no se publica\) o «Publicado» \(aparece en la web\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 300.89 Td
+(4.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 300.89 Td
 (Guarde. Los artículos publicados se muestran automáticamente en el blog público.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 393.89 483.28 45.00 re
+56.00 247.89 483.28 45.00 re
 f
 0.760 0.635 0.353 rg
-56.00 393.89 4.00 45.00 re
+56.00 247.89 4.00 45.00 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 419.39 Td
+71.00 273.39 Td
 (Autoría) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 405.89 Td
+71.00 259.89 Td
 (Cada artículo lo edita su autor o un administrador. Así se respeta la autoría del contenido.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 353.89 Td
+56.00 207.89 Td
 (10. Testimonios) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 345.89 m 539.28 345.89 l S
+56.00 199.89 m 539.28 199.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 319.39 Td
+56.00 173.39 Td
 (Los clientes pueden dejar su opinión desde su portal. El administrador las modera antes de que) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 304.89 Td
+56.00 158.89 Td
 (aparezcan en la web:) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 283.39 Td
+60.00 137.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 283.39 Td
+74.00 137.39 Td
 (Aprobar: el testimonio se publica en la página de inicio.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 266.89 Td
+60.00 120.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 266.89 Td
+74.00 120.89 Td
 (Rechazar: no se publica \(el cliente puede editarlo y reenviarlo\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 250.39 Td
+60.00 104.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 250.39 Td
+74.00 104.39 Td
 (Eliminar: quita el testimonio definitivamente.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 213.39 Td
-(11. Usuarios \(administrador\)) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 205.39 m 539.28 205.39 l S
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 178.89 Td
-(Solo el administrador ve esta pestaña. Sirve para gestionar al personal:) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 157.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 157.39 Td
-(Cambiar el rol de un usuario \(administrador, abogado, procurador o cliente\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 140.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 140.89 Td
-(Activar o desactivar cuentas. No es posible desactivar la propia cuenta.) Tj
 ET
 
 endstream
@@ -1777,7 +1792,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 15 0 R >>
 endobj
 17 0 obj
-<< /Length 5179 >>
+<< /Length 4911 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1816,7 +1831,7 @@ ET
 BT
 /F2 16.00 Tf
 56.00 741.89 Td
-(12. Categorías / áreas del derecho \(administrador\)) Tj
+(11. Usuarios \(administrador\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
@@ -1825,250 +1840,235 @@ ET
 BT
 /F1 10.50 Tf
 56.00 707.39 Td
+(Solo el administrador ve esta pestaña. Sirve para gestionar al personal:) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 685.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 685.89 Td
+(Cambiar el rol de un usuario \(administrador, abogado, procurador o cliente\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 669.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 669.39 Td
+(Activar o desactivar cuentas. No es posible desactivar la propia cuenta.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 632.39 Td
+(12. Categorías / áreas del derecho \(administrador\)) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 624.39 m 539.28 624.39 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 597.89 Td
 (Las áreas del derecho \(Laboral, Civil, Penal, etc.\) clasifican los procesos y los modelos de memoriales.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 692.89 Td
+56.00 583.39 Td
 (Esta pestaña permite administrarlas:) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 671.39 Td
+60.00 561.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 671.39 Td
+74.00 561.89 Td
 (Crear una categoría nueva: aparece al instante en las listas de Procesos y Modelos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 654.89 Td
+60.00 545.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 654.89 Td
+74.00 545.39 Td
 (Renombrar una categoría: los procesos y modelos que la usaban se actualizan automáticamente,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 640.39 Td
+74.00 530.89 Td
 (sin perder su clasificación.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 623.89 Td
+60.00 514.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 623.89 Td
+74.00 514.39 Td
 (Eliminar una categoría: solo es posible si no está en uso \(la tabla muestra cuántos procesos y) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 609.39 Td
+74.00 499.89 Td
 (modelos usan cada una\).) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 543.89 483.28 58.50 re
+56.00 434.39 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 543.89 4.00 58.50 re
+56.00 434.39 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 582.89 Td
+71.00 473.39 Td
 (Atajo) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 569.39 Td
+71.00 459.89 Td
 (También puede crear una categoría sobre la marcha desde los formularios de Procesos y de Modelos,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 555.89 Td
+71.00 446.39 Td
 (eligiendo «Crear nueva categoría...» en el selector de área.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 503.89 Td
+56.00 394.39 Td
 (13. Auditoría \(administrador\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 495.89 m 539.28 495.89 l S
+56.00 386.39 m 539.28 386.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 469.39 Td
+56.00 359.89 Td
 (Es la bitácora del sistema. Registra las acciones importantes \(quién creó, editó o eliminó algo, cambios) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 454.89 Td
+56.00 345.39 Td
 (de rol, moderación de testimonios, etc.\), con fecha, usuario y detalle. Útil para control interno y) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 440.39 Td
+56.00 330.89 Td
 (transparencia.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 403.39 Td
+56.00 293.89 Td
 (14. Portal del cliente) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 395.39 m 539.28 395.39 l S
+56.00 285.89 m 539.28 285.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 368.89 Td
+56.00 259.39 Td
 (Cuando un cliente inicia sesión, ve una versión reducida y privada:) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 347.39 Td
+60.00 237.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 347.39 Td
+74.00 237.89 Td
 (Mis procesos: el listado de sus casos, su estado y la próxima audiencia, además de un botón para) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 332.89 Td
+74.00 223.39 Td
 (consultar por WhatsApp.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 316.39 Td
+60.00 206.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 316.39 Td
+74.00 206.89 Td
 (Dentro de cada caso ve su historial de actuaciones y puede descargar los archivos de cada paso:) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 301.89 Td
+74.00 192.39 Td
 (la respuesta del juzgado y el nuevo memorial presentado, entre otros.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 285.39 Td
+60.00 175.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 285.39 Td
+74.00 175.89 Td
 (Mi opinión: un formulario para calificar el servicio y dejar un comentario, que el bufete revisa antes) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 270.89 Td
+74.00 161.39 Td
 (de publicarlo.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 233.89 Td
+56.00 124.39 Td
 (15. La página web pública) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 225.89 m 539.28 225.89 l S
+56.00 116.39 m 539.28 116.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 199.39 Td
+56.00 89.89 Td
 (Es la cara del bufete hacia los clientes. Incluye:) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 177.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 177.89 Td
-(Inicio, Áreas de práctica, Nosotros \(equipo\), Casos de éxito, Blog y Preguntas frecuentes.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 161.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 161.39 Td
-(Sección «Contáctenos» con el formulario \(que llega a la bandeja de Consultas\) y la opción de) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 146.89 Td
-(escribir por WhatsApp a un abogado específico.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 130.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 130.39 Td
-(Botón flotante de WhatsApp que abre un menú con los cinco abogados.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 113.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 113.89 Td
-(Páginas legales: Aviso de privacidad y Términos y condiciones, enlazadas en el pie de página.) Tj
 ET
 
 endstream
@@ -2077,7 +2077,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 17 0 R >>
 endobj
 19 0 obj
-<< /Length 5341 >>
+<< /Length 5923 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -2112,287 +2112,317 @@ BT
 281.85 52.00 Td
 (Página 7) Tj
 ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 757.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 757.39 Td
+(Inicio, Áreas de práctica, Nosotros \(equipo\), Casos de éxito, Blog y Preguntas frecuentes.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 740.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 740.89 Td
+(Sección «Contáctenos» con el formulario \(que llega a la bandeja de Consultas\) y la opción de) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 726.39 Td
+(escribir por WhatsApp a un abogado específico.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 709.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 709.89 Td
+(Botón flotante de WhatsApp que abre un menú con los cinco abogados.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 693.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 693.39 Td
+(Páginas legales: Aviso de privacidad y Términos y condiciones, enlazadas en el pie de página.) Tj
+ET
 0.965 0.957 0.937 rg
-56.00 713.39 483.28 58.50 re
+56.00 627.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 713.39 4.00 58.50 re
+56.00 627.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 752.39 Td
+71.00 666.89 Td
 (Privacidad del equipo) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 738.89 Td
+71.00 653.39 Td
 (La barra superior y el pie ya no muestran correos ni teléfonos personales: el canal principal es el) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 725.39 Td
+71.00 639.89 Td
 (formulario y, de forma directa, el WhatsApp de cada abogado.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 673.39 Td
+56.00 587.89 Td
 (16. Configuración técnica \(Supabase y despliegue\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 665.39 m 539.28 665.39 l S
+56.00 579.89 m 539.28 579.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 638.89 Td
+56.00 553.39 Td
 (Esta sección es para quien administra la parte técnica.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 609.89 Td
+56.00 524.39 Td
 (Base de datos \(Supabase\)) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 589.39 Td
+56.00 503.89 Td
 (En la carpeta db/ del repositorio están los scripts SQL. Se ejecutan UNA sola vez, en orden, en el SQL) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 574.89 Td
+56.00 489.39 Td
 (Editor de Supabase:) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 553.39 Td
+60.00 467.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 553.39 Td
+74.00 467.89 Td
 (schema.sql — tablas base, reglas de acceso por rol y almacenamiento de documentos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 536.89 Td
+60.00 451.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 536.89 Td
+74.00 451.39 Td
 (02_portal_clientes.sql — rol cliente y aislamiento de datos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 520.39 Td
+60.00 434.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 520.39 Td
+74.00 434.89 Td
 (03_blog_alertas_testimonios.sql — blog, alertas y testimonios.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 503.89 Td
+60.00 418.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 503.89 Td
+74.00 418.39 Td
 (04_modelos_nurej.sql — biblioteca de modelos y campo NUREJ.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 487.39 Td
+60.00 401.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 487.39 Td
+74.00 401.89 Td
 (05_multiples_abogados.sql — varios abogados/procuradores por proceso.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 470.89 Td
+60.00 385.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 470.89 Td
+74.00 385.39 Td
 (06_consultas.sql — bandeja de Consultas \(formulario de contacto\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 454.39 Td
+60.00 368.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 454.39 Td
+74.00 368.89 Td
 (07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 437.89 Td
+60.00 352.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 437.89 Td
+74.00 352.39 Td
 (08_categorias.sql — áreas del derecho dinámicas \(crear categorías desde el panel\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 421.39 Td
+60.00 335.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 421.39 Td
+74.00 335.89 Td
 (09_actuaciones_archivos.sql — adjuntar archivos a cada actuación del historial.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 392.39 Td
+56.00 306.89 Td
 (Conexión y correo) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 371.89 Td
+60.00 286.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 371.89 Td
+74.00 286.39 Td
 (La conexión a Supabase está en sistema/js/config.js \(URL y clave pública\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 355.39 Td
+60.00 269.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 355.39 Td
+74.00 269.89 Td
 (El aviso por correo de las consultas usa Web3Forms; la clave está en el formulario de contacto de) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 340.89 Td
+74.00 255.39 Td
 (index.html.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 311.89 Td
+56.00 226.39 Td
 (Despliegue \(publicar cambios\)) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 291.39 Td
+56.00 205.89 Td
 (El sitio se publica con Netlify, conectado al repositorio de GitHub. Al subir cambios a la rama principal) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 276.89 Td
+56.00 191.39 Td
 (\(main\), Netlify vuelve a publicar el sitio automáticamente en uno o dos minutos.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 239.89 Td
+56.00 154.39 Td
 (17. Cómo agregar un nuevo abogado) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 231.89 m 539.28 231.89 l S
+56.00 146.39 m 539.28 146.39 l S
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 205.39 Td
+58.00 119.89 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 205.39 Td
+78.00 119.89 Td
 (En Supabase, vaya a Authentication ? Users ? Add user, y cree la cuenta con su correo \(o pídale) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 190.89 Td
+78.00 105.39 Td
 (que se registre desde la pantalla de acceso\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 173.39 Td
+58.00 87.89 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 173.39 Td
+78.00 87.89 Td
 (Ingrese al panel como administrador y abra la pestaña «Usuarios».) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 155.89 Td
-(3.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 155.89 Td
-(Busque al nuevo usuario y cámbiele el rol a «Abogado» o «Procurador».) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 138.39 Td
-(4.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 138.39 Td
-(Listo: ya podrá ingresar y trabajar según su rol.) Tj
 ET
 
 endstream
@@ -2401,7 +2431,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 19 0 R >>
 endobj
 21 0 obj
-<< /Length 5025 >>
+<< /Length 4951 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -2438,264 +2468,264 @@ BT
 ET
 0.055 0.106 0.173 rg
 BT
+/F2 10.50 Tf
+58.00 757.39 Td
+(3.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 757.39 Td
+(Busque al nuevo usuario y cámbiele el rol a «Abogado» o «Procurador».) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 739.89 Td
+(4.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 739.89 Td
+(Listo: ya podrá ingresar y trabajar según su rol.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
 /F2 16.00 Tf
-56.00 741.89 Td
+56.00 701.89 Td
 (18. Mantenimiento y buenas prácticas) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 733.89 m 539.28 733.89 l S
+56.00 693.89 m 539.28 693.89 l S
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 707.39 Td
+60.00 667.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 707.39 Td
+74.00 667.39 Td
 (Cada persona debe tener su propia cuenta; no comparta usuarios ni contraseñas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 690.89 Td
+60.00 650.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 690.89 Td
+74.00 650.89 Td
 (Use contraseñas robustas y cámbielas periódicamente.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 674.39 Td
+60.00 634.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 674.39 Td
+74.00 634.39 Td
 (Cierre sesión en equipos compartidos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 657.89 Td
+60.00 617.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 657.89 Td
+74.00 617.89 Td
 (Revise la bandeja de Consultas a diario para no dejar clientes sin respuesta.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 641.39 Td
+60.00 601.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 641.39 Td
+74.00 601.39 Td
 (Mantenga al día los estados de los procesos y las próximas audiencias.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 624.89 Td
+60.00 584.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 624.89 Td
+74.00 584.89 Td
 (Supabase guarda los datos en la nube; aun así, conviene exportar respaldos periódicos desde el) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 610.39 Td
+74.00 570.39 Td
 (panel de Supabase.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 573.39 Td
+56.00 533.39 Td
 (19. Solución de problemas frecuentes) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 565.39 m 539.28 565.39 l S
+56.00 525.39 m 539.28 525.39 l S
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 531.39 Td
+56.00 491.39 Td
 (No veo la pestaña «Consultas» o da error) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 510.89 Td
+56.00 470.89 Td
 (Falta ejecutar el script db/06_consultas.sql en Supabase \(una sola vez\). Si el error menciona una) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 496.39 Td
+56.00 456.39 Td
 (columna que no existe, vuelva a ejecutar el script, que está preparado para completar la tabla sin borrar) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 481.89 Td
+56.00 441.89 Td
 (datos.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 452.89 Td
+56.00 412.89 Td
 (Envié una consulta de prueba y no aparece) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 432.39 Td
+60.00 392.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 432.39 Td
+74.00 392.39 Td
 (Verifique que el sitio ya tenga publicada la última versión \(Netlify\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 415.89 Td
+60.00 375.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 415.89 Td
+74.00 375.89 Td
 (Confirme que sistema/js/config.js tiene la URL y la clave de Supabase correctas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 399.39 Td
+60.00 359.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 399.39 Td
+74.00 359.39 Td
 (Revise el filtro de estado en la bandeja \(puede estar en «Atendidas»\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 370.39 Td
+56.00 330.39 Td
 (No puedo iniciar sesión) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 349.89 Td
+60.00 309.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 349.89 Td
+74.00 309.89 Td
 (Revise que el correo y la contraseña sean correctos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 333.39 Td
+60.00 293.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 333.39 Td
+74.00 293.39 Td
 (Si la cuenta fue desactivada, pida al administrador que la reactive en «Usuarios».) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 304.39 Td
+56.00 264.39 Td
 (Un cliente no ve sus procesos) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 283.89 Td
+56.00 243.89 Td
 (Debe haberse registrado con el mismo correo que figura en su ficha de cliente y en sus procesos.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 269.39 Td
+56.00 229.39 Td
 (Verifique el correo en la pestaña «Clientes».) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 232.39 Td
+56.00 192.39 Td
 (20. Soporte) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 224.39 m 539.28 224.39 l S
+56.00 184.39 m 539.28 184.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 197.89 Td
+56.00 157.89 Td
 (Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 183.39 Td
+56.00 143.39 Td
 (mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 168.89 Td
+56.00 128.89 Td
 (posible lo que necesita.) Tj
-ET
-0.965 0.957 0.937 rg
-56.00 95.39 483.28 58.50 re
-f
-0.760 0.635 0.353 rg
-56.00 95.39 4.00 58.50 re
-f
-0.659 0.522 0.235 rg
-BT
-/F2 10.00 Tf
-71.00 134.39 Td
-(Versión) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 120.89 Td
-(Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 107.39 Td
-(actualiza, solicite una versión nueva del manual.) Tj
 ET
 
 endstream
@@ -2703,33 +2733,101 @@ endobj
 22 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 21 0 R >>
 endobj
+23 0 obj
+<< /Length 906 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+464.64 792.89 Td
+(Manual del Sistema) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+281.85 52.00 Td
+(Página 9) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 713.39 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 713.39 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 752.39 Td
+(Versión) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 738.89 Td
+(Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 725.39 Td
+(actualiza, solicite una versión nueva del manual.) Tj
+ET
+
+endstream
+endobj
+24 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 23 0 R >>
+endobj
 xref
-0 23
+0 25
 0000000000 65535 f 
 0000000015 00000 n 
 0000000064 00000 n 
-0000000176 00000 n 
-0000000273 00000 n 
-0000000375 00000 n 
-0000001355 00000 n 
-0000001519 00000 n 
-0000008746 00000 n 
-0000008910 00000 n 
-0000014046 00000 n 
-0000014211 00000 n 
-0000020124 00000 n 
-0000020290 00000 n 
-0000025738 00000 n 
-0000025904 00000 n 
-0000030926 00000 n 
-0000031092 00000 n 
-0000036324 00000 n 
-0000036490 00000 n 
-0000041884 00000 n 
-0000042050 00000 n 
-0000047128 00000 n 
+0000000184 00000 n 
+0000000281 00000 n 
+0000000383 00000 n 
+0000001363 00000 n 
+0000001527 00000 n 
+0000008754 00000 n 
+0000008918 00000 n 
+0000014054 00000 n 
+0000014219 00000 n 
+0000020259 00000 n 
+0000020425 00000 n 
+0000026016 00000 n 
+0000026182 00000 n 
+0000031401 00000 n 
+0000031567 00000 n 
+0000036531 00000 n 
+0000036697 00000 n 
+0000042673 00000 n 
+0000042839 00000 n 
+0000047843 00000 n 
+0000048009 00000 n 
+0000048967 00000 n 
 trailer
-<< /Size 23 /Root 1 0 R >>
+<< /Size 25 /Root 1 0 R >>
 startxref
-47294
+49133
 %%EOF

@@ -95,6 +95,74 @@ function openModal(title, bodyHTML, buttons = [], wide = false) {
 }
 function closeModal() { $('#modalOverlay').classList.remove('open'); }
 
+// ============================================================
+//  BORRADORES — autoguardado para no perder lo que se está escribiendo
+//  (p. ej. la descripción de un caso o un memorial largo). Se guarda en
+//  el navegador, por usuario, y se recupera aunque la sesión se cierre
+//  por inactividad o se cierre el navegador.
+// ============================================================
+const Draft = {
+  key(name) { return `lexfive_draft_${state.profile ? state.profile.id : 'anon'}_${name}`; },
+  save(name, data) { try { localStorage.setItem(this.key(name), JSON.stringify({ data, ts: Date.now() })); } catch (e) {} },
+  load(name) { try { const r = localStorage.getItem(this.key(name)); return r ? JSON.parse(r) : null; } catch (e) { return null; } },
+  clear(name) { try { localStorage.removeItem(this.key(name)); } catch (e) {} }
+};
+
+// Texto amistoso de "hace cuánto" se guardó el borrador
+function draftAgo(ts) {
+  if (!ts) return 'hace un momento';
+  const min = Math.floor((Date.now() - ts) / 60000);
+  if (min < 1) return 'hace menos de un minuto';
+  if (min < 60) return `hace ${min} minuto${min === 1 ? '' : 's'}`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `hace ${h} hora${h === 1 ? '' : 's'}`;
+  const d = Math.floor(h / 24);
+  return `hace ${d} día${d === 1 ? '' : 's'}`;
+}
+
+// Conecta el autoguardado de un formulario: serializa los campos indicados
+// (y grupos de checkboxes) y los guarda en cada cambio.
+function wireDraft(draftName, fieldIds, checkboxClasses = []) {
+  const collect = () => {
+    const o = {};
+    fieldIds.forEach(id => { const el = document.getElementById(id); if (el) o[id] = el.value; });
+    checkboxClasses.forEach(cls => {
+      o['__chk_' + cls] = Array.from(document.querySelectorAll('.' + cls + ':checked')).map(c => c.value);
+    });
+    return o;
+  };
+  const apply = (o) => {
+    fieldIds.forEach(id => { const el = document.getElementById(id); if (el && o[id] != null) el.value = o[id]; });
+    checkboxClasses.forEach(cls => {
+      const vals = o['__chk_' + cls] || [];
+      document.querySelectorAll('.' + cls).forEach(c => { c.checked = vals.includes(c.value); });
+    });
+  };
+  const onChange = () => Draft.save(draftName, collect());
+  fieldIds.forEach(id => { const el = document.getElementById(id); if (el) { el.addEventListener('input', onChange); el.addEventListener('change', onChange); } });
+  checkboxClasses.forEach(cls => document.querySelectorAll('.' + cls).forEach(c => c.addEventListener('change', onChange)));
+  return { collect, apply };
+}
+
+// Si hay un borrador distinto a lo que ya muestra el formulario, ofrece
+// recuperarlo con un aviso en la parte superior del modal.
+function maybeOfferDraft(draftName, draft) {
+  const saved = Draft.load(draftName);
+  if (!saved || !saved.data) return;
+  if (JSON.stringify(saved.data) === JSON.stringify(draft.collect())) { Draft.clear(draftName); return; }
+  const body = $('#modalBody');
+  const banner = document.createElement('div');
+  banner.className = 'draft-banner';
+  banner.innerHTML = `<span>${ICON.alerta || ''} Se guardó automáticamente lo que estaba escribiendo (${draftAgo(saved.ts)}). ¿Desea recuperarlo?</span>
+    <span class="draft-banner__actions">
+      <button class="btn btn--navy btn--sm" id="draftRestore">Recuperar</button>
+      <button class="btn btn--ghost btn--sm" id="draftDiscard">Descartar</button>
+    </span>`;
+  body.insertBefore(banner, body.firstChild);
+  $('#draftRestore').onclick = () => { draft.apply(saved.data); banner.remove(); Draft.save(draftName, draft.collect()); toast('Recuperamos lo que estaba escribiendo.', 'success'); };
+  $('#draftDiscard').onclick = () => { Draft.clear(draftName); banner.remove(); };
+}
+
 function profName(id) {
   if (!id) return '—';
   const p = state.profiles.find(x => x.id === id);
@@ -485,6 +553,13 @@ function procesoForm(proc = null) {
     { label: 'Guardar', class: 'btn--primary', id: 'pf_save', onClick: () => saveProceso(proc) }
   ], true);
   wireCategoriaSelect($('#pf_materia'));
+
+  // Autoguardado de borrador (no perder lo escrito si se cierra la sesión)
+  const draftName = 'proceso_' + (proc ? proc.id : 'nuevo');
+  const fields = ['pf_caratula', 'pf_numero', 'pf_nurej', 'pf_tipo', 'pf_materia', 'pf_estado',
+    'pf_juzgado', 'pf_cliente', 'pf_contraria', 'pf_cliente_nuevo', 'pf_inicio', 'pf_audiencia', 'pf_desc'];
+  const draft = wireDraft(draftName, fields, ['pf-abo', 'pf-proc']);
+  maybeOfferDraft(draftName, draft);
 }
 
 async function saveProceso(proc) {
@@ -541,6 +616,7 @@ async function saveProceso(proc) {
     }
   }
   if (error) { toast('Error al guardar: ' + error.message, 'error'); $('#pf_save').disabled = false; return; }
+  Draft.clear('proceso_' + (proc ? proc.id : 'nuevo'));
   await logAccion(proc ? 'editar' : 'crear', 'proceso', proc ? proc.id : caratula, caratula);
   closeModal(); toast(proc ? 'Proceso actualizado.' : 'Proceso creado.', 'success');
   renderProcesos();
@@ -678,12 +754,24 @@ async function openProcesoDetail(id, readonly = false) {
     prog.textContent = '';
     btn.disabled = false; btn.textContent = 'Agregar al historial';
     $('#actDesc').value = ''; if ($('#actFiles')) $('#actFiles').value = '';
+    if (window.__clearActDraft) window.__clearActDraft();
     await reloadTimeline();
     toast(`Paso agregado al historial${ok ? ` con ${ok} archivo(s)` : ''}.${fallos ? ' ' + fallos + ' fallaron.' : ''}`, fallos ? 'error' : 'success');
   };
 
   // Para el cliente: widget de "Mi opinión" dentro del propio proceso
   if (state.profile.rol === 'cliente') mountOpinion($('#opinionProc'));
+
+  // Autoguardado de la actuación que se está escribiendo (no se pierde el texto)
+  if (!readonly && $('#actDesc')) {
+    const actDraft = 'actuacion_' + id;
+    const adraft = wireDraft(actDraft, ['actFecha', 'actDesc']);
+    const sv = Draft.load(actDraft);
+    if (sv && sv.data && sv.data.actDesc) { adraft.apply(sv.data); toast('Recuperamos la actuación que estaba escribiendo.', 'success'); }
+    // Nota: los archivos adjuntos no se pueden recuperar (el navegador no
+    // permite "recordar" archivos); sí se conserva la descripción y la fecha.
+    window.__clearActDraft = () => Draft.clear(actDraft);
+  }
 }
 
 function renderDocs(docs, readonly = false) {
@@ -1448,7 +1536,7 @@ function buildSidebar() {
   function resetIdle() {
     clearTimeout(idleTimer);
     idleTimer = setTimeout(async () => {
-      alert('Su sesión se cerró automáticamente por 10 minutos de inactividad. Por seguridad, vuelva a iniciar sesión.');
+      alert('Su sesión se cerró automáticamente por 10 minutos de inactividad. Por seguridad, vuelva a iniciar sesión.\n\nTranquilo: lo que estaba escribiendo (descripción del caso, memorial, etc.) quedó guardado y podrá recuperarlo al volver a abrir ese formulario.');
       await signOut();
     }, IDLE_MS);
   }
