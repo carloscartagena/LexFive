@@ -787,7 +787,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Length 5679 >>
+<< /Length 6184 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -952,168 +952,192 @@ ET
 BT
 /F1 10.50 Tf
 74.00 500.39 Td
+(Al hacer clic en el logo de LexFive \(arriba a la izquierda\) vuelve al sitio web público y, por) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 485.89 Td
+(seguridad, se cierra su sesión: al regresar deberá ingresar sus credenciales de nuevo. Lo que) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 471.39 Td
+(estaba escribiendo queda autoguardado y se recupera al volver a entrar.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 454.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 454.89 Td
 (Si olvidó su contraseña, solicite ayuda al administrador del sistema.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 463.39 Td
+56.00 417.89 Td
 (4. Panel general \(Dashboard\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 455.39 m 539.28 455.39 l S
+56.00 409.89 m 539.28 409.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 428.89 Td
+56.00 383.39 Td
 (Es la primera pantalla del personal. Muestra un resumen con tarjetas \(métricas\) y accesos rápidos:) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 407.39 Td
+60.00 361.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 407.39 Td
+74.00 361.89 Td
 (Procesos totales y procesos activos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 390.89 Td
+60.00 345.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 390.89 Td
+74.00 345.39 Td
 (Audiencias próximas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 374.39 Td
+60.00 328.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 374.39 Td
+74.00 328.89 Td
 (Mis procesos: los casos en los que usted está asignado.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 357.89 Td
+60.00 312.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 357.89 Td
+74.00 312.39 Td
 (Consultas nuevas: mensajes del formulario web aún sin atender. Al hacer clic en esta tarjeta se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 343.39 Td
+74.00 297.89 Td
 (abre directamente la bandeja de Consultas.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 306.39 Td
+56.00 260.89 Td
 (5. Procesos \(casos\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 298.39 m 539.28 298.39 l S
+56.00 252.89 m 539.28 252.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 271.89 Td
+56.00 226.39 Td
 (La pestaña «Procesos» es el corazón del sistema. Allí se registra y da seguimiento a cada caso.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 242.89 Td
+56.00 197.39 Td
 (Crear o editar un proceso) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 222.39 Td
+58.00 176.89 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 222.39 Td
+78.00 176.89 Td
 (Pulse «Nuevo proceso» \(o haga clic sobre un proceso existente para editarlo\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 204.89 Td
+58.00 159.39 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 204.89 Td
+78.00 159.39 Td
 (Complete los datos: carátula, número/NUREJ, materia, estado, parte contraria y la próxima) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 190.39 Td
+78.00 144.89 Td
 (audiencia. En «Materia» puede elegir «Crear nueva categoría...» para agregar un área del) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 175.89 Td
+78.00 130.39 Td
 (derecho que no esté en la lista; quedará disponible en todo el sistema.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 158.39 Td
+58.00 112.89 Td
 (3.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 158.39 Td
+78.00 112.89 Td
 (Asigne uno o varios abogados y procuradores a cargo.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 140.89 Td
+58.00 95.39 Td
 (4.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 140.89 Td
+78.00 95.39 Td
 (Vincule un cliente existente o registre uno nuevo directamente desde el formulario.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 123.39 Td
+58.00 77.89 Td
 (5.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 123.39 Td
+78.00 77.89 Td
 (Guarde. El proceso queda registrado y visible para el equipo asignado.) Tj
 ET
 
@@ -2861,21 +2885,21 @@ xref
 0000008918 00000 n 
 0000014028 00000 n 
 0000014193 00000 n 
-0000019925 00000 n 
-0000020091 00000 n 
-0000025998 00000 n 
-0000026164 00000 n 
-0000031459 00000 n 
-0000031625 00000 n 
-0000036594 00000 n 
-0000036760 00000 n 
-0000042663 00000 n 
-0000042829 00000 n 
-0000048280 00000 n 
-0000048446 00000 n 
-0000049945 00000 n 
+0000020430 00000 n 
+0000020596 00000 n 
+0000026503 00000 n 
+0000026669 00000 n 
+0000031964 00000 n 
+0000032130 00000 n 
+0000037099 00000 n 
+0000037265 00000 n 
+0000043168 00000 n 
+0000043334 00000 n 
+0000048785 00000 n 
+0000048951 00000 n 
+0000050450 00000 n 
 trailer
 << /Size 25 /Root 1 0 R >>
 startxref
-50111
+50616
 %%EOF

@@ -2,7 +2,7 @@
 //  LexFive — Sistema de Gestión Legal · Lógica principal
 // ============================================================
 import { supabase } from './supabase.js';
-import { requireAuth, getProfile, signOut, logAccion, can } from './auth.js';
+import { requireAuth, getProfile, signOut, signOutTo, logAccion, can } from './auth.js';
 import { ROLES, ESTADOS, MATERIAS, WHATSAPP, ABOGADOS } from './config.js';
 
 // ---------- Estado global ----------
@@ -1611,6 +1611,18 @@ function buildSidebar() {
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();
   initTooltipEngine();
+
+  // Al hacer clic en el logo (ir al sitio público), cerrar la sesión por
+  // seguridad. El autoguardado conserva lo que se estaba escribiendo, así que
+  // al volver a iniciar sesión se podrá recuperar.
+  const panelLogo = document.querySelector('.sidebar__head .logo');
+  if (panelLogo) {
+    panelLogo.setAttribute('data-tip', 'Vuelve al sitio web público y cierra su sesión por seguridad. Lo que esté escribiendo queda autoguardado y podrá recuperarlo al volver a entrar.');
+    panelLogo.addEventListener('click', (e) => {
+      e.preventDefault();
+      signOutTo('../index.html');
+    });
+  }
   $('#modalClose').onclick = closeModal;
   $('#modalOverlay').onclick = (e) => { if (e.target === $('#modalOverlay')) closeModal(); };
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });

@@ -94,6 +94,10 @@ def build_blocks():
         "opinión y el formulario de contacto de la web). Al volver a abrir ese mismo "
         "formulario, le ofrecerá «Recuperar» lo que había dejado.",
         "Use el botón «Cerrar sesión» al terminar, sobre todo en equipos compartidos.",
+        "Al hacer clic en el logo de LexFive (arriba a la izquierda) vuelve al sitio web "
+        "público y, por seguridad, se cierra su sesión: al regresar deberá ingresar sus "
+        "credenciales de nuevo. Lo que estaba escribiendo queda autoguardado y se recupera al "
+        "volver a entrar.",
         "Si olvidó su contraseña, solicite ayuda al administrador del sistema.",
     ])
 

@@ -70,6 +70,15 @@ export async function signOut() {
   window.location.href = 'login.html';
 }
 
+// Cierra la sesión SIN redirigir al login (para ir, por ejemplo, al sitio
+// público). Los borradores autoguardados NO se borran: quedan en el
+// navegador y se recuperan al volver a iniciar sesión.
+export async function signOutTo(url) {
+  _profile = null;
+  await supabase.auth.signOut();
+  window.location.href = url;
+}
+
 // Envía un correo con el enlace para restablecer la contraseña
 export async function resetPassword(email, redirectTo) {
   return supabase.auth.resetPasswordForEmail(email, { redirectTo });

@@ -67,6 +67,7 @@ Un cliente puede crear su cuenta desde la misma pantalla de acceso, en la pesta�
 - La sesión se cierra sola tras 10 minutos de inactividad, por seguridad.
 - No se preocupe si esto ocurre mientras redacta: el sistema guarda automáticamente lo que escribe en cualquier formulario (proceso, cliente, actuación, artículo del blog, opinión y el formulario de contacto de la web). Al volver a abrir ese mismo formulario, le ofrecerá «Recuperar» lo que había dejado.
 - Use el botón «Cerrar sesión» al terminar, sobre todo en equipos compartidos.
+- Al hacer clic en el logo de LexFive (arriba a la izquierda) vuelve al sitio web público y, por seguridad, se cierra su sesión: al regresar deberá ingresar sus credenciales de nuevo. Lo que estaba escribiendo queda autoguardado y se recupera al volver a entrar.
 - Si olvidó su contraseña, solicite ayuda al administrador del sistema.
 
 ## 4. Panel general (Dashboard)
