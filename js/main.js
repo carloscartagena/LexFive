@@ -190,6 +190,31 @@
         }
 
         if (form) {
+            // Autoguardado del mensaje (por si recarga o cierra el navegador sin querer)
+            var DRAFT_KEY = 'lexfive_contacto_borrador';
+            var draftFields = ['nombre', 'apellido', 'email', 'telefono', 'area', 'mensaje'];
+            try {
+                var savedRaw = localStorage.getItem(DRAFT_KEY);
+                if (savedRaw) {
+                    var saved = JSON.parse(savedRaw);
+                    draftFields.forEach(function (id) {
+                        var el = document.getElementById(id);
+                        if (el && saved[id] && !el.value) { el.value = saved[id]; }
+                    });
+                }
+            } catch (e) {}
+            var saveDraft = function () {
+                try {
+                    var o = {};
+                    draftFields.forEach(function (id) { var el = document.getElementById(id); if (el) o[id] = el.value; });
+                    localStorage.setItem(DRAFT_KEY, JSON.stringify(o));
+                } catch (e) {}
+            };
+            draftFields.forEach(function (id) {
+                var el = document.getElementById(id);
+                if (el) { el.addEventListener('input', saveDraft); el.addEventListener('change', saveDraft); }
+            });
+
             // Limpiar error al escribir
             form.querySelectorAll('input, select, textarea').forEach(function (field) {
                 field.addEventListener('input', function () { clearError(field); });
@@ -235,6 +260,7 @@
 
                 function showSuccess() {
                     form.reset();
+                    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
                     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Enviar solicitud'; }
                     if (feedback) {
                         feedback.textContent = '¡Gracias! Hemos recibido su solicitud y le contactaremos a la brevedad.';

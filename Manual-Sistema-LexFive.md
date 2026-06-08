@@ -63,7 +63,7 @@ Un cliente puede crear su cuenta desde la misma pantalla de acceso, en la pesta�
 ### Cierre de sesión y seguridad
 
 - La sesión se cierra sola tras 10 minutos de inactividad, por seguridad.
-- No se preocupe si esto ocurre mientras redacta: el sistema guarda automáticamente lo que escribe (descripción del caso, datos del proceso, una actuación, etc.). Al volver a abrir ese mismo formulario, le ofrecerá «Recuperar» lo que había dejado.
+- No se preocupe si esto ocurre mientras redacta: el sistema guarda automáticamente lo que escribe en cualquier formulario (proceso, cliente, actuación, artículo del blog, opinión y el formulario de contacto de la web). Al volver a abrir ese mismo formulario, le ofrecerá «Recuperar» lo que había dejado.
 - Use el botón «Cerrar sesión» al terminar, sobre todo en equipos compartidos.
 - Si olvidó su contraseña, solicite ayuda al administrador del sistema.
 
@@ -88,7 +88,7 @@ La pestaña «Procesos» es el corazón del sistema. Allí se registra y da segu
 4. Vincule un cliente existente o registre uno nuevo directamente desde el formulario.
 5. Guarde. El proceso queda registrado y visible para el equipo asignado.
 
-> **Autoguardado:** Mientras escribe (sobre todo descripciones largas o un memorial), el sistema guarda un borrador automático en su equipo. Si la sesión se cierra o cierra el navegador, al reabrir el formulario podrá «Recuperar» lo que había dejado y solo completar lo que falte. Al guardar, el borrador se descarta.
+> **Autoguardado:** Mientras escribe (sobre todo descripciones largas o un memorial), el sistema guarda un borrador automático en su equipo. Esto aplica a TODOS los formularios del sistema (procesos, clientes, actuaciones, blog, opinión y el contacto de la web). Si la sesión se cierra o cierra el navegador, al reabrir el formulario podrá «Recuperar» lo que había dejado y solo completar lo que falte. Al guardar, el borrador se descarta.
 
 ### Documentos y actuaciones
 

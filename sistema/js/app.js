@@ -898,6 +898,11 @@ function clienteForm(cli = null) {
   if (cli && can(state.profile, 'delete_cliente')) buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteCliente(cli) });
   buttons.push({ label: 'Guardar', class: 'btn--primary', id: 'cf_save', onClick: () => saveCliente(cli) });
   openModal(cli ? 'Editar cliente' : 'Nuevo cliente', body, buttons);
+
+  // Autoguardado de borrador
+  const draftName = 'cliente_' + (cli ? cli.id : 'nuevo');
+  const draft = wireDraft(draftName, ['cf_nombre', 'cf_doc', 'cf_tel', 'cf_email', 'cf_dir', 'cf_notas']);
+  maybeOfferDraft(draftName, draft);
 }
 
 async function saveCliente(cli) {
@@ -912,6 +917,7 @@ async function saveCliente(cli) {
   if (cli) ({ error } = await supabase.from('clientes').update(payload).eq('id', cli.id));
   else { payload.created_by = state.profile.id; ({ error } = await supabase.from('clientes').insert(payload)); }
   if (error) { toast('Error: ' + error.message, 'error'); $('#cf_save').disabled = false; return; }
+  Draft.clear('cliente_' + (cli ? cli.id : 'nuevo'));
   await logAccion(cli ? 'editar' : 'crear', 'cliente', cli ? cli.id : nombre, nombre);
   closeModal(); toast('Cliente guardado.', 'success'); renderClientes();
 }
@@ -968,6 +974,13 @@ function articuloForm(art = null) {
   if (art && editable) buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteArticulo(art) });
   if (editable) buttons.push({ label: 'Guardar', class: 'btn--primary', id: 'af_save', onClick: () => saveArticulo(art) });
   openModal(art ? 'Editar artículo' : 'Nuevo artículo', body, buttons, true);
+
+  // Autoguardado de borrador (solo si el formulario es editable)
+  if (editable) {
+    const draftName = 'articulo_' + (art ? art.id : 'nuevo');
+    const draft = wireDraft(draftName, ['af_titulo', 'af_cat', 'af_estado', 'af_resumen', 'af_contenido']);
+    maybeOfferDraft(draftName, draft);
+  }
 }
 
 async function saveArticulo(art) {
@@ -982,6 +995,7 @@ async function saveArticulo(art) {
   if (art) { payload.updated_at = new Date().toISOString(); ({ error } = await supabase.from('articulos').update(payload).eq('id', art.id)); }
   else { payload.autor_id = state.profile.id; ({ error } = await supabase.from('articulos').insert(payload)); }
   if (error) { toast('Error: ' + error.message, 'error'); $('#af_save').disabled = false; return; }
+  Draft.clear('articulo_' + (art ? art.id : 'nuevo'));
   await logAccion(art ? 'editar' : 'crear', 'articulo', art ? art.id : titulo, titulo);
   closeModal(); toast('Artículo guardado.', 'success'); renderBlog();
 }
@@ -1147,9 +1161,17 @@ async function mountOpinion(el) {
     if (t) ({ error } = await supabase.from('testimonios').update(payload).eq('id', t.id));
     else { payload.autor_id = state.profile.id; ({ error } = await supabase.from('testimonios').insert(payload)); }
     if (error) { toast('Error: ' + error.message, 'error'); btn.disabled = false; return; }
+    Draft.clear('opinion');
     toast('¡Gracias! Su opinión fue enviada para revisión.', 'success');
     mountOpinion(el);
   };
+
+  // Autoguardado del comentario de la opinión (texto y nombre)
+  const ta = el.querySelector('.js-texto'), nm = el.querySelector('.js-nombre');
+  const saveOp = () => Draft.save('opinion', { texto: ta.value, nombre: nm.value });
+  ta.addEventListener('input', saveOp); nm.addEventListener('input', saveOp);
+  const svOp = Draft.load('opinion');
+  if (svOp && svOp.data && svOp.data.texto && !ta.value) { ta.value = svOp.data.texto; if (svOp.data.nombre) nm.value = svOp.data.nombre; }
 }
 
 // Vista del CLIENTE dedicada a dejar su opinión
