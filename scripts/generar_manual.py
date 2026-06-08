@@ -619,13 +619,17 @@ class PDF:
         return bytes(out)
 
 
-def _render_pdf_once(blocks, pagemap):
+def _render_pdf_once(blocks, pagemap, compact=False):
     doc = PDF()
-    doc.add_cover_page()
-    doc.add_content_page()
-    doc.h1("Contenido")
-    doc.toc([b[1] for b in blocks if b[0] == 'h1'], pagemap)
-    doc.add_content_page()  # el contenido empieza en una página propia
+    if compact:
+        # Modo compacto (p. ej. una tarjeta): sin portada ni índice.
+        doc.add_content_page()
+    else:
+        doc.add_cover_page()
+        doc.add_content_page()
+        doc.h1("Contenido")
+        doc.toc([b[1] for b in blocks if b[0] == 'h1'], pagemap)
+        doc.add_content_page()  # el contenido empieza en una página propia
     for b in blocks:
         t = b[0]
         if t == 'h1':
@@ -645,9 +649,9 @@ def _render_pdf_once(blocks, pagemap):
     return doc
 
 
-def render_pdf(blocks, path):
-    first = _render_pdf_once(blocks, None)     # pasada 1: descubre páginas
-    final = _render_pdf_once(blocks, first.section_pages)  # pasada 2: con números
+def render_pdf(blocks, path, compact=False):
+    first = _render_pdf_once(blocks, None, compact)            # pasada 1: descubre páginas
+    final = _render_pdf_once(blocks, first.section_pages, compact)  # pasada 2: con números
     data = final.build()
     with open(path, "wb") as f:
         f.write(data)
