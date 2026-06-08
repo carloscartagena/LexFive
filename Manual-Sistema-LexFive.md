@@ -89,8 +89,10 @@ La pestaña «Procesos» es el corazón del sistema. Allí se registra y da segu
 
 ### Documentos y actuaciones
 
-- Dentro del detalle de un proceso puede subir documentos (memoriales, notificaciones, etc.) y descargarlos cuando los necesite.
-- Puede registrar actuaciones con fecha y descripción para llevar la bitácora del caso.
+- Documentos generales del proceso: en «Memoriales y documentos» puede subir y descargar archivos sueltos (carátula, poder, anexos, etc.).
+- Historial de actuaciones: registre cada paso del proceso con su fecha y una descripción (por ejemplo, «Respuesta del juzgado» o «Nuevo memorial presentado»).
+- A cada paso del historial puede adjuntar uno o varios archivos: así sube la respuesta recibida del juzgado y, junto a ella, el nuevo memorial que se presentará.
+- El cliente del caso ve su historial en modo lectura: puede abrir y descargar la respuesta del juzgado y el nuevo memorial, pero no modificar nada.
 
 > **Cuidado:** Solo el administrador puede eliminar un proceso de forma definitiva. La eliminación no se puede deshacer.
 
@@ -182,6 +184,7 @@ Es la bitácora del sistema. Registra las acciones importantes (quién creó, ed
 Cuando un cliente inicia sesión, ve una versión reducida y privada:
 
 - Mis procesos: el listado de sus casos, su estado y la próxima audiencia, además de un botón para consultar por WhatsApp.
+- Dentro de cada caso ve su historial de actuaciones y puede descargar los archivos de cada paso: la respuesta del juzgado y el nuevo memorial presentado, entre otros.
 - Mi opinión: un formulario para calificar el servicio y dejar un comentario, que el bufete revisa antes de publicarlo.
 
 ## 15. La página web pública
@@ -211,6 +214,7 @@ En la carpeta db/ del repositorio están los scripts SQL. Se ejecutan UNA sola v
 - 06_consultas.sql — bandeja de Consultas (formulario de contacto).
 - 07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.
 - 08_categorias.sql — áreas del derecho dinámicas (crear categorías desde el panel).
+- 09_actuaciones_archivos.sql — adjuntar archivos a cada actuación del historial.
 
 ### Conexión y correo
 

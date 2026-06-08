@@ -578,15 +578,21 @@ async function openProcesoDetail(id, readonly = false) {
       <input id="docNombre" placeholder="Descripción (ej: Memorial de respuesta)" style="flex-grow:1;min-width:180px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
       <button class="btn btn--navy" id="btnUpload">Subir</button>
     </div>`}
-    <div id="docList">${renderDocs(docs || [], readonly)}</div>
+    <div id="docList">${renderDocs((docs || []).filter(d => !d.actuacion_id), readonly)}</div>
 
     <h4 class="section-title">Historial de actuaciones</h4>
-    ${readonly ? '' : `<div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-      <input type="date" id="actFecha" value="${new Date().toISOString().slice(0,10)}" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
-      <input id="actDesc" placeholder="Describa la actuación o avance..." style="flex-grow:1;min-width:200px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
-      <button class="btn btn--navy" id="btnActuacion">Agregar</button>
+    ${readonly ? '' : `<div class="act-form">
+      <div class="field-row" style="margin-bottom:8px">
+        <input type="date" id="actFecha" value="${new Date().toISOString().slice(0,10)}" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
+        <input id="actDesc" placeholder="Describa el paso (ej: Respuesta del juzgado, Nuevo memorial...)" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="flex-grow:1;min-width:200px;"><label style="font-size:.8rem;color:var(--muted)">Adjuntar archivos (opcional): respuesta del juzgado, nuevo memorial, etc.</label><input type="file" id="actFiles" multiple></div>
+        <button class="btn btn--navy" id="btnActuacion">Agregar al historial</button>
+      </div>
+      <span class="cell-sub" id="actProgreso"></span>
     </div>`}
-    <ul class="timeline" id="actList">${renderActs(acts || [])}</ul>
+    <ul class="timeline" id="actList">${renderActs(acts || [], docs || [])}</ul>
     ${state.profile.rol === 'cliente' ? `<div class="card" id="opinionProc" style="margin-top:18px"></div>` : ''}`;
 
   const buttons = [];
@@ -618,25 +624,62 @@ async function openProcesoDetail(id, readonly = false) {
     else {
       await logAccion('subir_documento', 'proceso', id, file.name);
       const { data: nd } = await supabase.from('documentos').select('*').eq('proceso_id', id).order('created_at', { ascending: false });
-      $('#docList').innerHTML = renderDocs(nd || []); wireDocs(id);
+      $('#docList').innerHTML = renderDocs((nd || []).filter(d => !d.actuacion_id)); wireDocs(id);
       toast('Documento cargado.', 'success');
     }
     $('#btnUpload').disabled = false; $('#btnUpload').textContent = 'Subir'; $('#docNombre').value = ''; $('#docFile').value = '';
   };
   wireDocs(id);
 
-  // Agregar actuación (solo personal)
+  // Helper: recarga el historial (actuaciones + sus documentos) y reconecta botones
+  async function reloadTimeline() {
+    const [{ data: na }, { data: nd }] = await Promise.all([
+      supabase.from('actuaciones').select('*').eq('proceso_id', id).order('fecha', { ascending: false }),
+      supabase.from('documentos').select('*').eq('proceso_id', id).order('created_at', { ascending: false })
+    ]);
+    $('#actList').innerHTML = renderActs(na || [], nd || []);
+    wireTimelineDocs(id, readonly, reloadTimeline);
+    // Refresca también la lista general de documentos
+    if ($('#docList')) { $('#docList').innerHTML = renderDocs((nd || []).filter(d => !d.actuacion_id), readonly); wireDocs(id); }
+  }
+  wireTimelineDocs(id, readonly, reloadTimeline);
+
+  // Agregar actuación + adjuntos (solo personal)
   if ($('#btnActuacion')) $('#btnActuacion').onclick = async () => {
     const desc = $('#actDesc').value.trim();
-    if (!desc) { toast('Describa la actuación.', 'error'); return; }
-    const { error } = await supabase.from('actuaciones').insert({
-      proceso_id: id, fecha: $('#actFecha').value || new Date().toISOString().slice(0, 10), descripcion: desc, created_by: state.profile.id
-    });
-    if (error) { toast('Error: ' + error.message, 'error'); return; }
+    if (!desc) { toast('Describa el paso del proceso.', 'error'); return; }
+    const btn = $('#btnActuacion'); const prog = $('#actProgreso');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    // 1) Crear la actuación
+    const { data: actData, error } = await supabase.from('actuaciones').insert({
+      proceso_id: id, fecha: $('#actFecha').value || new Date().toISOString().slice(0, 10),
+      descripcion: desc, created_by: state.profile.id
+    }).select().single();
+    if (error) { toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = 'Agregar al historial'; return; }
     await logAccion('actuacion', 'proceso', id, desc.slice(0, 60));
-    const { data: na } = await supabase.from('actuaciones').select('*').eq('proceso_id', id).order('fecha', { ascending: false });
-    $('#actList').innerHTML = renderActs(na || []); $('#actDesc').value = '';
-    toast('Actuación registrada.', 'success');
+
+    // 2) Subir los archivos adjuntos vinculados a esa actuación
+    const archivos = [...($('#actFiles') ? $('#actFiles').files : [])];
+    let ok = 0, fallos = 0;
+    for (let i = 0; i < archivos.length; i++) {
+      const file = archivos[i];
+      prog.textContent = `Subiendo adjunto ${i + 1} de ${archivos.length}...`;
+      const path = `${id}/${Date.now()}_${i}_${file.name.replace(/[^\w.\-]/g, '_')}`;
+      const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+      if (upErr) { fallos++; continue; }
+      const { error: insErr } = await supabase.from('documentos').insert({
+        proceso_id: id, actuacion_id: actData.id, nombre: file.name, tipo: 'actuacion',
+        storage_path: path, subido_por: state.profile.id
+      });
+      if (insErr) { fallos++; await supabase.storage.from('documentos').remove([path]); continue; }
+      ok++;
+    }
+    prog.textContent = '';
+    btn.disabled = false; btn.textContent = 'Agregar al historial';
+    $('#actDesc').value = ''; if ($('#actFiles')) $('#actFiles').value = '';
+    await reloadTimeline();
+    toast(`Paso agregado al historial${ok ? ` con ${ok} archivo(s)` : ''}.${fallos ? ' ' + fallos + ' fallaron.' : ''}`, fallos ? 'error' : 'success');
   };
 
   // Para el cliente: widget de "Mi opinión" dentro del propio proceso
@@ -673,14 +716,46 @@ function wireDocs(procId) {
       await supabase.from('documentos').delete().eq('id', docId);
       await logAccion('eliminar_documento', 'proceso', procId, path);
       const { data: nd } = await supabase.from('documentos').select('*').eq('proceso_id', procId).order('created_at', { ascending: false });
-      $('#docList').innerHTML = renderDocs(nd || []); wireDocs(procId);
+      $('#docList').innerHTML = renderDocs((nd || []).filter(d => !d.actuacion_id)); wireDocs(procId);
       toast('Documento eliminado.', 'success');
     };
   });
 }
-function renderActs(acts) {
+function renderActs(acts, docs = []) {
   if (!acts.length) return '<li class="cell-sub" style="border:none">Sin actuaciones registradas.</li>';
-  return acts.map(a => `<li><div class="t-date">${fmtDate(a.fecha)} · ${esc(profName(a.created_by))}</div><div>${esc(a.descripcion)}</div></li>`).join('');
+  return acts.map(a => {
+    const adjuntos = docs.filter(d => d.actuacion_id === a.id);
+    const filesHtml = adjuntos.length ? `<div class="act-files">${adjuntos.map(d => `
+      <div class="act-file" data-path="${esc(d.storage_path)}" data-id="${d.id}">
+        <span class="act-file__icon">${ICON.doc}</span>
+        <span class="act-file__name">${esc(d.nombre)}</span>
+        <button class="btn btn--ghost btn--sm js-tl-dl">Descargar</button>
+        ${(state.profile.rol !== 'cliente' && (d.subido_por === state.profile.id || state.profile.rol === 'admin')) ? '<button class="btn btn--danger btn--sm js-tl-del">Eliminar</button>' : ''}
+      </div>`).join('')}</div>` : '';
+    return `<li><div class="t-date">${fmtDate(a.fecha)} · ${esc(profName(a.created_by))}</div><div>${esc(a.descripcion)}</div>${filesHtml}</li>`;
+  }).join('');
+}
+
+// Conecta los botones de descargar/eliminar de los adjuntos del historial
+function wireTimelineDocs(procId, readonly, reload) {
+  document.querySelectorAll('#actList .act-file').forEach(row => {
+    const path = row.dataset.path, docId = row.dataset.id;
+    const dl = row.querySelector('.js-tl-dl');
+    if (dl) dl.onclick = async () => {
+      const { data, error } = await supabase.storage.from('documentos').createSignedUrl(path, 120);
+      if (error) { toast('No se pudo generar el enlace.', 'error'); return; }
+      window.open(data.signedUrl, '_blank');
+    };
+    const del = row.querySelector('.js-tl-del');
+    if (del) del.onclick = async () => {
+      if (!confirm('¿Eliminar este archivo?')) return;
+      await supabase.storage.from('documentos').remove([path]);
+      await supabase.from('documentos').delete().eq('id', docId);
+      await logAccion('eliminar_documento', 'proceso', procId, path);
+      if (reload) await reload();
+      toast('Archivo eliminado.', 'success');
+    };
+  });
 }
 
 async function deleteProceso(p) {
