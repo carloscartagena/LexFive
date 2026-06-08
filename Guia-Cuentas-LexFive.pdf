@@ -265,7 +265,7 @@ ET
 BT
 /F1 10.50 Tf
 533.44 577.89 Td
-(4) Tj
+(5) Tj
 ET
 0.800 0.820 0.850 rg
 BT
@@ -298,7 +298,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 7 0 R >>
 endobj
 9 0 obj
-<< /Length 5419 >>
+<< /Length 5417 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -429,176 +429,170 @@ ET
 0.760 0.635 0.353 RG
 1.20 w
 56.00 469.39 m 539.28 469.39 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 442.89 Td
+(Correo del bufete usado en todas las cuentas: alba23meira@gmail.com) Tj
+ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 442.89 Td
+60.00 421.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 442.89 Td
-(GitHub — guarda el código del sistema. Entrar en: github.com) Tj
+74.00 421.39 Td
+(GitHub — guarda el código. Entrar en github.com con «Continuar con Google».) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 426.39 Td
+60.00 404.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 426.39 Td
-(Netlify — publica el sitio en internet. Entrar en: app.netlify.com) Tj
+74.00 404.89 Td
+(Netlify — publica el sitio. Entrar en app.netlify.com con «Continuar con GitHub».) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 409.89 Td
+60.00 388.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 409.89 Td
-(Supabase — base de datos y cuentas de usuario. Entrar en: supabase.com) Tj
+74.00 388.39 Td
+(Supabase — base de datos y usuarios. Entrar en supabase.com con «Continuar con GitHub».) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 393.39 Td
+60.00 371.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 393.39 Td
-(Web3Forms — envío por correo de las consultas. Entrar en: web3forms.com) Tj
+74.00 371.89 Td
+(Web3Forms — envío por correo de las consultas. Funciona con una clave, no con login.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 376.89 Td
+60.00 355.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 376.89 Td
-(Correo Gmail del bufete — recibe las consultas y sirve para recuperar contraseñas.) Tj
+74.00 355.39 Td
+(Correo Gmail del bufete — recibe las consultas y recupera las demás cuentas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 360.39 Td
+60.00 338.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 360.39 Td
+74.00 338.89 Td
 (Panel del sistema LexFive — donde trabaja el equipo \(no es una cuenta externa\).) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 281.39 483.28 72.00 re
+56.00 259.89 483.28 72.00 re
 f
 0.760 0.635 0.353 rg
-56.00 281.39 4.00 72.00 re
+56.00 259.89 4.00 72.00 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 333.89 Td
-(Cómo se ingresó) Tj
+71.00 312.39 Td
+(Lo más importante) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 320.39 Td
-(Lo más probable es que haya creado GitHub, Netlify y Supabase con el botón «Continuar con) Tj
+71.00 298.89 Td
+(Cadena de accesos \(verificada\): Supabase entra con GitHub; Netlify entra con GitHub; y GitHub entra) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 306.89 Td
-(Google», usando el correo del bufete. Si fue así, para entrar a cualquiera de los tres solo debe elegir) Tj
+71.00 285.39 Td
+(con Google \(su Gmail\). Por lo tanto, su correo de Google alba23meira@gmail.com es la LLAVE) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 293.39 Td
-(esa opción de Google; no necesita una contraseña aparte.) Tj
+71.00 271.89 Td
+(MAESTRA de todo el sistema: cuide muy bien su contraseña y actívele verificación en dos pasos.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 241.39 Td
+56.00 219.89 Td
 (3. GitHub — el código del sistema) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 233.39 m 539.28 233.39 l S
+56.00 211.89 m 539.28 211.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 206.89 Td
+56.00 185.39 Td
 (Guarda todos los archivos del sistema \(la página y el panel\). Cada cambio queda registrado aquí, y) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 192.39 Td
+56.00 170.89 Td
 (desde aquí se publica automáticamente en Netlify.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 163.39 Td
+56.00 141.89 Td
 (Cómo entrar) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 142.89 Td
+58.00 121.39 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 142.89 Td
-(Vaya a github.com e ingrese con la cuenta que usó al crearlo \(probablemente «Continuar con) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 128.39 Td
-(Google» usando el correo del bufete\).) Tj
+78.00 121.39 Td
+(Vaya a github.com y pulse «Sign in».) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 110.89 Td
+58.00 103.89 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 110.89 Td
-(Su proyecto \(repositorio\) se llama «LexFive», dentro de su usuario.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 93.39 Td
-(3.) Tj
+78.00 103.89 Td
+(Elija «Continuar con Google» con el correo del bufete \(alba23meira@gmail.com\). Así ingresó su) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 93.39 Td
-(Dirección directa del proyecto: github.com/carloscartagena/LexFive) Tj
+78.00 89.39 Td
+(cuenta y es la forma más cómoda.) Tj
 ET
 
 endstream
@@ -607,7 +601,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Length 5479 >>
+<< /Length 5402 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -644,291 +638,285 @@ BT
 ET
 0.055 0.106 0.173 rg
 BT
+/F2 10.50 Tf
+58.00 757.39 Td
+(3.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 757.39 Td
+(Su proyecto \(repositorio\) se llama «LexFive»: github.com/carloscartagena/LexFive) Tj
+ET
+0.055 0.106 0.173 rg
+BT
 /F2 12.00 Tf
-56.00 749.89 Td
+56.00 727.39 Td
 (Para qué lo usará) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 729.39 Td
+60.00 706.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 729.39 Td
+74.00 706.89 Td
 (Ver los archivos del sistema y el historial de cambios.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 712.89 Td
+60.00 690.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 712.89 Td
+74.00 690.39 Td
 (Descargar los documentos del repositorio \(manuales, scripts de base de datos\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 696.39 Td
+60.00 673.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 696.39 Td
-(No necesita tocar nada del código: de los cambios se encarga el desarrollo.) Tj
+74.00 673.89 Td
+(No necesita tocar el código: de los cambios se encarga el desarrollo.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 630.89 483.28 58.50 re
+56.00 594.89 483.28 72.00 re
 f
 0.760 0.635 0.353 rg
-56.00 630.89 4.00 58.50 re
+56.00 594.89 4.00 72.00 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 669.89 Td
-(Acceso con Google) Tj
+71.00 647.39 Td
+(Su caso) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 656.39 Td
-(Si entró con Google y no recuerda haber puesto contraseña de GitHub, es normal: use siempre) Tj
+71.00 633.89 Td
+(Verificado: su GitHub también tiene una contraseña propia configurada. Es decir, puede entrar con) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 642.89 Td
-(«Continuar con Google» con el correo del bufete.) Tj
+71.00 620.39 Td
+(«Continuar con Google» o con su correo + contraseña de GitHub. Recomendado: use Google y) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 606.89 Td
+(conserve la contraseña como respaldo.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 590.89 Td
+56.00 554.89 Td
 (4. Netlify — publica la página en internet) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 582.89 m 539.28 582.89 l S
+56.00 546.89 m 539.28 546.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 556.39 Td
+56.00 520.39 Td
 (Toma el código de GitHub y lo publica en internet. Gracias a Netlify, su sitio está en línea en la) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 541.89 Td
+56.00 505.89 Td
 (dirección lexfive.netlify.app. Cada vez que se sube un cambio a GitHub, Netlify vuelve a publicar el sitio) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 527.39 Td
+56.00 491.39 Td
 (solo, en uno o dos minutos.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 498.39 Td
+56.00 462.39 Td
 (Cómo entrar) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 477.89 Td
+58.00 441.89 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 477.89 Td
-(Vaya a app.netlify.com e ingrese con la misma cuenta \(normalmente «Continuar con GitHub» o) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 463.39 Td
-(«Continuar con Google»\).) Tj
+78.00 441.89 Td
+(Vaya a app.netlify.com y pulse «Log in».) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 445.89 Td
+58.00 424.39 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 445.89 Td
-(En «Sites» verá su sitio «lexfive» \(o similar\).) Tj
+78.00 424.39 Td
+(Elija «Continuar con GitHub» \(su cuenta de GitHub está conectada a Netlify\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 428.39 Td
+58.00 406.89 Td
 (3.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 428.39 Td
-(Ahí puede ver si la última publicación salió bien, en la sección «Deploys».) Tj
+78.00 406.89 Td
+(En «Sites» verá su sitio «lexfive»; en «Deploys» comprueba si la última publicación salió bien.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 398.39 Td
+56.00 376.89 Td
 (Para qué lo usará) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 377.89 Td
+60.00 356.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 377.89 Td
+74.00 356.39 Td
 (Confirmar que el sitio está publicado y en línea.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 361.39 Td
+60.00 339.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 361.39 Td
+74.00 339.89 Td
 (Más adelante, si compra un dominio propio \(ej. lexfive.bo\), se conecta aquí.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 344.89 Td
+60.00 323.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 344.89 Td
+74.00 323.39 Td
 (Por lo general no necesita entrar a diario: el sitio se actualiza solo.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 244.39 483.28 72.00 re
+f
+0.760 0.635 0.353 rg
+56.00 244.39 4.00 72.00 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 296.89 Td
+(Su caso) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 283.39 Td
+(Verificado: en Netlify, Google NO está conectado, así que NO use «Continuar con Google» aquí. Sí) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 269.89 Td
+(puede entrar con «Continuar con GitHub» o con su correo \(alba23meira@gmail.com\) + la contraseña) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 256.39 Td
+(propia de Netlify.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 307.89 Td
+56.00 204.39 Td
 (5. Supabase — la base de datos y los usuarios) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 299.89 m 539.28 299.89 l S
+56.00 196.39 m 539.28 196.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 273.39 Td
+56.00 169.89 Td
 (Es el servicio más importante para el día a día: guarda los procesos, clientes, consultas, documentos,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 258.89 Td
+56.00 155.39 Td
 (testimonios y las cuentas de acceso de los usuarios. El panel del sistema lee y escribe aquí.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 229.89 Td
+56.00 126.39 Td
 (Cómo entrar) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 209.39 Td
+58.00 105.89 Td
 (1.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 209.39 Td
-(Vaya a supabase.com y pulse «Sign in»; ingrese con la cuenta usada al crearlo \(probablemente) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 194.89 Td
-(«Continuar con Google» con el correo del bufete\).) Tj
+78.00 105.89 Td
+(Vaya a supabase.com y pulse «Sign in».) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 177.39 Td
+58.00 88.39 Td
 (2.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 177.39 Td
-(Abra su proyecto \(el que corresponde a LexFive\).) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 159.89 Td
-(3.) Tj
+78.00 88.39 Td
+(Elija «Continuar con GitHub» \(su cuenta de Supabase está vinculada a GitHub, con el correo) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 159.89 Td
-(Las dos secciones que más usará son: «Authentication ? Users» \(cuentas de usuario\) y «SQL) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 145.39 Td
-(Editor» \(para ejecutar los scripts de la carpeta db/\).) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 12.00 Tf
-56.00 115.39 Td
-(Datos de su proyecto \(públicos, no son secretos\)) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 94.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 94.89 Td
-(Dirección del proyecto \(URL\): https://soazmibvesvuwgxeealo.supabase.co) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 78.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 78.39 Td
-(Estos datos ya están configurados en el sistema; no necesita copiarlos a ningún lado.) Tj
+78.00 73.89 Td
+(alba23meira@gmail.com\).) Tj
 ET
 
 endstream
@@ -937,7 +925,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Length 5489 >>
+<< /Length 5511 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -974,282 +962,279 @@ BT
 ET
 0.055 0.106 0.173 rg
 BT
-/F2 12.00 Tf
-56.00 749.89 Td
-(Para qué lo usará) Tj
-ET
-0.659 0.522 0.235 rg
-BT
 /F2 10.50 Tf
-60.00 729.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 729.39 Td
-(Crear o habilitar usuarios \(abogados, procuradores\) en Authentication ? Users.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 712.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 712.89 Td
-(Ejecutar una sola vez los scripts de la carpeta db/ \(ver la guía de pasos pendientes\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 696.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 696.39 Td
-(Hacer respaldos de la información cada cierto tiempo.) Tj
-ET
-0.965 0.957 0.937 rg
-56.00 630.89 483.28 58.50 re
-f
-0.760 0.635 0.353 rg
-56.00 630.89 4.00 58.50 re
-f
-0.659 0.522 0.235 rg
-BT
-/F2 10.00 Tf
-71.00 669.89 Td
-(Seguridad) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 656.39 Td
-(La contraseña de la base de datos y las claves «secretas» de Supabase NO deben compartirse ni) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 642.89 Td
-(pegarse en la web. Las que usa el sistema son las públicas, pensadas para el navegador.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 590.89 Td
-(6. Web3Forms — envío de las consultas por correo) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 582.89 m 539.28 582.89 l S
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 556.39 Td
-(Cuando alguien llena el formulario de contacto de la web, Web3Forms envía una copia de ese mensaje) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 541.89 Td
-(al correo del bufete. \(La consulta además queda guardada en la bandeja «Consultas» del panel, así) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 527.39 Td
-(que no se pierde aunque el correo falle.\)) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 12.00 Tf
-56.00 498.39 Td
-(Cómo entrar) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 477.89 Td
-(1.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 477.89 Td
-(Vaya a web3forms.com.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 460.39 Td
-(2.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 460.39 Td
-(El servicio funciona con una «Access Key» \(clave de acceso\) ligada al correo del bufete; no) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 445.89 Td
-(requiere usuario y contraseña tradicionales.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 428.39 Td
+58.00 757.39 Td
 (3.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 428.39 Td
-(Si necesita una clave nueva, ingrese el correo del bufete en su página y la recibirá por correo.) Tj
+78.00 757.39 Td
+(Abra su proyecto \(LexFive\). Las secciones que más usará: «Authentication ? Users» \(cuentas\) y) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 742.89 Td
+(«SQL Editor» \(scripts de la carpeta db/\).) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 398.39 Td
+56.00 712.89 Td
+(Datos de su proyecto \(públicos, no son secretos\)) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 692.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 692.39 Td
+(Dirección del proyecto \(URL\): https://soazmibvesvuwgxeealo.supabase.co) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 675.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 675.89 Td
+(Estos datos ya están configurados en el sistema; no necesita copiarlos a ningún lado.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 646.89 Td
 (Para qué lo usará) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 377.89 Td
+60.00 626.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 377.89 Td
+74.00 626.39 Td
+(Crear o habilitar usuarios \(abogados, procuradores\) en Authentication ? Users.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 609.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 609.89 Td
+(Ejecutar una sola vez los scripts de la carpeta db/ \(ver la guía de pasos pendientes\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 593.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 593.39 Td
+(Hacer respaldos de la información cada cierto tiempo.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 500.89 483.28 85.50 re
+f
+0.760 0.635 0.353 rg
+56.00 500.89 4.00 85.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 566.89 Td
+(Su caso) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 553.39 Td
+(Verificado: en «Account identities» figura GitHub \(carloscartagena · alba23meira@gmail.com\). Su) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 539.89 Td
+(acceso a Supabase pasa por GitHub, así que entre siempre con «Continuar con GitHub». No confunda) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 526.39 Td
+(esto con «Connections ? GitHub», que sirve para conectar repositorios y no es su forma de iniciar) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 512.89 Td
+(sesión.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 460.89 Td
+(6. Web3Forms — envío de las consultas por correo) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 452.89 m 539.28 452.89 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 426.39 Td
+(Cuando alguien llena el formulario de contacto de la web, Web3Forms envía una copia de ese mensaje) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 411.89 Td
+(al correo del bufete. \(La consulta además queda guardada en la bandeja «Consultas» del panel, así) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 397.39 Td
+(que no se pierde aunque el correo falle.\)) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 368.39 Td
+(Cómo entrar) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 347.89 Td
+(1.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 347.89 Td
+(Vaya a web3forms.com e ingrese con su Gmail del bufete \(alba23meira@gmail.com\), que es con) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 333.39 Td
+(el que se registró.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 315.89 Td
+(2.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 315.89 Td
+(El servicio funciona con una «Access Key» \(clave de acceso\) ligada a ese correo.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 298.39 Td
+(3.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 298.39 Td
+(Si necesita una clave nueva, ingrese el correo del bufete en su página y la recibirá por correo.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 268.39 Td
+(Para qué lo usará) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 247.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 247.89 Td
 (Casi nunca: solo si deja de llegar el correo de las consultas o si cambia el correo de destino.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 361.39 Td
+60.00 231.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 361.39 Td
+74.00 231.39 Td
 (Si genera una clave nueva, pásesela al desarrollo para reemplazarla en el sistema.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 165.89 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 165.89 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 204.89 Td
+(Su caso) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 191.39 Td
+(Verificado: se registró con su Gmail del bufete. Una razón más para cuidar la contraseña de ese) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 177.89 Td
+(correo y activarle verificación en dos pasos.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 324.39 Td
+56.00 125.89 Td
 (7. Correo del bufete \(Gmail\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 316.39 m 539.28 316.39 l S
+56.00 117.89 m 539.28 117.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 289.89 Td
+56.00 91.39 Td
 (El correo del bufete es la pieza central de todo: con él se crearon \(o se pueden recuperar\) las cuentas) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 275.39 Td
+56.00 76.89 Td
 (de GitHub, Netlify y Supabase, y a él llegan las consultas de la web mediante Web3Forms.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 253.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 253.89 Td
-(Entrar en: gmail.com \(o el proveedor de correo que use el bufete\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 237.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 237.39 Td
-(Cuídelo especialmente: quien tenga acceso a este correo podría recuperar las demás cuentas. Use) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 222.89 Td
-(una contraseña fuerte y, de ser posible, verificación en dos pasos.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 185.89 Td
-(8. Panel del sistema LexFive) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 177.89 m 539.28 177.89 l S
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 151.39 Td
-(No es una cuenta externa, pero es donde trabaja el equipo todos los días. Sus usuarios se administran) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 136.89 Td
-(desde Supabase y desde la propia pestaña «Usuarios» del panel.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 115.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 115.39 Td
-(Sitio público: https://lexfive.netlify.app) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 98.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 98.89 Td
-(Ingreso al panel: https://lexfive.netlify.app/sistema/login.html) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 82.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 82.39 Td
-(Cada abogado, procurador y cliente entra con su propio correo y contraseña.) Tj
 ET
 
 endstream
@@ -1258,7 +1243,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 2543 >>
+<< /Length 4079 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1293,121 +1278,208 @@ BT
 281.85 52.00 Td
 (Página 5) Tj
 ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 741.89 Td
-(9. Recomendaciones para no perder los accesos) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 733.89 m 539.28 733.89 l S
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 707.39 Td
+60.00 757.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 707.39 Td
+74.00 757.39 Td
+(Entrar en: gmail.com \(o el proveedor de correo que use el bufete\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 740.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 740.89 Td
+(Cuídelo especialmente: quien tenga acceso a este correo podría recuperar las demás cuentas. Use) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 726.39 Td
+(una contraseña fuerte y, de ser posible, verificación en dos pasos.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 689.39 Td
+(8. Panel del sistema LexFive) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 681.39 m 539.28 681.39 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 654.89 Td
+(No es una cuenta externa, pero es donde trabaja el equipo todos los días. Sus usuarios se administran) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 640.39 Td
+(desde Supabase y desde la propia pestaña «Usuarios» del panel.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 618.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 618.89 Td
+(Sitio público: https://lexfive.netlify.app) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 602.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 602.39 Td
+(Ingreso al panel: https://lexfive.netlify.app/sistema/login.html) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 585.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 585.89 Td
+(Cada abogado, procurador y cliente entra con su propio correo y contraseña.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 548.89 Td
+(9. Recomendaciones para no perder los accesos) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 540.89 m 539.28 540.89 l S
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 514.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 514.39 Td
 (Use SIEMPRE el mismo correo del bufete para todos estos servicios; así son fáciles de recuperar.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 690.89 Td
+60.00 497.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 690.89 Td
+74.00 497.89 Td
 (Si entró con «Continuar con Google», entre siempre por esa misma opción.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 674.39 Td
+60.00 481.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 674.39 Td
+74.00 481.39 Td
 (Anote en un lugar privado y seguro qué método usó para cada servicio \(Google o) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 659.89 Td
+74.00 466.89 Td
 (correo+contraseña\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 643.39 Td
+60.00 450.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 643.39 Td
+74.00 450.39 Td
 (Active la verificación en dos pasos al menos en el correo y en GitHub.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 626.89 Td
+60.00 433.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 626.89 Td
+74.00 433.89 Td
 (Puede cerrar todas las pestañas con tranquilidad: con esta guía sabrá volver a entrar.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 610.39 Td
+60.00 417.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 610.39 Td
+74.00 417.39 Td
 (Si un servicio le pide la contraseña y no la recuerda, use «¿Olvidó su contraseña?» para recibir un) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 595.89 Td
+74.00 402.89 Td
 (enlace de recuperación en el correo del bufete.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 524.39 483.28 58.50 re
+56.00 331.39 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 524.39 4.00 58.50 re
+56.00 331.39 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 563.39 Td
+71.00 370.39 Td
 (Conserve esta guía) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 549.89 Td
+71.00 356.89 Td
 (Mantenga este documento en un lugar seguro y privado, ya que indica qué cuentas sostienen el) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 536.39 Td
+71.00 343.39 Td
 (sistema. No incluye contraseñas, pero sí orienta sobre cómo entrar.) Tj
 ET
 
@@ -1428,15 +1500,15 @@ xref
 0000001550 00000 n 
 0000005115 00000 n 
 0000005279 00000 n 
-0000010750 00000 n 
-0000010915 00000 n 
-0000016447 00000 n 
-0000016613 00000 n 
-0000022155 00000 n 
-0000022321 00000 n 
-0000024917 00000 n 
+0000010748 00000 n 
+0000010913 00000 n 
+0000016368 00000 n 
+0000016534 00000 n 
+0000022098 00000 n 
+0000022264 00000 n 
+0000026396 00000 n 
 trailer
 << /Size 17 /Root 1 0 R >>
 startxref
-25083
+26562
 %%EOF

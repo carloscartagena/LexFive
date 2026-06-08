@@ -25,14 +25,16 @@ Esta guía reúne todas las cuentas y servicios en internet que hacen funcionar 
 
 ## 2. Vista rápida de las cuentas
 
-- GitHub — guarda el código del sistema. Entrar en: github.com
-- Netlify — publica el sitio en internet. Entrar en: app.netlify.com
-- Supabase — base de datos y cuentas de usuario. Entrar en: supabase.com
-- Web3Forms — envío por correo de las consultas. Entrar en: web3forms.com
-- Correo Gmail del bufete — recibe las consultas y sirve para recuperar contraseñas.
+Correo del bufete usado en todas las cuentas: alba23meira@gmail.com
+
+- GitHub — guarda el código. Entrar en github.com con «Continuar con Google».
+- Netlify — publica el sitio. Entrar en app.netlify.com con «Continuar con GitHub».
+- Supabase — base de datos y usuarios. Entrar en supabase.com con «Continuar con GitHub».
+- Web3Forms — envío por correo de las consultas. Funciona con una clave, no con login.
+- Correo Gmail del bufete — recibe las consultas y recupera las demás cuentas.
 - Panel del sistema LexFive — donde trabaja el equipo (no es una cuenta externa).
 
-> **Cómo se ingresó:** Lo más probable es que haya creado GitHub, Netlify y Supabase con el botón «Continuar con Google», usando el correo del bufete. Si fue así, para entrar a cualquiera de los tres solo debe elegir esa opción de Google; no necesita una contraseña aparte.
+> **Lo más importante:** Cadena de accesos (verificada): Supabase entra con GitHub; Netlify entra con GitHub; y GitHub entra con Google (su Gmail). Por lo tanto, su correo de Google alba23meira@gmail.com es la LLAVE MAESTRA de todo el sistema: cuide muy bien su contraseña y actívele verificación en dos pasos.
 
 ## 3. GitHub — el código del sistema
 
@@ -40,17 +42,17 @@ Guarda todos los archivos del sistema (la página y el panel). Cada cambio queda
 
 ### Cómo entrar
 
-1. Vaya a github.com e ingrese con la cuenta que usó al crearlo (probablemente «Continuar con Google» usando el correo del bufete).
-2. Su proyecto (repositorio) se llama «LexFive», dentro de su usuario.
-3. Dirección directa del proyecto: github.com/carloscartagena/LexFive
+1. Vaya a github.com y pulse «Sign in».
+2. Elija «Continuar con Google» con el correo del bufete (alba23meira@gmail.com). Así ingresó su cuenta y es la forma más cómoda.
+3. Su proyecto (repositorio) se llama «LexFive»: github.com/carloscartagena/LexFive
 
 ### Para qué lo usará
 
 - Ver los archivos del sistema y el historial de cambios.
 - Descargar los documentos del repositorio (manuales, scripts de base de datos).
-- No necesita tocar nada del código: de los cambios se encarga el desarrollo.
+- No necesita tocar el código: de los cambios se encarga el desarrollo.
 
-> **Acceso con Google:** Si entró con Google y no recuerda haber puesto contraseña de GitHub, es normal: use siempre «Continuar con Google» con el correo del bufete.
+> **Su caso:** Verificado: su GitHub también tiene una contraseña propia configurada. Es decir, puede entrar con «Continuar con Google» o con su correo + contraseña de GitHub. Recomendado: use Google y conserve la contraseña como respaldo.
 
 ## 4. Netlify — publica la página en internet
 
@@ -58,9 +60,9 @@ Toma el código de GitHub y lo publica en internet. Gracias a Netlify, su sitio 
 
 ### Cómo entrar
 
-1. Vaya a app.netlify.com e ingrese con la misma cuenta (normalmente «Continuar con GitHub» o «Continuar con Google»).
-2. En «Sites» verá su sitio «lexfive» (o similar).
-3. Ahí puede ver si la última publicación salió bien, en la sección «Deploys».
+1. Vaya a app.netlify.com y pulse «Log in».
+2. Elija «Continuar con GitHub» (su cuenta de GitHub está conectada a Netlify).
+3. En «Sites» verá su sitio «lexfive»; en «Deploys» comprueba si la última publicación salió bien.
 
 ### Para qué lo usará
 
@@ -68,15 +70,17 @@ Toma el código de GitHub y lo publica en internet. Gracias a Netlify, su sitio 
 - Más adelante, si compra un dominio propio (ej. lexfive.bo), se conecta aquí.
 - Por lo general no necesita entrar a diario: el sitio se actualiza solo.
 
+> **Su caso:** Verificado: en Netlify, Google NO está conectado, así que NO use «Continuar con Google» aquí. Sí puede entrar con «Continuar con GitHub» o con su correo (alba23meira@gmail.com) + la contraseña propia de Netlify.
+
 ## 5. Supabase — la base de datos y los usuarios
 
 Es el servicio más importante para el día a día: guarda los procesos, clientes, consultas, documentos, testimonios y las cuentas de acceso de los usuarios. El panel del sistema lee y escribe aquí.
 
 ### Cómo entrar
 
-1. Vaya a supabase.com y pulse «Sign in»; ingrese con la cuenta usada al crearlo (probablemente «Continuar con Google» con el correo del bufete).
-2. Abra su proyecto (el que corresponde a LexFive).
-3. Las dos secciones que más usará son: «Authentication → Users» (cuentas de usuario) y «SQL Editor» (para ejecutar los scripts de la carpeta db/).
+1. Vaya a supabase.com y pulse «Sign in».
+2. Elija «Continuar con GitHub» (su cuenta de Supabase está vinculada a GitHub, con el correo alba23meira@gmail.com).
+3. Abra su proyecto (LexFive). Las secciones que más usará: «Authentication → Users» (cuentas) y «SQL Editor» (scripts de la carpeta db/).
 
 ### Datos de su proyecto (públicos, no son secretos)
 
@@ -89,7 +93,7 @@ Es el servicio más importante para el día a día: guarda los procesos, cliente
 - Ejecutar una sola vez los scripts de la carpeta db/ (ver la guía de pasos pendientes).
 - Hacer respaldos de la información cada cierto tiempo.
 
-> **Seguridad:** La contraseña de la base de datos y las claves «secretas» de Supabase NO deben compartirse ni pegarse en la web. Las que usa el sistema son las públicas, pensadas para el navegador.
+> **Su caso:** Verificado: en «Account identities» figura GitHub (carloscartagena · alba23meira@gmail.com). Su acceso a Supabase pasa por GitHub, así que entre siempre con «Continuar con GitHub». No confunda esto con «Connections → GitHub», que sirve para conectar repositorios y no es su forma de iniciar sesión.
 
 ## 6. Web3Forms — envío de las consultas por correo
 
@@ -97,14 +101,16 @@ Cuando alguien llena el formulario de contacto de la web, Web3Forms envía una c
 
 ### Cómo entrar
 
-1. Vaya a web3forms.com.
-2. El servicio funciona con una «Access Key» (clave de acceso) ligada al correo del bufete; no requiere usuario y contraseña tradicionales.
+1. Vaya a web3forms.com e ingrese con su Gmail del bufete (alba23meira@gmail.com), que es con el que se registró.
+2. El servicio funciona con una «Access Key» (clave de acceso) ligada a ese correo.
 3. Si necesita una clave nueva, ingrese el correo del bufete en su página y la recibirá por correo.
 
 ### Para qué lo usará
 
 - Casi nunca: solo si deja de llegar el correo de las consultas o si cambia el correo de destino.
 - Si genera una clave nueva, pásesela al desarrollo para reemplazarla en el sistema.
+
+> **Su caso:** Verificado: se registró con su Gmail del bufete. Una razón más para cuidar la contraseña de ese correo y activarle verificación en dos pasos.
 
 ## 7. Correo del bufete (Gmail)
 
