@@ -295,3 +295,29 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
     padding: 11px 14px; margin-bottom: 16px; font-size: .9rem;
 }
 .draft-banner__actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+
+/* ---------- Ayuda en pantalla (tooltips) ---------- */
+.help-tip {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; margin-left: 5px; vertical-align: middle;
+    border-radius: 50%; background: var(--gold, #c2a25a); color: #fff;
+    font-size: 11px; font-weight: 700; line-height: 1; cursor: help;
+    font-family: var(--font-sans, sans-serif); user-select: none;
+    transition: background .15s, transform .15s;
+}
+.help-tip:hover, .help-tip:focus { background: var(--gold-dark, #a8853c); transform: scale(1.12); outline: none; }
+
+/* Cualquier elemento con data-tip muestra el cursor de ayuda */
+[data-tip] { cursor: help; }
+button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-tip] { cursor: pointer; }
+
+.tip-bubble {
+    position: fixed; z-index: 4000; pointer-events: none;
+    background: #0e1b2c; color: #fff;
+    padding: 9px 12px; border-radius: 8px;
+    font-size: .82rem; line-height: 1.45; font-weight: 400;
+    box-shadow: 0 8px 28px rgba(14,27,44,.28);
+    opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s;
+}
+.tip-bubble.show { opacity: 1; transform: translateY(0); }

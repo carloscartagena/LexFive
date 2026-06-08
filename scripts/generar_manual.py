@@ -54,6 +54,10 @@ def build_blocks():
       "desde la web llega a la bandeja de Consultas del panel.")
     note("Para usar el panel necesita un usuario y contraseña. Para navegar la web pública "
          "no se necesita iniciar sesión.", "Importante")
+    note("¿No sabe qué hace un campo o un botón? Pase el mouse (o toque, en celular) sobre el "
+         "ícono «?» de color dorado que aparece junto a títulos y campos: el propio sistema le "
+         "explicará para qué sirve y qué debe hacer. Están repartidos por todo el panel.",
+         "Ayuda en pantalla")
 
     h1("2. Roles y permisos")
     p("Cada usuario tiene un rol que define lo que puede ver y hacer:")

@@ -74,6 +74,70 @@ function toast(msg, type = '') {
   t.textContent = msg; t.className = type; void t.offsetWidth; t.classList.add('show', type);
   setTimeout(() => t.classList.remove('show'), 3200);
 }
+
+// ============================================================
+//  AYUDA EN PANTALLA (tooltips)
+//  - tip('texto'): genera un ícono "?" con ayuda al pasar el mouse.
+//  - hint('texto'): añade la ayuda a un elemento existente (atributo).
+//  Un único motor global muestra el globo flotante para cualquier
+//  elemento con [data-tip], incluso los generados dinámicamente.
+// ============================================================
+function tip(text) {
+  return ` <span class="help-tip" data-tip="${esc(text)}" tabindex="0" aria-label="Ayuda: ${esc(text)}">?</span>`;
+}
+function hint(text) {
+  return ` data-tip="${esc(text)}" `;
+}
+
+function initTooltipEngine() {
+  if (document.getElementById('tipBubble')) return;
+  const bubble = document.createElement('div');
+  bubble.id = 'tipBubble';
+  bubble.className = 'tip-bubble';
+  document.body.appendChild(bubble);
+
+  let current = null;
+  function show(el) {
+    const text = el.getAttribute('data-tip');
+    if (!text) return;
+    current = el;
+    bubble.textContent = text;
+    bubble.classList.add('show');
+    position(el);
+  }
+  function position(el) {
+    const r = el.getBoundingClientRect();
+    bubble.style.maxWidth = Math.min(300, window.innerWidth - 24) + 'px';
+    bubble.style.left = '0px'; bubble.style.top = '0px';
+    const bw = bubble.offsetWidth, bh = bubble.offsetHeight;
+    let left = r.left + r.width / 2 - bw / 2;
+    left = Math.max(12, Math.min(left, window.innerWidth - bw - 12));
+    let top = r.top - bh - 10;            // arriba por defecto
+    if (top < 8) top = r.bottom + 10;      // si no cabe, abajo
+    bubble.style.left = left + 'px';
+    bubble.style.top = top + 'px';
+  }
+  function hide() { current = null; bubble.classList.remove('show'); }
+
+  // Delegación: funciona con elementos creados dinámicamente
+  document.addEventListener('mouseover', (e) => {
+    const el = e.target.closest('[data-tip]');
+    if (el && el !== current) show(el);
+  });
+  document.addEventListener('mouseout', (e) => {
+    const el = e.target.closest('[data-tip]');
+    if (el && el === current && !el.contains(e.relatedTarget)) hide();
+  });
+  // Accesibilidad: teclado y toque
+  document.addEventListener('focusin', (e) => { const el = e.target.closest('[data-tip]'); if (el) show(el); });
+  document.addEventListener('focusout', hide);
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('.help-tip');
+    if (el) { e.stopPropagation(); (current === el) ? hide() : show(el); }
+    else if (!e.target.closest('#tipBubble')) hide();
+  });
+  window.addEventListener('scroll', () => { if (current) position(current); }, true);
+}
 function loading() { content().innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>'; }
 
 // Modal
@@ -443,7 +507,7 @@ async function renderDashboard() {
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dashboard}</div></div><div class="metric__num">${activos}</div><div class="metric__label">Procesos activos</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.audiencia}</div></div><div class="metric__num">${proximas.length}</div><div class="metric__label">Audiencias próximas</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.clientes}</div></div><div class="metric__num">${mios}</div><div class="metric__label">Mis procesos</div></div>
-      <div class="metric" id="mConsultas" style="cursor:pointer"><div class="metric__top"><div class="metric__icon">${ICON.consultas}</div></div><div class="metric__num">${consultasNuevas}</div><div class="metric__label">Consultas nuevas</div></div>
+      <div class="metric" id="mConsultas" style="cursor:pointer" ${hint('Mensajes nuevos enviados desde el formulario de contacto de la web. Haga clic para verlos y responder.')}><div class="metric__top"><div class="metric__icon">${ICON.consultas}</div></div><div class="metric__num">${consultasNuevas}</div><div class="metric__label">Consultas nuevas</div></div>
     </div>
 
     ${alertasHtml}
@@ -485,11 +549,11 @@ async function renderProcesos() {
 
   content().innerHTML = `
     <div class="toolbar">
-      <input type="search" id="qProc" placeholder="Buscar por carátula, número, juzgado...">
-      <select id="fMateria"><option value="">Todas las materias</option>${state.categorias.map(m => `<option>${esc(m)}</option>`).join('')}</select>
-      <select id="fEstado"><option value="">Todos los estados</option>${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
+      <input type="search" id="qProc" placeholder="Buscar por carátula, número, juzgado..." ${hint('Escriba para filtrar la lista por carátula, número, juzgado o parte contraria.')}>
+      <select id="fMateria" ${hint('Filtra los procesos por área del derecho.')}><option value="">Todas las materias</option>${state.categorias.map(m => `<option>${esc(m)}</option>`).join('')}</select>
+      <select id="fEstado" ${hint('Filtra los procesos por su etapa actual.')}><option value="">Todos los estados</option>${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
       <div class="spacer"></div>
-      <button class="btn btn--primary" id="btnNuevoProc">${ICON.plus} Nuevo proceso</button>
+      <button class="btn btn--primary" id="btnNuevoProc" ${hint('Crea un nuevo caso. Solo la carátula es obligatoria; el resto puede completarlo después.')}>${ICON.plus} Nuevo proceso</button>
     </div>
     <div class="card"><div class="card__body--flush"><div id="procTable"></div></div></div>`;
 
@@ -521,32 +585,32 @@ async function renderProcesos() {
 function procesoForm(proc = null) {
   const p = proc || {};
   const body = `
-    <div class="field"><label>Carátula / Nombre del proceso *</label><input id="pf_caratula" value="${esc(p.caratula || '')}"></div>
+    <div class="field"><label>Carátula / Nombre del proceso *${tip('Es el título del caso. Ej: "García c/ Empresa X por beneficios sociales". Sirve para identificar el proceso rápidamente.')}</label><input id="pf_caratula" value="${esc(p.caratula || '')}"></div>
     <div class="field-row">
-      <div class="field"><label>N.º de proceso / expediente</label><input id="pf_numero" value="${esc(p.numero || '')}"></div>
-      <div class="field"><label>NUREJ</label><input id="pf_nurej" value="${esc(p.nurej || '')}" placeholder="Número Único de Registro Judicial"></div>
+      <div class="field"><label>N.º de proceso / expediente${tip('Número que asigna el juzgado al expediente. Si aún no lo tiene, puede dejarlo vacío y completarlo después.')}</label><input id="pf_numero" value="${esc(p.numero || '')}"></div>
+      <div class="field"><label>NUREJ${tip('Número Único de Registro Judicial. Es el código que identifica la causa en el sistema judicial.')}</label><input id="pf_nurej" value="${esc(p.nurej || '')}" placeholder="Número Único de Registro Judicial"></div>
     </div>
-    <div class="field"><label>Tipo</label><select id="pf_tipo"><option value="judicial" ${p.tipo !== 'administrativo' ? 'selected' : ''}>Judicial</option><option value="administrativo" ${p.tipo === 'administrativo' ? 'selected' : ''}>Administrativo</option></select></div>
+    <div class="field"><label>Tipo${tip('Judicial: el caso se tramita ante un juzgado. Administrativo: ante una entidad pública (alcaldía, ministerio, etc.).')}</label><select id="pf_tipo"><option value="judicial" ${p.tipo !== 'administrativo' ? 'selected' : ''}>Judicial</option><option value="administrativo" ${p.tipo === 'administrativo' ? 'selected' : ''}>Administrativo</option></select></div>
     <div class="field-row">
-      <div class="field"><label>Materia</label><select id="pf_materia" class="js-categoria" data-include-blank="1"><option value="">—</option>${categoriaOptions(p.materia)}</select></div>
-      <div class="field"><label>Estado</label><select id="pf_estado">${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}" ${p.estado === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+      <div class="field"><label>Materia${tip('Área del derecho del caso (Laboral, Civil, Penal...). Si falta una, elija "Crear nueva categoría" y se agregará a todo el sistema.')}</label><select id="pf_materia" class="js-categoria" data-include-blank="1"><option value="">—</option>${categoriaOptions(p.materia)}</select></div>
+      <div class="field"><label>Estado${tip('Etapa actual del caso. Manténgalo al día para que el equipo y el cliente sepan cómo avanza.')}</label><select id="pf_estado">${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}" ${p.estado === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
     </div>
-    <div class="field"><label>Juzgado / Entidad</label><input id="pf_juzgado" value="${esc(p.juzgado || '')}"></div>
+    <div class="field"><label>Juzgado / Entidad${tip('Nombre del juzgado o de la entidad donde se tramita el caso. Ej: "Juzgado 2º de Trabajo de El Alto".')}</label><input id="pf_juzgado" value="${esc(p.juzgado || '')}"></div>
     <div class="field-row">
-      <div class="field"><label>Cliente</label><select id="pf_cliente">${optionsClientes(p.cliente_id)}</select></div>
-      <div class="field"><label>Parte contraria</label><input id="pf_contraria" value="${esc(p.parte_contraria || '')}"></div>
+      <div class="field"><label>Cliente${tip('Persona o empresa que representamos. Elíjala de la lista; si es nueva, use el campo de abajo para registrarla.')}</label><select id="pf_cliente">${optionsClientes(p.cliente_id)}</select></div>
+      <div class="field"><label>Parte contraria${tip('La otra parte del proceso (demandado o demandante según el caso).')}</label><input id="pf_contraria" value="${esc(p.parte_contraria || '')}"></div>
     </div>
-    <div class="field"><label>...o registrar un cliente nuevo (nombre completo)</label><input id="pf_cliente_nuevo" placeholder="Se creará y aparecerá en la pestaña Clientes"></div>
+    <div class="field"><label>...o registrar un cliente nuevo (nombre completo)${tip('Si el cliente aún no existe, escriba aquí su nombre: se creará automáticamente y aparecerá en la pestaña Clientes.')}</label><input id="pf_cliente_nuevo" placeholder="Se creará y aparecerá en la pestaña Clientes"></div>
     <div class="field-row">
-      <div class="field"><label>Abogados a cargo (puede elegir varios)</label><div class="chk-grid">${checkboxesProfiles(p.abogados_ids, 'pf-abo')}</div></div>
-      <div class="field"><label>Procuradores asignados (puede elegir varios)</label><div class="chk-grid">${checkboxesProfiles(p.procuradores_ids, 'pf-proc')}</div></div>
+      <div class="field"><label>Abogados a cargo (puede elegir varios)${tip('Marque a los abogados responsables del caso. Pueden ser varios; aparecerá en su panel como "Mis procesos".')}</label><div class="chk-grid">${checkboxesProfiles(p.abogados_ids, 'pf-abo')}</div></div>
+      <div class="field"><label>Procuradores asignados (puede elegir varios)${tip('Marque a los procuradores que apoyarán en el seguimiento y trámites del caso.')}</label><div class="chk-grid">${checkboxesProfiles(p.procuradores_ids, 'pf-proc')}</div></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>Fecha de inicio</label><input type="date" id="pf_inicio" value="${p.fecha_inicio || (proc ? '' : new Date().toISOString().slice(0,10))}"></div>
-      <div class="field"><label>Próxima audiencia / plazo</label><input type="datetime-local" id="pf_audiencia" value="${p.proxima_audiencia ? new Date(p.proxima_audiencia).toISOString().slice(0,16) : ''}"></div>
+      <div class="field"><label>Fecha de inicio${tip('Fecha en que se inició o ingresó el caso al bufete.')}</label><input type="date" id="pf_inicio" value="${p.fecha_inicio || (proc ? '' : new Date().toISOString().slice(0,10))}"></div>
+      <div class="field"><label>Próxima audiencia / plazo${tip('Fecha y hora del próximo evento importante. El sistema avisará en el panel cuando se acerque o venza.')}</label><input type="datetime-local" id="pf_audiencia" value="${p.proxima_audiencia ? new Date(p.proxima_audiencia).toISOString().slice(0,16) : ''}"></div>
     </div>
-    <div class="field"><label>Descripción</label><textarea id="pf_desc">${esc(p.descripcion || '')}</textarea></div>
-    ${proc ? '' : `<div class="field"><label>Primer memorial (opcional)</label><input type="file" id="pf_memorial"><span class="cell-sub" style="display:block;margin-top:4px;">Se adjuntará al proceso al guardarlo.</span></div>`}`;
+    <div class="field"><label>Descripción${tip('Resumen del caso y notas importantes. Lo que escriba se autoguarda: si se cierra la sesión, podrá recuperarlo.')}</label><textarea id="pf_desc">${esc(p.descripcion || '')}</textarea></div>
+    ${proc ? '' : `<div class="field"><label>Primer memorial (opcional)${tip('Puede adjuntar el primer documento del caso. También podrá subir más archivos después, desde el detalle del proceso.')}</label><input type="file" id="pf_memorial"><span class="cell-sub" style="display:block;margin-top:4px;">Se adjuntará al proceso al guardarlo.</span></div>`}`;
 
   openModal(proc ? 'Editar proceso' : 'Nuevo proceso', body, [
     { label: 'Cancelar', class: 'btn--ghost', onClick: closeModal },
@@ -648,7 +712,7 @@ async function openProcesoDetail(id, readonly = false) {
     </div>
     ${p.descripcion ? `<div class="detail-item" style="margin-top:14px"><label>Descripción</label><span>${esc(p.descripcion)}</span></div>` : ''}
 
-    <h4 class="section-title">Memoriales y documentos</h4>
+    <h4 class="section-title">Memoriales y documentos${tip('Documentos generales del caso (poder, carátula, anexos). Para la respuesta del juzgado y el nuevo memorial, mejor adjúntelos en el paso correspondiente del historial de abajo.')}</h4>
     ${readonly ? '' : `<div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
       <div style="flex-grow:1;min-width:180px;"><label style="font-size:.8rem;">Subir archivo (PDF, Word, imagen...)</label><input type="file" id="docFile"></div>
       <input id="docNombre" placeholder="Descripción (ej: Memorial de respuesta)" style="flex-grow:1;min-width:180px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
@@ -656,7 +720,7 @@ async function openProcesoDetail(id, readonly = false) {
     </div>`}
     <div id="docList">${renderDocs((docs || []).filter(d => !d.actuacion_id), readonly)}</div>
 
-    <h4 class="section-title">Historial de actuaciones</h4>
+    <h4 class="section-title">Historial de actuaciones${tip('Cada paso del caso en orden. Registre el avance (ej: "Respuesta del juzgado") y adjunte los archivos: la respuesta recibida y el nuevo memorial a presentar. El cliente verá esto y podrá descargarlo.')}</h4>
     ${readonly ? '' : `<div class="act-form">
       <div class="field-row" style="margin-bottom:8px">
         <input type="date" id="actFecha" value="${new Date().toISOString().slice(0,10)}" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
@@ -886,14 +950,14 @@ async function renderClientes() {
 function clienteForm(cli = null) {
   const c = cli || {};
   const body = `
-    <div class="field"><label>Nombre / Razón social *</label><input id="cf_nombre" value="${esc(c.nombre || '')}"></div>
+    <div class="field"><label>Nombre / Razón social *${tip('Nombre completo de la persona o el nombre de la empresa que representamos.')}</label><input id="cf_nombre" value="${esc(c.nombre || '')}"></div>
     <div class="field-row">
-      <div class="field"><label>Documento (CI/NIT)</label><input id="cf_doc" value="${esc(c.documento || '')}"></div>
-      <div class="field"><label>Teléfono</label><input id="cf_tel" value="${esc(c.telefono || '')}"></div>
+      <div class="field"><label>Documento (CI/NIT)${tip('Cédula de Identidad de la persona o NIT si es empresa.')}</label><input id="cf_doc" value="${esc(c.documento || '')}"></div>
+      <div class="field"><label>Teléfono${tip('Número de contacto, preferentemente con WhatsApp.')}</label><input id="cf_tel" value="${esc(c.telefono || '')}"></div>
     </div>
-    <div class="field"><label>Correo electrónico</label><input id="cf_email" value="${esc(c.email || '')}"></div>
-    <div class="field"><label>Dirección</label><input id="cf_dir" value="${esc(c.direccion || '')}"></div>
-    <div class="field"><label>Notas</label><textarea id="cf_notas">${esc(c.notas || '')}</textarea></div>`;
+    <div class="field"><label>Correo electrónico${tip('Importante: si el cliente se registra en el portal con este mismo correo, verá automáticamente sus procesos.')}</label><input id="cf_email" value="${esc(c.email || '')}"></div>
+    <div class="field"><label>Dirección${tip('Domicilio del cliente (opcional).')}</label><input id="cf_dir" value="${esc(c.direccion || '')}"></div>
+    <div class="field"><label>Notas${tip('Anotaciones internas sobre el cliente. Solo las ve el personal del bufete.')}</label><textarea id="cf_notas">${esc(c.notas || '')}</textarea></div>`;
   const buttons = [{ label: 'Cancelar', class: 'btn--ghost', onClick: closeModal }];
   if (cli && can(state.profile, 'delete_cliente')) buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteCliente(cli) });
   buttons.push({ label: 'Guardar', class: 'btn--primary', id: 'cf_save', onClick: () => saveCliente(cli) });
@@ -962,13 +1026,13 @@ function articuloForm(art = null) {
   const a = art || {};
   const editable = !art || art.autor_id === state.profile.id || state.profile.rol === 'admin';
   const body = `
-    <div class="field"><label>Título *</label><input id="af_titulo" value="${esc(a.titulo || '')}" ${editable ? '' : 'disabled'}></div>
+    <div class="field"><label>Título *${tip('Título del artículo tal como aparecerá en el blog público.')}</label><input id="af_titulo" value="${esc(a.titulo || '')}" ${editable ? '' : 'disabled'}></div>
     <div class="field-row">
-      <div class="field"><label>Categoría</label><input id="af_cat" value="${esc(a.categoria || '')}" placeholder="Laboral, Familia..." ${editable ? '' : 'disabled'}></div>
-      <div class="field"><label>Estado</label><select id="af_estado" ${editable ? '' : 'disabled'}><option value="borrador" ${a.estado !== 'publicado' ? 'selected' : ''}>Borrador</option><option value="publicado" ${a.estado === 'publicado' ? 'selected' : ''}>Publicado</option></select></div>
+      <div class="field"><label>Categoría${tip('Tema del artículo (Laboral, Familia, etc.). Ayuda a los lectores a encontrarlo.')}</label><input id="af_cat" value="${esc(a.categoria || '')}" placeholder="Laboral, Familia..." ${editable ? '' : 'disabled'}></div>
+      <div class="field"><label>Estado${tip('"Borrador" lo mantiene oculto mientras lo redacta. "Publicado" lo muestra de inmediato en la web pública.')}</label><select id="af_estado" ${editable ? '' : 'disabled'}><option value="borrador" ${a.estado !== 'publicado' ? 'selected' : ''}>Borrador</option><option value="publicado" ${a.estado === 'publicado' ? 'selected' : ''}>Publicado</option></select></div>
     </div>
-    <div class="field"><label>Resumen (extracto)</label><textarea id="af_resumen" ${editable ? '' : 'disabled'}>${esc(a.resumen || '')}</textarea></div>
-    <div class="field"><label>Contenido</label><textarea id="af_contenido" style="min-height:160px" ${editable ? '' : 'disabled'}>${esc(a.contenido || '')}</textarea></div>
+    <div class="field"><label>Resumen (extracto)${tip('Frase corta que resume el artículo. Es lo que se ve en la lista del blog antes de abrirlo.')}</label><textarea id="af_resumen" ${editable ? '' : 'disabled'}>${esc(a.resumen || '')}</textarea></div>
+    <div class="field"><label>Contenido${tip('El texto completo del artículo. Se autoguarda mientras escribe.')}</label><textarea id="af_contenido" style="min-height:160px" ${editable ? '' : 'disabled'}>${esc(a.contenido || '')}</textarea></div>
     ${editable ? '' : '<p class="cell-sub">Solo el autor o un administrador pueden editar este artículo.</p>'}`;
   const buttons = [{ label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }];
   if (art && editable) buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteArticulo(art) });
@@ -1015,7 +1079,7 @@ async function renderUsuarios() {
   await loadProfiles();
   content().innerHTML = `
     <div class="card">
-      <div class="card__head"><h3>Usuarios del sistema</h3></div>
+      <div class="card__head"><h3>Usuarios del sistema${tip('Personal y clientes con acceso. Cambie el rol de cada uno o active/desactive su cuenta. El rol define qué puede ver y hacer.')}</h3></div>
       <div class="card__body--flush"><div class="table-wrap"><table class="data">
         <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
         <tbody>${state.profiles.map(u => `<tr class="no-hover" data-id="${u.id}">
@@ -1236,24 +1300,24 @@ async function renderModelos() {
 
   content().innerHTML = `
     <div class="card">
-      <div class="card__head"><h3>Subir modelos de memoriales</h3></div>
+      <div class="card__head"><h3>Subir modelos de memoriales${tip('Plantillas reutilizables (demandas, memoriales, etc.) que el equipo puede descargar cuando las necesite.')}</h3></div>
       <div class="card__body">
         <div class="field-row">
-          <div class="field"><label>Área del derecho *</label>
+          <div class="field"><label>Área del derecho *${tip('Clasifica el modelo. Si falta un área, elija "Crear nueva categoría" y se agregará a todo el sistema.')}</label>
             <select id="md_area" class="js-categoria" data-include-blank="1" data-blank-label="Seleccione un área"><option value="">Seleccione un área</option>${categoriaOptions('')}</select>
           </div>
-          <div class="field"><label>Nombre (opcional)</label>
+          <div class="field"><label>Nombre (opcional)${tip('Si sube un solo archivo puede darle un nombre claro. Si sube varios o una carpeta, se usa el nombre de cada archivo.')}</label>
             <input id="md_nombre" placeholder="Si sube un solo archivo. Si deja vacío, se usa el nombre del archivo.">
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Archivos (puede elegir varios)</label>
+            <label>Archivos (puede elegir varios)${tip('Puede seleccionar varios archivos a la vez manteniendo Ctrl (o Cmd en Mac) al elegirlos.')}</label>
             <input type="file" id="md_file" multiple>
             <span class="cell-sub" style="display:block;margin-top:4px;">Word, PDF, imágenes, etc. Mantenga Ctrl/Cmd para elegir varios.</span>
           </div>
           <div class="field">
-            <label>...o una carpeta completa</label>
+            <label>...o una carpeta completa${tip('Sube todos los archivos de una carpeta de su computadora al área elegida. Funciona en navegadores de escritorio.')}</label>
             <input type="file" id="md_folder" webkitdirectory directory multiple>
             <span class="cell-sub" style="display:block;margin-top:4px;">Se subirán todos los archivos de la carpeta al área elegida.</span>
           </div>
@@ -1400,8 +1464,8 @@ async function renderConsultas() {
   const nuevas = list.filter(c => c.estado === 'nueva').length;
   content().innerHTML = `
     <div class="toolbar">
-      <input type="search" id="qCons" placeholder="Buscar por nombre, correo, mensaje...">
-      <select id="fEstadoCons">
+      <input type="search" id="qCons" placeholder="Buscar por nombre, correo, mensaje..." ${hint('Busque una consulta por el nombre de la persona, su correo o el contenido del mensaje.')}>
+      <select id="fEstadoCons" ${hint('Filtre por estado: Nuevas (sin atender), Atendidas (ya respondidas) o Archivadas.')}>
         <option value="">Todos los estados</option>
         <option value="nueva">Nuevas (${nuevas})</option>
         <option value="atendida">Atendidas</option>
@@ -1546,6 +1610,7 @@ function buildSidebar() {
 
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();
+  initTooltipEngine();
   $('#modalClose').onclick = closeModal;
   $('#modalOverlay').onclick = (e) => { if (e.target === $('#modalOverlay')) closeModal(); };
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });

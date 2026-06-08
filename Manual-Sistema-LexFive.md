@@ -37,6 +37,8 @@ Toda la información se guarda de forma segura en una base de datos en la nube (
 
 > **Importante:** Para usar el panel necesita un usuario y contraseña. Para navegar la web pública no se necesita iniciar sesión.
 
+> **Ayuda en pantalla:** ¿No sabe qué hace un campo o un botón? Pase el mouse (o toque, en celular) sobre el ícono «?» de color dorado que aparece junto a títulos y campos: el propio sistema le explicará para qué sirve y qué debe hacer. Están repartidos por todo el panel.
+
 ## 2. Roles y permisos
 
 Cada usuario tiene un rol que define lo que puede ver y hacer:
