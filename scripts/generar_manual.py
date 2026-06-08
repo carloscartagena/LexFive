@@ -203,12 +203,26 @@ def build_blocks():
         "Activar o desactivar cuentas. No es posible desactivar la propia cuenta.",
     ])
 
-    h1("12. Auditoría (administrador)")
+    h1("12. Categorías / áreas del derecho (administrador)")
+    p("Las áreas del derecho (Laboral, Civil, Penal, etc.) clasifican los procesos y los "
+      "modelos de memoriales. Esta pestaña permite administrarlas:")
+    bul([
+        "Crear una categoría nueva: aparece al instante en las listas de Procesos y Modelos.",
+        "Renombrar una categoría: los procesos y modelos que la usaban se actualizan "
+        "automáticamente, sin perder su clasificación.",
+        "Eliminar una categoría: solo es posible si no está en uso (la tabla muestra cuántos "
+        "procesos y modelos usan cada una).",
+    ])
+    note("También puede crear una categoría sobre la marcha desde los formularios de Procesos "
+         "y de Modelos, eligiendo «Crear nueva categoría...» en el selector de área.",
+         "Atajo")
+
+    h1("13. Auditoría (administrador)")
     p("Es la bitácora del sistema. Registra las acciones importantes (quién creó, editó o "
       "eliminó algo, cambios de rol, moderación de testimonios, etc.), con fecha, usuario y "
       "detalle. Útil para control interno y transparencia.")
 
-    h1("13. Portal del cliente")
+    h1("14. Portal del cliente")
     p("Cuando un cliente inicia sesión, ve una versión reducida y privada:")
     bul([
         "Mis procesos: el listado de sus casos, su estado y la próxima audiencia, además de un "
@@ -217,7 +231,7 @@ def build_blocks():
         "bufete revisa antes de publicarlo.",
     ])
 
-    h1("14. La página web pública")
+    h1("15. La página web pública")
     p("Es la cara del bufete hacia los clientes. Incluye:")
     bul([
         "Inicio, Áreas de práctica, Nosotros (equipo), Casos de éxito, Blog y Preguntas "
@@ -232,7 +246,7 @@ def build_blocks():
          "principal es el formulario y, de forma directa, el WhatsApp de cada abogado.",
          "Privacidad del equipo")
 
-    h1("15. Configuración técnica (Supabase y despliegue)")
+    h1("16. Configuración técnica (Supabase y despliegue)")
     p("Esta sección es para quien administra la parte técnica.")
     h2("Base de datos (Supabase)")
     p("En la carpeta db/ del repositorio están los scripts SQL. Se ejecutan UNA sola vez, en "
@@ -258,7 +272,7 @@ def build_blocks():
       "la rama principal (main), Netlify vuelve a publicar el sitio automáticamente en uno o "
       "dos minutos.")
 
-    h1("16. Cómo agregar un nuevo abogado")
+    h1("17. Cómo agregar un nuevo abogado")
     stp([
         "En Supabase, vaya a Authentication → Users → Add user, y cree la cuenta con su correo "
         "(o pídale que se registre desde la pantalla de acceso).",
@@ -267,7 +281,7 @@ def build_blocks():
         "Listo: ya podrá ingresar y trabajar según su rol.",
     ])
 
-    h1("17. Mantenimiento y buenas prácticas")
+    h1("18. Mantenimiento y buenas prácticas")
     bul([
         "Cada persona debe tener su propia cuenta; no comparta usuarios ni contraseñas.",
         "Use contraseñas robustas y cámbielas periódicamente.",
@@ -278,7 +292,7 @@ def build_blocks():
         "desde el panel de Supabase.",
     ])
 
-    h1("18. Solución de problemas frecuentes")
+    h1("19. Solución de problemas frecuentes")
     h2("No veo la pestaña «Consultas» o da error")
     p("Falta ejecutar el script db/06_consultas.sql en Supabase (una sola vez). Si el error "
       "menciona una columna que no existe, vuelva a ejecutar el script, que está preparado "
@@ -298,7 +312,7 @@ def build_blocks():
     p("Debe haberse registrado con el mismo correo que figura en su ficha de cliente y en sus "
       "procesos. Verifique el correo en la pestaña «Clientes».")
 
-    h1("19. Soporte")
+    h1("20. Soporte")
     p("Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. "
       "Para cambios o mejoras en la web o el panel, conserve este manual como referencia y "
       "describa con el mayor detalle posible lo que necesita.")

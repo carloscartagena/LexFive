@@ -28,7 +28,8 @@ const ICON = {
   alerta: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>',
   estrella: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>',
   whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.05 24l1.69-6.16a11.9 11.9 0 1 1 4.3 4.2L.05 24zM6.6 20.2l.37.22a9.9 9.9 0 1 0-3.35-3.3l.24.38-1 3.65 3.74-.95z"/></svg>',
-  consultas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>'
+  consultas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+  categorias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83zM7 7h.01"/></svg>'
 };
 
 const NAV = [
@@ -39,6 +40,7 @@ const NAV = [
   { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
+  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
   { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true }
 ];
@@ -200,6 +202,110 @@ function wireCategoriaSelect(sel) {
     });
     if (creada) toast(`Categoría "${creada}" creada.`, 'success');
   });
+}
+
+// Renombra una categoría: actualiza la tabla y, en cascada, los procesos y
+// modelos que usaban el nombre anterior, para no perder la clasificación.
+async function renombrarCategoria(nombreActual, nombreNuevo) {
+  const limpio = (nombreNuevo || '').trim();
+  if (!limpio || limpio === nombreActual) return false;
+  if (state.categorias.find(c => c.toLowerCase() === limpio.toLowerCase())) {
+    toast('Ya existe una categoría con ese nombre.', 'error'); return false;
+  }
+  const { error } = await supabase.from('categorias').update({ nombre: limpio }).eq('nombre', nombreActual);
+  if (error) { toast('No se pudo renombrar: ' + error.message, 'error'); return false; }
+  // Reclasificar registros existentes
+  await supabase.from('procesos').update({ materia: limpio }).eq('materia', nombreActual);
+  await supabase.from('modelos').update({ categoria: limpio }).eq('categoria', nombreActual);
+  await logAccion('renombrar', 'categoria', nombreActual, `${nombreActual} → ${limpio}`);
+  await loadCategorias();
+  return true;
+}
+
+// Elimina una categoría (solo si nadie la está usando, para no dejar
+// procesos/modelos huérfanos sin área).
+async function eliminarCategoria(nombre) {
+  const [{ count: cProc }, { count: cMod }] = await Promise.all([
+    supabase.from('procesos').select('id', { count: 'exact', head: true }).eq('materia', nombre),
+    supabase.from('modelos').select('id', { count: 'exact', head: true }).eq('categoria', nombre)
+  ]);
+  const usos = (cProc || 0) + (cMod || 0);
+  if (usos > 0) {
+    toast(`No se puede eliminar: "${nombre}" se usa en ${cProc || 0} proceso(s) y ${cMod || 0} modelo(s).`, 'error');
+    return false;
+  }
+  if (!confirm(`¿Eliminar la categoría "${nombre}"?`)) return false;
+  const { error } = await supabase.from('categorias').delete().eq('nombre', nombre);
+  if (error) { toast('No se pudo eliminar: ' + error.message, 'error'); return false; }
+  await logAccion('eliminar', 'categoria', nombre, nombre);
+  await loadCategorias();
+  return true;
+}
+
+// ============================================================
+//  VISTA: CATEGORÍAS / ÁREAS DEL DERECHO (solo admin)
+// ============================================================
+async function renderCategorias() {
+  loading();
+  await loadCategorias();
+  // Conteo de uso por categoría (procesos + modelos)
+  const [{ data: procs }, { data: mods }] = await Promise.all([
+    supabase.from('procesos').select('materia'),
+    supabase.from('modelos').select('categoria')
+  ]);
+  const usoProc = {}, usoMod = {};
+  (procs || []).forEach(p => { if (p.materia) usoProc[p.materia] = (usoProc[p.materia] || 0) + 1; });
+  (mods || []).forEach(m => { if (m.categoria) usoMod[m.categoria] = (usoMod[m.categoria] || 0) + 1; });
+
+  content().innerHTML = `
+    <div class="toolbar">
+      <input type="search" id="qCat" placeholder="Buscar categoría...">
+      <div class="spacer"></div>
+      <button class="btn btn--primary" id="btnNuevaCat">${ICON.plus} Nueva categoría</button>
+    </div>
+    <div class="card">
+      <div class="card__body" style="padding-bottom:6px">
+        <p class="cell-sub">Las áreas del derecho se usan para clasificar <strong>procesos</strong> y <strong>modelos de memoriales</strong>. Al crear una, aparece automáticamente en todas las listas. Solo se pueden eliminar las que no estén en uso.</p>
+      </div>
+      <div class="card__body--flush"><div id="catTable"></div></div>
+    </div>`;
+
+  function paint() {
+    const q = ($('#qCat').value || '').toLowerCase();
+    const rows = state.categorias.filter(c => !q || c.toLowerCase().includes(q));
+    $('#catTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
+      <thead><tr><th>Categoría</th><th>Procesos</th><th>Modelos</th><th>Acciones</th></tr></thead>
+      <tbody>${rows.map(c => {
+        const enUso = (usoProc[c] || 0) + (usoMod[c] || 0) > 0;
+        return `<tr class="no-hover">
+          <td class="cell-strong">${esc(c)}</td>
+          <td>${usoProc[c] || 0}</td>
+          <td>${usoMod[c] || 0}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn--ghost btn--sm js-ren" data-cat="${esc(c)}">Renombrar</button>
+            <button class="btn btn--danger btn--sm js-del" data-cat="${esc(c)}" ${enUso ? 'disabled title="En uso, no se puede eliminar"' : ''}>Eliminar</button>
+          </td></tr>`;
+      }).join('')}</tbody></table></div>`
+      : `<div class="empty">${ICON.categorias}<p>No hay categorías que coincidan.</p></div>`;
+
+    $('#catTable').querySelectorAll('.js-ren').forEach(b => b.onclick = async () => {
+      const actual = b.dataset.cat;
+      const nuevo = prompt(`Nuevo nombre para "${actual}":`, actual);
+      if (nuevo === null) return;
+      if (await renombrarCategoria(actual, nuevo)) { toast('Categoría renombrada.', 'success'); renderCategorias(); }
+    });
+    $('#catTable').querySelectorAll('.js-del').forEach(b => b.onclick = async () => {
+      if (await eliminarCategoria(b.dataset.cat)) { toast('Categoría eliminada.', 'success'); renderCategorias(); }
+    });
+  }
+  paint();
+  $('#qCat').oninput = paint;
+  $('#btnNuevaCat').onclick = async () => {
+    const nombre = prompt('Nombre de la nueva área del derecho:');
+    if (nombre === null) return;
+    const creada = await crearCategoria(nombre);
+    if (creada) { toast(`Categoría "${creada}" creada.`, 'success'); renderCategorias(); }
+  };
 }
 
 // Genera un enlace de WhatsApp con un recordatorio de audiencia ya escrito
@@ -1200,6 +1306,7 @@ const VIEWS = {
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
   blog: { title: 'Blog', render: renderBlog },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
+  categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
   misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
@@ -1217,7 +1324,7 @@ function navigate(key) {
     if (!['misprocesos', 'opinion'].includes(key)) key = 'misprocesos';
   } else {
     if (!VIEWS[key]) key = 'dashboard';
-    if (['usuarios', 'auditoria', 'testimonios'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
+    if (['usuarios', 'auditoria', 'testimonios', 'categorias'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
   }
   state.view = key;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));

@@ -15,14 +15,15 @@ _Guía completa de uso y gestión · Versión: junio de 2026 · lexfive.netlify.
 - 9. Blog
 - 10. Testimonios
 - 11. Usuarios (administrador)
-- 12. Auditoría (administrador)
-- 13. Portal del cliente
-- 14. La página web pública
-- 15. Configuración técnica (Supabase y despliegue)
-- 16. Cómo agregar un nuevo abogado
-- 17. Mantenimiento y buenas prácticas
-- 18. Solución de problemas frecuentes
-- 19. Soporte
+- 12. Categorías / áreas del derecho (administrador)
+- 13. Auditoría (administrador)
+- 14. Portal del cliente
+- 15. La página web pública
+- 16. Configuración técnica (Supabase y despliegue)
+- 17. Cómo agregar un nuevo abogado
+- 18. Mantenimiento y buenas prácticas
+- 19. Solución de problemas frecuentes
+- 20. Soporte
 
 
 ## 1. Introducción: qué es el sistema
@@ -162,18 +163,28 @@ Solo el administrador ve esta pestaña. Sirve para gestionar al personal:
 - Cambiar el rol de un usuario (administrador, abogado, procurador o cliente).
 - Activar o desactivar cuentas. No es posible desactivar la propia cuenta.
 
-## 12. Auditoría (administrador)
+## 12. Categorías / áreas del derecho (administrador)
+
+Las áreas del derecho (Laboral, Civil, Penal, etc.) clasifican los procesos y los modelos de memoriales. Esta pestaña permite administrarlas:
+
+- Crear una categoría nueva: aparece al instante en las listas de Procesos y Modelos.
+- Renombrar una categoría: los procesos y modelos que la usaban se actualizan automáticamente, sin perder su clasificación.
+- Eliminar una categoría: solo es posible si no está en uso (la tabla muestra cuántos procesos y modelos usan cada una).
+
+> **Atajo:** También puede crear una categoría sobre la marcha desde los formularios de Procesos y de Modelos, eligiendo «Crear nueva categoría...» en el selector de área.
+
+## 13. Auditoría (administrador)
 
 Es la bitácora del sistema. Registra las acciones importantes (quién creó, editó o eliminó algo, cambios de rol, moderación de testimonios, etc.), con fecha, usuario y detalle. Útil para control interno y transparencia.
 
-## 13. Portal del cliente
+## 14. Portal del cliente
 
 Cuando un cliente inicia sesión, ve una versión reducida y privada:
 
 - Mis procesos: el listado de sus casos, su estado y la próxima audiencia, además de un botón para consultar por WhatsApp.
 - Mi opinión: un formulario para calificar el servicio y dejar un comentario, que el bufete revisa antes de publicarlo.
 
-## 14. La página web pública
+## 15. La página web pública
 
 Es la cara del bufete hacia los clientes. Incluye:
 
@@ -184,7 +195,7 @@ Es la cara del bufete hacia los clientes. Incluye:
 
 > **Privacidad del equipo:** La barra superior y el pie ya no muestran correos ni teléfonos personales: el canal principal es el formulario y, de forma directa, el WhatsApp de cada abogado.
 
-## 15. Configuración técnica (Supabase y despliegue)
+## 16. Configuración técnica (Supabase y despliegue)
 
 Esta sección es para quien administra la parte técnica.
 
@@ -210,14 +221,14 @@ En la carpeta db/ del repositorio están los scripts SQL. Se ejecutan UNA sola v
 
 El sitio se publica con Netlify, conectado al repositorio de GitHub. Al subir cambios a la rama principal (main), Netlify vuelve a publicar el sitio automáticamente en uno o dos minutos.
 
-## 16. Cómo agregar un nuevo abogado
+## 17. Cómo agregar un nuevo abogado
 
 1. En Supabase, vaya a Authentication → Users → Add user, y cree la cuenta con su correo (o pídale que se registre desde la pantalla de acceso).
 2. Ingrese al panel como administrador y abra la pestaña «Usuarios».
 3. Busque al nuevo usuario y cámbiele el rol a «Abogado» o «Procurador».
 4. Listo: ya podrá ingresar y trabajar según su rol.
 
-## 17. Mantenimiento y buenas prácticas
+## 18. Mantenimiento y buenas prácticas
 
 - Cada persona debe tener su propia cuenta; no comparta usuarios ni contraseñas.
 - Use contraseñas robustas y cámbielas periódicamente.
@@ -226,7 +237,7 @@ El sitio se publica con Netlify, conectado al repositorio de GitHub. Al subir ca
 - Mantenga al día los estados de los procesos y las próximas audiencias.
 - Supabase guarda los datos en la nube; aun así, conviene exportar respaldos periódicos desde el panel de Supabase.
 
-## 18. Solución de problemas frecuentes
+## 19. Solución de problemas frecuentes
 
 ### No veo la pestaña «Consultas» o da error
 
@@ -247,7 +258,7 @@ Falta ejecutar el script db/06_consultas.sql en Supabase (una sola vez). Si el e
 
 Debe haberse registrado con el mismo correo que figura en su ficha de cliente y en sus procesos. Verifique el correo en la pestaña «Clientes».
 
-## 19. Soporte
+## 20. Soporte
 
 Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle posible lo que necesita.
 
