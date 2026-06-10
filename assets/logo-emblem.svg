@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive">
+  <!-- Fondo -->
+  <rect width="64" height="64" rx="12" fill="#0e1b2c"/>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="10.5" fill="none" stroke="#c2a25a" stroke-width="1.5"/>
+  <g stroke="#c2a25a" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Corchete de codigo izquierdo:  <   (programacion / sistemas) -->
+    <path d="M20 17 L10 32 L20 47" stroke-width="3.2"/>
+    <!-- Corchete de codigo derecho:  >   (programacion / sistemas) -->
+    <path d="M44 17 L54 32 L44 47" stroke-width="3.2"/>
+    <!-- Balanza de la justicia (derecho) -->
+    <circle cx="32" cy="15.5" r="2.6" fill="#c2a25a" stroke="none"/>
+    <path d="M32 16 L32 44" stroke-width="2.4"/>
+    <path d="M23 24 L41 24" stroke-width="2.4"/>
+    <circle cx="23" cy="29" r="4" stroke-width="2"/>
+    <circle cx="41" cy="29" r="4" stroke-width="2"/>
+    <path d="M25 44 L39 44" stroke-width="2.8"/>
+  </g>
+</svg>

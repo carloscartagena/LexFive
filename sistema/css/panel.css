@@ -32,7 +32,7 @@ ul { list-style: none; }
 
 /* ---------- Logo ---------- */
 .logo { display: flex; align-items: center; gap: 11px; }
-.logo__mark { display: grid; place-items: center; width: 42px; height: 42px; background: var(--navy); color: var(--gold); font-family: var(--font-serif); font-weight: 700; border-radius: 7px; border: 1.5px solid var(--gold); }
+.logo__mark { display: block; width: 42px; height: 42px; background: url(../../assets/logo-emblem.svg) center / contain no-repeat; border-radius: 7px; font-size: 0; flex-shrink: 0; }
 .logo__text strong { display: block; font-family: var(--font-serif); font-size: 1.25rem; line-height: 1; }
 .logo__text small { display: block; text-transform: uppercase; letter-spacing: 3px; font-size: .58rem; color: var(--gold-dark); font-weight: 600; }
 
@@ -326,3 +326,57 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 /* ---------- Credenciales y accesos (lista de pasos) ---------- */
 .cred-steps { margin: 0; padding-left: 20px; }
 .cred-steps li { margin-bottom: 10px; line-height: 1.55; color: var(--ink, #1a2330); }
+
+
+/* ============================================================
+   Credencial / carnet del bufete
+   ============================================================ */
+.cred-wrap { display: flex; flex-wrap: wrap; gap: 22px; margin: 4px 0 18px; }
+.cred-card {
+    width: 340px; max-width: 100%;
+    background: linear-gradient(150deg, #0e1b2c 0%, #16273d 55%, #1f3450 100%);
+    color: #fff; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 14px 38px rgba(14,27,44,.30);
+    border: 1px solid rgba(194,162,90,.35);
+}
+.cred-card__top { display: flex; align-items: center; gap: 12px; padding: 16px 18px 10px; }
+.cred-logo { width: 44px; height: 44px; background: url(../../assets/logo-emblem.svg) center / contain no-repeat; flex-shrink: 0; }
+.cred-org strong { display: block; font-family: var(--font-serif, Georgia, serif); font-size: 1.35rem; line-height: 1; }
+.cred-org small { display: block; text-transform: uppercase; letter-spacing: 3px; font-size: .58rem; color: var(--gold-light, #e7d3a1); margin-top: 4px; }
+.cred-band {
+    background: var(--gold, #c2a25a); color: #0e1b2c;
+    font-weight: 700; font-size: .72rem; letter-spacing: 1px; text-transform: uppercase;
+    padding: 6px 18px;
+}
+.cred-body { display: flex; gap: 14px; padding: 16px 18px; }
+.cred-photo {
+    width: 76px; height: 92px; flex-shrink: 0; border-radius: 8px;
+    background: rgba(255,255,255,.10); border: 1.5px solid var(--gold, #c2a25a);
+    display: grid; place-items: center; font-family: var(--font-serif, Georgia, serif);
+    font-size: 2rem; font-weight: 700; color: var(--gold-light, #e7d3a1);
+}
+.cred-data { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; }
+.cred-row span { display: block; font-size: .58rem; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.55); }
+.cred-row strong { display: block; font-size: .9rem; word-break: break-word; }
+.cred-foot { display: flex; justify-content: space-between; gap: 10px; padding: 10px 18px 16px; border-top: 1px solid rgba(255,255,255,.12); }
+.cred-foot span { display: block; font-size: .56rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,.55); }
+.cred-foot strong { font-size: .78rem; }
+
+/* Reverso */
+.cred-card--back { display: flex; flex-direction: column; }
+.cred-cert { font-size: .76rem; line-height: 1.5; color: rgba(255,255,255,.85); padding: 14px 18px 0; }
+.cred-card--back .cred-cert:nth-of-type(2) { color: var(--gold-light, #e7d3a1); font-weight: 600; letter-spacing: .5px; padding-top: 8px; }
+.cred-sign { display: flex; gap: 16px; padding: 22px 18px 6px; margin-top: auto; }
+.cred-sign__line { flex: 1; border-top: 1px solid rgba(255,255,255,.4); padding-top: 5px; font-size: .6rem; text-align: center; color: rgba(255,255,255,.7); }
+.cred-note { font-size: .56rem; color: rgba(255,255,255,.5); padding: 8px 18px 16px; }
+.cred-actions { margin-bottom: 22px; }
+
+@media (max-width: 520px) { .cred-card { width: 100%; } }
+
+/* Impresión: solo la credencial */
+@media print {
+    body * { visibility: hidden; }
+    #credPrintArea, #credPrintArea * { visibility: visible; }
+    #credPrintArea { position: absolute; left: 0; top: 0; display: flex; gap: 18px; padding: 10px; }
+    .cred-card { box-shadow: none; }
+}

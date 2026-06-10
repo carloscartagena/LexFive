@@ -1549,84 +1549,90 @@ async function deleteConsulta(c) {
 
 // ============================================================
 //  VISTA: CREDENCIALES Y ACCESOS (solo administrador y abogados)
-//  Explica cómo se entra a cada plataforma y cómo dar acceso a los
-//  procuradores. El administrador y los abogados son los únicos que la
-//  ven; ellos entregan las credenciales a sus procuradores.
+//  Genera una credencial/carnet del bufete para el usuario, lista para
+//  imprimir. El administrador y los abogados son los únicos que la ven;
+//  ellos entregan las credenciales a sus procuradores.
 // ============================================================
+function credId(profile) {
+  // Identificador corto y estable a partir del id del perfil
+  const base = (profile.id || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  return 'LF-' + (base.slice(0, 6) || '000000');
+}
+
 async function renderCredenciales() {
   loading();
-  const card = (titulo, icono, filas, extra = '') => `
-    <div class="card">
-      <div class="card__head"><h3>${icono} ${titulo}</h3></div>
-      <div class="card__body">
-        <div class="detail-grid">${filas.map(f => `
-          <div class="detail-item"><label>${f[0]}</label><span>${f[1]}</span></div>`).join('')}</div>
-        ${extra}
-      </div>
-    </div>`;
+  const p = state.profile;
+  const hoy = new Date();
+  const emision = hoy.toLocaleDateString('es-BO', { day: '2-digit', month: 'long', year: 'numeric' });
+  const venc = new Date(hoy.getFullYear() + 1, hoy.getMonth(), hoy.getDate())
+    .toLocaleDateString('es-BO', { day: '2-digit', month: 'long', year: 'numeric' });
+  const rolLabel = ROLES[p.rol] || p.rol;
+  const inic = initials(p.nombre);
 
   content().innerHTML = `
     <div class="card" style="border-left:4px solid var(--gold,#c2a25a)">
       <div class="card__body">
-        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:8px;">${ICON.llave} Credenciales y accesos del sistema</h3>
-        <p class="cell-sub">Esta sección es confidencial y solo la ven el administrador y los abogados. Aquí encontrarán cómo se ingresa a cada plataforma y cómo dar acceso a un procurador. <strong>No comparta estas credenciales fuera del equipo autorizado.</strong></p>
+        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:6px;">${ICON.llave} Su credencial del bufete</h3>
+        <p class="cell-sub">Esta es su credencial oficial de <strong>LexFive Abogados</strong>. Puede imprimirla o guardarla como PDF. Solo el administrador y los abogados pueden generar credenciales; son quienes las entregan a sus procuradores.</p>
       </div>
     </div>
 
-    ${card('La llave maestra', ICON.llave, [
-      ['Correo principal del bufete', '<strong>alba23meira@gmail.com</strong>'],
-      ['Por qué es la llave maestra', 'GitHub entra con Google (este Gmail); Netlify y Supabase entran con GitHub; y Web3Forms usa este mismo Gmail.'],
-      ['Protección recomendada', 'Active la verificación en dos pasos del Gmail y guarde los códigos de respaldo en un lugar seguro.']
-    ])}
+    <div class="cred-wrap" id="credPrintArea">
+      <!-- ANVERSO -->
+      <div class="cred-card">
+        <div class="cred-card__top">
+          <span class="cred-logo"></span>
+          <div class="cred-org">
+            <strong>LexFive</strong>
+            <small>Bufete de Abogados</small>
+          </div>
+        </div>
+        <div class="cred-band">CREDENCIAL &middot; ${esc(rolLabel)}</div>
+        <div class="cred-body">
+          <div class="cred-photo">${esc(inic)}</div>
+          <div class="cred-data">
+            <div class="cred-row"><span>Nombre</span><strong>${esc(p.nombre || '—')}</strong></div>
+            <div class="cred-row"><span>Cargo</span><strong>${esc(rolLabel)}</strong></div>
+            <div class="cred-row"><span>N.&deg; de credencial</span><strong>${esc(credId(p))}</strong></div>
+            <div class="cred-row"><span>Correo</span><strong>${esc(p.email || '—')}</strong></div>
+          </div>
+        </div>
+        <div class="cred-foot">
+          <div><span>Emisión</span><strong>${esc(emision)}</strong></div>
+          <div><span>Válido hasta</span><strong>${esc(venc)}</strong></div>
+        </div>
+      </div>
 
-    ${card('GitHub — código del sistema', ICON.doc, [
-      ['Dónde', 'github.com'],
-      ['Cómo entrar', 'Botón «Continuar con Google» (con el Gmail del bufete). También tiene contraseña propia como respaldo.'],
-      ['Proyecto', 'github.com/carloscartagena/LexFive']
-    ])}
+      <!-- REVERSO -->
+      <div class="cred-card cred-card--back">
+        <div class="cred-band">LexFive &middot; La Paz / El Alto - Bolivia</div>
+        <p class="cred-cert">El portador(a) de la presente credencial forma parte del equipo del bufete <strong>LexFive Abogados</strong> y está autorizado(a) para representar al bufete en las gestiones jurídicas, judiciales y administrativas que le correspondan según su cargo.</p>
+        <p class="cred-cert">Derecho &middot; Tecnología &middot; Ingeniería de Sistemas</p>
+        <div class="cred-sign">
+          <div class="cred-sign__line">Firma autorizada</div>
+          <div class="cred-sign__line">Sello del bufete</div>
+        </div>
+        <p class="cred-note">Si encuentra esta credencial, devuélvala a LexFive. Documento de uso institucional.</p>
+      </div>
+    </div>
 
-    ${card('Netlify — publica el sitio', ICON.dashboard, [
-      ['Dónde', 'app.netlify.com'],
-      ['Cómo entrar', 'Botón «Continuar con GitHub». (Google NO está conectado aquí.) También correo + contraseña propia.'],
-      ['Sitio publicado', 'lexfive.netlify.app']
-    ])}
-
-    ${card('Supabase — base de datos y usuarios', ICON.clientes, [
-      ['Dónde', 'supabase.com'],
-      ['Cómo entrar', 'Botón «Continuar con GitHub» (vinculado al Gmail del bufete).'],
-      ['Proyecto (URL pública)', 'soazmibvesvuwgxeealo.supabase.co']
-    ])}
-
-    ${card('Web3Forms — correo de las consultas', ICON.consultas, [
-      ['Dónde', 'web3forms.com'],
-      ['Cómo entrar', 'Con el Gmail del bufete (la clave de acceso está ligada a ese correo).'],
-      ['Nota', 'Aunque el correo falle, las consultas siempre quedan en la pestaña «Consultas».']
-    ])}
-
-    ${card('Panel del sistema LexFive', ICON.procesos, [
-      ['Sitio público', 'lexfive.netlify.app'],
-      ['Ingreso al panel', 'lexfive.netlify.app/sistema/login.html'],
-      ['Acceso', 'Cada abogado, procurador y cliente entra con su propio correo y contraseña.']
-    ])}
+    <div class="cred-actions">
+      <button class="btn btn--primary" id="btnPrintCred">${ICON.doc} Imprimir / Guardar PDF</button>
+    </div>
 
     <div class="card">
-      <div class="card__head"><h3>${ICON.usuarios} Cómo dar acceso a un procurador</h3></div>
+      <div class="card__head"><h3>${ICON.usuarios} Cómo entregar una credencial a un procurador</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">El administrador y los abogados son quienes habilitan a los procuradores. Pasos:</p>
         <ol class="cred-steps">
           <li>Pida al procurador que se registre en <strong>lexfive.netlify.app/sistema/login.html</strong> con su correo y una contraseña (entra como «Cliente» por defecto).</li>
-          <li>Avise al <strong>administrador</strong> para que, en la pestaña <strong>Usuarios</strong>, le cambie el rol a <strong>Procurador</strong>.</li>
-          <li>Liste: el procurador ya podrá ver y dar seguimiento a los procesos que se le asignen.</li>
+          <li>El <strong>administrador</strong> abre la pestaña <strong>Usuarios</strong> y le cambia el rol a <strong>Procurador</strong>.</li>
+          <li>El procurador inicia sesión y, desde su panel, podrá ver los procesos que se le asignen. Su credencial se genera con sus propios datos.</li>
         </ol>
-        <p class="cell-sub" style="margin-top:12px"><strong>Importante:</strong> cada persona debe tener su <strong>propia</strong> cuenta y contraseña. No comparta el usuario del bufete ni la «llave maestra» (el Gmail) con los procuradores: ellos solo necesitan su acceso al panel.</p>
-      </div>
-    </div>
-
-    <div class="card" style="border-left:4px solid #c0392b">
-      <div class="card__body">
-        <p class="cell-sub"><strong style="color:#c0392b">Seguridad:</strong> si sospecha que una contraseña quedó expuesta, cámbiela de inmediato y avise al administrador. Para recuperar cualquier acceso, use la opción «¿Olvidó su contraseña?», que envía un enlace al Gmail del bufete.</p>
+        <p class="cell-sub" style="margin-top:10px"><strong>Importante:</strong> cada persona tiene su propia cuenta y su propia credencial. No comparta contraseñas ni la cuenta principal del bufete.</p>
       </div>
     </div>`;
+
+  $('#btnPrintCred').onclick = () => window.print();
 }
 
 // ============================================================

@@ -346,21 +346,22 @@ def build_blocks():
     p("Debe haberse registrado con el mismo correo que figura en su ficha de cliente y en sus "
       "procesos. Verifique el correo en la pestaña «Clientes».")
 
-    h1("20. Credenciales y accesos (administrador y abogados)")
+    h1("20. Credenciales del bufete (administrador y abogados)")
     p("El panel incluye una pestaña «Credenciales», visible solo para el administrador y los "
-      "abogados (los procuradores y clientes no la ven). Reúne, dentro del propio sistema, cómo "
-      "se ingresa a cada plataforma (GitHub, Netlify, Supabase, Web3Forms) y el panel, además "
-      "del recordatorio de la «llave maestra» (el Gmail del bufete).")
+      "abogados (los procuradores y clientes no la ven). Genera una credencial o carnet oficial "
+      "de LexFive con los datos del usuario, lista para imprimir o guardar como PDF.")
     bul([
-        "Solo el administrador y los abogados pueden consultarla; son ellos quienes entregan "
-        "las credenciales a sus procuradores.",
-        "Incluye el paso a paso para dar acceso a un procurador: que se registre, y que el "
-        "administrador le asigne el rol «Procurador» en la pestaña Usuarios.",
-        "Cada persona debe tener su propia cuenta y contraseña; no se comparte la llave maestra.",
+        "La credencial muestra el nombre, el cargo, un número de credencial, el correo y las "
+        "fechas de emisión y validez, con el logotipo y los colores del bufete.",
+        "El botón «Imprimir / Guardar PDF» imprime solo la credencial (anverso y reverso).",
+        "Cada persona obtiene su credencial con sus propios datos al iniciar sesión.",
     ])
-    note("La información de esta pestaña es confidencial. No incluye contraseñas escritas; "
-         "indica cómo entrar y cómo recuperarlas si se olvidan (enlace al Gmail del bufete).",
-         "Confidencial")
+    p("El administrador y los abogados son quienes entregan las credenciales a sus "
+      "procuradores. Para habilitar a un procurador: que se registre en el sistema, y que el "
+      "administrador le asigne el rol «Procurador» en la pestaña Usuarios; luego, al ingresar, "
+      "el procurador tendrá su propia credencial.")
+    note("Cada persona tiene su propia cuenta y su propia credencial. No se comparten "
+         "contraseñas ni la cuenta principal del bufete.", "Importante")
 
     h1("21. Soporte")
     p("Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. "

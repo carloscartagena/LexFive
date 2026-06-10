@@ -85,7 +85,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 5 0 R >>
 endobj
 7 0 obj
-<< /Length 7487 >>
+<< /Length 7488 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -475,7 +475,7 @@ ET
 BT
 /F1 10.50 Tf
 60.00 361.89 Td
-(20. Credenciales y accesos \(administrador y abogados\)) Tj
+(20. Credenciales del bufete \(administrador y abogados\)) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -486,7 +486,7 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-327.10 361.89 Td
+326.53 361.89 Td
 (....................................................................) Tj
 ET
 0.102 0.137 0.188 rg
@@ -2797,7 +2797,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 21 0 R >>
 endobj
 23 0 obj
-<< /Length 3515 >>
+<< /Length 3706 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -2836,7 +2836,7 @@ ET
 BT
 /F2 16.00 Tf
 56.00 741.89 Td
-(20. Credenciales y accesos \(administrador y abogados\)) Tj
+(20. Credenciales del bufete \(administrador y abogados\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
@@ -2851,141 +2851,147 @@ ET
 BT
 /F1 10.50 Tf
 56.00 692.89 Td
-(procuradores y clientes no la ven\). Reúne, dentro del propio sistema, cómo se ingresa a cada) Tj
+(procuradores y clientes no la ven\). Genera una credencial o carnet oficial de LexFive con los datos del) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 56.00 678.39 Td
-(plataforma \(GitHub, Netlify, Supabase, Web3Forms\) y el panel, además del recordatorio de la «llave) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 663.89 Td
-(maestra» \(el Gmail del bufete\).) Tj
+(usuario, lista para imprimir o guardar como PDF.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 642.39 Td
+60.00 656.89 Td
 (•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 656.89 Td
+(La credencial muestra el nombre, el cargo, un número de credencial, el correo y las fechas de) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 74.00 642.39 Td
-(Solo el administrador y los abogados pueden consultarla; son ellos quienes entregan las) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 627.89 Td
-(credenciales a sus procuradores.) Tj
+(emisión y validez, con el logotipo y los colores del bufete.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 611.39 Td
+60.00 625.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 611.39 Td
-(Incluye el paso a paso para dar acceso a un procurador: que se registre, y que el administrador le) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 596.89 Td
-(asigne el rol «Procurador» en la pestaña Usuarios.) Tj
+74.00 625.89 Td
+(El botón «Imprimir / Guardar PDF» imprime solo la credencial \(anverso y reverso\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 580.39 Td
+60.00 609.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 580.39 Td
-(Cada persona debe tener su propia cuenta y contraseña; no se comparte la llave maestra.) Tj
+74.00 609.39 Td
+(Cada persona obtiene su credencial con sus propios datos al iniciar sesión.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 587.89 Td
+(El administrador y los abogados son quienes entregan las credenciales a sus procuradores. Para) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 573.39 Td
+(habilitar a un procurador: que se registre en el sistema, y que el administrador le asigne el rol) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 558.89 Td
+(«Procurador» en la pestaña Usuarios; luego, al ingresar, el procurador tendrá su propia credencial.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 514.89 483.28 58.50 re
+56.00 493.39 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 514.89 4.00 58.50 re
+56.00 493.39 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 553.89 Td
-(Confidencial) Tj
+71.00 532.39 Td
+(Importante) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 540.39 Td
-(La información de esta pestaña es confidencial. No incluye contraseñas escritas; indica cómo entrar y) Tj
+71.00 518.89 Td
+(Cada persona tiene su propia cuenta y su propia credencial. No se comparten contraseñas ni la cuenta) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 526.89 Td
-(cómo recuperarlas si se olvidan \(enlace al Gmail del bufete\).) Tj
+71.00 505.39 Td
+(principal del bufete.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 474.89 Td
+56.00 453.39 Td
 (21. Soporte) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 466.89 m 539.28 466.89 l S
+56.00 445.39 m 539.28 445.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 440.39 Td
+56.00 418.89 Td
 (Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 425.89 Td
+56.00 404.39 Td
 (mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 411.39 Td
+56.00 389.89 Td
 (posible lo que necesita.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 337.89 483.28 58.50 re
+56.00 316.39 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 337.89 4.00 58.50 re
+56.00 316.39 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 376.89 Td
+71.00 355.39 Td
 (Versión) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 363.39 Td
+71.00 341.89 Td
 (Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 349.89 Td
+71.00 328.39 Td
 (actualiza, solicite una versión nueva del manual.) Tj
 ET
 
@@ -3004,25 +3010,25 @@ xref
 0000000383 00000 n 
 0000001363 00000 n 
 0000001527 00000 n 
-0000009066 00000 n 
-0000009230 00000 n 
-0000014340 00000 n 
-0000014505 00000 n 
-0000020742 00000 n 
-0000020908 00000 n 
-0000026815 00000 n 
-0000026981 00000 n 
-0000032276 00000 n 
-0000032442 00000 n 
-0000037411 00000 n 
-0000037577 00000 n 
-0000043480 00000 n 
-0000043646 00000 n 
-0000049097 00000 n 
-0000049263 00000 n 
-0000052831 00000 n 
+0000009067 00000 n 
+0000009231 00000 n 
+0000014341 00000 n 
+0000014506 00000 n 
+0000020743 00000 n 
+0000020909 00000 n 
+0000026816 00000 n 
+0000026982 00000 n 
+0000032277 00000 n 
+0000032443 00000 n 
+0000037412 00000 n 
+0000037578 00000 n 
+0000043481 00000 n 
+0000043647 00000 n 
+0000049098 00000 n 
+0000049264 00000 n 
+0000053023 00000 n 
 trailer
 << /Size 25 /Root 1 0 R >>
 startxref
-52997
+53189
 %%EOF
