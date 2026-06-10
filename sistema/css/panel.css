@@ -381,3 +381,21 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
     #credPrintArea { position: absolute; left: 0; top: 0; display: flex; gap: 14px; padding: 6px; }
     .cred-card { box-shadow: none; border: 1px solid #999; width: 8.5cm; height: 6cm; }
 }
+
+
+/* ---------- Galería de logos (elegir modelo) ---------- */
+.logo-gallery { display: flex; flex-wrap: wrap; gap: 12px; }
+.logo-option {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    width: 110px; padding: 12px 8px; cursor: pointer;
+    background: #fff; border: 1.5px solid var(--line, #e6e8ec); border-radius: 10px;
+    transition: border-color .15s, box-shadow .15s, transform .1s;
+}
+.logo-option:hover { border-color: var(--gold, #c2a25a); transform: translateY(-2px); }
+.logo-option img { width: 56px; height: 56px; }
+.logo-option span { font-size: .68rem; text-align: center; color: var(--muted, #5c6675); line-height: 1.25; }
+.logo-option.is-selected { border-color: var(--gold, #c2a25a); box-shadow: 0 0 0 2px var(--gold-light, #e7d3a1); }
+.logo-option.is-selected span { color: var(--navy, #0e1b2c); font-weight: 600; }
+
+/* Frase del bufete en el reverso de la credencial */
+.cred-frase { font-style: italic; color: var(--gold-dark, #a8853c) !important; font-weight: 600; text-align: center; }

@@ -1566,15 +1566,53 @@ async function renderCredenciales() {
     cargo: saved.cargo || rolLabel,
     ci: saved.ci || '',
     correo: saved.correo || '',
+    telPersonal: saved.telPersonal || '',
+    telOficina: saved.telOficina || '',
     emision: saved.emision || '',
-    validez: saved.validez || ''
+    validez: saved.validez || '',
+    frase: saved.frase || '',
+    representacion: saved.representacion || ''
   };
 
+  // Opciones de logo disponibles para elegir
+  const LOGOS = [
+    { id: 'opcion-1-balanza-corchetes', nombre: 'Balanza + código < >' },
+    { id: 'opcion-2-L5-monograma', nombre: 'Monograma L5' },
+    { id: 'opcion-3-balanza-engranaje', nombre: 'Balanza + engranaje' },
+    { id: 'opcion-4-columna-circuito', nombre: 'Columna + circuito' },
+    { id: 'opcion-5-balanza-chip', nombre: 'Balanza en chip' }
+  ];
+  const logoActual = localStorage.getItem('lexfive_logo') || 'opcion-1-balanza-corchetes';
+
+  // Frases sugeridas para el reverso
+  const FRASES = [
+    'Justicia con tecnología.',
+    'Donde el derecho y la innovación se encuentran.',
+    'Defendemos sus derechos con la fuerza de la tecnología.',
+    'Derecho moderno, soluciones reales.',
+    'La justicia a su alcance.',
+    'Su confianza, nuestra causa.'
+  ];
+
   content().innerHTML = `
-    <div class="card" style="border-left:4px solid var(--gold,#c2a25a)">
+    <div class="card">
       <div class="card__body">
-        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:6px;">${ICON.llave} Credencial del bufete</h3>
-        <p class="cell-sub">Complete los datos abajo y se reflejarán en la credencial en tiempo real. Luego use <strong>Imprimir / Guardar PDF</strong>. Lo que escriba queda guardado en este equipo.</p>
+        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:6px;">Credencial del bufete</h3>
+        <p class="cell-sub">Complete los datos y se reflejarán en la credencial en tiempo real. Luego use <strong>Imprimir / Guardar PDF</strong>. Lo que escriba queda guardado en este equipo.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Logotipo del bufete</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:12px">Elija el modelo de logo. Se aplicará en toda la página, el panel y la credencial.</p>
+        <div class="logo-gallery">
+          ${LOGOS.map(l => `
+            <button class="logo-option ${l.id === logoActual ? 'is-selected' : ''}" data-logo="${l.id}">
+              <img src="../assets/logos/${l.id}.svg" alt="${esc(l.nombre)}">
+              <span>${esc(l.nombre)}</span>
+            </button>`).join('')}
+        </div>
       </div>
     </div>
 
@@ -1590,8 +1628,21 @@ async function renderCredenciales() {
           <div class="field"><label>Correo</label><input id="cr_correo" value="${esc(datos.correo)}" placeholder="correo@ejemplo.com"></div>
         </div>
         <div class="field-row">
+          <div class="field"><label>Teléfono personal</label><input id="cr_telpers" value="${esc(datos.telPersonal)}" placeholder="Ej: 700 00 000"></div>
+          <div class="field"><label>Teléfono de la oficina</label><input id="cr_teloff" value="${esc(datos.telOficina)}" placeholder="Ej: 2 000 000"></div>
+        </div>
+        <div class="field-row">
           <div class="field"><label>Fecha de emisión</label><input id="cr_emision" value="${esc(datos.emision)}" placeholder="Ej: junio de 2026"></div>
           <div class="field"><label>Válido hasta</label><input id="cr_validez" value="${esc(datos.validez)}" placeholder="Ej: junio de 2027"></div>
+        </div>
+        <div class="field"><label>Frase del bufete (reverso)</label>
+          <input id="cr_frase" value="${esc(datos.frase)}" placeholder="Escríbala o elija una sugerencia" list="fraseList">
+          <datalist id="fraseList">${FRASES.map(f => `<option value="${esc(f)}">`).join('')}</datalist>
+          <span class="cell-sub" style="display:block;margin-top:5px">Sugerencias: ${FRASES.map(f => `&ldquo;${esc(f)}&rdquo;`).join(' &middot; ')}</span>
+        </div>
+        <div class="field"><label>Base legal de la representación (reverso)</label>
+          <textarea id="cr_repre" placeholder="Cite aquí, con su criterio profesional, los artículos de ley que facultan al procurador para representar (p. ej. del Código Procesal Civil - Ley 439 y del Código Civil sobre el mandato).">${esc(datos.representacion)}</textarea>
+          <span class="cell-sub" style="display:block;margin-top:5px">Por seguridad jurídica, este texto lo redacta usted como abogado; el sistema no inventa números de artículo.</span>
         </div>
       </div>
     </div>
@@ -1600,7 +1651,7 @@ async function renderCredenciales() {
       <!-- ANVERSO -->
       <div class="cred-card">
         <div class="cred-card__top">
-          <span class="cred-logo"></span>
+          <span class="cred-logo" id="cv_logo" style="background-image:url(../assets/logos/${logoActual}.svg)"></span>
           <div class="cred-org">
             <strong>LexFive</strong>
             <small>Bufete de Abogados</small>
@@ -1614,6 +1665,7 @@ async function renderCredenciales() {
             <div class="cred-row"><span>Cargo</span><strong id="cv_cargo">${esc(datos.cargo || '')}</strong></div>
             <div class="cred-row"><span>Carnet de identidad</span><strong id="cv_ci">${esc(datos.ci || '')}</strong></div>
             <div class="cred-row"><span>Correo</span><strong id="cv_correo">${esc(datos.correo || '')}</strong></div>
+            <div class="cred-row"><span>Tel. personal / oficina</span><strong id="cv_tel">${esc([datos.telPersonal, datos.telOficina].filter(Boolean).join('  /  '))}</strong></div>
           </div>
         </div>
         <div class="cred-foot">
@@ -1625,8 +1677,8 @@ async function renderCredenciales() {
       <!-- REVERSO -->
       <div class="cred-card cred-card--back">
         <div class="cred-band">LexFive &middot; La Paz / El Alto - Bolivia</div>
-        <p class="cred-cert">El portador(a) forma parte del equipo de <strong>LexFive Abogados</strong> y está autorizado(a) a representar al bufete en las gestiones propias de su cargo.</p>
-        <p class="cred-cert">Derecho &middot; Tecnología &middot; Ingeniería de Sistemas</p>
+        <p class="cred-cert" id="cv_repre">${esc(datos.representacion || 'El portador(a) forma parte del equipo de LexFive Abogados y está autorizado(a) a ejercer la representación que le corresponde según su cargo. (Edite este texto con la base legal correspondiente.)')}</p>
+        <p class="cred-cert cred-frase" id="cv_frase">${esc(datos.frase || '')}</p>
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
           <div class="cred-sign__line">Sello del bufete</div>
@@ -1651,6 +1703,16 @@ async function renderCredenciales() {
       </div>
     </div>`;
 
+  // Selección de logo: aplica al sistema (se guarda en este equipo)
+  content().querySelectorAll('.logo-option').forEach(btn => btn.onclick = () => {
+    const id = btn.dataset.logo;
+    localStorage.setItem('lexfive_logo', id);
+    content().querySelectorAll('.logo-option').forEach(b => b.classList.toggle('is-selected', b === btn));
+    $('#cv_logo').style.backgroundImage = `url(../assets/logos/${id}.svg)`;
+    applyLogo(id);
+    toast('Logo aplicado. Se usará en todo el sistema.', 'success');
+  });
+
   // Enlazar los campos con la credencial en vivo + autoguardado
   const sync = () => {
     const v = id => ($('#' + id).value || '').trim();
@@ -1659,18 +1721,31 @@ async function renderCredenciales() {
     $('#cv_cargo_band').textContent = v('cr_cargo');
     $('#cv_ci').textContent = v('cr_ci');
     $('#cv_correo').textContent = v('cr_correo');
+    $('#cv_tel').textContent = [v('cr_telpers'), v('cr_teloff')].filter(Boolean).join('  /  ');
     $('#cv_emision').textContent = v('cr_emision');
     $('#cv_validez').textContent = v('cr_validez');
+    $('#cv_frase').textContent = v('cr_frase');
+    $('#cv_repre').textContent = v('cr_repre') || 'El portador(a) forma parte del equipo de LexFive Abogados y está autorizado(a) a ejercer la representación que le corresponde según su cargo. (Edite este texto con la base legal correspondiente.)';
     $('#cv_foto').textContent = initials(v('cr_nombre')) || '';
     Draft.save('credencial', {
-      nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'),
-      correo: v('cr_correo'), emision: v('cr_emision'), validez: v('cr_validez')
+      nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'), correo: v('cr_correo'),
+      telPersonal: v('cr_telpers'), telOficina: v('cr_teloff'),
+      emision: v('cr_emision'), validez: v('cr_validez'),
+      frase: v('cr_frase'), representacion: v('cr_repre')
     });
   };
-  ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_correo', 'cr_emision', 'cr_validez']
+  ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_correo', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_validez', 'cr_frase', 'cr_repre']
     .forEach(id => $('#' + id).addEventListener('input', sync));
 
   $('#btnPrintCred').onclick = () => window.print();
+}
+
+// Aplica el logo elegido en todo el panel (inyecta un estilo que sobreescribe
+// el fondo del .logo__mark). Se guarda en este equipo (localStorage).
+function applyLogo(id) {
+  let st = document.getElementById('lexfiveLogoStyle');
+  if (!st) { st = document.createElement('style'); st.id = 'lexfiveLogoStyle'; document.head.appendChild(st); }
+  st.textContent = `.logo__mark{background-image:url(../../assets/logos/${id}.svg)!important;}`;
 }
 
 // ============================================================
@@ -1743,6 +1818,10 @@ function buildSidebar() {
   $('#userAvatar').textContent = initials(profile.nombre);
 
   buildSidebar();
+
+  // Aplica el logo elegido por el bufete (si se eligió uno)
+  const logoGuardado = localStorage.getItem('lexfive_logo');
+  if (logoGuardado) applyLogo(logoGuardado);
 
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();

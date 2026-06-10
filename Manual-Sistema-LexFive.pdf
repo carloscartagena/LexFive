@@ -2797,7 +2797,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 21 0 R >>
 endobj
 23 0 obj
-<< /Length 3706 >>
+<< /Length 4147 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -2851,13 +2851,13 @@ ET
 BT
 /F1 10.50 Tf
 56.00 692.89 Td
-(procuradores y clientes no la ven\). Genera una credencial o carnet oficial de LexFive con los datos del) Tj
+(procuradores y clientes no la ven\). Genera una credencial o carnet de LexFive con fondo blanco,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 56.00 678.39 Td
-(usuario, lista para imprimir o guardar como PDF.) Tj
+(tamaño 8.5 x 6 cm, lista para imprimir o guardar como PDF.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -2869,13 +2869,13 @@ ET
 BT
 /F1 10.50 Tf
 74.00 656.89 Td
-(La credencial muestra el nombre, el cargo, un número de credencial, el correo y las fechas de) Tj
+(Usted llena los datos: nombre, cargo, carnet de identidad, correo, teléfono personal y de oficina, y) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 74.00 642.39 Td
-(emisión y validez, con el logotipo y los colores del bufete.) Tj
+(las fechas de emisión y validez. La credencial se actualiza en vivo.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -2887,111 +2887,135 @@ ET
 BT
 /F1 10.50 Tf
 74.00 625.89 Td
-(El botón «Imprimir / Guardar PDF» imprime solo la credencial \(anverso y reverso\).) Tj
+(Puede elegir el logotipo del bufete entre varios modelos; el elegido se aplica en toda la página, el) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 611.39 Td
+(panel y la credencial.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 609.39 Td
+60.00 594.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 609.39 Td
-(Cada persona obtiene su credencial con sus propios datos al iniciar sesión.) Tj
+74.00 594.89 Td
+(En el reverso puede escribir una frase del bufete y la base legal que faculta la representación del) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 587.89 Td
-(El administrador y los abogados son quienes entregan las credenciales a sus procuradores. Para) Tj
+74.00 580.39 Td
+(procurador \(texto que redacta usted como abogado\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 563.89 Td
+(•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 573.39 Td
-(habilitar a un procurador: que se registre en el sistema, y que el administrador le asigne el rol) Tj
+74.00 563.89 Td
+(Hay líneas para la firma autorizada y el sello del bufete, sobre fondo blanco.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 558.89 Td
-(«Procurador» en la pestaña Usuarios; luego, al ingresar, el procurador tendrá su propia credencial.) Tj
+56.00 542.39 Td
+(El administrador y los abogados entregan las credenciales a sus procuradores: el procurador se) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 527.89 Td
+(registra, el administrador le asigna el rol «Procurador» en Usuarios, y luego se llena e imprime su) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 513.39 Td
+(credencial.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 493.39 483.28 58.50 re
+56.00 447.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 493.39 4.00 58.50 re
+56.00 447.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 532.39 Td
+71.00 486.89 Td
 (Importante) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 518.89 Td
-(Cada persona tiene su propia cuenta y su propia credencial. No se comparten contraseñas ni la cuenta) Tj
+71.00 473.39 Td
+(La base legal de la representación la redacta usted con su criterio profesional; el sistema no inventa) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 505.39 Td
-(principal del bufete.) Tj
+71.00 459.89 Td
+(números de artículo. Cada persona tiene su propia cuenta y no se comparten contraseñas.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 453.39 Td
+56.00 407.89 Td
 (21. Soporte) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 445.39 m 539.28 445.39 l S
+56.00 399.89 m 539.28 399.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 418.89 Td
+56.00 373.39 Td
 (Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 404.39 Td
+56.00 358.89 Td
 (mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 389.89 Td
+56.00 344.39 Td
 (posible lo que necesita.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 316.39 483.28 58.50 re
+56.00 270.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 316.39 4.00 58.50 re
+56.00 270.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 355.39 Td
+71.00 309.89 Td
 (Versión) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 341.89 Td
+71.00 296.39 Td
 (Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 328.39 Td
+71.00 282.89 Td
 (actualiza, solicite una versión nueva del manual.) Tj
 ET
 
@@ -3026,9 +3050,9 @@ xref
 0000043647 00000 n 
 0000049098 00000 n 
 0000049264 00000 n 
-0000053023 00000 n 
+0000053464 00000 n 
 trailer
 << /Size 25 /Root 1 0 R >>
 startxref
-53189
+53630
 %%EOF

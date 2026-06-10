@@ -6,6 +6,16 @@
 
     document.addEventListener('DOMContentLoaded', function () {
 
+        /* ---------- Logo elegido por el bufete (si se seleccionó uno) ---------- */
+        try {
+            var logoElegido = localStorage.getItem('lexfive_logo');
+            if (logoElegido) {
+                var st = document.createElement('style');
+                st.textContent = '.logo__mark{background-image:url(assets/logos/' + logoElegido + '.svg)!important;}';
+                document.head.appendChild(st);
+            }
+        } catch (e) {}
+
         /* ---------- Año actual en el footer ---------- */
         var yearEl = document.getElementById('year');
         if (yearEl) { yearEl.textContent = new Date().getFullYear(); }

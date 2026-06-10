@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive opción 5">
+  <defs>
+    <linearGradient id="g5bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1f3450"/><stop offset="1" stop-color="#0e1b2c"/></linearGradient>
+    <linearGradient id="g5gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e7d3a1"/><stop offset="0.5" stop-color="#c2a25a"/><stop offset="1" stop-color="#a8853c"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="13" fill="url(#g5bg)"/>
+  <rect x="2" y="2" width="60" height="60" rx="11" fill="none" stroke="url(#g5gold)" stroke-width="1.4"/>
+  <!-- Patas de chip (tecnologia) -->
+  <g stroke="url(#g5gold)" stroke-width="1.6" stroke-linecap="round">
+    <path d="M14 26 L18 26 M14 32 L18 32 M14 38 L18 38"/>
+    <path d="M46 26 L50 26 M46 32 L50 32 M46 38 L50 38"/>
+  </g>
+  <!-- Marco del chip -->
+  <rect x="18" y="18" width="28" height="28" rx="4" fill="none" stroke="url(#g5gold)" stroke-width="1.6"/>
+  <!-- Balanza dentro del chip (derecho) -->
+  <g fill="none" stroke="url(#g5gold)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 23 L32 40" stroke-width="2"/>
+    <path d="M26 27 L38 27" stroke-width="1.9"/>
+    <path d="M23.5 27 Q26 31 28.5 27" stroke-width="1.4"/>
+    <path d="M35.5 27 Q38 31 40.5 27" stroke-width="1.4"/>
+    <path d="M28 40 L36 40" stroke-width="2.4"/>
+  </g>
+  <circle cx="32" cy="22.5" r="2" fill="url(#g5gold)"/>
+</svg>

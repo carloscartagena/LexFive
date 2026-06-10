@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive opción 1">
+  <defs>
+    <linearGradient id="g1bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16273d"/><stop offset="1" stop-color="#0e1b2c"/></linearGradient>
+    <linearGradient id="g1gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e7d3a1"/><stop offset="0.5" stop-color="#c2a25a"/><stop offset="1" stop-color="#a8853c"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="13" fill="url(#g1bg)"/>
+  <rect x="2" y="2" width="60" height="60" rx="11" fill="none" stroke="url(#g1gold)" stroke-width="1.4"/>
+  <g fill="none" stroke="url(#g1gold)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 19 L9 32 L17 45" stroke-width="3"/>
+    <path d="M47 19 L55 32 L47 45" stroke-width="3"/>
+    <path d="M32 17 L32 45" stroke-width="2.4"/>
+    <path d="M24 23 L40 23" stroke-width="2.4"/>
+    <path d="M24 23 L21 30 M24 23 L27 30" stroke-width="1.3"/>
+    <path d="M40 23 L37 30 M40 23 L43 30" stroke-width="1.3"/>
+    <path d="M20 30 Q24 35 28 30" stroke-width="1.8"/>
+    <path d="M36 30 Q40 35 44 30" stroke-width="1.8"/>
+    <path d="M26 45 L38 45" stroke-width="3"/>
+    <path d="M29 41 L35 41" stroke-width="2"/>
+  </g>
+  <circle cx="32" cy="16" r="2.6" fill="url(#g1gold)"/>
+</svg>
