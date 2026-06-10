@@ -364,12 +364,12 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-foot strong { font-size: .62rem; color: var(--ink, #1a2330); }
 
 /* Reverso (también fondo blanco para que se vea el sello y la firma) */
-.cred-card--back { padding-bottom: 0; }
-.cred-cert { font-size: .56rem; line-height: 1.4; color: var(--ink, #1a2330); padding: 8px 12px 0; }
-.cred-card--back .cred-cert:nth-of-type(2) { color: var(--gold-dark, #a8853c); font-weight: 700; letter-spacing: .5px; padding-top: 5px; text-align: center; }
-.cred-sign { display: flex; gap: 14px; padding: 10px 12px 4px; margin-top: auto; }
-.cred-sign__line { flex: 1; border-top: 1px solid #b8bdc6; padding-top: 4px; font-size: .5rem; text-align: center; color: var(--muted, #5c6675); }
-.cred-note { font-size: .46rem; color: var(--muted, #5c6675); padding: 4px 12px 8px; }
+.cred-card--back { padding-bottom: 0; height: auto; min-height: 6cm; }
+.cred-cert { font-size: .48rem; line-height: 1.32; color: var(--ink, #1a2330); padding: 6px 11px 0; text-align: justify; }
+.cred-card--back .cred-cert.cred-frase { color: var(--gold-dark, #a8853c) !important; font-weight: 700; letter-spacing: .3px; padding-top: 4px; text-align: center; font-size: .54rem; }
+.cred-sign { display: flex; gap: 14px; padding: 8px 11px 4px; margin-top: auto; }
+.cred-sign__line { flex: 1; border-top: 1px solid #b8bdc6; padding-top: 4px; font-size: .48rem; text-align: center; color: var(--muted, #5c6675); }
+.cred-note { font-size: .44rem; color: var(--muted, #5c6675); padding: 3px 11px 7px; text-align: center; }
 .cred-actions { margin-bottom: 22px; }
 
 @media (max-width: 520px) { .cred-card { width: 100%; height: auto; min-height: 6cm; } }

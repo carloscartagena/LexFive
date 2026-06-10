@@ -1559,6 +1559,10 @@ async function renderCredenciales() {
   const rolLabel = ROLES[p.rol] || p.rol;
 
   // Datos editables de la credencial (los llena el director). Se guardan en
+  // Texto legal por defecto del reverso (base de la representación del portador),
+  // tomado de la normativa boliviana vigente proporcionada por el bufete.
+  const REPRE_DEFAULT = 'El PORTADOR se encuentra AUTORIZADO y FACULTADO para: ENTREGAR, EXAMINAR, SOLICITAR y RECOGER de las autoridades (Estrados Judiciales, Públicas y Privadas) correspondientes a Procesos y/o Trámites Administrativos que se PATROCINAN en calidad de ABOGADO, de acuerdo a normativa vigente: Art. 8 núm. 1 Ley 387 "Ley del Ejercicio de la Abogacía", concordante con los Arts. 84, 100 y 101 Ley 439 "Código Procesal Civil", Art. 300 parágrafo I Ley 603 "Código de las Familias y del Proceso Familiar" y demás normativa, bajo el PRINCIPIO del Art. 24 de la Constitución Política del Estado. Certifico.';
+
   // este equipo mediante el autoguardado por usuario.
   const saved = (Draft.load('credencial') || {}).data || {};
   const datos = {
@@ -1571,7 +1575,7 @@ async function renderCredenciales() {
     emision: saved.emision || '',
     validez: saved.validez || '',
     frase: saved.frase || '',
-    representacion: saved.representacion || ''
+    representacion: saved.representacion || REPRE_DEFAULT
   };
 
   // Opciones de logo disponibles para elegir
@@ -1641,8 +1645,8 @@ async function renderCredenciales() {
           <span class="cell-sub" style="display:block;margin-top:5px">Sugerencias: ${FRASES.map(f => `&ldquo;${esc(f)}&rdquo;`).join(' &middot; ')}</span>
         </div>
         <div class="field"><label>Base legal de la representación (reverso)</label>
-          <textarea id="cr_repre" placeholder="Cite aquí, con su criterio profesional, los artículos de ley que facultan al procurador para representar (p. ej. del Código Procesal Civil - Ley 439 y del Código Civil sobre el mandato).">${esc(datos.representacion)}</textarea>
-          <span class="cell-sub" style="display:block;margin-top:5px">Por seguridad jurídica, este texto lo redacta usted como abogado; el sistema no inventa números de artículo.</span>
+          <textarea id="cr_repre" style="min-height:120px">${esc(datos.representacion)}</textarea>
+          <span class="cell-sub" style="display:block;margin-top:5px">Ya viene con la base legal vigente (Ley 387, Ley 439, Ley 603 y Art. 24 CPE). Puede editarla con su criterio profesional.</span>
         </div>
       </div>
     </div>
@@ -1677,7 +1681,7 @@ async function renderCredenciales() {
       <!-- REVERSO -->
       <div class="cred-card cred-card--back">
         <div class="cred-band">LexFive &middot; La Paz / El Alto - Bolivia</div>
-        <p class="cred-cert" id="cv_repre">${esc(datos.representacion || 'El portador(a) forma parte del equipo de LexFive Abogados y está autorizado(a) a ejercer la representación que le corresponde según su cargo. (Edite este texto con la base legal correspondiente.)')}</p>
+        <p class="cred-cert" id="cv_repre">${esc(datos.representacion || REPRE_DEFAULT)}</p>
         <p class="cred-cert cred-frase" id="cv_frase">${esc(datos.frase || '')}</p>
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
@@ -1725,7 +1729,7 @@ async function renderCredenciales() {
     $('#cv_emision').textContent = v('cr_emision');
     $('#cv_validez').textContent = v('cr_validez');
     $('#cv_frase').textContent = v('cr_frase');
-    $('#cv_repre').textContent = v('cr_repre') || 'El portador(a) forma parte del equipo de LexFive Abogados y está autorizado(a) a ejercer la representación que le corresponde según su cargo. (Edite este texto con la base legal correspondiente.)';
+    $('#cv_repre').textContent = v('cr_repre') || REPRE_DEFAULT;
     $('#cv_foto').textContent = initials(v('cr_nombre')) || '';
     Draft.save('credencial', {
       nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'), correo: v('cr_correo'),
