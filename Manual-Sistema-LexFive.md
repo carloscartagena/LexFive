@@ -23,7 +23,8 @@ _Guía completa de uso y gestión · Versión: junio de 2026 · lexfive.netlify.
 - 17. Cómo agregar un nuevo abogado
 - 18. Mantenimiento y buenas prácticas
 - 19. Solución de problemas frecuentes
-- 20. Soporte
+- 20. Credenciales y accesos (administrador y abogados)
+- 21. Soporte
 
 
 ## 1. Introducción: qué es el sistema
@@ -268,7 +269,17 @@ Falta ejecutar el script db/06_consultas.sql en Supabase (una sola vez). Si el e
 
 Debe haberse registrado con el mismo correo que figura en su ficha de cliente y en sus procesos. Verifique el correo en la pestaña «Clientes».
 
-## 20. Soporte
+## 20. Credenciales y accesos (administrador y abogados)
+
+El panel incluye una pestaña «Credenciales», visible solo para el administrador y los abogados (los procuradores y clientes no la ven). Reúne, dentro del propio sistema, cómo se ingresa a cada plataforma (GitHub, Netlify, Supabase, Web3Forms) y el panel, además del recordatorio de la «llave maestra» (el Gmail del bufete).
+
+- Solo el administrador y los abogados pueden consultarla; son ellos quienes entregan las credenciales a sus procuradores.
+- Incluye el paso a paso para dar acceso a un procurador: que se registre, y que el administrador le asigne el rol «Procurador» en la pestaña Usuarios.
+- Cada persona debe tener su propia cuenta y contraseña; no se comparte la llave maestra.
+
+> **Confidencial:** La información de esta pestaña es confidencial. No incluye contraseñas escritas; indica cómo entrar y cómo recuperarlas si se olvidan (enlace al Gmail del bufete).
+
+## 21. Soporte
 
 Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle posible lo que necesita.
 

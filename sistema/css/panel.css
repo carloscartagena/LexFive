@@ -321,3 +321,8 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
     opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s;
 }
 .tip-bubble.show { opacity: 1; transform: translateY(0); }
+
+
+/* ---------- Credenciales y accesos (lista de pasos) ---------- */
+.cred-steps { margin: 0; padding-left: 20px; }
+.cred-steps li { margin-bottom: 10px; line-height: 1.55; color: var(--ink, #1a2330); }

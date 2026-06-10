@@ -85,7 +85,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 5 0 R >>
 endobj
 7 0 obj
-<< /Length 7175 >>
+<< /Length 7487 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -475,7 +475,7 @@ ET
 BT
 /F1 10.50 Tf
 60.00 361.89 Td
-(20. Soporte) Tj
+(20. Credenciales y accesos \(administrador y abogados\)) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -486,7 +486,25 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-122.28 361.89 Td
+327.10 361.89 Td
+(....................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 343.89 Td
+(21. Soporte) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 343.89 Td
+(9) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+122.28 343.89 Td
 (..........................................................................................................................................) Tj
 ET
 
@@ -2779,7 +2797,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 21 0 R >>
 endobj
 23 0 obj
-<< /Length 1446 >>
+<< /Length 3515 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -2818,7 +2836,7 @@ ET
 BT
 /F2 16.00 Tf
 56.00 741.89 Td
-(20. Soporte) Tj
+(20. Credenciales y accesos \(administrador y abogados\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
@@ -2827,42 +2845,147 @@ ET
 BT
 /F1 10.50 Tf
 56.00 707.39 Td
-(Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
+(El panel incluye una pestaña «Credenciales», visible solo para el administrador y los abogados \(los) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 56.00 692.89 Td
-(mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
+(procuradores y clientes no la ven\). Reúne, dentro del propio sistema, cómo se ingresa a cada) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 56.00 678.39 Td
-(posible lo que necesita.) Tj
+(plataforma \(GitHub, Netlify, Supabase, Web3Forms\) y el panel, además del recordatorio de la «llave) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 663.89 Td
+(maestra» \(el Gmail del bufete\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 642.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 642.39 Td
+(Solo el administrador y los abogados pueden consultarla; son ellos quienes entregan las) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 627.89 Td
+(credenciales a sus procuradores.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 611.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 611.39 Td
+(Incluye el paso a paso para dar acceso a un procurador: que se registre, y que el administrador le) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 596.89 Td
+(asigne el rol «Procurador» en la pestaña Usuarios.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 580.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 580.39 Td
+(Cada persona debe tener su propia cuenta y contraseña; no se comparte la llave maestra.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 604.89 483.28 58.50 re
+56.00 514.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 604.89 4.00 58.50 re
+56.00 514.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 643.89 Td
+71.00 553.89 Td
+(Confidencial) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 540.39 Td
+(La información de esta pestaña es confidencial. No incluye contraseñas escritas; indica cómo entrar y) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 526.89 Td
+(cómo recuperarlas si se olvidan \(enlace al Gmail del bufete\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 474.89 Td
+(21. Soporte) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 466.89 m 539.28 466.89 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 440.39 Td
+(Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 425.89 Td
+(mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 411.39 Td
+(posible lo que necesita.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 337.89 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 337.89 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 376.89 Td
 (Versión) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 630.39 Td
+71.00 363.39 Td
 (Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 616.89 Td
+71.00 349.89 Td
 (actualiza, solicite una versión nueva del manual.) Tj
 ET
 
@@ -2881,25 +3004,25 @@ xref
 0000000383 00000 n 
 0000001363 00000 n 
 0000001527 00000 n 
-0000008754 00000 n 
-0000008918 00000 n 
-0000014028 00000 n 
-0000014193 00000 n 
-0000020430 00000 n 
-0000020596 00000 n 
-0000026503 00000 n 
-0000026669 00000 n 
-0000031964 00000 n 
-0000032130 00000 n 
-0000037099 00000 n 
-0000037265 00000 n 
-0000043168 00000 n 
-0000043334 00000 n 
-0000048785 00000 n 
-0000048951 00000 n 
-0000050450 00000 n 
+0000009066 00000 n 
+0000009230 00000 n 
+0000014340 00000 n 
+0000014505 00000 n 
+0000020742 00000 n 
+0000020908 00000 n 
+0000026815 00000 n 
+0000026981 00000 n 
+0000032276 00000 n 
+0000032442 00000 n 
+0000037411 00000 n 
+0000037577 00000 n 
+0000043480 00000 n 
+0000043646 00000 n 
+0000049097 00000 n 
+0000049263 00000 n 
+0000052831 00000 n 
 trailer
 << /Size 25 /Root 1 0 R >>
 startxref
-50616
+52997
 %%EOF

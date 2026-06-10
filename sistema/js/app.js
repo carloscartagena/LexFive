@@ -29,7 +29,8 @@ const ICON = {
   estrella: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>',
   whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.05 24l1.69-6.16a11.9 11.9 0 1 1 4.3 4.2L.05 24zM6.6 20.2l.37.22a9.9 9.9 0 1 0-3.35-3.3l.24.38-1 3.65 3.74-.95z"/></svg>',
   consultas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
-  categorias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83zM7 7h.01"/></svg>'
+  categorias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83zM7 7h.01"/></svg>',
+  llave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-3.5 3.5L21 2m-5.5 5.5a3.5 3.5 0 1 1-5 5 3.5 3.5 0 0 1 5-5zm0 0L19 4m0 0l2 2m-2-2-2 2"/><circle cx="8.5" cy="15.5" r="5.5"/></svg>'
 };
 
 const NAV = [
@@ -39,11 +40,13 @@ const NAV = [
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
   { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
+  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
   { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
   { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true }
 ];
+// credOnly = solo administrador y abogado (NO procurador ni cliente)
 
 // ============================================================
 //  Utilidades de interfaz
@@ -1545,6 +1548,88 @@ async function deleteConsulta(c) {
 }
 
 // ============================================================
+//  VISTA: CREDENCIALES Y ACCESOS (solo administrador y abogados)
+//  Explica cómo se entra a cada plataforma y cómo dar acceso a los
+//  procuradores. El administrador y los abogados son los únicos que la
+//  ven; ellos entregan las credenciales a sus procuradores.
+// ============================================================
+async function renderCredenciales() {
+  loading();
+  const card = (titulo, icono, filas, extra = '') => `
+    <div class="card">
+      <div class="card__head"><h3>${icono} ${titulo}</h3></div>
+      <div class="card__body">
+        <div class="detail-grid">${filas.map(f => `
+          <div class="detail-item"><label>${f[0]}</label><span>${f[1]}</span></div>`).join('')}</div>
+        ${extra}
+      </div>
+    </div>`;
+
+  content().innerHTML = `
+    <div class="card" style="border-left:4px solid var(--gold,#c2a25a)">
+      <div class="card__body">
+        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:8px;">${ICON.llave} Credenciales y accesos del sistema</h3>
+        <p class="cell-sub">Esta sección es confidencial y solo la ven el administrador y los abogados. Aquí encontrarán cómo se ingresa a cada plataforma y cómo dar acceso a un procurador. <strong>No comparta estas credenciales fuera del equipo autorizado.</strong></p>
+      </div>
+    </div>
+
+    ${card('La llave maestra', ICON.llave, [
+      ['Correo principal del bufete', '<strong>alba23meira@gmail.com</strong>'],
+      ['Por qué es la llave maestra', 'GitHub entra con Google (este Gmail); Netlify y Supabase entran con GitHub; y Web3Forms usa este mismo Gmail.'],
+      ['Protección recomendada', 'Active la verificación en dos pasos del Gmail y guarde los códigos de respaldo en un lugar seguro.']
+    ])}
+
+    ${card('GitHub — código del sistema', ICON.doc, [
+      ['Dónde', 'github.com'],
+      ['Cómo entrar', 'Botón «Continuar con Google» (con el Gmail del bufete). También tiene contraseña propia como respaldo.'],
+      ['Proyecto', 'github.com/carloscartagena/LexFive']
+    ])}
+
+    ${card('Netlify — publica el sitio', ICON.dashboard, [
+      ['Dónde', 'app.netlify.com'],
+      ['Cómo entrar', 'Botón «Continuar con GitHub». (Google NO está conectado aquí.) También correo + contraseña propia.'],
+      ['Sitio publicado', 'lexfive.netlify.app']
+    ])}
+
+    ${card('Supabase — base de datos y usuarios', ICON.clientes, [
+      ['Dónde', 'supabase.com'],
+      ['Cómo entrar', 'Botón «Continuar con GitHub» (vinculado al Gmail del bufete).'],
+      ['Proyecto (URL pública)', 'soazmibvesvuwgxeealo.supabase.co']
+    ])}
+
+    ${card('Web3Forms — correo de las consultas', ICON.consultas, [
+      ['Dónde', 'web3forms.com'],
+      ['Cómo entrar', 'Con el Gmail del bufete (la clave de acceso está ligada a ese correo).'],
+      ['Nota', 'Aunque el correo falle, las consultas siempre quedan en la pestaña «Consultas».']
+    ])}
+
+    ${card('Panel del sistema LexFive', ICON.procesos, [
+      ['Sitio público', 'lexfive.netlify.app'],
+      ['Ingreso al panel', 'lexfive.netlify.app/sistema/login.html'],
+      ['Acceso', 'Cada abogado, procurador y cliente entra con su propio correo y contraseña.']
+    ])}
+
+    <div class="card">
+      <div class="card__head"><h3>${ICON.usuarios} Cómo dar acceso a un procurador</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:12px">El administrador y los abogados son quienes habilitan a los procuradores. Pasos:</p>
+        <ol class="cred-steps">
+          <li>Pida al procurador que se registre en <strong>lexfive.netlify.app/sistema/login.html</strong> con su correo y una contraseña (entra como «Cliente» por defecto).</li>
+          <li>Avise al <strong>administrador</strong> para que, en la pestaña <strong>Usuarios</strong>, le cambie el rol a <strong>Procurador</strong>.</li>
+          <li>Liste: el procurador ya podrá ver y dar seguimiento a los procesos que se le asignen.</li>
+        </ol>
+        <p class="cell-sub" style="margin-top:12px"><strong>Importante:</strong> cada persona debe tener su <strong>propia</strong> cuenta y contraseña. No comparta el usuario del bufete ni la «llave maestra» (el Gmail) con los procuradores: ellos solo necesitan su acceso al panel.</p>
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid #c0392b">
+      <div class="card__body">
+        <p class="cell-sub"><strong style="color:#c0392b">Seguridad:</strong> si sospecha que una contraseña quedó expuesta, cámbiela de inmediato y avise al administrador. Para recuperar cualquier acceso, use la opción «¿Olvidó su contraseña?», que envía un enlace al Gmail del bufete.</p>
+      </div>
+    </div>`;
+}
+
+// ============================================================
 //  Navegación
 // ============================================================
 const VIEWS = {
@@ -1554,6 +1639,7 @@ const VIEWS = {
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
   blog: { title: 'Blog', render: renderBlog },
+  credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
   categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
@@ -1574,6 +1660,7 @@ function navigate(key) {
   } else {
     if (!VIEWS[key]) key = 'dashboard';
     if (['usuarios', 'auditoria', 'testimonios', 'categorias'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
+    if (key === 'credenciales' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
   }
   state.view = key;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
@@ -1584,9 +1671,14 @@ function navigate(key) {
 
 function buildSidebar() {
   const nav = $('#sidebarNav');
-  const items = state.profile.rol === 'cliente'
+  const rol = state.profile.rol;
+  const items = rol === 'cliente'
     ? CLIENT_NAV
-    : NAV.filter(n => !n.adminOnly || state.profile.rol === 'admin');
+    : NAV.filter(n => {
+        if (n.adminOnly) return rol === 'admin';
+        if (n.credOnly) return rol === 'admin' || rol === 'abogado';
+        return true;
+      });
   nav.innerHTML = items
     .map(n => `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`).join('');
   nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
