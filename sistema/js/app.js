@@ -1606,13 +1606,13 @@ async function renderCredenciales() {
       <!-- REVERSO -->
       <div class="cred-card cred-card--back">
         <div class="cred-band">LexFive &middot; La Paz / El Alto - Bolivia</div>
-        <p class="cred-cert">El portador(a) de la presente credencial forma parte del equipo del bufete <strong>LexFive Abogados</strong> y está autorizado(a) para representar al bufete en las gestiones jurídicas, judiciales y administrativas que le correspondan según su cargo.</p>
+        <p class="cred-cert">El portador(a) forma parte del equipo de <strong>LexFive Abogados</strong> y está autorizado(a) a representar al bufete en las gestiones propias de su cargo.</p>
         <p class="cred-cert">Derecho &middot; Tecnología &middot; Ingeniería de Sistemas</p>
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
           <div class="cred-sign__line">Sello del bufete</div>
         </div>
-        <p class="cred-note">Si encuentra esta credencial, devuélvala a LexFive. Documento de uso institucional.</p>
+        <p class="cred-note">Documento de uso institucional. Si la encuentra, devuélvala a LexFive.</p>
       </div>
     </div>
 
