@@ -1,27 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive opción 3">
   <defs>
-    <linearGradient id="g3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16273d"/><stop offset="1" stop-color="#0e1b2c"/></linearGradient>
-    <linearGradient id="g3gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e7d3a1"/><stop offset="0.5" stop-color="#c2a25a"/><stop offset="1" stop-color="#a8853c"/></linearGradient>
+    <linearGradient id="o3bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16273d"/><stop offset="1" stop-color="#0e1b2c"/></linearGradient>
+    <linearGradient id="o3gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e7d3a1"/><stop offset="0.5" stop-color="#c2a25a"/><stop offset="1" stop-color="#a8853c"/></linearGradient>
   </defs>
-  <rect width="64" height="64" rx="13" fill="url(#g3bg)"/>
-  <rect x="2" y="2" width="60" height="60" rx="11" fill="none" stroke="url(#g3gold)" stroke-width="1.4"/>
-  <!-- Engranaje (tecnologia/ingenieria) detras -->
-  <g fill="none" stroke="url(#g3gold)" stroke-width="1.4" opacity="0.55">
-    <circle cx="32" cy="33" r="15"/>
-    <g stroke-width="2.4" stroke-linecap="round">
-      <path d="M32 14 L32 19"/><path d="M32 47 L32 52"/>
-      <path d="M13 33 L18 33"/><path d="M46 33 L51 33"/>
-      <path d="M18.5 19.5 L22 23"/><path d="M42 43 L45.5 46.5"/>
-      <path d="M45.5 19.5 L42 23"/><path d="M22 43 L18.5 46.5"/>
+  <rect width="64" height="64" rx="13" fill="url(#o3bg)"/>
+  <rect x="2" y="2" width="60" height="60" rx="11" fill="none" stroke="url(#o3gold)" stroke-width="1.4"/>
+  <!-- Engranaje grande de fondo (tecnologia / ingenieria) -->
+  <g fill="none" stroke="url(#o3gold)" stroke-width="1.5" opacity="0.45">
+    <circle cx="32" cy="30" r="19"/>
+    <g stroke-width="3" stroke-linecap="round">
+      <path d="M32 8 L32 14"/><path d="M32 46 L32 52"/>
+      <path d="M10 30 L16 30"/><path d="M48 30 L54 30"/>
+      <path d="M16 14 L20 18"/><path d="M44 42 L48 46"/>
+      <path d="M48 14 L44 18"/><path d="M20 42 L16 46"/>
     </g>
   </g>
-  <!-- Balanza (derecho) al frente -->
-  <g fill="none" stroke="url(#g3gold)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M32 22 L32 44" stroke-width="2.4"/>
-    <path d="M25 27 L39 27" stroke-width="2.2"/>
-    <path d="M22 27 Q25 32 28 27" stroke-width="1.6"/>
-    <path d="M36 27 Q39 32 42 27" stroke-width="1.6"/>
-    <path d="M27 44 L37 44" stroke-width="2.8"/>
+  <!-- Balanza GRANDE al frente (derecho) -->
+  <g fill="none" stroke="url(#o3gold)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 14 L32 44" stroke-width="2.8"/>
+    <path d="M20 20 L44 20" stroke-width="2.8"/>
+    <path d="M20 20 L15 29 M20 20 L25 29" stroke-width="1.4"/>
+    <path d="M44 20 L39 29 M44 20 L49 29" stroke-width="1.4"/>
+    <path d="M13 29 Q20 37 27 29" stroke-width="2"/>
+    <path d="M37 29 Q44 37 51 29" stroke-width="2"/>
+    <path d="M25 44 L39 44" stroke-width="3"/>
   </g>
-  <circle cx="32" cy="21" r="2.3" fill="url(#g3gold)"/>
+  <circle cx="32" cy="13" r="2.8" fill="url(#o3gold)"/>
+  <text x="32" y="60.5" text-anchor="middle" font-family="Georgia, serif" font-size="6.5" font-weight="700" letter-spacing="2" fill="url(#o3gold)">LEXFIVE</text>
 </svg>
