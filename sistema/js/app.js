@@ -1553,27 +1553,46 @@ async function deleteConsulta(c) {
 //  imprimir. El administrador y los abogados son los únicos que la ven;
 //  ellos entregan las credenciales a sus procuradores.
 // ============================================================
-function credId(profile) {
-  // Identificador corto y estable a partir del id del perfil
-  const base = (profile.id || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-  return 'LF-' + (base.slice(0, 6) || '000000');
-}
-
 async function renderCredenciales() {
   loading();
   const p = state.profile;
-  const hoy = new Date();
-  const emision = hoy.toLocaleDateString('es-BO', { day: '2-digit', month: 'long', year: 'numeric' });
-  const venc = new Date(hoy.getFullYear() + 1, hoy.getMonth(), hoy.getDate())
-    .toLocaleDateString('es-BO', { day: '2-digit', month: 'long', year: 'numeric' });
   const rolLabel = ROLES[p.rol] || p.rol;
-  const inic = initials(p.nombre);
+
+  // Datos editables de la credencial (los llena el director). Se guardan en
+  // este equipo mediante el autoguardado por usuario.
+  const saved = (Draft.load('credencial') || {}).data || {};
+  const datos = {
+    nombre: saved.nombre || '',
+    cargo: saved.cargo || rolLabel,
+    ci: saved.ci || '',
+    correo: saved.correo || '',
+    emision: saved.emision || '',
+    validez: saved.validez || ''
+  };
 
   content().innerHTML = `
     <div class="card" style="border-left:4px solid var(--gold,#c2a25a)">
       <div class="card__body">
-        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:6px;">${ICON.llave} Su credencial del bufete</h3>
-        <p class="cell-sub">Esta es su credencial oficial de <strong>LexFive Abogados</strong>. Puede imprimirla o guardarla como PDF. Solo el administrador y los abogados pueden generar credenciales; son quienes las entregan a sus procuradores.</p>
+        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:6px;">${ICON.llave} Credencial del bufete</h3>
+        <p class="cell-sub">Complete los datos abajo y se reflejarán en la credencial en tiempo real. Luego use <strong>Imprimir / Guardar PDF</strong>. Lo que escriba queda guardado en este equipo.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Datos de la credencial</h3></div>
+      <div class="card__body">
+        <div class="field-row">
+          <div class="field"><label>Nombre completo</label><input id="cr_nombre" value="${esc(datos.nombre)}" placeholder="Escriba el nombre y apellido"></div>
+          <div class="field"><label>Cargo</label><input id="cr_cargo" value="${esc(datos.cargo)}" placeholder="Ej: Director / Abogado"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Carnet de identidad</label><input id="cr_ci" value="${esc(datos.ci)}" placeholder="Ej: 6813383 L.P."></div>
+          <div class="field"><label>Correo</label><input id="cr_correo" value="${esc(datos.correo)}" placeholder="correo@ejemplo.com"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Fecha de emisión</label><input id="cr_emision" value="${esc(datos.emision)}" placeholder="Ej: junio de 2026"></div>
+          <div class="field"><label>Válido hasta</label><input id="cr_validez" value="${esc(datos.validez)}" placeholder="Ej: junio de 2027"></div>
+        </div>
       </div>
     </div>
 
@@ -1587,19 +1606,19 @@ async function renderCredenciales() {
             <small>Bufete de Abogados</small>
           </div>
         </div>
-        <div class="cred-band">CREDENCIAL &middot; ${esc(rolLabel)}</div>
+        <div class="cred-band">CREDENCIAL &middot; <span id="cv_cargo_band">${esc(datos.cargo || '')}</span></div>
         <div class="cred-body">
-          <div class="cred-photo">${esc(inic)}</div>
+          <div class="cred-photo" id="cv_foto">${esc(initials(datos.nombre) || '')}</div>
           <div class="cred-data">
-            <div class="cred-row"><span>Nombre</span><strong>${esc(p.nombre || '—')}</strong></div>
-            <div class="cred-row"><span>Cargo</span><strong>${esc(rolLabel)}</strong></div>
-            <div class="cred-row"><span>N.&deg; de credencial</span><strong>${esc(credId(p))}</strong></div>
-            <div class="cred-row"><span>Correo</span><strong>${esc(p.email || '—')}</strong></div>
+            <div class="cred-row"><span>Nombre</span><strong id="cv_nombre">${esc(datos.nombre || '')}</strong></div>
+            <div class="cred-row"><span>Cargo</span><strong id="cv_cargo">${esc(datos.cargo || '')}</strong></div>
+            <div class="cred-row"><span>Carnet de identidad</span><strong id="cv_ci">${esc(datos.ci || '')}</strong></div>
+            <div class="cred-row"><span>Correo</span><strong id="cv_correo">${esc(datos.correo || '')}</strong></div>
           </div>
         </div>
         <div class="cred-foot">
-          <div><span>Emisión</span><strong>${esc(emision)}</strong></div>
-          <div><span>Válido hasta</span><strong>${esc(venc)}</strong></div>
+          <div><span>Emisión</span><strong id="cv_emision">${esc(datos.emision || '')}</strong></div>
+          <div><span>Válido hasta</span><strong id="cv_validez">${esc(datos.validez || '')}</strong></div>
         </div>
       </div>
 
@@ -1626,11 +1645,30 @@ async function renderCredenciales() {
         <ol class="cred-steps">
           <li>Pida al procurador que se registre en <strong>lexfive.netlify.app/sistema/login.html</strong> con su correo y una contraseña (entra como «Cliente» por defecto).</li>
           <li>El <strong>administrador</strong> abre la pestaña <strong>Usuarios</strong> y le cambia el rol a <strong>Procurador</strong>.</li>
-          <li>El procurador inicia sesión y, desde su panel, podrá ver los procesos que se le asignen. Su credencial se genera con sus propios datos.</li>
+          <li>Llene aquí los datos de la credencial del procurador, imprímala y entréguesela.</li>
         </ol>
-        <p class="cell-sub" style="margin-top:10px"><strong>Importante:</strong> cada persona tiene su propia cuenta y su propia credencial. No comparta contraseñas ni la cuenta principal del bufete.</p>
+        <p class="cell-sub" style="margin-top:10px"><strong>Importante:</strong> cada persona tiene su propia cuenta. No comparta contraseñas ni la cuenta principal del bufete.</p>
       </div>
     </div>`;
+
+  // Enlazar los campos con la credencial en vivo + autoguardado
+  const sync = () => {
+    const v = id => ($('#' + id).value || '').trim();
+    $('#cv_nombre').textContent = v('cr_nombre');
+    $('#cv_cargo').textContent = v('cr_cargo');
+    $('#cv_cargo_band').textContent = v('cr_cargo');
+    $('#cv_ci').textContent = v('cr_ci');
+    $('#cv_correo').textContent = v('cr_correo');
+    $('#cv_emision').textContent = v('cr_emision');
+    $('#cv_validez').textContent = v('cr_validez');
+    $('#cv_foto').textContent = initials(v('cr_nombre')) || '';
+    Draft.save('credencial', {
+      nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'),
+      correo: v('cr_correo'), emision: v('cr_emision'), validez: v('cr_validez')
+    });
+  };
+  ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_correo', 'cr_emision', 'cr_validez']
+    .forEach(id => $('#' + id).addEventListener('input', sync));
 
   $('#btnPrintCred').onclick = () => window.print();
 }
