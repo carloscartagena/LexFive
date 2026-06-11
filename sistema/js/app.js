@@ -1578,13 +1578,13 @@ async function renderCredenciales() {
     representacion: saved.representacion || REPRE_DEFAULT
   };
 
-  // Opciones de logo disponibles para elegir
+  // Opciones de logo disponibles para elegir (ámbito jurídico)
   const LOGOS = [
-    { id: 'opcion-1-balanza-corchetes', nombre: 'Balanza + código < >' },
-    { id: 'opcion-2-L5-monograma', nombre: 'Monograma L5' },
-    { id: 'opcion-3-balanza-engranaje', nombre: 'Balanza + engranaje' },
-    { id: 'opcion-4-columna-circuito', nombre: 'Columna + circuito' },
-    { id: 'opcion-5-balanza-chip', nombre: 'Balanza en chip' }
+    { id: 'opcion-1-balanza-corchetes', nombre: 'Balanza de la justicia' },
+    { id: 'opcion-2-L5-monograma', nombre: 'Monograma L5 con laureles' },
+    { id: 'opcion-3-balanza-engranaje', nombre: 'Mazo del juez + balanza' },
+    { id: 'opcion-4-columna-circuito', nombre: 'Columnas de justicia' },
+    { id: 'opcion-5-balanza-chip', nombre: 'Balanza + libro de leyes' }
   ];
   const logoActual = localStorage.getItem('lexfive_logo') || 'opcion-1-balanza-corchetes';
 
@@ -1616,6 +1616,20 @@ async function renderCredenciales() {
               <img src="../assets/logos/${l.id}.svg" alt="${esc(l.nombre)}">
               <span>${esc(l.nombre)}</span>
             </button>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Sello del bufete</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:12px">Sello oficial de LexFive Abogados. Puede descargarlo o imprimirlo para usarlo en documentos y en el reverso de las credenciales.</p>
+        <div class="sello-box">
+          <img src="../assets/sello-lexfive.svg" alt="Sello LexFive Abogados" class="sello-img">
+          <div class="sello-actions">
+            <a class="btn btn--ghost btn--sm" href="../assets/sello-lexfive.svg" download="sello-lexfive.svg">Descargar sello</a>
+            <button class="btn btn--ghost btn--sm" id="btnPrintSello">Imprimir sello</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1742,6 +1756,12 @@ async function renderCredenciales() {
     .forEach(id => $('#' + id).addEventListener('input', sync));
 
   $('#btnPrintCred').onclick = () => window.print();
+  const bps = $('#btnPrintSello');
+  if (bps) bps.onclick = () => {
+    const w = window.open('', '_blank');
+    w.document.write('<img src="../assets/sello-lexfive.svg" style="width:6cm;height:6cm" onload="window.print();window.close()">');
+    w.document.close();
+  };
 }
 
 // Aplica el logo elegido en todo el panel (inyecta un estilo que sobreescribe
