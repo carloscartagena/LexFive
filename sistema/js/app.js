@@ -1584,7 +1584,8 @@ async function renderCredenciales() {
     { id: 'opcion-2-L5-monograma', nombre: 'Monograma L5 con laureles' },
     { id: 'opcion-3-balanza-engranaje', nombre: 'Mazo del juez + balanza' },
     { id: 'opcion-4-columna-circuito', nombre: 'Columnas de justicia' },
-    { id: 'opcion-5-balanza-chip', nombre: 'Balanza + libro de leyes' }
+    { id: 'opcion-5-balanza-chip', nombre: 'Balanza + libro de leyes' },
+    { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' }
   ];
   const logoActual = localStorage.getItem('lexfive_logo') || 'opcion-1-balanza-corchetes';
 
