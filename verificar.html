@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de credencial — LexFive Abogados</title>
+    <meta name="description" content="Verificación oficial de la credencial de un miembro del bufete LexFive Abogados.">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        :root { --nv: #0e1b2c; --gd: #c2a25a; --gdk: #a8853c; }
+        body { background: #eef0f3; }
+        .vf-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+        .vf-card {
+            background: #fff; max-width: 480px; width: 100%; border-radius: 16px;
+            box-shadow: 0 18px 50px rgba(14,27,44,.18); overflow: hidden; border: 1px solid #e1e4e9;
+        }
+        .vf-top { background: var(--nv); color: #fff; text-align: center; padding: 26px 22px 22px; }
+        .vf-brand { font-family: Georgia, 'Times New Roman', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: .5px; }
+        .vf-brand span { color: var(--gd); }
+        .vf-sub { text-transform: uppercase; letter-spacing: 4px; font-size: .62rem; color: var(--gd); margin-top: 4px; }
+        .vf-check {
+            width: 78px; height: 78px; margin: 18px auto 6px; border-radius: 50%;
+            background: #1faa5a; display: flex; align-items: center; justify-content: center;
+        }
+        .vf-check svg { width: 42px; height: 42px; stroke: #fff; stroke-width: 4; fill: none; }
+        .vf-body { padding: 22px 26px 8px; text-align: center; }
+        .vf-title { font-family: Georgia, serif; color: var(--nv); font-size: 1.35rem; margin: 4px 0 8px; }
+        .vf-lead { color: #3a4658; font-size: .98rem; line-height: 1.5; }
+        .vf-lead strong { color: var(--nv); }
+        .vf-data { text-align: left; margin: 20px 0 6px; border-top: 1px solid #eceef1; }
+        .vf-row { display: flex; justify-content: space-between; gap: 14px; padding: 11px 2px; border-bottom: 1px solid #eceef1; }
+        .vf-row span { color: #6b7280; font-size: .76rem; text-transform: uppercase; letter-spacing: .6px; }
+        .vf-row strong { color: var(--nv); font-size: .98rem; text-align: right; }
+        .vf-note { background: #fbf7ec; border: 1px solid #ecdfbf; color: #6b5a2c; font-size: .8rem; line-height: 1.5; border-radius: 10px; padding: 12px 14px; margin: 16px 0; }
+        .vf-foot { padding: 0 26px 26px; text-align: center; }
+        .vf-btn { display: inline-block; background: var(--nv); color: #fff; text-decoration: none; padding: 12px 22px; border-radius: 8px; font-weight: 600; font-size: .92rem; }
+        .vf-legal { color: #9aa1ab; font-size: .72rem; margin-top: 14px; }
+    </style>
+</head>
+<body>
+    <div class="vf-wrap">
+        <div class="vf-card">
+            <div class="vf-top">
+                <div class="vf-brand">Lex<span>Five</span></div>
+                <div class="vf-sub">Bufete de Abogados</div>
+                <div class="vf-check" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><polyline points="4,12 10,18 20,6" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                </div>
+            </div>
+            <div class="vf-body">
+                <h1 class="vf-title">Credencial verificada</h1>
+                <p class="vf-lead" id="vfLead">El portador de esta credencial pertenece al bufete <strong>LexFive</strong>.</p>
+                <div class="vf-data" id="vfData"></div>
+                <div class="vf-note">Esta verificación confirma que el portador está autorizado por el bufete <strong>LexFive</strong> para actuar en su representación ante autoridades judiciales, públicas y privadas, conforme a la normativa vigente.</div>
+            </div>
+            <div class="vf-foot">
+                <a class="vf-btn" href="index.html">Ir al sitio de LexFive</a>
+                <p class="vf-legal">Documento de uso institucional. Para validar la habilitación profesional del abogado responsable, escanee el código SAJ-RPA de la credencial.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            function getParams() {
+                var p = {};
+                var q = window.location.search.replace(/^\?/, '');
+                q.split('&').forEach(function (pair) {
+                    if (!pair) return;
+                    var kv = pair.split('=');
+                    p[decodeURIComponent(kv[0])] = decodeURIComponent((kv[1] || '').replace(/\+/g, ' '));
+                });
+                return p;
+            }
+            var p = getParams();
+            var nombre = (p.n || '').trim();
+            var ci = (p.ci || '').trim();
+            var rol = (p.rol || 'Procurador').trim();
+
+            var lead = document.getElementById('vfLead');
+            var data = document.getElementById('vfData');
+
+            if (nombre) {
+                lead.innerHTML = 'El portador de esta credencial pertenece al bufete <strong>LexFive</strong> en calidad de <strong>' + escapeHtml(rol) + '</strong>.';
+                var rows = '';
+                rows += row('Nombre', nombre);
+                if (ci) rows += row('Carnet de identidad', ci);
+                rows += row('Rol', rol);
+                rows += row('Bufete', 'LexFive Abogados · La Paz / El Alto — Bolivia');
+                data.innerHTML = rows;
+            } else {
+                lead.innerHTML = 'Página oficial de verificación de credenciales del bufete <strong>LexFive</strong>. Escanee el código QR de una credencial para ver los datos del portador.';
+            }
+
+            function row(k, v) {
+                return '<div class="vf-row"><span>' + escapeHtml(k) + '</span><strong>' + escapeHtml(v) + '</strong></div>';
+            }
+            function escapeHtml(s) {
+                return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

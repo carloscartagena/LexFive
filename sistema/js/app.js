@@ -80,10 +80,10 @@ function qrURL(texto) {
 // URL fija del certificado SAJ-RPA del abogado responsable (va igual en TODAS las credenciales).
 const RPA_URL = 'https://rpa2.justicia.gob.bo/#/certificado-funcionamiento?codigo=52348873-02ea-4065-9b69-3c27a86c9dd9';
 const SITIO_URL = 'https://lexfive.netlify.app/';
-// Enlace que codifica el QR personal del procurador: abre el sitio del bufete con sus datos.
+// Enlace que codifica el QR personal del procurador: abre la página de verificación del bufete con sus datos.
 function qrPersona(d) {
   d = d || {};
-  return SITIO_URL + '?procurador=' + encodeURIComponent(d.nombre || '') + '&ci=' + encodeURIComponent(d.ci || '') + '&rol=' + encodeURIComponent(d.cargo || '');
+  return SITIO_URL + 'verificar.html?n=' + encodeURIComponent(d.nombre || '') + '&ci=' + encodeURIComponent(d.ci || '') + '&rol=' + encodeURIComponent(d.cargo || 'Procurador');
 }
 // Resalta en negrita las palabras/cláusulas importantes del texto legal del reverso.
 function resaltarRepre(txt) {
@@ -240,7 +240,7 @@ const ImgDB = {
 };
 
 // Caché sincrónica de las imágenes para que el render no tenga que esperar.
-const IMG = { logo: null, sello: null, loaded: false };
+const IMG = { logo: null, sello: null, foto: null, loaded: false };
 
 async function ensureImgCache() {
   if (IMG.loaded) return;
@@ -253,6 +253,7 @@ async function ensureImgCache() {
   } catch (e) {}
   IMG.logo = await ImgDB.get('logo');
   IMG.sello = await ImgDB.get('sello');
+  IMG.foto = await ImgDB.get('foto');
   // Respaldo: si quedó un data URL en localStorage (no se pudo migrar), úsalo.
   if (!IMG.logo) { const ol = localStorage.getItem('lexfive_logo_custom'); if (ol && ol.indexOf('data:') === 0) IMG.logo = ol; }
   if (!IMG.sello) { const os = localStorage.getItem('lexfive_sello_custom'); if (os && os.indexOf('data:') === 0) IMG.sello = os; }
@@ -1833,7 +1834,14 @@ async function renderCredenciales() {
         </div>
         <div class="field-row">
           <div class="field"><label>Válido hasta (automático · 3 años)</label><input id="cr_validez_view" type="text" readonly value="" style="background:#f4f5f7;font-weight:600"></div>
-          <div class="field"></div>
+          <div class="field">
+            <label>Foto del procurador (3×3)</label>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="btn btn--ghost btn--sm" id="btnUploadFoto" type="button">Subir foto</button>
+              ${IMG.foto ? '<button class="btn btn--ghost btn--sm" id="btnRemoveFoto" type="button">Quitar</button><img src="' + IMG.foto + '" alt="foto" style="width:34px;height:34px;border-radius:5px;object-fit:cover;border:1px solid #e6e8ec">' : '<span class="cell-sub">Se recorta cuadrada (3×3)</span>'}
+            </div>
+            <input type="file" id="fileFoto" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
+          </div>
         </div>
         <div class="field"><label>Frase del bufete (reverso)</label>
           <input id="cr_frase" value="${esc(datos.frase)}" placeholder="Escríbala o elija una sugerencia" list="fraseList">
@@ -1850,20 +1858,16 @@ async function renderCredenciales() {
     <div class="cred-wrap" id="credPrintArea">
       <!-- ANVERSO -->
       <div class="cred-card">
-        <div class="cred-card__top">
-          <img class="cred-logo" id="cv_logo" src="${logoSrc(logoActual)}" alt="Logo del bufete">
-          <div class="cred-org">
+        <div class="cred-top2">
+          <div class="cred-photo" id="cv_foto">${IMG.foto ? '<img src="' + IMG.foto + '" alt="Foto del portador">' : esc(initials(datos.nombre) || '')}</div>
+          <div class="cred-brand">
+            <img class="cred-logo" id="cv_logo" src="${logoSrc(logoActual)}" alt="Logo del bufete">
             <strong>LexFive</strong>
             <small>Bufete de Abogados</small>
           </div>
         </div>
         <div class="cred-band">CREDENCIAL &middot; <span id="cv_cargo_band">${esc(datos.cargo || '')}</span></div>
         <div class="cred-body">
-          <div class="cred-photo-col">
-            <div class="cred-photo" id="cv_foto">${esc(initials(datos.nombre) || '')}</div>
-            <img class="cred-qr" id="cv_qr" src="${qrURL(qrPersona(datos))}" alt="QR de datos y sitio web">
-            <small class="cred-qr-cap">Datos · web</small>
-          </div>
           <div class="cred-data">
             <div class="cred-row"><span>Nombre</span><strong id="cv_nombre">${esc(datos.nombre || '')}</strong></div>
             <div class="cred-row"><span>Carnet de identidad</span><strong id="cv_ci">${esc(datos.ci || '')}</strong></div>
@@ -1872,7 +1876,10 @@ async function renderCredenciales() {
         </div>
         <div class="cred-foot">
           <div><span>Emisión</span><strong id="cv_emision">${esc(fmtFechaCorta(datos.emision))}</strong></div>
-          <div class="cred-foot__qr"><img src="${qrURL(RPA_URL)}" alt="Verificación SAJ-RPA del abogado" class="cred-qr-cert"><small class="cred-qr-cap">SAJ-RPA</small></div>
+          <div class="cred-foot__qrs">
+            <div class="cred-foot__qr"><img id="cv_qr" src="${qrURL(qrPersona(datos))}" alt="Verificación del bufete" class="cred-qr-cert"><small class="cred-qr-cap">Verificar</small></div>
+            <div class="cred-foot__qr"><img src="${qrURL(RPA_URL)}" alt="SAJ-RPA" class="cred-qr-cert"><small class="cred-qr-cap">SAJ-RPA</small></div>
+          </div>
           <div><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong></div>
         </div>
       </div>
@@ -1973,13 +1980,14 @@ async function renderCredenciales() {
     const emi = v('cr_emision') || hoyISO();
     const val = addAnios(emi, 3);
     const cvqr = $('#cv_qr');
-    if (cvqr) cvqr.src = qrURL(SITIO_URL + '?procurador=' + encodeURIComponent(v('cr_nombre')) + '&ci=' + encodeURIComponent(v('cr_ci')) + '&rol=' + encodeURIComponent(v('cr_cargo')));
+    if (cvqr) cvqr.src = qrURL(qrPersona({ nombre: v('cr_nombre'), ci: v('cr_ci'), cargo: v('cr_cargo') }));
     $('#cv_emision').textContent = fmtFechaCorta(emi);
     $('#cv_validez').textContent = fmtFechaCorta(val);
     const vv = $('#cr_validez_view'); if (vv) vv.value = fmtFechaCorta(val);
     $('#cv_frase').textContent = v('cr_frase');
     $('#cv_repre').innerHTML = resaltarRepre(v('cr_repre') || REPRE_DEFAULT);
-    $('#cv_foto').textContent = initials(v('cr_nombre')) || '';
+    const fotoEl = $('#cv_foto');
+    if (fotoEl && !IMG.foto) fotoEl.textContent = initials(v('cr_nombre')) || '';
     Draft.save('credencial', {
       nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'),
       telPersonal: v('cr_telpers'), telOficina: v('cr_teloff'),
@@ -1990,6 +1998,24 @@ async function renderCredenciales() {
   ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_frase', 'cr_repre']
     .forEach(id => { const el = $('#' + id); if (el) { el.addEventListener('input', sync); el.addEventListener('change', sync); } });
   sync();
+
+  // Subir / quitar foto del procurador (se recorta cuadrada y se guarda en IndexedDB)
+  const fileFoto = $('#fileFoto');
+  const btnUploadFoto = $('#btnUploadFoto');
+  if (btnUploadFoto) btnUploadFoto.onclick = () => fileFoto.click();
+  if (fileFoto) fileFoto.onchange = () => {
+    const f = fileFoto.files && fileFoto.files[0];
+    fileFoto.value = '';
+    if (!f) return;
+    abrirEditorImagen(f, { titulo: 'Ajustar foto (3×3)', salida: 360, quitarBlanco: false }, async (png) => {
+      const ok = await guardarImagen('foto', png);
+      if (!ok) { toast('No se pudo guardar la foto.', 'error'); return; }
+      renderCredenciales();
+      toast('Foto agregada a la credencial.', 'success');
+    });
+  };
+  const btnRemoveFoto = $('#btnRemoveFoto');
+  if (btnRemoveFoto) btnRemoveFoto.onclick = () => { borrarImagen('foto'); renderCredenciales(); toast('Foto quitada.', 'success'); };
 
   // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
   let selloElegido = selloActual;
@@ -2044,7 +2070,7 @@ async function renderCredenciales() {
   const btnRestoreSellos = $('#btnRestoreSellos');
   if (btnRestoreSellos) btnRestoreSellos.onclick = () => { localStorage.removeItem('lexfive_sellos_hidden'); renderCredenciales(); toast('Sellos restaurados.', 'success'); };
 
-  $('#btnPrintCred').onclick = () => window.print();
+  $('#btnPrintCred').onclick = imprimirCredencial;
   const bps = $('#btnPrintSello');
   if (bps) bps.onclick = () => {
     const src = selloSrc(selloElegido);
@@ -2250,6 +2276,33 @@ function applyLogo(id) {
   if (!st) { st = document.createElement('style'); st.id = 'lexfiveLogoStyle'; document.head.appendChild(st); }
   const url = id === 'custom' ? (IMG.logo || '') : `../../assets/logos/${id}.svg`;
   st.textContent = `.logo__mark{background-image:url(${url})!important;}`;
+}
+
+// Imprime la credencial: clona las dos caras en un contenedor a nivel de <body>
+// para imprimir cada cara en su propia hoja (4x6), de tamaño idéntico.
+function imprimirCredencial() {
+  const area = document.getElementById('credPrintArea');
+  if (!area) { window.print(); return; }
+  const previo = document.getElementById('printRoot');
+  if (previo) previo.remove();
+  const root = document.createElement('div');
+  root.id = 'printRoot';
+  root.innerHTML = area.innerHTML;
+  document.body.appendChild(root);
+  document.body.classList.add('printing');
+  const limpiar = () => { document.body.classList.remove('printing'); const r = document.getElementById('printRoot'); if (r) r.remove(); };
+  window.addEventListener('afterprint', limpiar, { once: true });
+  let hecho = false;
+  const imprimir = () => { if (hecho) return; hecho = true; window.print(); setTimeout(limpiar, 3000); };
+  // Esperar a que carguen las imágenes del clon (QRs, logo, foto) antes de imprimir.
+  const imgs = Array.from(root.querySelectorAll('img'));
+  let pendientes = imgs.filter(i => !i.complete).length;
+  if (pendientes === 0) { setTimeout(imprimir, 60); }
+  else {
+    const check = () => { pendientes--; if (pendientes <= 0) imprimir(); };
+    imgs.forEach(i => { if (!i.complete) { i.addEventListener('load', check, { once: true }); i.addEventListener('error', check, { once: true }); } });
+    setTimeout(imprimir, 2500);
+  }
 }
 
 // ============================================================
