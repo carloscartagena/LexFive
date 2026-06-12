@@ -1580,11 +1580,11 @@ async function renderCredenciales() {
 
   // Opciones de logo disponibles para elegir (Derecho + Ingeniería en Sistemas)
   const LOGOS = [
-    { id: 'ds1-balanza-codigo', nombre: 'Balanza + código </>' },
-    { id: 'ds2-L5-circuito', nombre: 'Monograma L5 en circuito' },
-    { id: 'ds3-mazo-pulso', nombre: 'Mazo del juez + señal digital' },
-    { id: 'ds4-columna-circuito', nombre: 'Columnas de justicia + circuito' },
-    { id: 'ds5-balanza-chip', nombre: 'Balanza en microchip' },
+    { id: 'ds1-balanza-codigo', nombre: 'Emblema · Balanza' },
+    { id: 'ds2-L5-circuito', nombre: 'Emblema · Monograma L5' },
+    { id: 'ds3-mazo-pulso', nombre: 'Emblema · Mazo del juez' },
+    { id: 'ds4-columna-circuito', nombre: 'Emblema · Templo de justicia' },
+    { id: 'ds5-balanza-chip', nombre: 'Emblema · Balanza en chip' },
     { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' }
   ];
   const LOGO_DEFAULT = 'ds1-balanza-codigo';

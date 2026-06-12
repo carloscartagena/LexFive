@@ -1,35 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Sello LexFive Abogados con templo de justicia y laureles">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Sello LexFive Abogados con templo de justicia">
   <defs>
-    <path id="s5Top" d="M 28 100 A 72 72 0 0 1 172 100" fill="none"/>
-    <path id="s5Bottom" d="M 38 100 A 62 62 0 0 0 162 100" fill="none"/>
+    <path id="s5top" d="M 36 120 A 84 84 0 0 1 204 120"/>
+    <path id="s5bot" d="M 40 120 A 80 80 0 0 0 200 120"/>
   </defs>
-  <g fill="none" stroke="#0e1b2c" stroke-width="2.4">
-    <circle cx="100" cy="100" r="93"/>
-    <circle cx="100" cy="100" r="85"/>
+  <g fill="none" stroke="#122a44" stroke-width="3">
+    <circle cx="120" cy="120" r="114"/>
+    <circle cx="120" cy="120" r="104"/>
+    <circle cx="120" cy="120" r="74"/>
   </g>
-  <g fill="#0e1b2c" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
-    <text font-size="15" letter-spacing="2.8">
-      <textPath href="#s5Top" startOffset="50%" text-anchor="middle">LEXFIVE · ABOGADOS</textPath>
-    </text>
-    <text font-size="9.5" letter-spacing="1.8">
-      <textPath href="#s5Bottom" startOffset="50%" text-anchor="middle">JUSTICIA &amp; DERECHO · BOLIVIA</textPath>
-    </text>
+  <g fill="#122a44" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text font-size="20" letter-spacing="3.5"><textPath href="#s5top" startOffset="50%" text-anchor="middle">LEXFIVE · ABOGADOS</textPath></text>
+    <text font-size="12" letter-spacing="2.2"><textPath href="#s5bot" startOffset="50%" text-anchor="middle">JUSTICIA &amp; DERECHO · BOLIVIA</textPath></text>
   </g>
-  <g fill="#0e1b2c"><circle cx="33" cy="100" r="2.5"/><circle cx="167" cy="100" r="2.5"/></g>
+  <g fill="#122a44"><circle cx="40" cy="120" r="3.4"/><circle cx="200" cy="120" r="3.4"/></g>
+  <!-- Templo de justicia simetrico -->
+  <g fill="none" stroke="#122a44" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M86 90 L120 66 L154 90"/>
+    <path d="M84 90 L156 90" stroke-width="2.6"/>
+    <path d="M94 94 L94 138 M110 94 L110 138 M130 94 L130 138 M146 94 L146 138" stroke-width="3.6"/>
+    <path d="M88 94 L152 94" stroke-width="2.2"/>
+    <path d="M82 142 L158 142" stroke-width="2.6"/>
+    <path d="M76 150 L164 150" stroke-width="3"/>
+  </g>
   <!-- Ramas de laurel -->
-  <g fill="none" stroke="#0e1b2c" stroke-width="2" stroke-linecap="round">
-    <path d="M64 138 Q54 120 60 100"/>
-    <path d="M62 130 L54 127 M61 121 L53 118 M61 112 L53 109 M62 104 L55 101"/>
-    <path d="M136 138 Q146 120 140 100"/>
-    <path d="M138 130 L146 127 M139 121 L147 118 M139 112 L147 109 M138 104 L145 101"/>
-  </g>
-  <!-- Templo de justicia central -->
-  <g fill="none" stroke="#0e1b2c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M74 78 L100 62 L126 78"/>
-    <path d="M72 78 L128 78"/>
-    <path d="M80 82 L80 118 M92 82 L92 118 M108 82 L108 118 M120 82 L120 118"/>
-    <path d="M76 82 L124 82"/>
-    <path d="M72 120 L128 120"/>
-    <path d="M66 128 L134 128"/>
+  <g fill="none" stroke="#122a44" stroke-width="2.4" stroke-linecap="round">
+    <path d="M150 168 Q170 156 172 132"/>
+    <path d="M163 160 q8 -2 9 -9 M167 150 q8 -2 9 -9 M169 140 q7 -2 8 -9"/>
+    <path d="M90 168 Q70 156 68 132"/>
+    <path d="M77 160 q-8 -2 -9 -9 M73 150 q-8 -2 -9 -9 M71 140 q-7 -2 -8 -9"/>
   </g>
 </svg>

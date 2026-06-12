@@ -1,28 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive - Balanza dentro de un microchip">
   <defs>
-    <linearGradient id="ds5bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16273d"/><stop offset="1" stop-color="#0e1b2c"/></linearGradient>
-    <linearGradient id="ds5gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e7d3a1"/><stop offset="0.5" stop-color="#c2a25a"/><stop offset="1" stop-color="#a8853c"/></linearGradient>
+    <linearGradient id="l5bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2f49"/><stop offset="1" stop-color="#0d1826"/></linearGradient>
+    <linearGradient id="l5gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecdcb2"/><stop offset="0.45" stop-color="#cba765"/><stop offset="1" stop-color="#a07f3a"/></linearGradient>
   </defs>
-  <rect width="64" height="64" rx="13" fill="url(#ds5bg)"/>
-  <rect x="2" y="2" width="60" height="60" rx="11" fill="none" stroke="url(#ds5gold)" stroke-width="1.4"/>
-  <!-- Microchip: cuerpo y pines (ingenieria en sistemas) -->
-  <g fill="none" stroke="url(#ds5gold)" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="18" y="16" width="28" height="28" rx="3.5" stroke-width="2.2"/>
-    <path d="M24 16 L24 11 M32 16 L32 11 M40 16 L40 11" stroke-width="1.6"/>
-    <path d="M24 44 L24 49 M32 44 L32 49 M40 44 L40 49" stroke-width="1.6"/>
-    <path d="M18 23 L13 23 M18 30 L13 30 M18 37 L13 37" stroke-width="1.6"/>
-    <path d="M46 23 L51 23 M46 30 L51 30 M46 37 L51 37" stroke-width="1.6"/>
+  <rect width="64" height="64" rx="14" fill="url(#l5bg)"/>
+  <rect x="3.25" y="3.25" width="57.5" height="57.5" rx="11" fill="none" stroke="url(#l5gold)" stroke-width="0.8" opacity="0.55"/>
+  <!-- Microchip (Ingenieria en Sistemas) -->
+  <g fill="none" stroke="url(#l5gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="19" y="13" width="26" height="26" rx="3.5"/>
+    <path d="M25 13 L25 9.5 M32 13 L32 9.5 M39 13 L39 9.5"/>
+    <path d="M25 39 L25 42.5 M32 39 L32 42.5 M39 39 L39 42.5"/>
+    <path d="M19 20 L15.5 20 M19 26 L15.5 26 M19 32 L15.5 32"/>
+    <path d="M45 20 L48.5 20 M45 26 L48.5 26 M45 32 L48.5 32"/>
   </g>
-  <!-- Balanza de la justicia dentro del chip (derecho) -->
-  <g fill="none" stroke="url(#ds5gold)" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M32 21 L32 39" stroke-width="2.2"/>
-    <path d="M23 25 L41 25" stroke-width="2.2"/>
-    <path d="M23 25 L20 31 M23 25 L26 31" stroke-width="1.2"/>
-    <path d="M41 25 L38 31 M41 25 L44 31" stroke-width="1.2"/>
-    <path d="M19 31 Q23 36 27 31" stroke-width="1.6"/>
-    <path d="M37 31 Q41 36 45 31" stroke-width="1.6"/>
-    <path d="M27 39 L37 39" stroke-width="2.4"/>
+  <!-- Balanza centrada dentro del chip (Derecho) -->
+  <g fill="none" stroke="url(#l5gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 18 L32 34"/>
+    <path d="M24 22 L40 22"/>
+    <path d="M24 22 L21.5 27 M24 22 L26.5 27"/>
+    <path d="M40 22 L37.5 27 M40 22 L42.5 27"/>
+    <path d="M20.5 27 Q24 30.8 27.5 27"/>
+    <path d="M36.5 27 Q40 30.8 43.5 27"/>
+    <path d="M28 34 L36 34"/>
   </g>
-  <circle cx="32" cy="20" r="2.3" fill="url(#ds5gold)"/>
-  <text x="32" y="61" text-anchor="middle" font-family="Georgia, serif" font-size="6.2" font-weight="700" letter-spacing="2" fill="url(#ds5gold)">LEXFIVE</text>
+  <circle cx="32" cy="17.4" r="1.7" fill="url(#l5gold)"/>
+  <circle cx="32" cy="22" r="1.2" fill="url(#l5gold)"/>
+  <text x="32" y="58.6" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="8" font-weight="700" letter-spacing="3" fill="url(#l5gold)">LEXFIVE</text>
 </svg>
