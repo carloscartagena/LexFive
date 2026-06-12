@@ -374,13 +374,20 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 
 @media (max-width: 520px) { .cred-card { width: 100%; height: auto; min-height: 6cm; } }
 
-/* Impresión: solo la credencial, a tamaño real */
+/* Impresión: la credencial en papel fotográfico 4x6 pulgadas (10x15 cm).
+   Se apilan anverso y reverso para imprimir en una sola hoja y poder recortar. */
+@page { size: 4in 6in; margin: 5mm; }
 @media print {
     body * { visibility: hidden; }
     #credPrintArea, #credPrintArea * { visibility: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    #credPrintArea { position: absolute; left: 0; top: 0; display: flex; gap: 14px; padding: 6px; }
+    #credPrintArea {
+        position: absolute; left: 0; top: 0; right: 0;
+        display: flex; flex-direction: column; align-items: center;
+        gap: 6mm; padding: 2mm 0 0;
+    }
     #credPrintArea img { display: block !important; }
-    .cred-card { box-shadow: none; border: 1px solid #999; width: 8.5cm; height: 6cm; }
+    .cred-card { box-shadow: none; border: 1px solid #999; width: 8.5cm; height: 5.7cm; }
+    .cred-card--back { height: 5.7cm; min-height: 5.7cm; }
 }
 
 
