@@ -10,9 +10,15 @@
         try {
             var LOGOS_VALIDOS = ['ds1-balanza-codigo', 'ds2-L5-circuito', 'ds3-mazo-pulso', 'ds4-columna-circuito', 'ds5-balanza-chip', 'opcion-6-LF-circuito'];
             var logoElegido = localStorage.getItem('lexfive_logo');
-            if (logoElegido && LOGOS_VALIDOS.indexOf(logoElegido) !== -1) {
+            var logoUrl = '';
+            if (logoElegido === 'custom') {
+                logoUrl = localStorage.getItem('lexfive_logo_custom') || '';
+            } else if (logoElegido && LOGOS_VALIDOS.indexOf(logoElegido) !== -1) {
+                logoUrl = 'assets/logos/' + logoElegido + '.svg';
+            }
+            if (logoUrl) {
                 var st = document.createElement('style');
-                st.textContent = '.logo__mark{background-image:url(assets/logos/' + logoElegido + '.svg)!important;}';
+                st.textContent = '.logo__mark{background-image:url(' + logoUrl + ')!important;}';
                 document.head.appendChild(st);
             }
         } catch (e) {}

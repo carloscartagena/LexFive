@@ -1588,8 +1588,10 @@ async function renderCredenciales() {
     { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' }
   ];
   const LOGO_DEFAULT = 'ds1-balanza-codigo';
+  const customLogo = localStorage.getItem('lexfive_logo_custom');
   const logoGuardado = localStorage.getItem('lexfive_logo');
-  const logoActual = LOGOS.some(l => l.id === logoGuardado) ? logoGuardado : LOGO_DEFAULT;
+  const logoActual = (logoGuardado === 'custom' && customLogo) ? 'custom'
+    : (LOGOS.some(l => l.id === logoGuardado) ? logoGuardado : LOGO_DEFAULT);
 
   // Opciones de sello para el bufete (memoriales y documentos)
   const SELLOS = [
@@ -1600,8 +1602,14 @@ async function renderCredenciales() {
     { id: 'sello-5-columnas', nombre: 'Templo de justicia' }
   ];
   const SELLO_DEFAULT = 'sello-1-clasico';
+  const customSello = localStorage.getItem('lexfive_sello_custom');
   const selloGuardado = localStorage.getItem('lexfive_sello');
-  const selloActual = SELLOS.some(s => s.id === selloGuardado) ? selloGuardado : SELLO_DEFAULT;
+  const selloActual = (selloGuardado === 'custom' && customSello) ? 'custom'
+    : (SELLOS.some(s => s.id === selloGuardado) ? selloGuardado : SELLO_DEFAULT);
+
+  // Devuelven la fuente correcta: archivo del repo o imagen subida por el bufete (data URL)
+  const logoSrc = id => id === 'custom' ? (localStorage.getItem('lexfive_logo_custom') || '') : `../assets/logos/${id}.svg`;
+  const selloSrc = id => id === 'custom' ? (localStorage.getItem('lexfive_sello_custom') || '') : `../assets/sellos/${id}.svg`;
 
   // Frases sugeridas para el reverso
   const FRASES = [
@@ -1624,32 +1632,54 @@ async function renderCredenciales() {
     <div class="card">
       <div class="card__head"><h3>Logotipo del bufete</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">Elija el modelo de logo. Se aplicará en toda la página, el panel y la credencial.</p>
+        <p class="cell-sub" style="margin-bottom:12px">Elija un modelo o <strong>suba su propio logo</strong>. Se aplicará en toda la página, el panel y la credencial.</p>
         <div class="logo-gallery">
           ${LOGOS.map(l => `
             <button class="logo-option ${l.id === logoActual ? 'is-selected' : ''}" data-logo="${l.id}">
               <img src="../assets/logos/${l.id}.svg" alt="${esc(l.nombre)}">
               <span>${esc(l.nombre)}</span>
             </button>`).join('')}
+          ${customLogo ? `
+            <button class="logo-option ${logoActual === 'custom' ? 'is-selected' : ''}" data-logo="custom">
+              <img src="${customLogo}" alt="Mi logo">
+              <span>Mi logo</span>
+            </button>` : ''}
+          <button class="logo-option logo-upload" id="btnUploadLogo" type="button">
+            <span class="logo-upload__plus">+</span>
+            <span>Subir mi logo</span>
+          </button>
         </div>
+        <input type="file" id="fileLogo" accept=".svg,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp" hidden>
+        <p class="cell-sub" style="margin-top:10px">Formato ideal: <strong>SVG</strong> o <strong>PNG con fondo transparente</strong>, cuadrado (1:1), mínimo 1024×1024 px. ${customLogo ? '<button class="btn btn--ghost btn--sm" id="btnRemoveLogo" type="button" style="margin-left:8px">Quitar mi logo</button>' : ''}</p>
       </div>
     </div>
 
     <div class="card">
       <div class="card__head"><h3>Sello del bufete</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">Elija el sello oficial de LexFive Abogados. Puede descargarlo o imprimirlo para usarlo en <strong>memoriales</strong>, documentos y en el reverso de las credenciales.</p>
+        <p class="cell-sub" style="margin-bottom:12px">Elija un sello o <strong>suba el suyo</strong>. Puede descargarlo o imprimirlo para usarlo en <strong>memoriales</strong>, documentos y en el reverso de las credenciales.</p>
         <div class="logo-gallery">
           ${SELLOS.map(s => `
             <button class="logo-option sello-option ${s.id === selloActual ? 'is-selected' : ''}" data-sello="${s.id}">
               <img src="../assets/sellos/${s.id}.svg" alt="${esc(s.nombre)}">
               <span>${esc(s.nombre)}</span>
             </button>`).join('')}
+          ${customSello ? `
+            <button class="logo-option sello-option ${selloActual === 'custom' ? 'is-selected' : ''}" data-sello="custom">
+              <img src="${customSello}" alt="Mi sello">
+              <span>Mi sello</span>
+            </button>` : ''}
+          <button class="logo-option logo-upload" id="btnUploadSello" type="button">
+            <span class="logo-upload__plus">+</span>
+            <span>Subir mi sello</span>
+          </button>
         </div>
+        <input type="file" id="fileSello" accept=".svg,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp" hidden>
+        <p class="cell-sub" style="margin-top:10px">Formato ideal: <strong>SVG</strong> o <strong>PNG con fondo transparente</strong>, cuadrado (1:1), un solo color, alta resolución (2000×2000 px). ${customSello ? '<button class="btn btn--ghost btn--sm" id="btnRemoveSello" type="button" style="margin-left:8px">Quitar mi sello</button>' : ''}</p>
         <div class="sello-box" style="margin-top:14px">
-          <img src="../assets/sellos/${selloActual}.svg" alt="Sello LexFive Abogados" class="sello-img" id="selloPreview">
+          <img src="${selloSrc(selloActual)}" alt="Sello LexFive Abogados" class="sello-img" id="selloPreview">
           <div class="sello-actions">
-            <a class="btn btn--ghost btn--sm" href="../assets/sellos/${selloActual}.svg" download="sello-lexfive.svg" id="selloDownload">Descargar sello</a>
+            <a class="btn btn--ghost btn--sm" href="${selloSrc(selloActual)}" download="sello-lexfive" id="selloDownload">Descargar sello</a>
             <button class="btn btn--ghost btn--sm" id="btnPrintSello">Imprimir sello</button>
           </div>
         </div>
@@ -1691,7 +1721,7 @@ async function renderCredenciales() {
       <!-- ANVERSO -->
       <div class="cred-card">
         <div class="cred-card__top">
-          <span class="cred-logo" id="cv_logo" style="background-image:url(../assets/logos/${logoActual}.svg)"></span>
+          <span class="cred-logo" id="cv_logo" style="background-image:url(${logoSrc(logoActual)})"></span>
           <div class="cred-org">
             <strong>LexFive</strong>
             <small>Bufete de Abogados</small>
@@ -1744,14 +1774,35 @@ async function renderCredenciales() {
     </div>`;
 
   // Selección de logo: aplica al sistema (se guarda en este equipo)
-  content().querySelectorAll('.logo-option').forEach(btn => btn.onclick = () => {
+  content().querySelectorAll('.logo-option[data-logo]').forEach(btn => btn.onclick = () => {
     const id = btn.dataset.logo;
     localStorage.setItem('lexfive_logo', id);
-    content().querySelectorAll('.logo-option').forEach(b => b.classList.toggle('is-selected', b === btn));
-    $('#cv_logo').style.backgroundImage = `url(../assets/logos/${id}.svg)`;
+    content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === btn));
+    $('#cv_logo').style.backgroundImage = `url(${logoSrc(id)})`;
     applyLogo(id);
     toast('Logo aplicado. Se usará en todo el sistema.', 'success');
   });
+
+  // Subir mi logo
+  const fileLogo = $('#fileLogo');
+  const btnUploadLogo = $('#btnUploadLogo');
+  if (btnUploadLogo) btnUploadLogo.onclick = () => fileLogo.click();
+  if (fileLogo) fileLogo.onchange = () => {
+    const f = fileLogo.files && fileLogo.files[0];
+    if (f) leerImagenBufete(f, 'lexfive_logo_custom', 'lexfive_logo', () => {
+      applyLogo('custom');
+      renderCredenciales();
+      toast('Logo subido y aplicado en todo el sistema.', 'success');
+    });
+  };
+  const btnRemoveLogo = $('#btnRemoveLogo');
+  if (btnRemoveLogo) btnRemoveLogo.onclick = () => {
+    localStorage.removeItem('lexfive_logo_custom');
+    if (localStorage.getItem('lexfive_logo') === 'custom') localStorage.setItem('lexfive_logo', LOGO_DEFAULT);
+    applyLogo(localStorage.getItem('lexfive_logo') || LOGO_DEFAULT);
+    renderCredenciales();
+    toast('Se quitó su logo. Se restauró el modelo por defecto.', 'success');
+  };
 
   // Enlazar los campos con la credencial en vivo + autoguardado
   const sync = () => {
@@ -1779,23 +1830,69 @@ async function renderCredenciales() {
 
   // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
   let selloElegido = selloActual;
-  content().querySelectorAll('.sello-option').forEach(btn => btn.onclick = () => {
+  content().querySelectorAll('.sello-option[data-sello]').forEach(btn => btn.onclick = () => {
     const id = btn.dataset.sello;
     selloElegido = id;
     localStorage.setItem('lexfive_sello', id);
-    content().querySelectorAll('.sello-option').forEach(b => b.classList.toggle('is-selected', b === btn));
-    const prev = $('#selloPreview'); if (prev) prev.src = `../assets/sellos/${id}.svg`;
-    const dl = $('#selloDownload'); if (dl) dl.href = `../assets/sellos/${id}.svg`;
+    content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === btn));
+    const prev = $('#selloPreview'); if (prev) prev.src = selloSrc(id);
+    const dl = $('#selloDownload'); if (dl) dl.href = selloSrc(id);
     toast('Sello seleccionado. Listo para memoriales y documentos.', 'success');
   });
+
+  // Subir mi sello
+  const fileSello = $('#fileSello');
+  const btnUploadSello = $('#btnUploadSello');
+  if (btnUploadSello) btnUploadSello.onclick = () => fileSello.click();
+  if (fileSello) fileSello.onchange = () => {
+    const f = fileSello.files && fileSello.files[0];
+    if (f) leerImagenBufete(f, 'lexfive_sello_custom', 'lexfive_sello', () => {
+      renderCredenciales();
+      toast('Sello subido. Listo para memoriales y documentos.', 'success');
+    });
+  };
+  const btnRemoveSello = $('#btnRemoveSello');
+  if (btnRemoveSello) btnRemoveSello.onclick = () => {
+    localStorage.removeItem('lexfive_sello_custom');
+    if (localStorage.getItem('lexfive_sello') === 'custom') localStorage.setItem('lexfive_sello', SELLO_DEFAULT);
+    renderCredenciales();
+    toast('Se quitó su sello. Se restauró el sello por defecto.', 'success');
+  };
 
   $('#btnPrintCred').onclick = () => window.print();
   const bps = $('#btnPrintSello');
   if (bps) bps.onclick = () => {
     const w = window.open('', '_blank');
-    w.document.write('<img src="../assets/sellos/' + selloElegido + '.svg" style="width:6cm;height:6cm" onload="window.print();window.close()">');
+    w.document.write('<img src="' + selloSrc(selloElegido) + '" style="width:6cm;height:6cm;object-fit:contain" onload="window.print();window.close()">');
     w.document.close();
   };
+}
+
+// Lee una imagen subida por el bufete (logo o sello), la valida y la guarda en este equipo.
+function leerImagenBufete(file, storeKey, selKey, done) {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  const tiposOk = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp'];
+  const extOk = ['svg', 'png', 'jpg', 'jpeg', 'webp'].includes(ext);
+  if (!tiposOk.includes(file.type) && !extOk) {
+    toast('Formato no válido. Use SVG o PNG (de preferencia con fondo transparente).', 'error');
+    return;
+  }
+  if (file.size > 1.5 * 1024 * 1024) {
+    toast('La imagen pesa demasiado (máx. 1.5 MB). Exporte una versión más liviana.', 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      localStorage.setItem(storeKey, reader.result);
+      localStorage.setItem(selKey, 'custom');
+      if (typeof done === 'function') done();
+    } catch (e) {
+      toast('No se pudo guardar (espacio insuficiente en el navegador). Use una imagen más liviana.', 'error');
+    }
+  };
+  reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
+  reader.readAsDataURL(file);
 }
 
 // Aplica el logo elegido en todo el panel (inyecta un estilo que sobreescribe
@@ -1803,7 +1900,8 @@ async function renderCredenciales() {
 function applyLogo(id) {
   let st = document.getElementById('lexfiveLogoStyle');
   if (!st) { st = document.createElement('style'); st.id = 'lexfiveLogoStyle'; document.head.appendChild(st); }
-  st.textContent = `.logo__mark{background-image:url(../../assets/logos/${id}.svg)!important;}`;
+  const url = id === 'custom' ? (localStorage.getItem('lexfive_logo_custom') || '') : `../../assets/logos/${id}.svg`;
+  st.textContent = `.logo__mark{background-image:url(${url})!important;}`;
 }
 
 // ============================================================
