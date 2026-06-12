@@ -57,6 +57,16 @@ const content = () => $('#content');
 function esc(s) {
   return (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
+// Resalta en negrita las palabras/cláusulas importantes del texto legal del reverso.
+function resaltarRepre(txt) {
+  let s = esc(txt || '');
+  const palabras = ['AUTORIZADO', 'FACULTADO', 'ENTREGAR', 'EXAMINAR', 'SOLICITAR', 'RECOGER', 'ABOGADO', 'PORTADOR', 'Procesos', 'Trámites Administrativos', 'Constitución Política del Estado'];
+  palabras.forEach(p => { s = s.replace(new RegExp('\\b(' + p + ')\\b', 'g'), '<strong>$1</strong>'); });
+  // Referencias legales (Ley NNN, Art. NN)
+  s = s.replace(/\b(Ley\s\d{2,4})/g, '<strong>$1</strong>');
+  s = s.replace(/\b(Art\.\s?\d{1,3})/g, '<strong>$1</strong>');
+  return s;
+}
 function fmtDate(d) {
   if (!d) return '—';
   const x = new Date(d);
@@ -1839,7 +1849,7 @@ async function renderCredenciales() {
       <!-- REVERSO -->
       <div class="cred-card cred-card--back">
         <div class="cred-band">LexFive &middot; La Paz / El Alto - Bolivia</div>
-        <p class="cred-cert" id="cv_repre">${esc(datos.representacion || REPRE_DEFAULT)}</p>
+        <p class="cred-cert" id="cv_repre">${resaltarRepre(datos.representacion || REPRE_DEFAULT)}</p>
         <p class="cred-cert cred-frase" id="cv_frase">${esc(datos.frase || '')}</p>
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
@@ -1934,7 +1944,7 @@ async function renderCredenciales() {
     $('#cv_emision').textContent = v('cr_emision');
     $('#cv_validez').textContent = v('cr_validez');
     $('#cv_frase').textContent = v('cr_frase');
-    $('#cv_repre').textContent = v('cr_repre') || REPRE_DEFAULT;
+    $('#cv_repre').innerHTML = resaltarRepre(v('cr_repre') || REPRE_DEFAULT);
     $('#cv_foto').textContent = initials(v('cr_nombre')) || '';
     Draft.save('credencial', {
       nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'), correo: v('cr_correo'),
