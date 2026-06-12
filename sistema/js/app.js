@@ -1666,6 +1666,14 @@ async function renderCredenciales() {
         </div>
         <input type="file" id="fileLogo" accept=".svg,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp" hidden>
         <p class="cell-sub" style="margin-top:10px">Acepta <strong>SVG</strong> o foto <strong>JPG/PNG</strong>. Si sube una foto podrá <strong>recortarla, ajustar el tamaño y se convertirá a PNG</strong> automáticamente (con opción de quitar el fondo blanco). ${hiddenLogos.length ? '<button class="btn btn--ghost btn--sm" id="btnRestoreLogos" type="button" style="margin-left:8px">Restaurar modelos eliminados</button>' : ''}</p>
+        <div class="brand-preview">
+          <img src="${logoSrc(logoActual)}" alt="Vista del logo" class="brand-preview__img" id="logoPreviewBig">
+          <div class="brand-preview__side">
+            <p class="cell-sub" style="margin:0 0 8px">Así se verá el logo. Ábralo en grande para revisar el diseño antes de usarlo.</p>
+            <button class="btn btn--ghost btn--sm" id="btnLogoBig" type="button">Ver en grande</button>
+            <a class="btn btn--ghost btn--sm" id="logoDownload" href="${logoSrc(logoActual)}" download="logo-lexfive" style="margin-left:6px">Descargar logo</a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1696,6 +1704,7 @@ async function renderCredenciales() {
         <div class="sello-box" style="margin-top:14px">
           <img src="${selloSrc(selloActual)}" alt="Sello LexFive Abogados" class="sello-img" id="selloPreview">
           <div class="sello-actions">
+            <button class="btn btn--ghost btn--sm" id="btnSelloBig" type="button">Ver en grande</button>
             <a class="btn btn--ghost btn--sm" href="${selloSrc(selloActual)}" download="sello-lexfive" id="selloDownload">Descargar sello</a>
             <button class="btn btn--ghost btn--sm" id="btnPrintSello">Imprimir sello</button>
           </div>
@@ -1791,14 +1800,21 @@ async function renderCredenciales() {
     </div>`;
 
   // Selección de logo: aplica al sistema (se guarda en este equipo)
+  let logoSel = logoActual;
+  const nombreLogo = id => id === 'custom' ? 'logo-lexfive.png' : id + '.svg';
   content().querySelectorAll('.logo-option[data-logo]').forEach(tile => tile.onclick = () => {
     const id = tile.dataset.logo;
+    logoSel = id;
     localStorage.setItem('lexfive_logo', id);
     content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const cv = $('#cv_logo'); if (cv) cv.src = logoSrc(id);
+    const pv = $('#logoPreviewBig'); if (pv) pv.src = logoSrc(id);
+    const dl = $('#logoDownload'); if (dl) { dl.href = logoSrc(id); dl.setAttribute('download', nombreLogo(id)); }
     applyLogo(id);
     toast('Logo aplicado. Se usará en todo el sistema.', 'success');
   });
+  const btnLogoBig = $('#btnLogoBig');
+  if (btnLogoBig) btnLogoBig.onclick = () => verImagenGrande(logoSrc(logoSel), 'Logo del bufete', nombreLogo(logoSel));
 
   // Subir mi logo (SVG se guarda tal cual; foto JPG/PNG pasa por el editor y se convierte a PNG)
   const fileLogo = $('#fileLogo');
@@ -1873,9 +1889,11 @@ async function renderCredenciales() {
     localStorage.setItem('lexfive_sello', id);
     content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const prev = $('#selloPreview'); if (prev) prev.src = selloSrc(id);
-    const dl = $('#selloDownload'); if (dl) dl.href = selloSrc(id);
+    const dl = $('#selloDownload'); if (dl) { dl.href = selloSrc(id); dl.setAttribute('download', id === 'custom' ? 'sello-lexfive.png' : id + '.svg'); }
     toast('Sello seleccionado. Listo para memoriales y documentos.', 'success');
   });
+  const btnSelloBig = $('#btnSelloBig');
+  if (btnSelloBig) btnSelloBig.onclick = () => verImagenGrande(selloSrc(selloElegido), 'Sello del bufete', selloElegido === 'custom' ? 'sello-lexfive.png' : selloElegido + '.svg');
 
   // Subir mi sello (SVG tal cual; foto pasa por el editor y se convierte a PNG)
   const fileSello = $('#fileSello');
@@ -1960,7 +1978,7 @@ function leerImagenBufete(file, storeKey, selKey, done) {
 function abrirEditorImagen(file, opts, onDone) {
   opts = opts || {};
   const SALIDA = opts.salida || 600;     // px del PNG final (cuadrado)
-  const LIENZO = 300;                     // px del área de edición
+  const LIENZO = 340;                     // px del área de edición
   if (file.size > 12 * 1024 * 1024) { toast('La foto es muy pesada (máx. 12 MB).', 'error'); return; }
 
   const reader = new FileReader();
@@ -1979,9 +1997,16 @@ function abrirEditorImagen(file, opts, onDone) {
     overlay.innerHTML = `
       <div class="img-editor__panel">
         <h3>${esc(opts.titulo || 'Ajustar imagen')}</h3>
-        <p class="cell-sub">Arrastre la imagen para moverla y use el control para acercar. El recuadro es el recorte final (cuadrado). Se guardará en <strong>PNG ${SALIDA}×${SALIDA}px</strong>.</p>
+        <p class="cell-sub">Arrastre la imagen o use las flechas para moverla. Aparecen <strong>guías verdes</strong> y se imanta al centro. El recuadro es el recorte final. Se guardará en <strong>PNG ${SALIDA}×${SALIDA}px</strong>.</p>
         <div class="img-editor__stage">
           <canvas id="ieCanvas" width="${LIENZO}" height="${LIENZO}"></canvas>
+        </div>
+        <div class="img-editor__nudge">
+          <button type="button" class="n-up" data-nudge="up" title="Subir">&#9650;</button>
+          <button type="button" class="n-left" data-nudge="left" title="Izquierda">&#9664;</button>
+          <button type="button" class="n-center" data-nudge="center" title="Centrar">&#10043;</button>
+          <button type="button" class="n-right" data-nudge="right" title="Derecha">&#9654;</button>
+          <button type="button" class="n-down" data-nudge="down" title="Bajar">&#9660;</button>
         </div>
         <label class="img-editor__zoom">Zoom
           <input type="range" id="ieZoom" min="1" max="5" step="0.01" value="1">
@@ -1998,6 +2023,7 @@ function abrirEditorImagen(file, opts, onDone) {
     const ctx = canvas.getContext('2d');
     const zoomEl = overlay.querySelector('#ieZoom');
     const whiteEl = overlay.querySelector('#ieWhite');
+    const C = LIENZO / 2;
 
     const base = Math.min(LIENZO / img.width, LIENZO / img.height);
     const st = { scale: base, x: (LIENZO - img.width * base) / 2, y: (LIENZO - img.height * base) / 2 };
@@ -2011,22 +2037,55 @@ function abrirEditorImagen(file, opts, onDone) {
       context.putImageData(d, 0, 0);
     }
 
+    // Dibuja guías verdes cuando la imagen está centrada (como en Word)
+    function ejes() {
+      const cx = st.x + img.width * st.scale / 2;
+      const cy = st.y + img.height * st.scale / 2;
+      ctx.save();
+      ctx.strokeStyle = '#19b36b'; ctx.lineWidth = 1;
+      if (Math.abs(cx - C) < 1.5) { ctx.beginPath(); ctx.moveTo(C, 0); ctx.lineTo(C, LIENZO); ctx.stroke(); }
+      if (Math.abs(cy - C) < 1.5) { ctx.beginPath(); ctx.moveTo(0, C); ctx.lineTo(LIENZO, C); ctx.stroke(); }
+      ctx.restore();
+    }
+
     function pintar() {
       ctx.clearRect(0, 0, LIENZO, LIENZO);
       ctx.drawImage(img, st.x, st.y, img.width * st.scale, img.height * st.scale);
       if (whiteEl.checked) quitarBlanco(ctx, LIENZO);
+      ejes();
     }
     pintar();
 
+    // Imán hacia el centro
+    function imantar() {
+      const SNAP = 8;
+      const cx = st.x + img.width * st.scale / 2;
+      const cy = st.y + img.height * st.scale / 2;
+      if (Math.abs(cx - C) < SNAP) st.x = C - img.width * st.scale / 2;
+      if (Math.abs(cy - C) < SNAP) st.y = C - img.height * st.scale / 2;
+    }
+    function centrar() {
+      st.x = (LIENZO - img.width * st.scale) / 2;
+      st.y = (LIENZO - img.height * st.scale) / 2;
+      pintar();
+    }
+
     zoomEl.oninput = () => {
       const nueva = base * parseFloat(zoomEl.value);
-      const cx = LIENZO / 2, cy = LIENZO / 2;
-      st.x = cx - ((cx - st.x) / st.scale) * nueva;
-      st.y = cy - ((cy - st.y) / st.scale) * nueva;
+      st.x = C - ((C - st.x) / st.scale) * nueva;
+      st.y = C - ((C - st.y) / st.scale) * nueva;
       st.scale = nueva;
       pintar();
     };
     whiteEl.onchange = pintar;
+
+    overlay.querySelectorAll('[data-nudge]').forEach(b => b.onclick = () => {
+      const d = b.dataset.nudge, S = 6;
+      if (d === 'up') st.y -= S; else if (d === 'down') st.y += S;
+      else if (d === 'left') st.x -= S; else if (d === 'right') st.x += S;
+      else if (d === 'center') return centrar();
+      imantar(); pintar();
+    });
 
     let drag = false, px = 0, py = 0;
     const down = e => { drag = true; const t = e.touches ? e.touches[0] : e; px = t.clientX; py = t.clientY; };
@@ -2034,7 +2093,7 @@ function abrirEditorImagen(file, opts, onDone) {
       if (!drag) return;
       const t = e.touches ? e.touches[0] : e;
       st.x += t.clientX - px; st.y += t.clientY - py; px = t.clientX; py = t.clientY;
-      pintar(); if (e.cancelable) e.preventDefault();
+      imantar(); pintar(); if (e.cancelable) e.preventDefault();
     };
     const up = () => { drag = false; };
     canvas.addEventListener('mousedown', down); window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
@@ -2057,6 +2116,25 @@ function abrirEditorImagen(file, opts, onDone) {
       if (typeof onDone === 'function') onDone(url);
     };
   }
+}
+
+// Vista previa en grande de un logo o sello, con opción de descargar a tamaño completo.
+function verImagenGrande(src, titulo, nombreArchivo) {
+  if (!src) { toast('No hay imagen para mostrar.', 'error'); return; }
+  const o = document.createElement('div');
+  o.className = 'img-editor';
+  o.innerHTML = `
+    <div class="img-editor__panel" style="width:540px;max-width:100%">
+      <h3>${esc(titulo || 'Vista previa')}</h3>
+      <div class="big-preview"><img src="${src}" alt="${esc(titulo || '')}"></div>
+      <div class="img-editor__actions">
+        <a class="btn btn--ghost" href="${src}" download="${esc(nombreArchivo || 'imagen')}">Descargar</a>
+        <button class="btn btn--primary" id="bpClose" type="button">Cerrar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(o);
+  o.querySelector('#bpClose').onclick = () => o.remove();
+  o.onclick = e => { if (e.target === o) o.remove(); };
 }
 
 // Aplica el logo elegido en todo el panel (inyecta un estilo que sobreescribe

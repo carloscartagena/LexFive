@@ -418,12 +418,12 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
     padding: 16px;
 }
 .img-editor__panel {
-    background: #fff; border-radius: 14px; padding: 22px; width: 360px; max-width: 100%;
+    background: #fff; border-radius: 14px; padding: 22px; width: 392px; max-width: 100%;
     box-shadow: 0 18px 50px rgba(0,0,0,.35);
 }
 .img-editor__panel h3 { font-family: var(--font-serif, Georgia, serif); color: var(--navy, #0e1b2c); margin: 0 0 6px; }
 .img-editor__stage {
-    width: 300px; height: 300px; margin: 12px auto; border-radius: 10px; overflow: hidden;
+    width: 340px; max-width: 100%; height: 340px; margin: 12px auto; border-radius: 10px; overflow: hidden;
     background-color: #eee;
     background-image: linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);
     background-size: 18px 18px; background-position: 0 0,0 9px,9px -9px,-9px 0;
@@ -434,6 +434,37 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .img-editor__zoom input { flex: 1; }
 .img-editor__chk { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted, #5c6675); margin-bottom: 14px; }
 .img-editor__actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Flechas para mover / centrar la imagen (estilo Word) */
+.img-editor__nudge { display: grid; grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 36px); justify-content: center; gap: 5px; margin: 4px 0 8px; }
+.img-editor__nudge button {
+    border: 1px solid var(--line, #e6e8ec); background: #fff; border-radius: 8px;
+    cursor: pointer; font-size: 13px; color: var(--navy, #0e1b2c); line-height: 1;
+    display: flex; align-items: center; justify-content: center; transition: border-color .12s, background .12s;
+}
+.img-editor__nudge button:hover { border-color: var(--gold, #c2a25a); background: #faf6ec; }
+.img-editor__nudge .n-center { color: var(--gold-dark, #a8853c); font-size: 16px; }
+.n-up { grid-area: 1 / 2; } .n-left { grid-area: 2 / 1; } .n-center { grid-area: 2 / 2; } .n-right { grid-area: 2 / 3; } .n-down { grid-area: 3 / 2; }
+
+/* Vista previa en grande */
+.big-preview {
+    margin: 12px auto; border-radius: 10px; min-height: 320px; padding: 16px;
+    display: flex; align-items: center; justify-content: center;
+    background-color: #eee;
+    background-image: linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);
+    background-size: 22px 22px; background-position: 0 0,0 11px,11px -11px,-11px 0;
+}
+.big-preview img { max-width: 100%; max-height: 460px; object-fit: contain; }
+
+/* Vista del logo en la tarjeta del panel */
+.brand-preview { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 14px; }
+.brand-preview__img {
+    width: 120px; height: 120px; object-fit: contain; border-radius: 10px; padding: 6px;
+    background-color: #f4f5f7;
+    background-image: linear-gradient(45deg,#e7e9ed 25%,transparent 25%),linear-gradient(-45deg,#e7e9ed 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e7e9ed 75%),linear-gradient(-45deg,transparent 75%,#e7e9ed 75%);
+    background-size: 16px 16px; background-position: 0 0,0 8px,8px -8px,-8px 0;
+}
+.brand-preview__side { flex: 1; min-width: 180px; }
 
 /* Botón para subir un logo o sello propio */
 .logo-upload {
