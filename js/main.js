@@ -9,17 +9,35 @@
         /* ---------- Logo elegido por el bufete (si se seleccionó uno) ---------- */
         try {
             var LOGOS_VALIDOS = ['ds1-balanza-codigo', 'ds2-L5-circuito', 'ds3-mazo-pulso', 'ds4-columna-circuito', 'ds5-balanza-chip', 'opcion-6-LF-circuito'];
-            var logoElegido = localStorage.getItem('lexfive_logo');
-            var logoUrl = '';
-            if (logoElegido === 'custom') {
-                logoUrl = localStorage.getItem('lexfive_logo_custom') || '';
-            } else if (logoElegido && LOGOS_VALIDOS.indexOf(logoElegido) !== -1) {
-                logoUrl = 'assets/logos/' + logoElegido + '.svg';
-            }
-            if (logoUrl) {
+            var aplicarMarca = function (url) {
+                if (!url) return;
                 var st = document.createElement('style');
-                st.textContent = '.logo__mark{background-image:url(' + logoUrl + ')!important;}';
+                st.textContent = '.logo__mark{background-image:url(' + url + ')!important;}';
                 document.head.appendChild(st);
+            };
+            var obtenerLogoIDB = function () {
+                return new Promise(function (res) {
+                    try {
+                        var r = indexedDB.open('lexfive_media', 1);
+                        r.onupgradeneeded = function () { if (!r.result.objectStoreNames.contains('img')) r.result.createObjectStore('img'); };
+                        r.onsuccess = function () {
+                            try {
+                                var rq = r.result.transaction('img').objectStore('img').get('logo');
+                                rq.onsuccess = function () { res(rq.result || ''); };
+                                rq.onerror = function () { res(''); };
+                            } catch (e) { res(''); }
+                        };
+                        r.onerror = function () { res(''); };
+                    } catch (e) { res(''); }
+                });
+            };
+            var logoElegido = localStorage.getItem('lexfive_logo');
+            if (logoElegido === 'custom') {
+                var ls = localStorage.getItem('lexfive_logo_custom');
+                if (ls && ls.indexOf('data:') === 0) aplicarMarca(ls);
+                else obtenerLogoIDB().then(aplicarMarca);
+            } else if (logoElegido && LOGOS_VALIDOS.indexOf(logoElegido) !== -1) {
+                aplicarMarca('assets/logos/' + logoElegido + '.svg');
             }
         } catch (e) {}
 

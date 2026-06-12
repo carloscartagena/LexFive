@@ -175,6 +175,71 @@ const Draft = {
   clear(name) { try { localStorage.removeItem(this.key(name)); } catch (e) {} }
 };
 
+// ============================================================
+//  Almacén de imágenes del bufete (logo y sello) en IndexedDB.
+//  Antes se guardaban en localStorage, pero las imágenes en base64
+//  son grandes y llenaban el cupo (~5MB), lo que hacía que el
+//  autoguardado de la credencial fallara y se perdieran datos.
+//  IndexedDB tiene mucho más espacio y resuelve ese problema.
+// ============================================================
+const ImgDB = {
+  _p: null,
+  _open() {
+    if (this._p) return this._p;
+    this._p = new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open('lexfive_media', 1);
+        r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains('img')) r.result.createObjectStore('img'); };
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      } catch (e) { rej(e); }
+    });
+    return this._p;
+  },
+  async get(k) { try { const db = await this._open(); return await new Promise(res => { const rq = db.transaction('img').objectStore('img').get(k); rq.onsuccess = () => res(rq.result || null); rq.onerror = () => res(null); }); } catch (e) { return null; } },
+  async set(k, v) { const db = await this._open(); return new Promise((res, rej) => { const tx = db.transaction('img', 'readwrite'); tx.objectStore('img').put(v, k); tx.oncomplete = () => res(true); tx.onerror = () => rej(tx.error); }); },
+  async del(k) { try { const db = await this._open(); return await new Promise(res => { const tx = db.transaction('img', 'readwrite'); tx.objectStore('img').delete(k); tx.oncomplete = () => res(true); tx.onerror = () => res(false); }); } catch (e) { return false; } }
+};
+
+// Caché sincrónica de las imágenes para que el render no tenga que esperar.
+const IMG = { logo: null, sello: null, loaded: false };
+
+async function ensureImgCache() {
+  if (IMG.loaded) return;
+  // Migración: versiones anteriores guardaban la imagen (data URL) en localStorage.
+  try {
+    const ol = localStorage.getItem('lexfive_logo_custom');
+    if (ol && ol.indexOf('data:') === 0) { try { await ImgDB.set('logo', ol); localStorage.setItem('lexfive_logo_custom', '1'); } catch (e) {} }
+    const os = localStorage.getItem('lexfive_sello_custom');
+    if (os && os.indexOf('data:') === 0) { try { await ImgDB.set('sello', os); localStorage.setItem('lexfive_sello_custom', '1'); } catch (e) {} }
+  } catch (e) {}
+  IMG.logo = await ImgDB.get('logo');
+  IMG.sello = await ImgDB.get('sello');
+  // Respaldo: si quedó un data URL en localStorage (no se pudo migrar), úsalo.
+  if (!IMG.logo) { const ol = localStorage.getItem('lexfive_logo_custom'); if (ol && ol.indexOf('data:') === 0) IMG.logo = ol; }
+  if (!IMG.sello) { const os = localStorage.getItem('lexfive_sello_custom'); if (os && os.indexOf('data:') === 0) IMG.sello = os; }
+  IMG.loaded = true;
+}
+
+// Guarda la imagen del bufete (kind = 'logo' | 'sello'). Devuelve true si lo logró.
+async function guardarImagen(kind, dataUrl) {
+  try {
+    await ImgDB.set(kind, dataUrl);
+    IMG[kind] = dataUrl;
+    localStorage.setItem('lexfive_' + kind + '_custom', '1'); // bandera liviana
+    return true;
+  } catch (e) {
+    try { localStorage.setItem('lexfive_' + kind + '_custom', dataUrl); IMG[kind] = dataUrl; return true; }
+    catch (e2) { return false; }
+  }
+}
+
+function borrarImagen(kind) {
+  IMG[kind] = null;
+  localStorage.removeItem('lexfive_' + kind + '_custom');
+  ImgDB.del(kind);
+}
+
 // Texto amistoso de "hace cuánto" se guardó el borrador
 function draftAgo(ts) {
   if (!ts) return 'hace un momento';
@@ -1555,6 +1620,7 @@ async function deleteConsulta(c) {
 // ============================================================
 async function renderCredenciales() {
   loading();
+  await ensureImgCache();
   const p = state.profile;
   const rolLabel = ROLES[p.rol] || p.rol;
 
@@ -1606,8 +1672,8 @@ async function renderCredenciales() {
   const logosVisibles = LOGOS.filter(l => hiddenLogos.indexOf(l.id) === -1);
   const sellosVisibles = SELLOS.filter(s => hiddenSellos.indexOf(s.id) === -1);
 
-  const customLogo = localStorage.getItem('lexfive_logo_custom');
-  const customSello = localStorage.getItem('lexfive_sello_custom');
+  const customLogo = IMG.logo;
+  const customSello = IMG.sello;
 
   // Elige la opción activa respetando ocultos y la imagen propia
   const pickActive = (saved, custom, visibles, def) => {
@@ -1621,8 +1687,8 @@ async function renderCredenciales() {
   const selloActual = pickActive(localStorage.getItem('lexfive_sello'), customSello, sellosVisibles, SELLO_DEFAULT);
 
   // Devuelven la fuente correcta: archivo del repo o imagen subida por el bufete (data URL)
-  const logoSrc = id => id === 'custom' ? (localStorage.getItem('lexfive_logo_custom') || '') : `../assets/logos/${id}.svg`;
-  const selloSrc = id => id === 'custom' ? (localStorage.getItem('lexfive_sello_custom') || '') : `../assets/sellos/${id}.svg`;
+  const logoSrc = id => id === 'custom' ? (IMG.logo || '') : `../assets/logos/${id}.svg`;
+  const selloSrc = id => id === 'custom' ? (IMG.sello || '') : `../assets/sellos/${id}.svg`;
 
   // Frases sugeridas para el reverso
   const FRASES = [
@@ -1826,15 +1892,14 @@ async function renderCredenciales() {
     if (!f) return;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
     if (f.type === 'image/svg+xml' || ext === 'svg') {
-      leerImagenBufete(f, 'lexfive_logo_custom', 'lexfive_logo', () => { applyLogo('custom'); renderCredenciales(); toast('Logo subido y aplicado.', 'success'); });
+      leerImagenBufete(f, 'logo', () => { applyLogo('custom'); renderCredenciales(); toast('Logo subido y aplicado.', 'success'); });
     } else {
-      abrirEditorImagen(f, { titulo: 'Ajustar logo', salida: 600, quitarBlanco: false }, (pngUrl) => {
-        try {
-          localStorage.setItem('lexfive_logo_custom', pngUrl);
-          localStorage.setItem('lexfive_logo', 'custom');
-          applyLogo('custom'); renderCredenciales();
-          toast('Logo ajustado, convertido a PNG y aplicado.', 'success');
-        } catch (e) { toast('No se pudo guardar (imagen muy pesada). Use un tamaño menor.', 'error'); }
+      abrirEditorImagen(f, { titulo: 'Ajustar logo', salida: 600, quitarBlanco: false }, async (pngUrl) => {
+        const ok = await guardarImagen('logo', pngUrl);
+        if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
+        localStorage.setItem('lexfive_logo', 'custom');
+        applyLogo('custom'); renderCredenciales();
+        toast('Logo ajustado, convertido a PNG y aplicado.', 'success');
       });
     }
   };
@@ -1844,11 +1909,11 @@ async function renderCredenciales() {
     e.stopPropagation();
     const id = b.dataset.delLogo;
     if (!confirm('¿Eliminar este logo de la galería?')) return;
-    if (id === 'custom') localStorage.removeItem('lexfive_logo_custom');
+    if (id === 'custom') borrarImagen('logo');
     else { const arr = readList('lexfive_logos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_logos_hidden', JSON.stringify(arr)); }
     if (localStorage.getItem('lexfive_logo') === id) {
       const vis = LOGOS.filter(l => readList('lexfive_logos_hidden').indexOf(l.id) === -1);
-      const nuevo = pickActive(null, localStorage.getItem('lexfive_logo_custom'), vis, LOGO_DEFAULT);
+      const nuevo = pickActive(null, IMG.logo, vis, LOGO_DEFAULT);
       localStorage.setItem('lexfive_logo', nuevo); applyLogo(nuevo);
     }
     renderCredenciales();
@@ -1905,15 +1970,14 @@ async function renderCredenciales() {
     if (!f) return;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
     if (f.type === 'image/svg+xml' || ext === 'svg') {
-      leerImagenBufete(f, 'lexfive_sello_custom', 'lexfive_sello', () => { renderCredenciales(); toast('Sello subido.', 'success'); });
+      leerImagenBufete(f, 'sello', () => { renderCredenciales(); toast('Sello subido.', 'success'); });
     } else {
-      abrirEditorImagen(f, { titulo: 'Ajustar sello', salida: 1000, quitarBlanco: true }, (pngUrl) => {
-        try {
-          localStorage.setItem('lexfive_sello_custom', pngUrl);
-          localStorage.setItem('lexfive_sello', 'custom');
-          renderCredenciales();
-          toast('Sello ajustado, convertido a PNG y aplicado.', 'success');
-        } catch (e) { toast('No se pudo guardar (imagen muy pesada). Use un tamaño menor.', 'error'); }
+      abrirEditorImagen(f, { titulo: 'Ajustar sello', salida: 1000, quitarBlanco: true }, async (pngUrl) => {
+        const ok = await guardarImagen('sello', pngUrl);
+        if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
+        localStorage.setItem('lexfive_sello', 'custom');
+        renderCredenciales();
+        toast('Sello ajustado, convertido a PNG y aplicado.', 'success');
       });
     }
   };
@@ -1923,11 +1987,11 @@ async function renderCredenciales() {
     e.stopPropagation();
     const id = b.dataset.delSello;
     if (!confirm('¿Eliminar este sello de la galería?')) return;
-    if (id === 'custom') localStorage.removeItem('lexfive_sello_custom');
+    if (id === 'custom') borrarImagen('sello');
     else { const arr = readList('lexfive_sellos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(arr)); }
     if (localStorage.getItem('lexfive_sello') === id) {
       const vis = SELLOS.filter(s => readList('lexfive_sellos_hidden').indexOf(s.id) === -1);
-      localStorage.setItem('lexfive_sello', pickActive(null, localStorage.getItem('lexfive_sello_custom'), vis, SELLO_DEFAULT));
+      localStorage.setItem('lexfive_sello', pickActive(null, IMG.sello, vis, SELLO_DEFAULT));
     }
     renderCredenciales();
     toast('Sello eliminado de la galería.', 'success');
@@ -1946,8 +2010,8 @@ async function renderCredenciales() {
   };
 }
 
-// Lee una imagen subida por el bufete (logo o sello), la valida y la guarda en este equipo.
-function leerImagenBufete(file, storeKey, selKey, done) {
+// Lee una imagen subida por el bufete (kind = 'logo' | 'sello'), la valida y la guarda.
+function leerImagenBufete(file, kind, done) {
   const ext = (file.name.split('.').pop() || '').toLowerCase();
   const tiposOk = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/webp'];
   const extOk = ['svg', 'png', 'jpg', 'jpeg', 'webp'].includes(ext);
@@ -1955,19 +2019,16 @@ function leerImagenBufete(file, storeKey, selKey, done) {
     toast('Formato no válido. Use SVG o PNG (de preferencia con fondo transparente).', 'error');
     return;
   }
-  if (file.size > 1.5 * 1024 * 1024) {
-    toast('La imagen pesa demasiado (máx. 1.5 MB). Exporte una versión más liviana.', 'error');
+  if (file.size > 2 * 1024 * 1024) {
+    toast('La imagen pesa demasiado (máx. 2 MB). Exporte una versión más liviana.', 'error');
     return;
   }
   const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      localStorage.setItem(storeKey, reader.result);
-      localStorage.setItem(selKey, 'custom');
-      if (typeof done === 'function') done();
-    } catch (e) {
-      toast('No se pudo guardar (espacio insuficiente en el navegador). Use una imagen más liviana.', 'error');
-    }
+  reader.onload = async () => {
+    const ok = await guardarImagen(kind, reader.result);
+    if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
+    localStorage.setItem('lexfive_' + kind, 'custom');
+    if (typeof done === 'function') done();
   };
   reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
   reader.readAsDataURL(file);
@@ -2142,7 +2203,7 @@ function verImagenGrande(src, titulo, nombreArchivo) {
 function applyLogo(id) {
   let st = document.getElementById('lexfiveLogoStyle');
   if (!st) { st = document.createElement('style'); st.id = 'lexfiveLogoStyle'; document.head.appendChild(st); }
-  const url = id === 'custom' ? (localStorage.getItem('lexfive_logo_custom') || '') : `../../assets/logos/${id}.svg`;
+  const url = id === 'custom' ? (IMG.logo || '') : `../../assets/logos/${id}.svg`;
   st.textContent = `.logo__mark{background-image:url(${url})!important;}`;
 }
 
