@@ -1675,6 +1675,7 @@ async function renderCredenciales() {
     telOficina: saved.telOficina || '',
     emision: saved.emision || hoyISO(),
     validez: saved.validez || '',
+    qr: saved.qr || '',
     frase: saved.frase || '',
     representacion: saved.representacion || REPRE_DEFAULT
   };
@@ -1830,7 +1831,15 @@ async function renderCredenciales() {
         </div>
         <div class="field-row">
           <div class="field"><label>Válido hasta (automático · 3 años)</label><input id="cr_validez_view" type="text" readonly value="" style="background:#f4f5f7;font-weight:600"></div>
-          <div class="field"></div>
+          <div class="field">
+            <label>QR de certificación (abogado)</label>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="btn btn--ghost btn--sm" id="btnUploadQR" type="button">Subir mi QR</button>
+              ${datos.qr ? '<button class="btn btn--ghost btn--sm" id="btnRemoveQR" type="button">Quitar</button>' : ''}
+              ${datos.qr ? '<img src="' + datos.qr + '" alt="QR" style="width:36px;height:36px;border-radius:4px;border:1px solid #e6e8ec">' : '<span class="cell-sub">Suba la imagen del QR de su certificación</span>'}
+            </div>
+            <input type="file" id="fileQR" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
+          </div>
         </div>
         <div class="field"><label>Frase del bufete (reverso)</label>
           <input id="cr_frase" value="${esc(datos.frase)}" placeholder="Escríbala o elija una sugerencia" list="fraseList">
@@ -1868,6 +1877,7 @@ async function renderCredenciales() {
         </div>
         <div class="cred-foot">
           <div><span>Emisión</span><strong id="cv_emision">${esc(fmtFechaCorta(datos.emision))}</strong></div>
+          <div class="cred-foot__qr">${datos.qr ? '<img id="cv_qr_cert" src="' + datos.qr + '" alt="QR certificación" class="cred-qr-cert">' : ''}</div>
           <div><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong></div>
         </div>
       </div>
@@ -1978,13 +1988,39 @@ async function renderCredenciales() {
     Draft.save('credencial', {
       nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'),
       telPersonal: v('cr_telpers'), telOficina: v('cr_teloff'),
-      emision: emi, validez: val,
+      emision: emi, validez: val, qr: datos.qr || '',
       frase: v('cr_frase'), representacion: v('cr_repre')
     });
   };
   ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_frase', 'cr_repre']
     .forEach(id => { const el = $('#' + id); if (el) { el.addEventListener('input', sync); el.addEventListener('change', sync); } });
   sync();
+
+  // Subir QR de certificación
+  const fileQR = $('#fileQR');
+  const btnUploadQR = $('#btnUploadQR');
+  if (btnUploadQR) btnUploadQR.onclick = () => fileQR.click();
+  if (fileQR) fileQR.onchange = () => {
+    const f = fileQR.files && fileQR.files[0];
+    fileQR.value = '';
+    if (!f) return;
+    if (f.size > 500 * 1024) { toast('La imagen del QR es muy grande (máx. 500 KB).', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      datos.qr = reader.result;
+      Draft.save('credencial', { nombre: datos.nombre, cargo: datos.cargo, ci: datos.ci, telPersonal: datos.telPersonal, telOficina: datos.telOficina, emision: datos.emision, validez: datos.validez, qr: datos.qr, frase: datos.frase, representacion: datos.representacion });
+      renderCredenciales();
+      toast('QR de certificación agregado a la credencial.', 'success');
+    };
+    reader.readAsDataURL(f);
+  };
+  const btnRemoveQR = $('#btnRemoveQR');
+  if (btnRemoveQR) btnRemoveQR.onclick = () => {
+    datos.qr = '';
+    Draft.save('credencial', { nombre: datos.nombre, cargo: datos.cargo, ci: datos.ci, telPersonal: datos.telPersonal, telOficina: datos.telOficina, emision: datos.emision, validez: datos.validez, qr: '', frase: datos.frase, representacion: datos.representacion });
+    renderCredenciales();
+    toast('QR de certificación eliminado.', 'success');
+  };
 
   // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
   let selloElegido = selloActual;

@@ -361,7 +361,9 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-data { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
 .cred-row span { display: block; font-size: .5rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted, #5c6675); }
 .cred-row strong { display: block; font-size: .78rem; color: var(--ink, #1a2330); word-break: break-word; line-height: 1.18; }
-.cred-foot { display: flex; justify-content: space-between; gap: 10px; padding: 6px 12px 9px; border-top: 1px solid #e6e8ec; }
+.cred-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 12px 9px; border-top: 1px solid #e6e8ec; }
+.cred-foot__qr { flex: 0 0 auto; }
+.cred-qr-cert { width: 42px; height: 42px; display: block; object-fit: contain; }
 .cred-foot span { display: block; font-size: .48rem; text-transform: uppercase; letter-spacing: .8px; color: var(--muted, #5c6675); }
 .cred-foot strong { font-size: .66rem; color: var(--ink, #1a2330); }
 

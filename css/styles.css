@@ -130,7 +130,10 @@ ul { list-style: none; }
 .logo__mark {
     display: block;
     width: 46px; height: 46px;
-    background: url(../assets/logo-emblem.svg) center / contain no-repeat;
+    background-image: url(../assets/logo-emblem.svg);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
     border-radius: 6px;
     font-size: 0; /* oculta el texto "L5" de respaldo */
     flex-shrink: 0;
