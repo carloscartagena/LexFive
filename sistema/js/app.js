@@ -73,6 +73,15 @@ function fmtFechaCorta(iso) {
   const p = String(iso || '').split('-');
   return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : (iso || '');
 }
+// Genera la URL de un código QR (servicio público) a partir de un texto.
+function qrURL(texto) {
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=0&qzone=1&data=' + encodeURIComponent(texto || 'LexFive');
+}
+// Texto que codifica el QR de la credencial (datos de verificación).
+function qrTexto(d) {
+  d = d || {};
+  return 'LexFive Abogados\nNombre: ' + (d.nombre || '') + '\nCI: ' + (d.ci || '') + '\nValido hasta: ' + fmtFechaCorta(addAnios(d.emision, 3));
+}
 // Resalta en negrita las palabras/cláusulas importantes del texto legal del reverso.
 function resaltarRepre(txt) {
   let s = esc(txt || '');
@@ -1809,7 +1818,7 @@ async function renderCredenciales() {
       <div class="card__body">
         <div class="field-row">
           <div class="field"><label>Nombre completo</label><input id="cr_nombre" value="${esc(datos.nombre)}" placeholder="Escriba el nombre y apellido"></div>
-          <div class="field"><label>Cargo</label><input id="cr_cargo" value="${esc(datos.cargo)}" placeholder="Ej: Director / Abogado"></div>
+          <div class="field"><label>Cargo / rol (aparece solo en la banda superior)</label><input id="cr_cargo" value="${esc(datos.cargo)}" placeholder="Ej: Procurador / Abogado"></div>
         </div>
         <div class="field-row">
           <div class="field"><label>Carnet de identidad</label><input id="cr_ci" value="${esc(datos.ci)}" placeholder="Ej: 6813383 L.P."></div>
@@ -1847,10 +1856,12 @@ async function renderCredenciales() {
         </div>
         <div class="cred-band">CREDENCIAL &middot; <span id="cv_cargo_band">${esc(datos.cargo || '')}</span></div>
         <div class="cred-body">
-          <div class="cred-photo" id="cv_foto">${esc(initials(datos.nombre) || '')}</div>
+          <div class="cred-photo-col">
+            <div class="cred-photo" id="cv_foto">${esc(initials(datos.nombre) || '')}</div>
+            <img class="cred-qr" id="cv_qr" src="${qrURL(qrTexto(datos))}" alt="Código QR de verificación">
+          </div>
           <div class="cred-data">
             <div class="cred-row"><span>Nombre</span><strong id="cv_nombre">${esc(datos.nombre || '')}</strong></div>
-            <div class="cred-row"><span>Cargo</span><strong id="cv_cargo">${esc(datos.cargo || '')}</strong></div>
             <div class="cred-row"><span>Carnet de identidad</span><strong id="cv_ci">${esc(datos.ci || '')}</strong></div>
             <div class="cred-row"><span>Tel. personal / oficina</span><strong id="cv_tel">${esc([datos.telPersonal, datos.telOficina].filter(Boolean).join('  /  '))}</strong></div>
           </div>
@@ -1951,12 +1962,13 @@ async function renderCredenciales() {
   const sync = () => {
     const v = id => ($('#' + id).value || '').trim();
     $('#cv_nombre').textContent = v('cr_nombre');
-    $('#cv_cargo').textContent = v('cr_cargo');
     $('#cv_cargo_band').textContent = v('cr_cargo');
     $('#cv_ci').textContent = v('cr_ci');
     $('#cv_tel').textContent = [v('cr_telpers'), v('cr_teloff')].filter(Boolean).join('  /  ');
     const emi = v('cr_emision') || hoyISO();
     const val = addAnios(emi, 3);
+    const cvqr = $('#cv_qr');
+    if (cvqr) cvqr.src = qrURL('LexFive Abogados\nNombre: ' + v('cr_nombre') + '\nCI: ' + v('cr_ci') + '\nValido hasta: ' + fmtFechaCorta(val));
     $('#cv_emision').textContent = fmtFechaCorta(emi);
     $('#cv_validez').textContent = fmtFechaCorta(val);
     const vv = $('#cr_validez_view'); if (vv) vv.value = fmtFechaCorta(val);

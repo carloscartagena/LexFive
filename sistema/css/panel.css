@@ -333,7 +333,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
    ============================================================ */
 .cred-wrap { display: flex; flex-wrap: wrap; gap: 22px; margin: 4px 0 18px; }
 .cred-card {
-    width: 8.6cm; height: 6.5cm; box-sizing: border-box;
+    width: 8.6cm; height: 6.7cm; box-sizing: border-box;
     background: #ffffff; color: var(--ink, #1a2330);
     border-radius: 10px; overflow: hidden;
     box-shadow: 0 10px 30px rgba(14,27,44,.18);
@@ -347,16 +347,18 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-band {
     background: var(--navy, #0e1b2c); color: var(--gold-light, #e7d3a1);
     font-weight: 700; font-size: .6rem; letter-spacing: 1px; text-transform: uppercase;
-    padding: 4px 12px;
+    padding: 4px 12px; text-align: center;
 }
-.cred-body { display: flex; gap: 10px; padding: 9px 12px; flex: 1; }
+.cred-body { display: flex; gap: 10px; padding: 9px 12px; flex: 1; align-items: flex-start; }
+.cred-photo-col { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
 .cred-photo {
-    width: 58px; height: 70px; flex-shrink: 0; border-radius: 6px;
+    width: 54px; height: 60px; flex-shrink: 0; border-radius: 6px;
     background: #f4f5f7; border: 1.5px solid var(--gold, #c2a25a);
     display: grid; place-items: center; font-family: var(--font-serif, Georgia, serif);
-    font-size: 1.5rem; font-weight: 700; color: var(--navy, #0e1b2c);
+    font-size: 1.4rem; font-weight: 700; color: var(--navy, #0e1b2c);
 }
-.cred-data { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.cred-qr { width: 54px; height: 54px; display: block; }
+.cred-data { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
 .cred-row span { display: block; font-size: .5rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted, #5c6675); }
 .cred-row strong { display: block; font-size: .78rem; color: var(--ink, #1a2330); word-break: break-word; line-height: 1.18; }
 .cred-foot { display: flex; justify-content: space-between; gap: 10px; padding: 6px 12px 9px; border-top: 1px solid #e6e8ec; }
@@ -364,7 +366,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-foot strong { font-size: .66rem; color: var(--ink, #1a2330); }
 
 /* Reverso (también fondo blanco para que se vea el sello y la firma) */
-.cred-card--back { padding-bottom: 0; height: auto; min-height: 6.5cm; }
+.cred-card--back { padding-bottom: 0; height: auto; min-height: 6.7cm; }
 .cred-cert { font-size: .53rem; line-height: 1.4; color: var(--ink, #1a2330); padding: 7px 12px 0; text-align: justify; }
 .cred-cert strong { font-weight: 700; color: var(--navy, #0e1b2c); }
 .cred-card--back .cred-cert.cred-frase { color: var(--gold-dark, #a8853c) !important; font-weight: 700; letter-spacing: .3px; padding-top: 4px; text-align: center; font-size: .54rem; }
@@ -373,21 +375,21 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-note { font-size: .44rem; color: var(--muted, #5c6675); padding: 3px 11px 7px; text-align: center; }
 .cred-actions { margin-bottom: 22px; }
 
-@media (max-width: 520px) { .cred-card { width: 100%; height: auto; min-height: 6.5cm; } }
+@media (max-width: 520px) { .cred-card { width: 100%; height: auto; min-height: 6.7cm; } }
 
 /* Impresión: la credencial en papel fotográfico 4x6 pulgadas (10x15 cm).
    Se apilan anverso y reverso para imprimir en una sola hoja y poder recortar. */
-@page { size: 4in 6in; margin: 5mm; }
+@page { size: 4in 6in; margin: 4mm; }
 @media print {
     body * { visibility: hidden; }
     #credPrintArea, #credPrintArea * { visibility: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #credPrintArea {
         position: absolute; left: 0; top: 0; right: 0;
         display: flex; flex-direction: column; align-items: center;
-        gap: 6mm; padding: 2mm 0 0;
+        gap: 4mm; padding: 1mm 0 0;
     }
     #credPrintArea img { display: block !important; }
-    .cred-card { box-shadow: none; border: 1px solid #999; width: 8.6cm; height: 6.5cm; }
+    .cred-card { box-shadow: none; border: 1px solid #999; width: 8.6cm; height: 6.7cm; }
     .cred-card--back { height: auto; min-height: 0; }
 }
 
