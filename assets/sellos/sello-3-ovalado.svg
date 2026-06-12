@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 160" role="img" aria-label="Sello ovalado LexFive Abogados">
+  <defs>
+    <path id="s3Top" d="M 30 80 A 80 56 0 0 1 190 80" fill="none"/>
+    <path id="s3Bottom" d="M 42 80 A 68 46 0 0 0 178 80" fill="none"/>
+  </defs>
+  <g fill="none" stroke="#0e1b2c" stroke-width="2.4">
+    <ellipse cx="110" cy="80" rx="92" ry="68"/>
+    <ellipse cx="110" cy="80" rx="84" ry="60"/>
+  </g>
+  <g fill="#0e1b2c" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text font-size="15" letter-spacing="2.5">
+      <textPath href="#s3Top" startOffset="50%" text-anchor="middle">LEXFIVE · ABOGADOS</textPath>
+    </text>
+    <text font-size="9.5" letter-spacing="1.8">
+      <textPath href="#s3Bottom" startOffset="50%" text-anchor="middle">LA PAZ · EL ALTO — BOLIVIA</textPath>
+    </text>
+  </g>
+  <g fill="#0e1b2c"><circle cx="26" cy="80" r="2.4"/><circle cx="194" cy="80" r="2.4"/></g>
+  <!-- Balanza central compacta -->
+  <g fill="none" stroke="#0e1b2c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M110 52 L110 104"/>
+    <path d="M86 63 L134 63"/>
+    <path d="M86 63 L77 80 M86 63 L95 80"/>
+    <path d="M134 63 L125 80 M134 63 L143 80"/>
+    <path d="M73 80 Q86 95 99 80"/>
+    <path d="M121 80 Q134 95 147 80"/>
+    <path d="M94 104 L126 104"/>
+    <path d="M100 109 L120 109"/>
+  </g>
+  <circle cx="110" cy="50" r="4.2" fill="#0e1b2c"/>
+</svg>
