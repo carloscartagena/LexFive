@@ -341,7 +341,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
     display: flex; flex-direction: column;
 }
 .cred-card__top { display: flex; align-items: center; gap: 9px; padding: 8px 12px 6px; }
-.cred-logo { width: 34px; height: 34px; background: url(../../assets/logo-emblem.svg) center / contain no-repeat; flex-shrink: 0; }
+.cred-logo { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; }
 .cred-org strong { display: block; font-family: var(--font-serif, Georgia, serif); font-size: 1.08rem; line-height: 1; color: var(--navy, #0e1b2c); }
 .cred-org small { display: block; text-transform: uppercase; letter-spacing: 2.5px; font-size: .5rem; color: var(--gold-dark, #a8853c); margin-top: 3px; }
 .cred-band {
@@ -377,8 +377,9 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 /* Impresión: solo la credencial, a tamaño real */
 @media print {
     body * { visibility: hidden; }
-    #credPrintArea, #credPrintArea * { visibility: visible; }
+    #credPrintArea, #credPrintArea * { visibility: visible; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #credPrintArea { position: absolute; left: 0; top: 0; display: flex; gap: 14px; padding: 6px; }
+    #credPrintArea img { display: block !important; }
     .cred-card { box-shadow: none; border: 1px solid #999; width: 8.5cm; height: 6cm; }
 }
 
@@ -392,10 +393,47 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
     transition: border-color .15s, box-shadow .15s, transform .1s;
 }
 .logo-option:hover { border-color: var(--gold, #c2a25a); transform: translateY(-2px); }
+.logo-option { position: relative; }
 .logo-option img { width: 56px; height: 56px; object-fit: contain; }
 .logo-option span { font-size: .68rem; text-align: center; color: var(--muted, #5c6675); line-height: 1.25; }
 .logo-option.is-selected { border-color: var(--gold, #c2a25a); box-shadow: 0 0 0 2px var(--gold-light, #e7d3a1); }
 .logo-option.is-selected span { color: var(--navy, #0e1b2c); font-weight: 600; }
+
+/* Botón ✕ para eliminar un modelo de la galería */
+.tile-del {
+    position: absolute; top: -8px; right: -8px;
+    width: 22px; height: 22px; border-radius: 50%;
+    border: none; background: #c0392b; color: #fff;
+    font-size: 15px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25); opacity: 0; transition: opacity .15s;
+}
+.logo-option:hover .tile-del { opacity: 1; }
+.tile-del:hover { background: #a5281b; }
+
+/* Editor de imagen (recortar / redimensionar logo o sello) */
+.img-editor {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(14,27,44,.62); display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+}
+.img-editor__panel {
+    background: #fff; border-radius: 14px; padding: 22px; width: 360px; max-width: 100%;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+}
+.img-editor__panel h3 { font-family: var(--font-serif, Georgia, serif); color: var(--navy, #0e1b2c); margin: 0 0 6px; }
+.img-editor__stage {
+    width: 300px; height: 300px; margin: 12px auto; border-radius: 10px; overflow: hidden;
+    background-color: #eee;
+    background-image: linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);
+    background-size: 18px 18px; background-position: 0 0,0 9px,9px -9px,-9px 0;
+}
+.img-editor__stage canvas { display: block; cursor: grab; touch-action: none; }
+.img-editor__stage canvas:active { cursor: grabbing; }
+.img-editor__zoom { display: flex; align-items: center; gap: 10px; font-size: .82rem; color: var(--navy, #0e1b2c); margin: 6px 0; }
+.img-editor__zoom input { flex: 1; }
+.img-editor__chk { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted, #5c6675); margin-bottom: 14px; }
+.img-editor__actions { display: flex; justify-content: flex-end; gap: 10px; }
 
 /* Botón para subir un logo o sello propio */
 .logo-upload {

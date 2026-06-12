@@ -1588,10 +1588,6 @@ async function renderCredenciales() {
     { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' }
   ];
   const LOGO_DEFAULT = 'ds1-balanza-codigo';
-  const customLogo = localStorage.getItem('lexfive_logo_custom');
-  const logoGuardado = localStorage.getItem('lexfive_logo');
-  const logoActual = (logoGuardado === 'custom' && customLogo) ? 'custom'
-    : (LOGOS.some(l => l.id === logoGuardado) ? logoGuardado : LOGO_DEFAULT);
 
   // Opciones de sello para el bufete (memoriales y documentos)
   const SELLOS = [
@@ -1602,10 +1598,27 @@ async function renderCredenciales() {
     { id: 'sello-5-columnas', nombre: 'Templo de justicia' }
   ];
   const SELLO_DEFAULT = 'sello-1-clasico';
+
+  // Modelos ocultos (eliminados de la galería por el bufete)
+  const readList = k => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
+  const hiddenLogos = readList('lexfive_logos_hidden');
+  const hiddenSellos = readList('lexfive_sellos_hidden');
+  const logosVisibles = LOGOS.filter(l => hiddenLogos.indexOf(l.id) === -1);
+  const sellosVisibles = SELLOS.filter(s => hiddenSellos.indexOf(s.id) === -1);
+
+  const customLogo = localStorage.getItem('lexfive_logo_custom');
   const customSello = localStorage.getItem('lexfive_sello_custom');
-  const selloGuardado = localStorage.getItem('lexfive_sello');
-  const selloActual = (selloGuardado === 'custom' && customSello) ? 'custom'
-    : (SELLOS.some(s => s.id === selloGuardado) ? selloGuardado : SELLO_DEFAULT);
+
+  // Elige la opción activa respetando ocultos y la imagen propia
+  const pickActive = (saved, custom, visibles, def) => {
+    if (saved === 'custom' && custom) return 'custom';
+    if (visibles.some(x => x.id === saved)) return saved;
+    if (custom) return 'custom';
+    if (visibles.length) return visibles[0].id;
+    return def;
+  };
+  const logoActual = pickActive(localStorage.getItem('lexfive_logo'), customLogo, logosVisibles, LOGO_DEFAULT);
+  const selloActual = pickActive(localStorage.getItem('lexfive_sello'), customSello, sellosVisibles, SELLO_DEFAULT);
 
   // Devuelven la fuente correcta: archivo del repo o imagen subida por el bufete (data URL)
   const logoSrc = id => id === 'custom' ? (localStorage.getItem('lexfive_logo_custom') || '') : `../assets/logos/${id}.svg`;
@@ -1632,50 +1645,54 @@ async function renderCredenciales() {
     <div class="card">
       <div class="card__head"><h3>Logotipo del bufete</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">Elija un modelo o <strong>suba su propio logo</strong>. Se aplicará en toda la página, el panel y la credencial.</p>
+        <p class="cell-sub" style="margin-bottom:12px">Elija un modelo, elimínelo con la <strong>✕</strong>, o <strong>suba su propio logo</strong>. Se aplicará en toda la página, el panel y la credencial.</p>
         <div class="logo-gallery">
-          ${LOGOS.map(l => `
-            <button class="logo-option ${l.id === logoActual ? 'is-selected' : ''}" data-logo="${l.id}">
+          ${logosVisibles.map(l => `
+            <div class="logo-option ${l.id === logoActual ? 'is-selected' : ''}" data-logo="${l.id}">
+              <button class="tile-del" data-del-logo="${l.id}" type="button" title="Eliminar este modelo">&times;</button>
               <img src="../assets/logos/${l.id}.svg" alt="${esc(l.nombre)}">
               <span>${esc(l.nombre)}</span>
-            </button>`).join('')}
+            </div>`).join('')}
           ${customLogo ? `
-            <button class="logo-option ${logoActual === 'custom' ? 'is-selected' : ''}" data-logo="custom">
+            <div class="logo-option ${logoActual === 'custom' ? 'is-selected' : ''}" data-logo="custom">
+              <button class="tile-del" data-del-logo="custom" type="button" title="Quitar mi logo">&times;</button>
               <img src="${customLogo}" alt="Mi logo">
               <span>Mi logo</span>
-            </button>` : ''}
+            </div>` : ''}
           <button class="logo-option logo-upload" id="btnUploadLogo" type="button">
             <span class="logo-upload__plus">+</span>
             <span>Subir mi logo</span>
           </button>
         </div>
         <input type="file" id="fileLogo" accept=".svg,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp" hidden>
-        <p class="cell-sub" style="margin-top:10px">Formato ideal: <strong>SVG</strong> o <strong>PNG con fondo transparente</strong>, cuadrado (1:1), mínimo 1024×1024 px. ${customLogo ? '<button class="btn btn--ghost btn--sm" id="btnRemoveLogo" type="button" style="margin-left:8px">Quitar mi logo</button>' : ''}</p>
+        <p class="cell-sub" style="margin-top:10px">Acepta <strong>SVG</strong> o foto <strong>JPG/PNG</strong>. Si sube una foto podrá <strong>recortarla, ajustar el tamaño y se convertirá a PNG</strong> automáticamente (con opción de quitar el fondo blanco). ${hiddenLogos.length ? '<button class="btn btn--ghost btn--sm" id="btnRestoreLogos" type="button" style="margin-left:8px">Restaurar modelos eliminados</button>' : ''}</p>
       </div>
     </div>
 
     <div class="card">
       <div class="card__head"><h3>Sello del bufete</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">Elija un sello o <strong>suba el suyo</strong>. Puede descargarlo o imprimirlo para usarlo en <strong>memoriales</strong>, documentos y en el reverso de las credenciales.</p>
+        <p class="cell-sub" style="margin-bottom:12px">Elija un sello, elimínelo con la <strong>✕</strong>, o <strong>suba el suyo</strong>. Puede descargarlo o imprimirlo para usarlo en <strong>memoriales</strong>, documentos y en el reverso de las credenciales.</p>
         <div class="logo-gallery">
-          ${SELLOS.map(s => `
-            <button class="logo-option sello-option ${s.id === selloActual ? 'is-selected' : ''}" data-sello="${s.id}">
+          ${sellosVisibles.map(s => `
+            <div class="logo-option sello-option ${s.id === selloActual ? 'is-selected' : ''}" data-sello="${s.id}">
+              <button class="tile-del" data-del-sello="${s.id}" type="button" title="Eliminar este sello">&times;</button>
               <img src="../assets/sellos/${s.id}.svg" alt="${esc(s.nombre)}">
               <span>${esc(s.nombre)}</span>
-            </button>`).join('')}
+            </div>`).join('')}
           ${customSello ? `
-            <button class="logo-option sello-option ${selloActual === 'custom' ? 'is-selected' : ''}" data-sello="custom">
+            <div class="logo-option sello-option ${selloActual === 'custom' ? 'is-selected' : ''}" data-sello="custom">
+              <button class="tile-del" data-del-sello="custom" type="button" title="Quitar mi sello">&times;</button>
               <img src="${customSello}" alt="Mi sello">
               <span>Mi sello</span>
-            </button>` : ''}
+            </div>` : ''}
           <button class="logo-option logo-upload" id="btnUploadSello" type="button">
             <span class="logo-upload__plus">+</span>
             <span>Subir mi sello</span>
           </button>
         </div>
         <input type="file" id="fileSello" accept=".svg,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp" hidden>
-        <p class="cell-sub" style="margin-top:10px">Formato ideal: <strong>SVG</strong> o <strong>PNG con fondo transparente</strong>, cuadrado (1:1), un solo color, alta resolución (2000×2000 px). ${customSello ? '<button class="btn btn--ghost btn--sm" id="btnRemoveSello" type="button" style="margin-left:8px">Quitar mi sello</button>' : ''}</p>
+        <p class="cell-sub" style="margin-top:10px">Acepta <strong>SVG</strong> o foto <strong>JPG/PNG</strong>. Si sube una foto podrá <strong>recortarla, ajustar el tamaño y se convertirá a PNG</strong> (con opción de quitar el fondo blanco). ${hiddenSellos.length ? '<button class="btn btn--ghost btn--sm" id="btnRestoreSellos" type="button" style="margin-left:8px">Restaurar sellos eliminados</button>' : ''}</p>
         <div class="sello-box" style="margin-top:14px">
           <img src="${selloSrc(selloActual)}" alt="Sello LexFive Abogados" class="sello-img" id="selloPreview">
           <div class="sello-actions">
@@ -1721,7 +1738,7 @@ async function renderCredenciales() {
       <!-- ANVERSO -->
       <div class="cred-card">
         <div class="cred-card__top">
-          <span class="cred-logo" id="cv_logo" style="background-image:url(${logoSrc(logoActual)})"></span>
+          <img class="cred-logo" id="cv_logo" src="${logoSrc(logoActual)}" alt="Logo del bufete">
           <div class="cred-org">
             <strong>LexFive</strong>
             <small>Bufete de Abogados</small>
@@ -1774,35 +1791,55 @@ async function renderCredenciales() {
     </div>`;
 
   // Selección de logo: aplica al sistema (se guarda en este equipo)
-  content().querySelectorAll('.logo-option[data-logo]').forEach(btn => btn.onclick = () => {
-    const id = btn.dataset.logo;
+  content().querySelectorAll('.logo-option[data-logo]').forEach(tile => tile.onclick = () => {
+    const id = tile.dataset.logo;
     localStorage.setItem('lexfive_logo', id);
-    content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === btn));
-    $('#cv_logo').style.backgroundImage = `url(${logoSrc(id)})`;
+    content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === tile));
+    const cv = $('#cv_logo'); if (cv) cv.src = logoSrc(id);
     applyLogo(id);
     toast('Logo aplicado. Se usará en todo el sistema.', 'success');
   });
 
-  // Subir mi logo
+  // Subir mi logo (SVG se guarda tal cual; foto JPG/PNG pasa por el editor y se convierte a PNG)
   const fileLogo = $('#fileLogo');
   const btnUploadLogo = $('#btnUploadLogo');
   if (btnUploadLogo) btnUploadLogo.onclick = () => fileLogo.click();
   if (fileLogo) fileLogo.onchange = () => {
     const f = fileLogo.files && fileLogo.files[0];
-    if (f) leerImagenBufete(f, 'lexfive_logo_custom', 'lexfive_logo', () => {
-      applyLogo('custom');
-      renderCredenciales();
-      toast('Logo subido y aplicado en todo el sistema.', 'success');
-    });
+    fileLogo.value = '';
+    if (!f) return;
+    const ext = (f.name.split('.').pop() || '').toLowerCase();
+    if (f.type === 'image/svg+xml' || ext === 'svg') {
+      leerImagenBufete(f, 'lexfive_logo_custom', 'lexfive_logo', () => { applyLogo('custom'); renderCredenciales(); toast('Logo subido y aplicado.', 'success'); });
+    } else {
+      abrirEditorImagen(f, { titulo: 'Ajustar logo', salida: 600, quitarBlanco: false }, (pngUrl) => {
+        try {
+          localStorage.setItem('lexfive_logo_custom', pngUrl);
+          localStorage.setItem('lexfive_logo', 'custom');
+          applyLogo('custom'); renderCredenciales();
+          toast('Logo ajustado, convertido a PNG y aplicado.', 'success');
+        } catch (e) { toast('No se pudo guardar (imagen muy pesada). Use un tamaño menor.', 'error'); }
+      });
+    }
   };
-  const btnRemoveLogo = $('#btnRemoveLogo');
-  if (btnRemoveLogo) btnRemoveLogo.onclick = () => {
-    localStorage.removeItem('lexfive_logo_custom');
-    if (localStorage.getItem('lexfive_logo') === 'custom') localStorage.setItem('lexfive_logo', LOGO_DEFAULT);
-    applyLogo(localStorage.getItem('lexfive_logo') || LOGO_DEFAULT);
+
+  // Eliminar / restaurar logos
+  content().querySelectorAll('[data-del-logo]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const id = b.dataset.delLogo;
+    if (!confirm('¿Eliminar este logo de la galería?')) return;
+    if (id === 'custom') localStorage.removeItem('lexfive_logo_custom');
+    else { const arr = readList('lexfive_logos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_logos_hidden', JSON.stringify(arr)); }
+    if (localStorage.getItem('lexfive_logo') === id) {
+      const vis = LOGOS.filter(l => readList('lexfive_logos_hidden').indexOf(l.id) === -1);
+      const nuevo = pickActive(null, localStorage.getItem('lexfive_logo_custom'), vis, LOGO_DEFAULT);
+      localStorage.setItem('lexfive_logo', nuevo); applyLogo(nuevo);
+    }
     renderCredenciales();
-    toast('Se quitó su logo. Se restauró el modelo por defecto.', 'success');
-  };
+    toast('Logo eliminado de la galería.', 'success');
+  });
+  const btnRestoreLogos = $('#btnRestoreLogos');
+  if (btnRestoreLogos) btnRestoreLogos.onclick = () => { localStorage.removeItem('lexfive_logos_hidden'); renderCredenciales(); toast('Modelos de logo restaurados.', 'success'); };
 
   // Enlazar los campos con la credencial en vivo + autoguardado
   const sync = () => {
@@ -1830,40 +1867,63 @@ async function renderCredenciales() {
 
   // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
   let selloElegido = selloActual;
-  content().querySelectorAll('.sello-option[data-sello]').forEach(btn => btn.onclick = () => {
-    const id = btn.dataset.sello;
+  content().querySelectorAll('.sello-option[data-sello]').forEach(tile => tile.onclick = () => {
+    const id = tile.dataset.sello;
     selloElegido = id;
     localStorage.setItem('lexfive_sello', id);
-    content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === btn));
+    content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const prev = $('#selloPreview'); if (prev) prev.src = selloSrc(id);
     const dl = $('#selloDownload'); if (dl) dl.href = selloSrc(id);
     toast('Sello seleccionado. Listo para memoriales y documentos.', 'success');
   });
 
-  // Subir mi sello
+  // Subir mi sello (SVG tal cual; foto pasa por el editor y se convierte a PNG)
   const fileSello = $('#fileSello');
   const btnUploadSello = $('#btnUploadSello');
   if (btnUploadSello) btnUploadSello.onclick = () => fileSello.click();
   if (fileSello) fileSello.onchange = () => {
     const f = fileSello.files && fileSello.files[0];
-    if (f) leerImagenBufete(f, 'lexfive_sello_custom', 'lexfive_sello', () => {
-      renderCredenciales();
-      toast('Sello subido. Listo para memoriales y documentos.', 'success');
-    });
+    fileSello.value = '';
+    if (!f) return;
+    const ext = (f.name.split('.').pop() || '').toLowerCase();
+    if (f.type === 'image/svg+xml' || ext === 'svg') {
+      leerImagenBufete(f, 'lexfive_sello_custom', 'lexfive_sello', () => { renderCredenciales(); toast('Sello subido.', 'success'); });
+    } else {
+      abrirEditorImagen(f, { titulo: 'Ajustar sello', salida: 1000, quitarBlanco: true }, (pngUrl) => {
+        try {
+          localStorage.setItem('lexfive_sello_custom', pngUrl);
+          localStorage.setItem('lexfive_sello', 'custom');
+          renderCredenciales();
+          toast('Sello ajustado, convertido a PNG y aplicado.', 'success');
+        } catch (e) { toast('No se pudo guardar (imagen muy pesada). Use un tamaño menor.', 'error'); }
+      });
+    }
   };
-  const btnRemoveSello = $('#btnRemoveSello');
-  if (btnRemoveSello) btnRemoveSello.onclick = () => {
-    localStorage.removeItem('lexfive_sello_custom');
-    if (localStorage.getItem('lexfive_sello') === 'custom') localStorage.setItem('lexfive_sello', SELLO_DEFAULT);
+
+  // Eliminar / restaurar sellos
+  content().querySelectorAll('[data-del-sello]').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const id = b.dataset.delSello;
+    if (!confirm('¿Eliminar este sello de la galería?')) return;
+    if (id === 'custom') localStorage.removeItem('lexfive_sello_custom');
+    else { const arr = readList('lexfive_sellos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(arr)); }
+    if (localStorage.getItem('lexfive_sello') === id) {
+      const vis = SELLOS.filter(s => readList('lexfive_sellos_hidden').indexOf(s.id) === -1);
+      localStorage.setItem('lexfive_sello', pickActive(null, localStorage.getItem('lexfive_sello_custom'), vis, SELLO_DEFAULT));
+    }
     renderCredenciales();
-    toast('Se quitó su sello. Se restauró el sello por defecto.', 'success');
-  };
+    toast('Sello eliminado de la galería.', 'success');
+  });
+  const btnRestoreSellos = $('#btnRestoreSellos');
+  if (btnRestoreSellos) btnRestoreSellos.onclick = () => { localStorage.removeItem('lexfive_sellos_hidden'); renderCredenciales(); toast('Sellos restaurados.', 'success'); };
 
   $('#btnPrintCred').onclick = () => window.print();
   const bps = $('#btnPrintSello');
   if (bps) bps.onclick = () => {
+    const src = selloSrc(selloElegido);
+    const abs = src.indexOf('data:') === 0 ? src : new URL(src, location.href).href;
     const w = window.open('', '_blank');
-    w.document.write('<img src="' + selloSrc(selloElegido) + '" style="width:6cm;height:6cm;object-fit:contain" onload="window.print();window.close()">');
+    w.document.write('<img src="' + abs + '" style="width:6cm;height:6cm;object-fit:contain" onload="window.print();window.close()">');
     w.document.close();
   };
 }
@@ -1893,6 +1953,110 @@ function leerImagenBufete(file, storeKey, selKey, done) {
   };
   reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
   reader.readAsDataURL(file);
+}
+
+// Editor de imagen para logos/sellos: recortar (cuadrado), acercar, opcionalmente quitar
+// el fondo blanco, y exportar en PNG al tamaño exacto que necesita el sistema.
+function abrirEditorImagen(file, opts, onDone) {
+  opts = opts || {};
+  const SALIDA = opts.salida || 600;     // px del PNG final (cuadrado)
+  const LIENZO = 300;                     // px del área de edición
+  if (file.size > 12 * 1024 * 1024) { toast('La foto es muy pesada (máx. 12 MB).', 'error'); return; }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => construir(img);
+    img.onerror = () => toast('No se pudo abrir la imagen.', 'error');
+    img.src = reader.result;
+  };
+  reader.onerror = () => toast('No se pudo leer el archivo.', 'error');
+  reader.readAsDataURL(file);
+
+  function construir(img) {
+    const overlay = document.createElement('div');
+    overlay.className = 'img-editor';
+    overlay.innerHTML = `
+      <div class="img-editor__panel">
+        <h3>${esc(opts.titulo || 'Ajustar imagen')}</h3>
+        <p class="cell-sub">Arrastre la imagen para moverla y use el control para acercar. El recuadro es el recorte final (cuadrado). Se guardará en <strong>PNG ${SALIDA}×${SALIDA}px</strong>.</p>
+        <div class="img-editor__stage">
+          <canvas id="ieCanvas" width="${LIENZO}" height="${LIENZO}"></canvas>
+        </div>
+        <label class="img-editor__zoom">Zoom
+          <input type="range" id="ieZoom" min="1" max="5" step="0.01" value="1">
+        </label>
+        <label class="img-editor__chk"><input type="checkbox" id="ieWhite" ${opts.quitarBlanco ? 'checked' : ''}> Quitar fondo blanco (ideal para fotos JPG)</label>
+        <div class="img-editor__actions">
+          <button class="btn btn--ghost" id="ieCancel" type="button">Cancelar</button>
+          <button class="btn btn--primary" id="ieApply" type="button">Aplicar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const canvas = overlay.querySelector('#ieCanvas');
+    const ctx = canvas.getContext('2d');
+    const zoomEl = overlay.querySelector('#ieZoom');
+    const whiteEl = overlay.querySelector('#ieWhite');
+
+    const base = Math.min(LIENZO / img.width, LIENZO / img.height);
+    const st = { scale: base, x: (LIENZO - img.width * base) / 2, y: (LIENZO - img.height * base) / 2 };
+
+    function quitarBlanco(context, size) {
+      const d = context.getImageData(0, 0, size, size);
+      const p = d.data;
+      for (let i = 0; i < p.length; i += 4) {
+        if (p[i] > 238 && p[i + 1] > 238 && p[i + 2] > 238) p[i + 3] = 0;
+      }
+      context.putImageData(d, 0, 0);
+    }
+
+    function pintar() {
+      ctx.clearRect(0, 0, LIENZO, LIENZO);
+      ctx.drawImage(img, st.x, st.y, img.width * st.scale, img.height * st.scale);
+      if (whiteEl.checked) quitarBlanco(ctx, LIENZO);
+    }
+    pintar();
+
+    zoomEl.oninput = () => {
+      const nueva = base * parseFloat(zoomEl.value);
+      const cx = LIENZO / 2, cy = LIENZO / 2;
+      st.x = cx - ((cx - st.x) / st.scale) * nueva;
+      st.y = cy - ((cy - st.y) / st.scale) * nueva;
+      st.scale = nueva;
+      pintar();
+    };
+    whiteEl.onchange = pintar;
+
+    let drag = false, px = 0, py = 0;
+    const down = e => { drag = true; const t = e.touches ? e.touches[0] : e; px = t.clientX; py = t.clientY; };
+    const move = e => {
+      if (!drag) return;
+      const t = e.touches ? e.touches[0] : e;
+      st.x += t.clientX - px; st.y += t.clientY - py; px = t.clientX; py = t.clientY;
+      pintar(); if (e.cancelable) e.preventDefault();
+    };
+    const up = () => { drag = false; };
+    canvas.addEventListener('mousedown', down); window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+    canvas.addEventListener('touchstart', down, { passive: true }); canvas.addEventListener('touchmove', move, { passive: false }); window.addEventListener('touchend', up);
+
+    function cerrar() {
+      window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); window.removeEventListener('touchend', up);
+      overlay.remove();
+    }
+    overlay.querySelector('#ieCancel').onclick = cerrar;
+    overlay.querySelector('#ieApply').onclick = () => {
+      const out = document.createElement('canvas');
+      out.width = SALIDA; out.height = SALIDA;
+      const octx = out.getContext('2d');
+      const k = SALIDA / LIENZO;
+      octx.drawImage(img, st.x * k, st.y * k, img.width * st.scale * k, img.height * st.scale * k);
+      if (whiteEl.checked) quitarBlanco(octx, SALIDA);
+      const url = out.toDataURL('image/png');
+      cerrar();
+      if (typeof onDone === 'function') onDone(url);
+    };
+  }
 }
 
 // Aplica el logo elegido en todo el panel (inyecta un estilo que sobreescribe
