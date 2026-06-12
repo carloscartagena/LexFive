@@ -1578,15 +1578,29 @@ async function renderCredenciales() {
     representacion: saved.representacion || REPRE_DEFAULT
   };
 
-  // Opciones de logo disponibles para elegir (ámbito jurídico)
+  // Opciones de logo disponibles para elegir (Derecho + Ingeniería en Sistemas)
   const LOGOS = [
-    { id: 'opcion-1-balanza-corchetes', nombre: 'Balanza de la justicia' },
-    { id: 'opcion-2-L5-monograma', nombre: 'Monograma L5 con laureles' },
-    { id: 'opcion-3-balanza-engranaje', nombre: 'Mazo del juez + balanza' },
-    { id: 'opcion-4-columna-circuito', nombre: 'Columnas de justicia' },
-    { id: 'opcion-5-balanza-chip', nombre: 'Balanza + libro de leyes' }
+    { id: 'ds1-balanza-codigo', nombre: 'Balanza + código </>' },
+    { id: 'ds2-L5-circuito', nombre: 'Monograma L5 en circuito' },
+    { id: 'ds3-mazo-pulso', nombre: 'Mazo del juez + señal digital' },
+    { id: 'ds4-columna-circuito', nombre: 'Columnas de justicia + circuito' },
+    { id: 'ds5-balanza-chip', nombre: 'Balanza en microchip' }
   ];
-  const logoActual = localStorage.getItem('lexfive_logo') || 'opcion-1-balanza-corchetes';
+  const LOGO_DEFAULT = 'ds1-balanza-codigo';
+  const logoGuardado = localStorage.getItem('lexfive_logo');
+  const logoActual = LOGOS.some(l => l.id === logoGuardado) ? logoGuardado : LOGO_DEFAULT;
+
+  // Opciones de sello para el bufete (memoriales y documentos)
+  const SELLOS = [
+    { id: 'sello-1-clasico', nombre: 'Clásico — balanza' },
+    { id: 'sello-2-mazo', nombre: 'Mazo del juez' },
+    { id: 'sello-3-ovalado', nombre: 'Ovalado institucional' },
+    { id: 'sello-4-circuito', nombre: 'Derecho & Tecnología' },
+    { id: 'sello-5-columnas', nombre: 'Templo de justicia' }
+  ];
+  const SELLO_DEFAULT = 'sello-1-clasico';
+  const selloGuardado = localStorage.getItem('lexfive_sello');
+  const selloActual = SELLOS.some(s => s.id === selloGuardado) ? selloGuardado : SELLO_DEFAULT;
 
   // Frases sugeridas para el reverso
   const FRASES = [
@@ -1623,11 +1637,18 @@ async function renderCredenciales() {
     <div class="card">
       <div class="card__head"><h3>Sello del bufete</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">Sello oficial de LexFive Abogados. Puede descargarlo o imprimirlo para usarlo en documentos y en el reverso de las credenciales.</p>
-        <div class="sello-box">
-          <img src="../assets/sello-lexfive.svg" alt="Sello LexFive Abogados" class="sello-img">
+        <p class="cell-sub" style="margin-bottom:12px">Elija el sello oficial de LexFive Abogados. Puede descargarlo o imprimirlo para usarlo en <strong>memoriales</strong>, documentos y en el reverso de las credenciales.</p>
+        <div class="logo-gallery">
+          ${SELLOS.map(s => `
+            <button class="logo-option sello-option ${s.id === selloActual ? 'is-selected' : ''}" data-sello="${s.id}">
+              <img src="../assets/sellos/${s.id}.svg" alt="${esc(s.nombre)}">
+              <span>${esc(s.nombre)}</span>
+            </button>`).join('')}
+        </div>
+        <div class="sello-box" style="margin-top:14px">
+          <img src="../assets/sellos/${selloActual}.svg" alt="Sello LexFive Abogados" class="sello-img" id="selloPreview">
           <div class="sello-actions">
-            <a class="btn btn--ghost btn--sm" href="../assets/sello-lexfive.svg" download="sello-lexfive.svg">Descargar sello</a>
+            <a class="btn btn--ghost btn--sm" href="../assets/sellos/${selloActual}.svg" download="sello-lexfive.svg" id="selloDownload">Descargar sello</a>
             <button class="btn btn--ghost btn--sm" id="btnPrintSello">Imprimir sello</button>
           </div>
         </div>
@@ -1755,11 +1776,23 @@ async function renderCredenciales() {
   ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_correo', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_validez', 'cr_frase', 'cr_repre']
     .forEach(id => $('#' + id).addEventListener('input', sync));
 
+  // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
+  let selloElegido = selloActual;
+  content().querySelectorAll('.sello-option').forEach(btn => btn.onclick = () => {
+    const id = btn.dataset.sello;
+    selloElegido = id;
+    localStorage.setItem('lexfive_sello', id);
+    content().querySelectorAll('.sello-option').forEach(b => b.classList.toggle('is-selected', b === btn));
+    const prev = $('#selloPreview'); if (prev) prev.src = `../assets/sellos/${id}.svg`;
+    const dl = $('#selloDownload'); if (dl) dl.href = `../assets/sellos/${id}.svg`;
+    toast('Sello seleccionado. Listo para memoriales y documentos.', 'success');
+  });
+
   $('#btnPrintCred').onclick = () => window.print();
   const bps = $('#btnPrintSello');
   if (bps) bps.onclick = () => {
     const w = window.open('', '_blank');
-    w.document.write('<img src="../assets/sello-lexfive.svg" style="width:6cm;height:6cm" onload="window.print();window.close()">');
+    w.document.write('<img src="../assets/sellos/' + selloElegido + '.svg" style="width:6cm;height:6cm" onload="window.print();window.close()">');
     w.document.close();
   };
 }

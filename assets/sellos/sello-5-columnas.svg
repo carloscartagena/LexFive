@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Sello LexFive Abogados con templo de justicia y laureles">
+  <defs>
+    <path id="s5Top" d="M 28 100 A 72 72 0 0 1 172 100" fill="none"/>
+    <path id="s5Bottom" d="M 38 100 A 62 62 0 0 0 162 100" fill="none"/>
+  </defs>
+  <g fill="none" stroke="#0e1b2c" stroke-width="2.4">
+    <circle cx="100" cy="100" r="93"/>
+    <circle cx="100" cy="100" r="85"/>
+  </g>
+  <g fill="#0e1b2c" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text font-size="15" letter-spacing="2.8">
+      <textPath href="#s5Top" startOffset="50%" text-anchor="middle">LEXFIVE · ABOGADOS</textPath>
+    </text>
+    <text font-size="9.5" letter-spacing="1.8">
+      <textPath href="#s5Bottom" startOffset="50%" text-anchor="middle">JUSTICIA &amp; DERECHO · BOLIVIA</textPath>
+    </text>
+  </g>
+  <g fill="#0e1b2c"><circle cx="33" cy="100" r="2.5"/><circle cx="167" cy="100" r="2.5"/></g>
+  <!-- Ramas de laurel -->
+  <g fill="none" stroke="#0e1b2c" stroke-width="2" stroke-linecap="round">
+    <path d="M64 138 Q54 120 60 100"/>
+    <path d="M62 130 L54 127 M61 121 L53 118 M61 112 L53 109 M62 104 L55 101"/>
+    <path d="M136 138 Q146 120 140 100"/>
+    <path d="M138 130 L146 127 M139 121 L147 118 M139 112 L147 109 M138 104 L145 101"/>
+  </g>
+  <!-- Templo de justicia central -->
+  <g fill="none" stroke="#0e1b2c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M74 78 L100 62 L126 78"/>
+    <path d="M72 78 L128 78"/>
+    <path d="M80 82 L80 118 M92 82 L92 118 M108 82 L108 118 M120 82 L120 118"/>
+    <path d="M76 82 L124 82"/>
+    <path d="M72 120 L128 120"/>
+    <path d="M66 128 L134 128"/>
+  </g>
+</svg>

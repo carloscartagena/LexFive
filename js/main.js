@@ -8,8 +8,9 @@
 
         /* ---------- Logo elegido por el bufete (si se seleccionó uno) ---------- */
         try {
+            var LOGOS_VALIDOS = ['ds1-balanza-codigo', 'ds2-L5-circuito', 'ds3-mazo-pulso', 'ds4-columna-circuito', 'ds5-balanza-chip'];
             var logoElegido = localStorage.getItem('lexfive_logo');
-            if (logoElegido) {
+            if (logoElegido && LOGOS_VALIDOS.indexOf(logoElegido) !== -1) {
                 var st = document.createElement('style');
                 st.textContent = '.logo__mark{background-image:url(assets/logos/' + logoElegido + '.svg)!important;}';
                 document.head.appendChild(st);

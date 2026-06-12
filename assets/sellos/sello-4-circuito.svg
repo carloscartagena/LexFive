@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Sello LexFive Abogados derecho y tecnologia">
+  <defs>
+    <path id="s4Top" d="M 28 100 A 72 72 0 0 1 172 100" fill="none"/>
+    <path id="s4Bottom" d="M 38 100 A 62 62 0 0 0 162 100" fill="none"/>
+  </defs>
+  <g fill="none" stroke="#0e1b2c" stroke-width="2.4">
+    <circle cx="100" cy="100" r="93"/>
+    <circle cx="100" cy="100" r="85"/>
+    <circle cx="100" cy="100" r="54"/>
+  </g>
+  <g fill="#0e1b2c" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text font-size="14.5" letter-spacing="2.6">
+      <textPath href="#s4Top" startOffset="50%" text-anchor="middle">LEXFIVE · ABOGADOS</textPath>
+    </text>
+    <text font-size="9.5" letter-spacing="1.6">
+      <textPath href="#s4Bottom" startOffset="50%" text-anchor="middle">DERECHO &amp; TECNOLOGÍA · BOLIVIA</textPath>
+    </text>
+  </g>
+  <g fill="#0e1b2c"><circle cx="32" cy="100" r="2.5"/><circle cx="168" cy="100" r="2.5"/></g>
+  <!-- Balanza central -->
+  <g fill="none" stroke="#0e1b2c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M100 64 L100 128"/>
+    <path d="M74 76 L126 76"/>
+    <path d="M74 76 L64 95 M74 76 L84 95"/>
+    <path d="M126 76 L116 95 M126 76 L136 95"/>
+    <path d="M60 95 Q74 112 88 95"/>
+    <path d="M112 95 Q126 112 140 95"/>
+    <path d="M84 128 L116 128"/>
+    <path d="M90 133 L110 133"/>
+  </g>
+  <circle cx="100" cy="62" r="4.5" fill="#0e1b2c"/>
+  <!-- Nodos de circuito que rodean la balanza (sistemas) -->
+  <g fill="none" stroke="#0e1b2c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M54 100 L62 100 M138 100 L146 100 M100 146 L100 138"/>
+  </g>
+  <g fill="#0e1b2c"><circle cx="54" cy="100" r="2.4"/><circle cx="146" cy="100" r="2.4"/><circle cx="100" cy="146" r="2.4"/></g>
+</svg>
