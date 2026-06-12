@@ -352,7 +352,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-body { display: flex; gap: 10px; padding: 9px 12px; flex: 1; align-items: flex-start; }
 .cred-photo-col { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
 .cred-photo {
-    width: 54px; height: 60px; flex-shrink: 0; border-radius: 6px;
+    width: 58px; height: 68px; flex-shrink: 0; border-radius: 6px;
     background: #f4f5f7; border: 1.5px solid var(--gold, #c2a25a);
     display: grid; place-items: center; font-family: var(--font-serif, Georgia, serif);
     font-size: 1.4rem; font-weight: 700; color: var(--navy, #0e1b2c);

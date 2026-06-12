@@ -73,9 +73,9 @@ function fmtFechaCorta(iso) {
   const p = String(iso || '').split('-');
   return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : (iso || '');
 }
-// Genera la URL de un código QR (servicio público) a partir de un texto.
+// Genera la URL de un código QR (servicio público) a partir de un texto. ecc=M para mejor lectura.
 function qrURL(texto) {
-  return 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=0&qzone=1&data=' + encodeURIComponent(texto || 'LexFive');
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&ecc=M&data=' + encodeURIComponent(texto || 'LexFive');
 }
 // Texto que codifica el QR de la credencial (datos de verificación).
 function qrTexto(d) {
@@ -1676,6 +1676,7 @@ async function renderCredenciales() {
     emision: saved.emision || hoyISO(),
     validez: saved.validez || '',
     qr: saved.qr || '',
+    certUrl: saved.certUrl || 'https://rpa2.justicia.gob.bo/#/certificado-funcionamiento?codigo=52348873-02ea-4065-9b69-3c27a86c9dd9',
     frase: saved.frase || '',
     representacion: saved.representacion || REPRE_DEFAULT
   };
@@ -1832,12 +1833,9 @@ async function renderCredenciales() {
         <div class="field-row">
           <div class="field"><label>Válido hasta (automático · 3 años)</label><input id="cr_validez_view" type="text" readonly value="" style="background:#f4f5f7;font-weight:600"></div>
           <div class="field">
-            <label>QR de certificación (abogado)</label>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button class="btn btn--ghost btn--sm" id="btnUploadQR" type="button">Subir mi QR</button>
-              ${datos.qr ? '<button class="btn btn--ghost btn--sm" id="btnRemoveQR" type="button">Quitar</button>' : ''}
-              ${datos.qr ? '<img src="' + datos.qr + '" alt="QR" style="width:36px;height:36px;border-radius:4px;border:1px solid #e6e8ec">' : '<span class="cell-sub">Suba la imagen del QR de su certificación</span>'}
-            </div>
+            <label>QR de certificación (enlace SAJ-RPA)</label>
+            <input id="cr_certurl" value="${esc(datos.certUrl)}" placeholder="https://rpa2.justicia.gob.bo/#/certificado-funcionamiento?codigo=...">
+            <span class="cell-sub" style="display:block;margin-top:4px">Se genera un QR que abre su certificado al escanearlo. También puede <button class="btn btn--ghost btn--sm" id="btnUploadQR" type="button">subir imagen del QR</button>${datos.qr ? ' <button class="btn btn--ghost btn--sm" id="btnRemoveQR" type="button">quitar imagen</button>' : ''}</span>
             <input type="file" id="fileQR" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
           </div>
         </div>
@@ -1865,10 +1863,7 @@ async function renderCredenciales() {
         </div>
         <div class="cred-band">CREDENCIAL &middot; <span id="cv_cargo_band">${esc(datos.cargo || '')}</span></div>
         <div class="cred-body">
-          <div class="cred-photo-col">
-            <div class="cred-photo" id="cv_foto">${esc(initials(datos.nombre) || '')}</div>
-            <img class="cred-qr" id="cv_qr" src="${qrURL(qrTexto(datos))}" alt="Código QR de verificación">
-          </div>
+          <div class="cred-photo" id="cv_foto">${esc(initials(datos.nombre) || '')}</div>
           <div class="cred-data">
             <div class="cred-row"><span>Nombre</span><strong id="cv_nombre">${esc(datos.nombre || '')}</strong></div>
             <div class="cred-row"><span>Carnet de identidad</span><strong id="cv_ci">${esc(datos.ci || '')}</strong></div>
@@ -1877,7 +1872,7 @@ async function renderCredenciales() {
         </div>
         <div class="cred-foot">
           <div><span>Emisión</span><strong id="cv_emision">${esc(fmtFechaCorta(datos.emision))}</strong></div>
-          <div class="cred-foot__qr">${datos.qr ? '<img id="cv_qr_cert" src="' + datos.qr + '" alt="QR certificación" class="cred-qr-cert">' : ''}</div>
+          <div class="cred-foot__qr"><img id="cv_qr_cert" alt="QR certificación SAJ-RPA" class="cred-qr-cert" src="${datos.certUrl ? qrURL(datos.certUrl) : (datos.qr || '')}" style="${(datos.certUrl || datos.qr) ? '' : 'display:none'}"></div>
           <div><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong></div>
         </div>
       </div>
@@ -1977,8 +1972,14 @@ async function renderCredenciales() {
     $('#cv_tel').textContent = [v('cr_telpers'), v('cr_teloff')].filter(Boolean).join('  /  ');
     const emi = v('cr_emision') || hoyISO();
     const val = addAnios(emi, 3);
-    const cvqr = $('#cv_qr');
-    if (cvqr) cvqr.src = qrURL('LexFive Abogados\nNombre: ' + v('cr_nombre') + '\nCI: ' + v('cr_ci') + '\nValido hasta: ' + fmtFechaCorta(val));
+    const certUrl = (($('#cr_certurl') && $('#cr_certurl').value) || '').trim();
+    datos.certUrl = certUrl;
+    const qrCert = $('#cv_qr_cert');
+    if (qrCert) {
+      const src = certUrl ? qrURL(certUrl) : (datos.qr || '');
+      if (src) { qrCert.src = src; qrCert.style.display = ''; }
+      else { qrCert.removeAttribute('src'); qrCert.style.display = 'none'; }
+    }
     $('#cv_emision').textContent = fmtFechaCorta(emi);
     $('#cv_validez').textContent = fmtFechaCorta(val);
     const vv = $('#cr_validez_view'); if (vv) vv.value = fmtFechaCorta(val);
@@ -1988,11 +1989,11 @@ async function renderCredenciales() {
     Draft.save('credencial', {
       nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'),
       telPersonal: v('cr_telpers'), telOficina: v('cr_teloff'),
-      emision: emi, validez: val, qr: datos.qr || '',
+      emision: emi, validez: val, qr: datos.qr || '', certUrl: certUrl,
       frase: v('cr_frase'), representacion: v('cr_repre')
     });
   };
-  ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_frase', 'cr_repre']
+  ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_certurl', 'cr_frase', 'cr_repre']
     .forEach(id => { const el = $('#' + id); if (el) { el.addEventListener('input', sync); el.addEventListener('change', sync); } });
   sync();
 
@@ -2008,7 +2009,7 @@ async function renderCredenciales() {
     const reader = new FileReader();
     reader.onload = () => {
       datos.qr = reader.result;
-      Draft.save('credencial', { nombre: datos.nombre, cargo: datos.cargo, ci: datos.ci, telPersonal: datos.telPersonal, telOficina: datos.telOficina, emision: datos.emision, validez: datos.validez, qr: datos.qr, frase: datos.frase, representacion: datos.representacion });
+      Draft.save('credencial', { nombre: datos.nombre, cargo: datos.cargo, ci: datos.ci, telPersonal: datos.telPersonal, telOficina: datos.telOficina, emision: datos.emision, validez: datos.validez, qr: datos.qr, certUrl: datos.certUrl, frase: datos.frase, representacion: datos.representacion });
       renderCredenciales();
       toast('QR de certificación agregado a la credencial.', 'success');
     };
@@ -2017,7 +2018,7 @@ async function renderCredenciales() {
   const btnRemoveQR = $('#btnRemoveQR');
   if (btnRemoveQR) btnRemoveQR.onclick = () => {
     datos.qr = '';
-    Draft.save('credencial', { nombre: datos.nombre, cargo: datos.cargo, ci: datos.ci, telPersonal: datos.telPersonal, telOficina: datos.telOficina, emision: datos.emision, validez: datos.validez, qr: '', frase: datos.frase, representacion: datos.representacion });
+    Draft.save('credencial', { nombre: datos.nombre, cargo: datos.cargo, ci: datos.ci, telPersonal: datos.telPersonal, telOficina: datos.telOficina, emision: datos.emision, validez: datos.validez, qr: '', certUrl: datos.certUrl, frase: datos.frase, representacion: datos.representacion });
     renderCredenciales();
     toast('QR de certificación eliminado.', 'success');
   };
