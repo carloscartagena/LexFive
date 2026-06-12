@@ -1584,7 +1584,8 @@ async function renderCredenciales() {
     { id: 'ds2-L5-circuito', nombre: 'Monograma L5 en circuito' },
     { id: 'ds3-mazo-pulso', nombre: 'Mazo del juez + señal digital' },
     { id: 'ds4-columna-circuito', nombre: 'Columnas de justicia + circuito' },
-    { id: 'ds5-balanza-chip', nombre: 'Balanza en microchip' }
+    { id: 'ds5-balanza-chip', nombre: 'Balanza en microchip' },
+    { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' }
   ];
   const LOGO_DEFAULT = 'ds1-balanza-codigo';
   const logoGuardado = localStorage.getItem('lexfive_logo');
