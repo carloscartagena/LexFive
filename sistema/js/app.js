@@ -57,6 +57,22 @@ const content = () => $('#content');
 function esc(s) {
   return (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
+// Fecha de hoy en formato ISO (AAAA-MM-DD) para el input type=date.
+function hoyISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+// Suma n años a una fecha ISO. Si no es ISO (texto antiguo), la devuelve igual.
+function addAnios(iso, n) {
+  const p = String(iso || '').split('-');
+  if (p.length !== 3) return iso || '';
+  return `${parseInt(p[0], 10) + n}-${p[1]}-${p[2]}`;
+}
+// Muestra una fecha ISO como DD/MM/AAAA (o tal cual si era texto libre).
+function fmtFechaCorta(iso) {
+  const p = String(iso || '').split('-');
+  return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : (iso || '');
+}
 // Resalta en negrita las palabras/cláusulas importantes del texto legal del reverso.
 function resaltarRepre(txt) {
   let s = esc(txt || '');
@@ -1648,7 +1664,7 @@ async function renderCredenciales() {
     correo: saved.correo || '',
     telPersonal: saved.telPersonal || '',
     telOficina: saved.telOficina || '',
-    emision: saved.emision || '',
+    emision: saved.emision || hoyISO(),
     validez: saved.validez || '',
     frase: saved.frase || '',
     representacion: saved.representacion || REPRE_DEFAULT
@@ -1797,15 +1813,15 @@ async function renderCredenciales() {
         </div>
         <div class="field-row">
           <div class="field"><label>Carnet de identidad</label><input id="cr_ci" value="${esc(datos.ci)}" placeholder="Ej: 6813383 L.P."></div>
-          <div class="field"><label>Correo</label><input id="cr_correo" value="${esc(datos.correo)}" placeholder="correo@ejemplo.com"></div>
-        </div>
-        <div class="field-row">
           <div class="field"><label>Teléfono personal</label><input id="cr_telpers" value="${esc(datos.telPersonal)}" placeholder="Ej: 700 00 000"></div>
-          <div class="field"><label>Teléfono de la oficina</label><input id="cr_teloff" value="${esc(datos.telOficina)}" placeholder="Ej: 2 000 000"></div>
         </div>
         <div class="field-row">
-          <div class="field"><label>Fecha de emisión</label><input id="cr_emision" value="${esc(datos.emision)}" placeholder="Ej: junio de 2026"></div>
-          <div class="field"><label>Válido hasta</label><input id="cr_validez" value="${esc(datos.validez)}" placeholder="Ej: junio de 2027"></div>
+          <div class="field"><label>Teléfono de la oficina</label><input id="cr_teloff" value="${esc(datos.telOficina)}" placeholder="Ej: 2 000 000"></div>
+          <div class="field"><label>Fecha de emisión</label><input id="cr_emision" type="date" value="${esc(datos.emision)}"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Válido hasta (automático · 3 años)</label><input id="cr_validez_view" type="text" readonly value="" style="background:#f4f5f7;font-weight:600"></div>
+          <div class="field"></div>
         </div>
         <div class="field"><label>Frase del bufete (reverso)</label>
           <input id="cr_frase" value="${esc(datos.frase)}" placeholder="Escríbala o elija una sugerencia" list="fraseList">
@@ -1836,13 +1852,12 @@ async function renderCredenciales() {
             <div class="cred-row"><span>Nombre</span><strong id="cv_nombre">${esc(datos.nombre || '')}</strong></div>
             <div class="cred-row"><span>Cargo</span><strong id="cv_cargo">${esc(datos.cargo || '')}</strong></div>
             <div class="cred-row"><span>Carnet de identidad</span><strong id="cv_ci">${esc(datos.ci || '')}</strong></div>
-            <div class="cred-row"><span>Correo</span><strong id="cv_correo">${esc(datos.correo || '')}</strong></div>
             <div class="cred-row"><span>Tel. personal / oficina</span><strong id="cv_tel">${esc([datos.telPersonal, datos.telOficina].filter(Boolean).join('  /  '))}</strong></div>
           </div>
         </div>
         <div class="cred-foot">
-          <div><span>Emisión</span><strong id="cv_emision">${esc(datos.emision || '')}</strong></div>
-          <div><span>Válido hasta</span><strong id="cv_validez">${esc(datos.validez || '')}</strong></div>
+          <div><span>Emisión</span><strong id="cv_emision">${esc(fmtFechaCorta(datos.emision))}</strong></div>
+          <div><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong></div>
         </div>
       </div>
 
@@ -1939,22 +1954,25 @@ async function renderCredenciales() {
     $('#cv_cargo').textContent = v('cr_cargo');
     $('#cv_cargo_band').textContent = v('cr_cargo');
     $('#cv_ci').textContent = v('cr_ci');
-    $('#cv_correo').textContent = v('cr_correo');
     $('#cv_tel').textContent = [v('cr_telpers'), v('cr_teloff')].filter(Boolean).join('  /  ');
-    $('#cv_emision').textContent = v('cr_emision');
-    $('#cv_validez').textContent = v('cr_validez');
+    const emi = v('cr_emision') || hoyISO();
+    const val = addAnios(emi, 3);
+    $('#cv_emision').textContent = fmtFechaCorta(emi);
+    $('#cv_validez').textContent = fmtFechaCorta(val);
+    const vv = $('#cr_validez_view'); if (vv) vv.value = fmtFechaCorta(val);
     $('#cv_frase').textContent = v('cr_frase');
     $('#cv_repre').innerHTML = resaltarRepre(v('cr_repre') || REPRE_DEFAULT);
     $('#cv_foto').textContent = initials(v('cr_nombre')) || '';
     Draft.save('credencial', {
-      nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'), correo: v('cr_correo'),
+      nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'),
       telPersonal: v('cr_telpers'), telOficina: v('cr_teloff'),
-      emision: v('cr_emision'), validez: v('cr_validez'),
+      emision: emi, validez: val,
       frase: v('cr_frase'), representacion: v('cr_repre')
     });
   };
-  ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_correo', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_validez', 'cr_frase', 'cr_repre']
-    .forEach(id => $('#' + id).addEventListener('input', sync));
+  ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_frase', 'cr_repre']
+    .forEach(id => { const el = $('#' + id); if (el) { el.addEventListener('input', sync); el.addEventListener('change', sync); } });
+  sync();
 
   // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
   let selloElegido = selloActual;
