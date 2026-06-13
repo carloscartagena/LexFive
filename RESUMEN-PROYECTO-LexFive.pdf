@@ -1,0 +1,2119 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R] /Count 7 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 1072 >>
+stream
+0.055 0.106 0.173 rg
+0.00 0.00 595.28 841.89 re
+f
+0.760 0.635 0.353 rg
+56.00 651.89 66.00 66.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 27.00 Tf
+73.25 674.89 Td
+(L5) Tj
+ET
+1.000 1.000 1.000 rg
+BT
+/F2 42.00 Tf
+56.00 589.89 Td
+(LexFive) Tj
+ET
+0.760 0.635 0.353 rg
+BT
+/F1 12.00 Tf
+59.00 567.89 Td
+(A B O G A D O S) Tj
+ET
+0.760 0.635 0.353 rg
+56.00 539.89 120.00 3.00 re
+f
+1.000 1.000 1.000 rg
+BT
+/F2 30.00 Tf
+56.00 479.89 Td
+(Resumen del Proyecto) Tj
+ET
+0.760 0.635 0.353 rg
+BT
+/F1 14.00 Tf
+56.00 447.89 Td
+(Guía de referencia para replicarlo en otras plataformas) Tj
+ET
+0.780 0.820 0.880 rg
+BT
+/F1 11.00 Tf
+56.00 409.89 Td
+(Qué se construyó, con qué tecnologías, cómo está organizado y cómo) Tj
+ET
+0.780 0.820 0.880 rg
+BT
+/F1 11.00 Tf
+56.00 393.89 Td
+(recrearlo si en otra ocasión se usa otra plataforma o lenguaje de) Tj
+ET
+0.780 0.820 0.880 rg
+BT
+/F1 11.00 Tf
+56.00 377.89 Td
+(programación.) Tj
+ET
+0.700 0.740 0.800 rg
+BT
+/F1 10.00 Tf
+56.00 92.00 Td
+(Versión del manual: junio de 2026) Tj
+ET
+0.700 0.740 0.800 rg
+BT
+/F1 10.00 Tf
+56.00 74.00 Td
+(Sitio: lexfive.netlify.app) Tj
+ET
+
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 3202 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+453.30 792.89 Td
+(Resumen del Proyecto) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+281.85 52.00 Td
+(Página 1) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 741.89 Td
+(Contenido) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 733.89 m 539.28 733.89 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 703.89 Td
+(1. Qué es LexFive) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 703.89 Td
+(2) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+153.21 703.89 Td
+(................................................................................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 685.89 Td
+(2. Tecnologías utilizadas \(y por qué\)) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 685.89 Td
+(2) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+237.24 685.89 Td
+(...................................................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 667.89 Td
+(3. Estructura del proyecto) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 667.89 Td
+(2) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+187.64 667.89 Td
+(....................................................................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 649.89 Td
+(4. Funcionalidades construidas) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 649.89 Td
+(3) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+212.73 649.89 Td
+(...........................................................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 631.89 Td
+(5. Modelo de datos \(resumen\)) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 631.89 Td
+(4) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+208.06 631.89 Td
+(.............................................................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 613.89 Td
+(6. Cómo se pone en marcha \(una sola vez\)) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 613.89 Td
+(4) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+269.34 613.89 Td
+(........................................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 595.89 Td
+(7. Guía para replicar el sistema en otra plataforma) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 595.89 Td
+(5) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+302.01 595.89 Td
+(.............................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 577.89 Td
+(8. Datos clave del proyecto actual) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 577.89 Td
+(6) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+225.57 577.89 Td
+(.......................................................................................................) Tj
+ET
+
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 5831 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+453.30 792.89 Td
+(Resumen del Proyecto) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+281.85 52.00 Td
+(Página 2) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 741.89 Td
+(1. Qué es LexFive) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 733.89 m 539.28 733.89 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 707.39 Td
+(LexFive es el sistema digital completo del bufete de abogados LexFive \(El Alto, Bolivia\). Se compone) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 692.89 Td
+(de dos partes que comparten la misma base de datos:) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 671.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 671.39 Td
+(Sitio web público: la cara del bufete hacia los clientes \(presentación, áreas de práctica, casos de) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 656.89 Td
+(éxito, blog, preguntas frecuentes y formulario de contacto\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 640.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 640.39 Td
+(Panel de gestión privado \(en /sistema\): donde el personal administra procesos judiciales, clientes,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 625.89 Td
+(consultas, modelos de memoriales, blog, testimonios, usuarios, credenciales y auditoría.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 604.39 Td
+(El objetivo del proyecto fue: una web profesional más un sistema de gestión legal, barato de mantener,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 589.89 Td
+(sin servidor propio y fácil de desplegar.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 552.89 Td
+(2. Tecnologías utilizadas \(y por qué\)) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 544.89 m 539.28 544.89 l S
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 518.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 518.39 Td
+(Frontend: HTML5, CSS3 y JavaScript puro \(sin frameworks\). Rápido, ligero, sin dependencias ni) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 503.89 Td
+(compilación; fácil de desplegar y mantener.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 487.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 487.39 Td
+(Backend y base de datos: Supabase \(PostgreSQL gestionado\). Aporta base de datos,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 472.89 Td
+(autenticación y almacenamiento de archivos sin programar un servidor.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 456.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 456.39 Td
+(Autenticación: Supabase Auth \(correo + contraseña\). Login, registro y recuperación de contraseña) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 441.89 Td
+(listos para usar.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 425.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 425.39 Td
+(Seguridad de datos: Row Level Security \(RLS\) de PostgreSQL. Las reglas de acceso por rol viven) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 410.89 Td
+(en la base de datos, no en el navegador.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 394.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 394.39 Td
+(Almacenamiento de archivos: Supabase Storage \(bucket «documentos»\), para memoriales, anexos) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 379.89 Td
+(y archivos de actuaciones.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 363.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 363.39 Td
+(Cliente de Supabase: la librería supabase-js cargada por CDN \(esm.sh\), sin npm ni build.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 346.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 346.89 Td
+(Envío de correos del formulario: Web3Forms, servicio gratuito para recibir el formulario de contacto) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 332.39 Td
+(sin backend.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 315.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 315.89 Td
+(Hosting: Netlify, conectado a GitHub \(despliegue automático al hacer push a main\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 299.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 299.39 Td
+(Generación de documentos: scripts en Python que generan manuales, guías y credenciales en) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 284.89 Td
+(formatos .md, .docx y .pdf.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 219.39 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 219.39 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 258.39 Td
+(Idea clave) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 244.89 Td
+(Idea clave del proyecto: todo el «backend» lo provee Supabase. El frontend es estático y la seguridad) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 231.39 Td
+(real la imponen las reglas RLS de la base de datos, no el JavaScript del navegador.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 179.39 Td
+(3. Estructura del proyecto) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 171.39 m 539.28 171.39 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 144.89 Td
+(Las páginas públicas están en la raíz; el panel privado, en la carpeta /sistema; los scripts de base de) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 130.39 Td
+(datos, en /db; y los generadores de documentos, en /scripts.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 101.39 Td
+(Web pública \(raíz\)) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 80.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 80.89 Td
+(index.html — inicio, áreas, nosotros, equipo y contacto.) Tj
+ET
+
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 6646 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+453.30 792.89 Td
+(Resumen del Proyecto) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+281.85 52.00 Td
+(Página 3) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 757.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 757.39 Td
+(casos.html — casos de éxito.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 740.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 740.89 Td
+(blog.html — blog jurídico \(lee los artículos publicados desde Supabase\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 724.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 724.39 Td
+(faq.html — preguntas frecuentes \(acordeón\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 707.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 707.89 Td
+(verificar.html — verificación pública de credenciales del bufete.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 691.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 691.39 Td
+(aviso-privacidad.html y terminos.html — páginas legales.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 674.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 674.89 Td
+(css/styles.css — estilos, paleta de colores, temas y diseño responsive.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 658.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 658.39 Td
+(js/main.js — interactividad de la web \(menú, FAQ, formulario\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 629.39 Td
+(Panel de gestión \(carpeta /sistema\)) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 608.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 608.89 Td
+(login.html — pantalla de acceso y registro.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 592.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 592.39 Td
+(index.html — el panel \(dashboard\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 575.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 575.89 Td
+(css/panel.css — estilos del panel.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 559.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 559.39 Td
+(js/config.js — URL y clave pública de Supabase, roles, abogados y materias.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 542.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 542.89 Td
+(js/supabase.js — inicializa el cliente de Supabase.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 526.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 526.39 Td
+(js/auth.js — sesión, perfil, roles, permisos y auditoría.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 509.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 509.89 Td
+(js/app.js — lógica del panel \(procesos, clientes, blog, usuarios, etc.\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 480.89 Td
+(Base de datos \(carpeta /db\)) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 460.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 460.39 Td
+(schema.sql — tablas base, RLS y almacenamiento.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 443.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 443.89 Td
+(02_portal_clientes.sql — rol «cliente» y aislamiento de datos.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 427.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 427.39 Td
+(03_blog_alertas_testimonios.sql — blog, alertas y testimonios.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 410.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 410.89 Td
+(04_modelos_nurej.sql — biblioteca de modelos y campo NUREJ.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 394.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 394.39 Td
+(05_multiples_abogados.sql — varios abogados/procuradores por proceso.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 377.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 377.89 Td
+(06_consultas.sql — bandeja de consultas \(formulario de contacto\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 361.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 361.39 Td
+(07_sync_clientes.sql — crea la ficha de cliente al registrarse.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 344.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 344.89 Td
+(08_categorias.sql — áreas del derecho dinámicas.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 328.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 328.39 Td
+(09_actuaciones_archivos.sql — adjuntar archivos a cada actuación.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 291.39 Td
+(4. Funcionalidades construidas) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 283.39 m 539.28 283.39 l S
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 249.39 Td
+(Sitio web público) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 228.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 228.89 Td
+(Página de inicio con áreas de práctica, equipo, testimonios e indicadores.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 212.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 212.39 Td
+(Casos de éxito, blog jurídico y preguntas frecuentes.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 195.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 195.89 Td
+(Formulario de contacto que guarda cada mensaje en la base de datos \(bandeja de Consultas\) y,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 181.39 Td
+(opcionalmente, envía copia por correo \(Web3Forms\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 164.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 164.89 Td
+(Botón flotante de WhatsApp con menú de los cinco abogados.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 148.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 148.39 Td
+(Páginas legales y página de verificación de credenciales.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 131.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 131.89 Td
+(Cuatro temas de color con acento dorado y diseño accesible y responsive.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 102.89 Td
+(Panel de gestión privado) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 82.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 82.39 Td
+(Dashboard con métricas \(procesos totales/activos, audiencias próximas, consultas nuevas\).) Tj
+ET
+
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 6852 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+453.30 792.89 Td
+(Resumen del Proyecto) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+281.85 52.00 Td
+(Página 4) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 757.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 757.39 Td
+(Procesos/casos: crear, editar, asignar varios abogados y procuradores, vincular cliente, estados,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 742.89 Td
+(NUREJ, próxima audiencia e historial de actuaciones con archivos.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 726.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 726.39 Td
+(Clientes: cartera con documento, contacto y vinculación por correo.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 709.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 709.89 Td
+(Bandeja de consultas con estados \(Nueva/Atendida/Archivada\) y respuesta por WhatsApp o correo.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 693.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 693.39 Td
+(Modelos de memoriales: biblioteca de plantillas por área del derecho.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 676.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 676.89 Td
+(Blog: redacción de artículos \(borrador/publicado\) que aparecen en la web pública.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 660.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 660.39 Td
+(Testimonios: moderación \(aprobar/rechazar\) antes de publicarse.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 643.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 643.89 Td
+(Usuarios \(solo admin\): cambiar roles, activar/desactivar cuentas.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 627.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 627.39 Td
+(Categorías/áreas del derecho \(solo admin\): crear, renombrar y eliminar.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 610.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 610.89 Td
+(Auditoría \(solo admin\): bitácora de acciones importantes.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 594.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 594.39 Td
+(Credenciales: generador de carnet imprimible del bufete.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 577.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 577.89 Td
+(Portal del cliente: vista reducida donde el cliente ve solo sus procesos y deja su opinión.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 561.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 561.39 Td
+(Autoguardado de borradores y cierre de sesión por inactividad.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 524.39 Td
+(5. Modelo de datos \(resumen\)) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 516.39 m 539.28 516.39 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 489.89 Td
+(Tablas principales en PostgreSQL \(Supabase\):) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 468.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 468.39 Td
+(profiles — usuarios del sistema, vinculados a auth.users, con rol) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 453.89 Td
+(\(admin/procurador/abogado/cliente\) y estado activo.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 437.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 437.39 Td
+(clientes — cartera de clientes \(vinculados por correo\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 420.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 420.89 Td
+(procesos — casos judiciales/administrativos \(carátula, número/NUREJ, materia, estado, audiencia,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 406.39 Td
+(etc.\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 389.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 389.89 Td
+(actuaciones — historial de pasos de cada proceso \(con archivos adjuntos\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 373.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 373.39 Td
+(documentos — metadatos de memoriales/archivos \(el archivo físico va en Storage\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 356.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 356.89 Td
+(articulos — artículos del blog \(borrador/publicado\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 340.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 340.39 Td
+(auditoria — bitácora de acciones.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 323.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 323.89 Td
+(Más tablas para consultas, testimonios y categorías, añadidas por los scripts 02 a 09.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 244.89 483.28 72.00 re
+f
+0.760 0.635 0.353 rg
+56.00 244.89 4.00 72.00 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 297.39 Td
+(Seguridad) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 283.89 Td
+(Seguridad \(RLS\): cada tabla tiene políticas que definen quién puede ver, crear, editar o borrar. Por) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 270.39 Td
+(ejemplo, todos ven los procesos pero solo el admin elimina; un cliente solo ve sus propios procesos; la) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 256.89 Td
+(auditoría solo la ve el admin. Funciones auxiliares: is_admin\(\) y current_rol\(\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 204.89 Td
+(6. Cómo se pone en marcha \(una sola vez\)) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 196.89 m 539.28 196.89 l S
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 170.39 Td
+(1.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 170.39 Td
+(Crear un proyecto en Supabase.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 152.89 Td
+(2.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 152.89 Td
+(En el SQL Editor, ejecutar en orden los scripts de db/: primero schema.sql, luego del 02 al 09.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 135.39 Td
+(3.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 135.39 Td
+(En Authentication ? Providers ? Email, configurar el login por correo.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 117.89 Td
+(4.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 117.89 Td
+(Crear el primer usuario y convertirlo en admin con: update public.profiles set rol = 'admin' where) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 103.39 Td
+(email = 'tu-correo';) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 85.89 Td
+(5.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 85.89 Td
+(Poner la URL y la clave pública de Supabase en sistema/js/config.js.) Tj
+ET
+
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 6468 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+453.30 792.89 Td
+(Resumen del Proyecto) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+281.85 52.00 Td
+(Página 5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 757.39 Td
+(6.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 757.39 Td
+(\(Opcional\) Poner la clave de Web3Forms en el formulario de index.html.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 739.89 Td
+(7.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 739.89 Td
+(Desplegar en Netlify conectando el repositorio de GitHub \(push a main = publica solo\).) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 686.89 483.28 45.00 re
+f
+0.760 0.635 0.353 rg
+56.00 686.89 4.00 45.00 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 712.39 Td
+(Más detalle) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 698.89 Td
+(El detalle completo está en sistema/CONFIGURACION.md y en el Manual del Sistema.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 646.89 Td
+(7. Guía para replicar el sistema en otra plataforma) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 638.89 m 539.28 638.89 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 612.39 Td
+(Si en el futuro se reconstruye con otro stack \(por ejemplo React + Node, Django, Laravel, Firebase,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 597.89 Td
+(etc.\), estos son los componentes que hay que cubrir, independientemente del lenguaje.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 568.89 Td
+(Equivalencias por capa \(lo usado aquí y sus alternativas\)) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 548.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 548.39 Td
+(Base de datos relacional — aquí: Supabase \(PostgreSQL\). Alternativas: Firebase/Firestore,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 533.89 Td
+(MySQL, MongoDB, PlanetScale, Neon.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 517.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 517.39 Td
+(Autenticación — aquí: Supabase Auth. Alternativas: Firebase Auth, Auth0, Clerk, NextAuth, Devise) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 502.89 Td
+(\(Rails\), auth de Django.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 486.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 486.39 Td
+(Seguridad por rol — aquí: RLS de PostgreSQL. Alternativas: middleware/guards en el backend) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 471.89 Td
+(\(guards de NestJS, permissions de Django, policies de Laravel\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 455.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 455.39 Td
+(Almacenamiento de archivos — aquí: Supabase Storage. Alternativas: AWS S3, Firebase Storage,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 440.89 Td
+(Cloudinary.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 424.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 424.39 Td
+(Frontend — aquí: HTML/CSS/JS puro. Alternativas: React, Vue, Angular, Svelte, Next.js.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 407.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 407.89 Td
+(Recepción de formularios — aquí: Web3Forms. Alternativas: Formspree, EmailJS, o un endpoint) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 393.39 Td
+(propio con Nodemailer/SendGrid.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 376.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 376.89 Td
+(Hosting — aquí: Netlify. Alternativas: Vercel, GitHub Pages, Render, Cloudflare Pages o un VPS.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 347.89 Td
+(Checklist funcional para no olvidar nada) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 327.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 327.39 Td
+(Roles y permisos: admin, abogado, procurador, cliente — con quién puede borrar.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 310.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 310.89 Td
+(Gestión de procesos con asignación múltiple de abogados/procuradores.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 294.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 294.39 Td
+(Historial de actuaciones con archivos adjuntos por paso.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 277.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 277.89 Td
+(Clientes vinculados por correo y portal del cliente \(ve solo lo suyo\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 261.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 261.39 Td
+(Bandeja de consultas alimentada por el formulario web.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 244.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 244.89 Td
+(Biblioteca de modelos por área del derecho.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 228.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 228.39 Td
+(Blog editable desde el panel que se publica en la web.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 211.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 211.89 Td
+(Testimonios con moderación.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 195.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 195.39 Td
+(Categorías dinámicas \(áreas del derecho\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 178.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 178.89 Td
+(Auditoría de acciones.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 162.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 162.39 Td
+(Generador de credenciales imprimibles.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 145.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 145.89 Td
+(Autoguardado de borradores y cierre de sesión por inactividad.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 116.89 Td
+(Lecciones aprendidas y recomendaciones) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 96.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 96.39 Td
+(Empezar por el modelo de datos y los roles: todo lo demás \(pantallas, permisos\) se deriva de ahí.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 81.89 Td
+(Tener clara la matriz de permisos antes de programar evita rehacer trabajo.) Tj
+ET
+
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 3425 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+453.30 792.89 Td
+(Resumen del Proyecto) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+281.85 52.00 Td
+(Página 6) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 757.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 757.39 Td
+(Mantener la seguridad en el backend o la base de datos, nunca solo en el navegador. Aquí se logró) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 742.89 Td
+(con RLS; en otro stack, con guards/policies del lado del servidor.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 726.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 726.39 Td
+(Separar claves públicas de claves secretas. En config.js solo va la clave pública; la service_role y) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 711.89 Td
+(las contraseñas jamás se exponen en el frontend.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 695.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 695.39 Td
+(Un frontend estático más un backend gestionado \(BaaS\) abarata y simplifica el mantenimiento de) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 680.89 Td
+(proyectos pequeños y medianos: no hay servidor que administrar.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 664.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 664.39 Td
+(El despliegue continuo \(push a main que publica solo\) ahorra mucho tiempo.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 647.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 647.89 Td
+(Documentar desde el inicio \(manual y guía de configuración\) facilita el traspaso y el soporte.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 610.89 Td
+(8. Datos clave del proyecto actual) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 602.89 m 539.28 602.89 l S
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 576.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 576.39 Td
+(Sitio: lexfive.netlify.app.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 559.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 559.89 Td
+(Frontend: HTML/CSS/JS puro \(alrededor de 3.700 líneas entre app.js, main.js y styles.css\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 543.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 543.39 Td
+(Base de datos: Supabase \(PostgreSQL\), 9 scripts SQL versionados en db/.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 526.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 526.89 Td
+(Despliegue: Netlify conectado a GitHub \(rama main\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 510.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 510.39 Td
+(Repositorio: carloscartagena/LexFive.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 436.89 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 436.89 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 475.89 Td
+(Versión) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 462.39 Td
+(Este resumen describe el proyecto a la fecha indicada en la portada. Si el sistema cambia, vuelva a) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 448.89 Td
+(generar el documento con scripts/generar_resumen.py.) Tj
+ET
+
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 17 0 R >>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000162 00000 n 
+0000000259 00000 n 
+0000000361 00000 n 
+0000001485 00000 n 
+0000001649 00000 n 
+0000004903 00000 n 
+0000005067 00000 n 
+0000010950 00000 n 
+0000011115 00000 n 
+0000017814 00000 n 
+0000017980 00000 n 
+0000024885 00000 n 
+0000025051 00000 n 
+0000031572 00000 n 
+0000031738 00000 n 
+0000035216 00000 n 
+trailer
+<< /Size 19 /Root 1 0 R >>
+startxref
+35382
+%%EOF
