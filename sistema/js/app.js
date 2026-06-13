@@ -45,6 +45,7 @@ const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
   { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
   { key: 'agenda', label: 'Agenda', icon: ICON.audiencia },
+  { key: 'reportes', label: 'Reportes', icon: ICON.grafico },
   { key: 'tareas', label: 'Tareas', icon: ICON.tareas },
   { key: 'modelos', label: 'Modelos', icon: ICON.doc },
   { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla },
@@ -1420,6 +1421,85 @@ async function renderFinanzas() {
         </tbody>
       </table>`;
     abrirImpresion('Reporte de honorarios', cuerpo);
+  };
+}
+
+// ============================================================
+//  VISTA: REPORTES  (procesos por estado, materia y abogado, por período)
+// ============================================================
+async function renderReportes() {
+  loading();
+  const { data } = await supabase.from('procesos').select('*').eq('eliminado', false);
+  const todos = data || [];
+  const fechaProc = p => (p.fecha_inicio || (p.created_at ? p.created_at.slice(0, 10) : ''));
+  const hoy = hoyISO();
+  const iniAnio = hoy.slice(0, 4) + '-01-01';
+
+  content().innerHTML = `
+    <div class="toolbar">
+      <label class="chk-inline">Desde&nbsp;<input type="date" id="rDesde" value="${iniAnio}"></label>
+      <label class="chk-inline">Hasta&nbsp;<input type="date" id="rHasta" value="${hoy}"></label>
+      <div class="spacer"></div>
+      <button class="btn btn--ghost" id="rTodo">Todo el historial</button>
+      <button class="btn btn--primary" id="rPrint">${ICON.doc} Imprimir / PDF</button>
+    </div>
+    <div id="repBody"></div>`;
+
+  let rango = { desde: iniAnio, hasta: hoy };
+  const enRango = p => {
+    const f = fechaProc(p);
+    if (!f) return true;
+    if (rango.desde && f < rango.desde) return false;
+    if (rango.hasta && f > rango.hasta) return false;
+    return true;
+  };
+
+  let datos = {};
+  function calc() {
+    const filt = todos.filter(enRango);
+    const activos = filt.filter(p => !['archivado', 'concluido'].includes(p.estado)).length;
+    const judiciales = filt.filter(p => p.tipo !== 'administrativo').length;
+    const administrativos = filt.length - judiciales;
+    const porEstado = Object.entries(ESTADOS).map(([k, v]) => ({ label: v, value: filt.filter(p => p.estado === k).length }));
+    const matCount = {}; filt.forEach(p => { const m = p.materia || 'Sin materia'; matCount[m] = (matCount[m] || 0) + 1; });
+    const porMateria = Object.entries(matCount).map(([k, v]) => ({ label: k, value: v })).sort((a, b) => b.value - a.value);
+    const aboCount = {}; filt.forEach(p => { const ids = (p.abogados_ids && p.abogados_ids.length) ? p.abogados_ids : (p.abogado_id ? [p.abogado_id] : []); ids.forEach(id => { aboCount[id] = (aboCount[id] || 0) + 1; }); });
+    const porAbogado = Object.entries(aboCount).map(([id, v]) => ({ label: profName(id), value: v })).sort((a, b) => b.value - a.value);
+    datos = { filt, activos, judiciales, administrativos, porEstado, porMateria, porAbogado };
+
+    $('#repBody').innerHTML = `
+      <div class="stats-grid">
+        <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.procesos}</div></div><div class="metric__num">${filt.length}</div><div class="metric__label">Procesos en el período</div></div>
+        <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dashboard}</div></div><div class="metric__num">${activos}</div><div class="metric__label">Activos</div></div>
+        <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.doc}</div></div><div class="metric__num">${judiciales}</div><div class="metric__label">Judiciales</div></div>
+        <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.doc}</div></div><div class="metric__num">${administrativos}</div><div class="metric__label">Administrativos</div></div>
+      </div>
+      <div class="charts-grid">
+        <div class="card"><div class="card__head"><h3>${ICON.grafico} Por estado</h3></div><div class="card__body">${barChart(porEstado)}</div></div>
+        <div class="card"><div class="card__head"><h3>${ICON.grafico} Por materia</h3></div><div class="card__body">${barChart(porMateria)}</div></div>
+        <div class="card"><div class="card__head"><h3>${ICON.grafico} Por abogado</h3></div><div class="card__body">${barChart(porAbogado)}</div></div>
+      </div>`;
+  }
+  calc();
+
+  const aplicar = () => { rango = { desde: $('#rDesde').value, hasta: $('#rHasta').value }; calc(); };
+  $('#rDesde').onchange = aplicar;
+  $('#rHasta').onchange = aplicar;
+  $('#rTodo').onclick = () => { $('#rDesde').value = ''; $('#rHasta').value = ''; aplicar(); };
+  $('#rPrint').onclick = () => {
+    const d = datos;
+    const tabla = (titulo, colName, arr) => `<h2 style="font-size:13px;margin:16px 0 4px;color:#0e1b2c">${esc(titulo)}</h2>
+      <table><thead><tr><th>${esc(colName)}</th><th style="width:120px">Cantidad</th></tr></thead>
+      <tbody>${arr.filter(i => i.value > 0).map(i => `<tr><td>${esc(i.label)}</td><td>${i.value}</td></tr>`).join('') || '<tr><td colspan="2">Sin datos</td></tr>'}</tbody></table>`;
+    const periodo = (rango.desde || rango.hasta)
+      ? `Período: ${rango.desde ? fmtDate(rango.desde) : 'inicio'} — ${rango.hasta ? fmtDate(rango.hasta) : 'hoy'}`
+      : 'Todo el historial';
+    const body = `<h1>Reporte de procesos</h1>
+      <p style="color:#5c6675;font-size:12px;margin:0 0 4px">${esc(periodo)} · ${d.filt.length} proceso(s) · ${d.activos} activo(s)</p>
+      ${tabla('Por estado', 'Estado', d.porEstado)}
+      ${tabla('Por materia', 'Materia', d.porMateria)}
+      ${tabla('Por abogado', 'Abogado', d.porAbogado)}`;
+    abrirImpresion('Reporte de procesos', body);
   };
 }
 
@@ -3548,6 +3628,7 @@ const VIEWS = {
   dashboard: { title: 'Panel general', render: renderDashboard },
   procesos: { title: 'Procesos', render: renderProcesos },
   agenda: { title: 'Agenda y calendario', render: renderAgenda },
+  reportes: { title: 'Reportes', render: renderReportes },
   tareas: { title: 'Tareas y pendientes', render: renderTareas },
   finanzas: { title: 'Honorarios y pagos', render: renderFinanzas },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
