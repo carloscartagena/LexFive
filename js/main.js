@@ -237,6 +237,8 @@
         }
 
         if (form) {
+            // Momento en que se mostró el formulario (para detectar envíos instantáneos de bots).
+            var formLoadedAt = Date.now();
             // Autoguardado del mensaje (por si recarga o cierra el navegador sin querer)
             var DRAFT_KEY = 'lexfive_contacto_borrador';
             var draftFields = ['nombre', 'apellido', 'email', 'telefono', 'area', 'mensaje'];
@@ -269,6 +271,24 @@
 
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
+
+                /* ---------- Anti-spam silencioso (no molesta al usuario real) ---------- */
+                var hpCheck = form.querySelector('input[name="botcheck"]');
+                var hpText = document.getElementById('hp_empresa');
+                var pareceBot = (hpCheck && hpCheck.checked) ||
+                                (hpText && hpText.value.trim() !== '') ||
+                                ((Date.now() - formLoadedAt) < 2500); // enviado demasiado rápido
+                if (pareceBot) {
+                    // Fingimos éxito y NO guardamos nada (así el bot no se da cuenta).
+                    form.reset();
+                    try { localStorage.removeItem(DRAFT_KEY); } catch (e2) {}
+                    if (feedback) {
+                        feedback.textContent = '¡Gracias! Hemos recibido su solicitud y le contactaremos a la brevedad.';
+                        feedback.className = 'form__feedback is-success';
+                    }
+                    return;
+                }
+
                 var valid = true;
                 if (feedback) { feedback.textContent = ''; feedback.className = 'form__feedback'; }
 
@@ -299,6 +319,21 @@
                     if (firstError) { firstError.focus(); }
                     return;
                 }
+
+                /* ---------- Límite de envíos por navegador (evita spam repetido) ---------- */
+                var ENVIOS_KEY = 'lexfive_envios';
+                var ahoraTs = Date.now();
+                var envios = [];
+                try { envios = JSON.parse(localStorage.getItem(ENVIOS_KEY) || '[]'); } catch (e2) { envios = []; }
+                envios = envios.filter(function (t) { return ahoraTs - t < 10 * 60 * 1000; }); // últimos 10 min
+                if (envios.length >= 3) {
+                    if (feedback) {
+                        feedback.textContent = 'Ha enviado varias consultas seguidas. Por favor espere unos minutos o escríbanos por WhatsApp.';
+                        feedback.className = 'form__feedback is-error';
+                    }
+                    return;
+                }
+                try { envios.push(ahoraTs); localStorage.setItem(ENVIOS_KEY, JSON.stringify(envios)); } catch (e2) {}
 
                 var submitBtn = form.querySelector('button[type="submit"]');
                 var accessKey = form.querySelector('input[name="access_key"]');

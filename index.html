@@ -430,6 +430,8 @@
                     <input type="hidden" name="from_name" value="Sitio web LexFive">
                     <!-- Honeypot anti-spam (no tocar) -->
                     <input type="checkbox" name="botcheck" class="hp" style="display:none !important;" tabindex="-1" autocomplete="off">
+                    <!-- Campo trampa adicional: invisible para personas, suelen rellenarlo los bots -->
+                    <input type="text" name="empresa_web" id="hp_empresa" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;">
 
                     <div class="field-row">
                         <div class="field">
