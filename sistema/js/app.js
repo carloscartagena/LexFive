@@ -563,6 +563,13 @@ function optionsClientes(selected) {
 //  Carga de datos comunes
 // ============================================================
 async function loadProfiles() {
+  // El cliente NO puede leer las fichas del personal (privacidad: sin correos).
+  // Para mostrar el nombre de su abogado usa la vista "directorio" (id, nombre, rol).
+  if (state.profile && state.profile.rol === 'cliente') {
+    const { data, error } = await supabase.from('directorio').select('*').order('nombre');
+    if (!error) { state.profiles = (data || []).map(p => ({ ...p, activo: true })); return; }
+    // Respaldo si aún no se ejecutó la migración 13 (la vista no existe todavía).
+  }
   const { data } = await supabase.from('profiles').select('*').order('nombre');
   state.profiles = data || [];
 }
