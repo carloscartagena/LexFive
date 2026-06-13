@@ -606,3 +606,15 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .fin-row__right { display: flex; align-items: center; gap: 8px; }
 .fin-monto { font-weight: 700; color: var(--navy, #0e1b2c); }
 .fin-debe { color: #c0392b; }
+
+
+/* ---------- Plantillas de memoriales ---------- */
+.plant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.plant-card { background: #fff; border: 1px solid var(--line, #e6e8ec); border-radius: 11px; padding: 14px; display: flex; flex-direction: column; gap: 7px; }
+.plant-card__title { font-weight: 700; color: var(--navy, #0e1b2c); font-size: 1rem; }
+.plant-card__preview { flex: 1; line-height: 1.5; }
+.plant-card__actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.campos-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip-campo { background: #f3eedf; border: 1px solid var(--gold, #c2a25a); color: var(--gold-dark, #a8853c); border-radius: 20px; padding: 3px 10px; font-size: .72rem; font-family: monospace; cursor: pointer; }
+.chip-campo:hover { background: var(--gold, #c2a25a); color: #fff; }
+code { background: #f1f2f4; padding: 1px 5px; border-radius: 4px; font-size: .85em; }
