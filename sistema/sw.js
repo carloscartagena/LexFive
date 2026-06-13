@@ -10,7 +10,7 @@
    copia guardada. Las peticiones a Supabase y otros servicios
    externos NO se interceptan (van directo a la red).
    ========================================================= */
-const CACHE = 'lexfive-sistema-v1';
+const CACHE = 'lexfive-sistema-v2';
 const SHELL = [
   './',
   './index.html',
@@ -22,7 +22,9 @@ const SHELL = [
   './js/supabase.js',
   './manifest.webmanifest',
   '../js/branding.js',
-  '../assets/pwa/icon.svg'
+  '../assets/pwa/icon.svg',
+  '../assets/pwa/icon-192.png',
+  '../assets/pwa/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
