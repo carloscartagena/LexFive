@@ -6,39 +6,51 @@
 
     document.addEventListener('DOMContentLoaded', function () {
 
-        /* ---------- Logo elegido por el bufete (si se seleccionó uno) ---------- */
+        /* ---------- Logo del bufete (compartido vía Supabase) ----------
+           El logo se guarda en la nube (tabla "configuracion", clave
+           'branding') desde el panel. Así, el logo elegido en la
+           computadora se ve igual en el celular y en cualquier equipo.
+           Se pinta de inmediato con la última copia local y luego se
+           refresca desde la nube. */
         try {
+            // Datos PÚBLICOS de Supabase (mismos que en sistema/js/config.js).
+            var SB_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
+            var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
             var LOGOS_VALIDOS = ['ds1-balanza-codigo', 'ds2-L5-circuito', 'ds3-mazo-pulso', 'ds4-columna-circuito', 'ds5-balanza-chip', 'opcion-6-LF-circuito'];
+
             var aplicarMarca = function (url) {
                 if (!url) return;
-                var st = document.createElement('style');
+                var st = document.getElementById('lexfiveLogoStyle');
+                if (!st) { st = document.createElement('style'); st.id = 'lexfiveLogoStyle'; document.head.appendChild(st); }
                 st.textContent = '.logo__mark{background-image:url(' + url + ')!important;}';
-                document.head.appendChild(st);
             };
-            var obtenerLogoIDB = function () {
-                return new Promise(function (res) {
-                    try {
-                        var r = indexedDB.open('lexfive_media', 1);
-                        r.onupgradeneeded = function () { if (!r.result.objectStoreNames.contains('img')) r.result.createObjectStore('img'); };
-                        r.onsuccess = function () {
-                            try {
-                                var rq = r.result.transaction('img').objectStore('img').get('logo');
-                                rq.onsuccess = function () { res(rq.result || ''); };
-                                rq.onerror = function () { res(''); };
-                            } catch (e) { res(''); }
-                        };
-                        r.onerror = function () { res(''); };
-                    } catch (e) { res(''); }
-                });
+            // Convierte la configuración de marca en la URL del logo a mostrar.
+            var urlDeMarca = function (b) {
+                if (!b) return '';
+                if (b.logoId === 'custom' && b.logoImg) return b.logoImg;
+                if (b.logoId && LOGOS_VALIDOS.indexOf(b.logoId) !== -1) return 'assets/logos/' + b.logoId + '.svg';
+                return '';
             };
-            var logoElegido = localStorage.getItem('lexfive_logo');
-            if (logoElegido === 'custom') {
-                var ls = localStorage.getItem('lexfive_logo_custom');
-                if (ls && ls.indexOf('data:') === 0) aplicarMarca(ls);
-                else obtenerLogoIDB().then(aplicarMarca);
-            } else if (logoElegido && LOGOS_VALIDOS.indexOf(logoElegido) !== -1) {
-                aplicarMarca('assets/logos/' + logoElegido + '.svg');
-            }
+
+            // 1) Pintado rápido con la última copia guardada en este equipo.
+            try {
+                var cache = JSON.parse(localStorage.getItem('lexfive_branding') || '{}');
+                aplicarMarca(urlDeMarca(cache));
+            } catch (e) {}
+
+            // 2) Refresco desde la nube (fuente de verdad para todos los equipos).
+            fetch(SB_URL + '/rest/v1/configuracion?clave=eq.branding&select=valor', {
+                headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+            })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (rows) {
+                if (rows && rows[0] && rows[0].valor) {
+                    var b = rows[0].valor;
+                    try { localStorage.setItem('lexfive_branding', JSON.stringify(b)); } catch (e) {}
+                    aplicarMarca(urlDeMarca(b));
+                }
+            })
+            .catch(function () {});
         } catch (e) {}
 
         /* ---------- Año actual en el footer ---------- */
