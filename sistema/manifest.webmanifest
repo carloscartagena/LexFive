@@ -1,0 +1,21 @@
+{
+  "name": "LexFive — Sistema de Gestión Legal",
+  "short_name": "LexFive",
+  "description": "Panel de gestión de procesos, clientes, audiencias y documentos del bufete LexFive.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1b2c",
+  "theme_color": "#0e1b2c",
+  "icons": [
+    {
+      "src": "../assets/pwa/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

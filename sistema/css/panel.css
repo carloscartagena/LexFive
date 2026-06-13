@@ -499,3 +499,55 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .sello-box { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
 .sello-img { width: 150px; height: 150px; }
 .sello-actions { display: flex; flex-direction: column; gap: 8px; }
+
+
+/* ============================================================
+   Mejoras: Agenda/Calendario, gráficos, buscador global
+   ============================================================ */
+
+/* ---------- Buscador global (barra superior) ---------- */
+.topbar__search { display: inline-flex; align-items: center; gap: 6px; }
+.topbar__search svg { width: 16px; height: 16px; }
+@media (max-width: 560px) { .topbar__search span { display: none; } }
+
+.gq-group { margin-top: 12px; }
+.gq-group__title { display: flex; align-items: center; gap: 7px; font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted, #5c6675); margin-bottom: 6px; }
+.gq-group__title svg { width: 15px; height: 15px; }
+.gq-item { display: block; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line, #e6e8ec); border-radius: 9px; padding: 9px 12px; margin-bottom: 6px; cursor: pointer; transition: border-color .12s, background .12s; }
+.gq-item:hover { border-color: var(--gold, #c2a25a); background: #fbf9f3; }
+.gq-item strong { display: block; color: var(--ink, #1a2330); font-size: .92rem; }
+.gq-item .cell-sub { display: block; margin-top: 1px; }
+
+/* ---------- Calendario / Agenda ---------- */
+.cal-nav { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line, #e6e8ec); }
+.cal-nav .spacer { flex: 1; }
+.cal-title { font-family: var(--font-serif, Georgia, serif); color: var(--navy, #0e1b2c); font-size: 1.15rem; margin: 0; min-width: 150px; text-align: center; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--navy, #0e1b2c); }
+.cal-weekdays div { padding: 7px 4px; text-align: center; color: var(--gold-light, #e7d3a1); font-size: .62rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-cell { min-height: 92px; border-right: 1px solid #eef0f3; border-bottom: 1px solid #eef0f3; padding: 4px; display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+.cal-cell--empty { background: #fafbfc; }
+.cal-cell--hoy { background: #fbf7ec; }
+.cal-daynum { font-size: .72rem; font-weight: 700; color: var(--muted, #5c6675); }
+.cal-cell--hoy .cal-daynum { color: var(--gold-dark, #a8853c); }
+.cal-ev { display: block; width: 100%; text-align: left; border: none; cursor: pointer; font-size: .6rem; line-height: 1.2; padding: 3px 5px; border-radius: 5px; background: var(--navy, #0e1b2c); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-ev:hover { filter: brightness(1.15); }
+.cal-ev--amber { background: #c2872a; }
+.cal-ev--red { background: #c0392b; }
+.cal-mas { font-size: .56rem; color: var(--muted, #5c6675); padding-left: 4px; }
+@media (max-width: 640px) {
+    .cal-cell { min-height: 64px; }
+    .cal-ev { font-size: 0; padding: 5px; }
+    .cal-ev::before { content: ''; display: block; width: 100%; height: 4px; border-radius: 3px; background: currentColor; }
+    .cal-mas { font-size: .5rem; }
+}
+
+/* ---------- Gráficos del dashboard ---------- */
+.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.bars { display: flex; flex-direction: column; gap: 9px; }
+.bar-row { display: grid; grid-template-columns: 120px 1fr 30px; align-items: center; gap: 8px; }
+.bar-row__label { font-size: .76rem; color: var(--ink, #1a2330); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-row__track { background: #eef0f3; border-radius: 6px; height: 16px; overflow: hidden; }
+.bar-row__fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--navy, #0e1b2c), var(--gold, #c2a25a)); transition: width .5s ease; }
+.bar-row__val { font-size: .76rem; font-weight: 700; color: var(--navy, #0e1b2c); text-align: right; }
+@media (max-width: 480px) { .bar-row { grid-template-columns: 90px 1fr 26px; } }
