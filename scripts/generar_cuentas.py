@@ -51,13 +51,14 @@ def build_blocks():
         "Netlify — publica el sitio. Entrar en app.netlify.com con «Continuar con GitHub».",
         "Supabase — base de datos y usuarios. Entrar en supabase.com con «Continuar con GitHub».",
         "Web3Forms — envío por correo de las consultas. Funciona con una clave, no con login.",
+        "Resend — envía los correos de recordatorio de audiencias. Entrar en resend.com con «Continuar con Google» (su Gmail).",
         "Correo Gmail del bufete — recibe las consultas y recupera las demás cuentas.",
         "Panel del sistema LexFive — donde trabaja el equipo (no es una cuenta externa).",
     ])
     note("Cadena de accesos (verificada): Supabase entra con GitHub; Netlify entra con GitHub; "
-         "y GitHub entra con Google (su Gmail). Por lo tanto, su correo de Google "
-         "alba23meira@gmail.com es la LLAVE MAESTRA de todo el sistema: cuide muy bien su "
-         "contraseña y actívele verificación en dos pasos.", "Lo más importante")
+         "GitHub entra con Google (su Gmail); y Resend entra directamente con Google (su Gmail). "
+         "Por lo tanto, su correo de Google alba23meira@gmail.com es la LLAVE MAESTRA de todo el "
+         "sistema: cuide muy bien su contraseña y actívele verificación en dos pasos.", "Lo más importante")
 
     # ---------- GitHub ----------
     h1("3. GitHub — el código del sistema")
@@ -153,8 +154,41 @@ def build_blocks():
     note("Verificado: se registró con su Gmail del bufete. Una razón más para cuidar la "
          "contraseña de ese correo y activarle verificación en dos pasos.", "Su caso")
 
+    # ---------- Resend ----------
+    h1("7. Resend — recordatorios de audiencias por correo")
+    p("Resend es el servicio que envía, cada mañana y de forma automática, el correo de "
+      "recordatorio con las audiencias y plazos del día siguiente. Trabaja junto con una "
+      "función programada dentro de Supabase (no requiere que usted haga nada a diario).")
+    h2("Cómo entrar")
+    stp([
+        "Vaya a resend.com y pulse «Sign in» (Iniciar sesión).",
+        "Elija «Continuar con Google» (Continue with Google) e ingrese con SU GMAIL. En Resend "
+        "usted inicia sesión directamente con su cuenta de Google, no con usuario y contraseña "
+        "propios de Resend.",
+        "Si pierde el acceso, recupérelo desde su cuenta de Google (el mismo Gmail).",
+    ])
+    h2("Para qué lo usará")
+    bul([
+        "Casi nunca en el día a día: los recordatorios se envían solos.",
+        "Para revisar si los correos salieron (sección «Emails» / «Logs» de Resend).",
+        "Más adelante, para verificar un dominio propio (sección «Domains») y así enviar los "
+        "recordatorios a TODOS los abogados en sus propios correos.",
+    ])
+    h2("Cómo está configurado hoy")
+    bul([
+        "La clave de Resend (API key) NO se anota aquí: está guardada de forma segura dentro de "
+        "Supabase, en «Edge Functions → Secrets» (RESEND_API_KEY y MAIL_FROM).",
+        "Por ahora, sin un dominio propio verificado, el recordatorio llega solo al correo del "
+        "bufete (el dueño de la cuenta), que coordina al equipo.",
+        "El envío diario está programado en Supabase → «Integrations → Cron» (trabajo "
+        "«LexFive», todos los días a las 07:00 de Bolivia).",
+    ])
+    note("Importante: en Resend usted ingresa con su GMAIL mediante «Continuar con Google». "
+         "Anote en un lugar privado cuál es ese correo exacto. Como también es su llave para "
+         "Google, cuide su contraseña y mantenga la verificación en dos pasos activada.", "Su caso")
+
     # ---------- Correo ----------
-    h1("7. Correo del bufete (Gmail)")
+    h1("8. Correo del bufete (Gmail)")
     p("El correo del bufete es la pieza central de todo: con él se crearon (o se pueden "
       "recuperar) las cuentas de GitHub, Netlify y Supabase, y a él llegan las consultas de la "
       "web mediante Web3Forms.")
@@ -165,7 +199,7 @@ def build_blocks():
     ])
 
     # ---------- Panel del sistema ----------
-    h1("8. Panel del sistema LexFive")
+    h1("9. Panel del sistema LexFive")
     p("No es una cuenta externa, pero es donde trabaja el equipo todos los días. Sus usuarios "
       "se administran desde Supabase y desde la propia pestaña «Usuarios» del panel.")
     bul([
@@ -175,14 +209,15 @@ def build_blocks():
     ])
 
     # ---------- Buenas prácticas ----------
-    h1("9. Recomendaciones para no perder los accesos")
+    h1("10. Recomendaciones para no perder los accesos")
     bul([
         "Use SIEMPRE el mismo correo del bufete para todos estos servicios; así son fáciles de "
         "recuperar.",
-        "Si entró con «Continuar con Google», entre siempre por esa misma opción.",
+        "Si entró con «Continuar con Google», entre siempre por esa misma opción (es el caso de "
+        "GitHub y de Resend).",
         "Anote en un lugar privado y seguro qué método usó para cada servicio (Google o "
         "correo+contraseña).",
-        "Active la verificación en dos pasos al menos en el correo y en GitHub.",
+        "Active la verificación en dos pasos al menos en el correo, en GitHub y en Google.",
         "Puede cerrar todas las pestañas con tranquilidad: con esta guía sabrá volver a entrar.",
         "Si un servicio le pide la contraseña y no la recuerda, use «¿Olvidó su contraseña?» "
         "para recibir un enlace de recuperación en el correo del bufete.",
