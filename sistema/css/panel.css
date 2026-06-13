@@ -630,3 +630,11 @@ code { background: #f1f2f4; padding: 1px 5px; border-radius: 4px; font-size: .85
 .novedad__top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .novedad__nuevo { background: #c0392b; color: #fff; font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 1px 7px; border-radius: 20px; }
 .novedad__fecha { margin-left: auto; font-size: .72rem; color: var(--muted, #5c6675); }
+
+
+/* ---------- Paginación de listas ---------- */
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-top: 1px solid var(--line, #e6e8ec); }
+.pager__info { font-size: .8rem; color: var(--muted, #5c6675); }
+.pager__btns { display: flex; align-items: center; gap: 10px; }
+.pager__page { font-size: .8rem; color: var(--ink, #1a2330); font-weight: 600; }
+.pager .btn[disabled] { opacity: .45; cursor: not-allowed; }

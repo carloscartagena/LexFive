@@ -207,6 +207,44 @@ function fmtMoneda(monto, moneda = 'Bs') {
   return (moneda || 'Bs') + ' ' + n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// ============================================================
+//  Paginación reutilizable para listas largas (cliente)
+// ============================================================
+const PAGE_SIZE = 25;
+
+// Calcula la "rebanada" visible y los datos de la página actual.
+function paginar(rows, page, perPage = PAGE_SIZE) {
+  const total = rows.length;
+  const pages = Math.max(1, Math.ceil(total / perPage));
+  const p = Math.min(Math.max(1, page || 1), pages);
+  const from = (p - 1) * perPage;
+  return { slice: rows.slice(from, from + perPage), page: p, pages, total, from };
+}
+
+// HTML de la barra de paginación (no se muestra si todo cabe en una página).
+function pagerHTML(info) {
+  if (info.total === 0) return '';
+  if (info.pages <= 1) return `<div class="pager"><span class="pager__info">${info.total} registro${info.total === 1 ? '' : 's'}</span></div>`;
+  const desde = info.from + 1, hasta = info.from + info.slice.length;
+  return `<div class="pager">
+    <span class="pager__info">${desde}–${hasta} de ${info.total}</span>
+    <div class="pager__btns">
+      <button class="btn btn--ghost btn--sm" data-pg="prev" ${info.page <= 1 ? 'disabled' : ''}>&larr; Anterior</button>
+      <span class="pager__page">Pág. ${info.page} / ${info.pages}</span>
+      <button class="btn btn--ghost btn--sm" data-pg="next" ${info.page >= info.pages ? 'disabled' : ''}>Siguiente &rarr;</button>
+    </div>
+  </div>`;
+}
+
+// Conecta los botones de la paginación dentro de un contenedor.
+function wirePager(container, info, onGo) {
+  if (!container) return;
+  container.querySelectorAll('[data-pg]').forEach(b => b.onclick = () => {
+    if (b.disabled) return;
+    onGo(b.dataset.pg === 'next' ? info.page + 1 : info.page - 1);
+  });
+}
+
 // Gráfico de barras horizontal simple (sin librerías).
 function barChart(items) {
   const datos = (items || []).filter(i => i.value > 0);
@@ -1641,6 +1679,7 @@ async function renderProcesos() {
     <div class="card"><div class="card__body--flush"><div id="procTable"></div></div></div>`;
 
   let filtradas = procesos;
+  let page = 1;
   function paint() {
     const q = ($('#qProc').value || '').toLowerCase();
     const fm = $('#fMateria').value, fe = $('#fEstado').value;
@@ -1648,9 +1687,10 @@ async function renderProcesos() {
       (!fm || p.materia === fm) && (!fe || p.estado === fe) &&
       (!q || [p.caratula, p.numero, p.juzgado, p.parte_contraria].some(v => (v || '').toLowerCase().includes(q))));
     filtradas = rows;
+    const info = paginar(rows, page);
     $('#procTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
       <thead><tr><th>Carátula</th><th>Materia</th><th>Tipo</th><th>Abogado</th><th>Estado</th><th>Próx. audiencia</th></tr></thead>
-      <tbody>${rows.map(p => `
+      <tbody>${info.slice.map(p => `
         <tr data-id="${p.id}">
           <td class="cell-strong">${esc(p.caratula)}<div class="cell-sub">${esc(p.numero || 'Sin número')}</div></td>
           <td><span class="badge badge-mat">${esc(p.materia || '—')}</span></td>
@@ -1658,12 +1698,14 @@ async function renderProcesos() {
           <td>${esc(namesFromIds(p.abogados_ids) || profName(p.abogado_id))}</td>
           <td>${badgeEstado(p.estado)}</td>
           <td>${p.proxima_audiencia ? fmtDateTime(p.proxima_audiencia) : '—'}</td>
-        </tr>`).join('')}</tbody></table></div>`
+        </tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
       : `<div class="empty">${ICON.procesos}<p>No se encontraron procesos.</p></div>`;
     $('#procTable').querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id));
+    wirePager($('#procTable'), info, (n) => { page = n; paint(); });
   }
   paint();
-  $('#qProc').oninput = paint; $('#fMateria').onchange = paint; $('#fEstado').onchange = paint;
+  const rePaint = () => { page = 1; paint(); };
+  $('#qProc').oninput = rePaint; $('#fMateria').onchange = rePaint; $('#fEstado').onchange = rePaint;
   $('#btnNuevoProc').onclick = () => procesoForm();
   $('#btnExportCSV').onclick = () => {
     if (!filtradas.length) { toast('No hay procesos para exportar.', 'error'); return; }
@@ -2066,19 +2108,22 @@ async function renderClientes() {
       <button class="btn btn--primary" id="btnNuevoCli">${ICON.plus} Nuevo cliente</button>
     </div>
     <div class="card"><div class="card__body--flush"><div id="cliTable"></div></div></div>`;
+  let page = 1;
   function paint() {
     const q = ($('#qCli').value || '').toLowerCase();
     const rows = state.clientes.filter(c => !q || [c.nombre, c.documento, c.email, c.telefono].some(v => (v || '').toLowerCase().includes(q)));
+    const info = paginar(rows, page);
     $('#cliTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
       <thead><tr><th>Nombre</th><th>Documento</th><th>Teléfono</th><th>Correo</th></tr></thead>
-      <tbody>${rows.map(c => `<tr data-id="${c.id}"><td class="cell-strong">${esc(c.nombre)}</td><td>${esc(c.documento || '—')}</td><td>${esc(c.telefono || '—')}</td><td>${esc(c.email || '—')}</td></tr>`).join('')}</tbody></table></div>`
+      <tbody>${info.slice.map(c => `<tr data-id="${c.id}"><td class="cell-strong">${esc(c.nombre)}</td><td>${esc(c.documento || '—')}</td><td>${esc(c.telefono || '—')}</td><td>${esc(c.email || '—')}</td></tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
       : `<div class="empty">${ICON.clientes}<p>No hay clientes registrados.</p></div>`;
     $('#cliTable').querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => {
       const c = state.clientes.find(x => x.id === tr.dataset.id); clienteForm(c);
     });
+    wirePager($('#cliTable'), info, (n) => { page = n; paint(); });
   }
   paint();
-  $('#qCli').oninput = paint;
+  $('#qCli').oninput = () => { page = 1; paint(); };
   $('#btnNuevoCli').onclick = () => clienteForm();
 }
 
@@ -2257,14 +2302,21 @@ async function renderUsuarios() {
 async function renderAuditoria() {
   loading();
   await loadProfiles();
-  const { data } = await supabase.from('auditoria').select('*').order('created_at', { ascending: false }).limit(150);
+  const { data } = await supabase.from('auditoria').select('*').order('created_at', { ascending: false }).limit(500);
   const logs = data || [];
   content().innerHTML = `
     <div class="card"><div class="card__head"><h3>Bitácora de auditoría</h3></div>
-    <div class="card__body--flush">${logs.length ? `<div class="table-wrap"><table class="data">
+    <div class="card__body--flush"><div id="audTable"></div></div></div>`;
+  let page = 1;
+  function paint() {
+    const info = paginar(logs, page);
+    $('#audTable').innerHTML = logs.length ? `<div class="table-wrap"><table class="data">
       <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>Detalle</th></tr></thead>
-      <tbody>${logs.map(l => `<tr class="no-hover"><td>${fmtDateTime(l.created_at)}</td><td>${esc(profName(l.usuario_id))}</td><td><span class="badge badge-mat">${esc(l.accion || '—')}</span></td><td>${esc(l.entidad || '—')}</td><td class="cell-sub">${esc(l.detalle || '')}</td></tr>`).join('')}</tbody></table></div>`
-      : `<div class="empty">${ICON.auditoria}<p>Sin registros todavía.</p></div>`}</div></div>`;
+      <tbody>${info.slice.map(l => `<tr class="no-hover"><td>${fmtDateTime(l.created_at)}</td><td>${esc(profName(l.usuario_id))}</td><td><span class="badge badge-mat">${esc(l.accion || '—')}</span></td><td>${esc(l.entidad || '—')}</td><td class="cell-sub">${esc(l.detalle || '')}</td></tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
+      : `<div class="empty">${ICON.auditoria}<p>Sin registros todavía.</p></div>`;
+    wirePager($('#audTable'), info, (n) => { page = n; paint(); });
+  }
+  paint();
 }
 
 // ============================================================
@@ -2610,30 +2662,34 @@ async function renderConsultas() {
     </div>
     <div class="card"><div class="card__body--flush"><div id="consTable"></div></div></div>`;
 
+  let page = 1;
   function paint() {
     const q = ($('#qCons').value || '').toLowerCase();
     const fe = $('#fEstadoCons').value;
     const rows = list.filter(c =>
       (!fe || c.estado === fe) &&
       (!q || [c.nombre, c.apellido, c.email, c.telefono, c.area, c.mensaje].some(v => (v || '').toLowerCase().includes(q))));
+    const info = paginar(rows, page);
     $('#consTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
       <thead><tr><th>Fecha</th><th>Nombre</th><th>Contacto</th><th>Área</th><th>Estado</th></tr></thead>
-      <tbody>${rows.map(c => `
+      <tbody>${info.slice.map(c => `
         <tr data-id="${c.id}">
           <td>${fmtDateTime(c.created_at)}</td>
           <td class="cell-strong">${esc(consultaNombre(c))}<div class="cell-sub">${esc((c.mensaje || '').slice(0, 60))}${(c.mensaje || '').length > 60 ? '…' : ''}</div></td>
           <td>${esc(c.email || c.telefono || '—')}</td>
           <td>${c.area ? `<span class="badge badge-mat">${esc(c.area)}</span>` : '—'}</td>
           <td>${consultaEstadoBadge(c.estado)}</td>
-        </tr>`).join('')}</tbody></table></div>`
+        </tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
       : `<div class="empty">${ICON.consultas}<p>No hay consultas que coincidan.<br>Las consultas enviadas desde el formulario de contacto de la web aparecerán aquí.</p></div>`;
     $('#consTable').querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => {
       const c = list.find(x => x.id === tr.dataset.id); openConsultaDetail(c);
     });
+    wirePager($('#consTable'), info, (n) => { page = n; paint(); });
   }
   paint();
-  $('#qCons').oninput = paint;
-  $('#fEstadoCons').onchange = paint;
+  const rePaintCons = () => { page = 1; paint(); };
+  $('#qCons').oninput = rePaintCons;
+  $('#fEstadoCons').onchange = rePaintCons;
 }
 
 function openConsultaDetail(c) {
