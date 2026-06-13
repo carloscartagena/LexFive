@@ -30,12 +30,16 @@ const ICON = {
   whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M.05 24l1.69-6.16a11.9 11.9 0 1 1 4.3 4.2L.05 24zM6.6 20.2l.37.22a9.9 9.9 0 1 0-3.35-3.3l.24.38-1 3.65 3.74-.95z"/></svg>',
   consultas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
   categorias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.59 3H4a1 1 0 0 0-1 1v5.59A2 2 0 0 0 3.83 11l9.58 9.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83zM7 7h.01"/></svg>',
-  llave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-3.5 3.5L21 2m-5.5 5.5a3.5 3.5 0 1 1-5 5 3.5 3.5 0 0 1 5-5zm0 0L19 4m0 0l2 2m-2-2-2 2"/><circle cx="8.5" cy="15.5" r="5.5"/></svg>'
+  llave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-3.5 3.5L21 2m-5.5 5.5a3.5 3.5 0 1 1-5 5 3.5 3.5 0 0 1 5-5zm0 0L19 4m0 0l2 2m-2-2-2 2"/><circle cx="8.5" cy="15.5" r="5.5"/></svg>',
+  buscar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  descargar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
+  grafico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>'
 };
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
   { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
+  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia },
   { key: 'modelos', label: 'Modelos', icon: ICON.doc },
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
   { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
@@ -110,6 +114,99 @@ function fmtDateTime(d) {
 function initials(name) {
   return (name || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 }
+
+// ============================================================
+//  Utilidades de exportación (descargas, calendario .ics, CSV)
+// ============================================================
+// Descarga un contenido como archivo (sin servidor).
+function descargarArchivo(nombre, contenido, mime = 'text/plain;charset=utf-8') {
+  const blob = (contenido instanceof Blob) ? contenido : new Blob([contenido], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+// Convierte una fecha a formato UTC para iCalendar (AAAAMMDDTHHMMSSZ).
+function icsFecha(d) {
+  return d.getUTCFullYear() + pad2(d.getUTCMonth() + 1) + pad2(d.getUTCDate()) +
+    'T' + pad2(d.getUTCHours()) + pad2(d.getUTCMinutes()) + pad2(d.getUTCSeconds()) + 'Z';
+}
+function icsEscape(s) {
+  return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+}
+
+// Genera el contenido .ics de la audiencia/plazo de un proceso (1 hora de duración).
+function buildICS(proc) {
+  if (!proc.proxima_audiencia) return null;
+  const inicio = new Date(proc.proxima_audiencia);
+  const fin = new Date(inicio.getTime() + 60 * 60 * 1000);
+  const resumen = 'Audiencia: ' + (proc.caratula || 'Proceso');
+  const partes = [];
+  if (proc.numero) partes.push('Nº ' + proc.numero);
+  if (proc.juzgado) partes.push(proc.juzgado);
+  if (proc.materia) partes.push(proc.materia);
+  const desc = partes.join(' · ');
+  return [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//LexFive//Sistema de Gestion//ES', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    'UID:lexfive-' + proc.id + '@lexfive',
+    'DTSTAMP:' + icsFecha(new Date()),
+    'DTSTART:' + icsFecha(inicio),
+    'DTEND:' + icsFecha(fin),
+    'SUMMARY:' + icsEscape(resumen),
+    'DESCRIPTION:' + icsEscape(desc),
+    proc.juzgado ? 'LOCATION:' + icsEscape(proc.juzgado) : '',
+    'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEscape(resumen), 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR'
+  ].filter(Boolean).join('\r\n');
+}
+
+// Descarga la audiencia de un proceso como archivo de calendario.
+function descargarICS(proc) {
+  const ics = buildICS(proc);
+  if (!ics) { toast('Este proceso no tiene fecha de audiencia.', 'error'); return; }
+  const nombre = 'audiencia-' + (proc.caratula || 'proceso').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40) + '.ics';
+  descargarArchivo(nombre, ics, 'text/calendar;charset=utf-8');
+  toast('Evento descargado. Ábralo para agregarlo a su calendario.', 'success');
+}
+
+// Convierte filas de procesos a CSV (compatible con Excel: separador ; y BOM UTF-8).
+function procesosToCSV(rows) {
+  const cab = ['Carátula', 'Número', 'NUREJ', 'Materia', 'Tipo', 'Estado', 'Juzgado', 'Cliente', 'Parte contraria', 'Abogados', 'Procuradores', 'Fecha inicio', 'Próxima audiencia'];
+  const celda = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lineas = [cab.map(celda).join(';')];
+  rows.forEach(p => {
+    lineas.push([
+      p.caratula, p.numero, p.nurej, p.materia,
+      p.tipo === 'administrativo' ? 'Administrativo' : 'Judicial',
+      ESTADOS[p.estado] || p.estado, p.juzgado,
+      clienteName(p.cliente_id), p.parte_contraria,
+      namesFromIds(p.abogados_ids) || profName(p.abogado_id),
+      namesFromIds(p.procuradores_ids) || profName(p.procurador_id),
+      p.fecha_inicio ? fmtDate(p.fecha_inicio) : '',
+      p.proxima_audiencia ? fmtDateTime(p.proxima_audiencia) : ''
+    ].map(celda).join(';'));
+  });
+  return '\ufeff' + lineas.join('\r\n');
+}
+
+// Gráfico de barras horizontal simple (sin librerías).
+function barChart(items) {
+  const datos = (items || []).filter(i => i.value > 0);
+  if (!datos.length) return '<p class="cell-sub" style="padding:6px 0">Sin datos para mostrar.</p>';
+  const max = Math.max.apply(null, datos.map(i => i.value));
+  return '<div class="bars">' + datos.map(i => `
+    <div class="bar-row">
+      <div class="bar-row__label" title="${esc(i.label)}">${esc(i.label)}</div>
+      <div class="bar-row__track"><div class="bar-row__fill ${i.cls || ''}" style="width:${Math.max(6, Math.round(i.value / max * 100))}%"></div></div>
+      <div class="bar-row__val">${i.value}</div>
+    </div>`).join('') + '</div>';
+}
+
 function toast(msg, type = '') {
   const t = $('#toast');
   t.textContent = msg; t.className = type; void t.offsetWidth; t.classList.add('show', type);
@@ -676,6 +773,22 @@ async function renderDashboard() {
     .sort((a, b) => new Date(b.proxima_audiencia) - new Date(a.proxima_audiencia));
   const urgentes = proximas.filter(p => new Date(p.proxima_audiencia) <= en7);
 
+  // Datos para los gráficos
+  const porEstado = Object.entries(ESTADOS)
+    .map(([k, v]) => ({ label: v, value: list.filter(p => p.estado === k).length }));
+  const matCount = {};
+  list.forEach(p => { const mt = p.materia || 'Sin materia'; matCount[mt] = (matCount[mt] || 0) + 1; });
+  const porMateria = Object.entries(matCount).map(([k, v]) => ({ label: k, value: v }))
+    .sort((a, b) => b.value - a.value).slice(0, 8);
+  const activosList = list.filter(p => !['archivado', 'concluido'].includes(p.estado));
+  const aboCount = {};
+  activosList.forEach(p => {
+    const ids = (p.abogados_ids && p.abogados_ids.length) ? p.abogados_ids : (p.abogado_id ? [p.abogado_id] : []);
+    ids.forEach(id => { aboCount[id] = (aboCount[id] || 0) + 1; });
+  });
+  const porAbogado = Object.entries(aboCount).map(([id, v]) => ({ label: profName(id), value: v }))
+    .sort((a, b) => b.value - a.value).slice(0, 8);
+
   const alertRow = (p, cls) => `
     <div class="alert-row ${cls}">
       <div><strong>${esc(p.caratula)}</strong><div class="cell-sub">${fmtDateTime(p.proxima_audiencia)} · ${esc(profName(p.abogado_id))}</div></div>
@@ -700,6 +813,12 @@ async function renderDashboard() {
     </div>
 
     ${alertasHtml}
+
+    <div class="charts-grid">
+      <div class="card"><div class="card__head"><h3>${ICON.grafico} Procesos por estado</h3></div><div class="card__body">${barChart(porEstado)}</div></div>
+      <div class="card"><div class="card__head"><h3>${ICON.grafico} Procesos por materia</h3></div><div class="card__body">${barChart(porMateria)}</div></div>
+      <div class="card"><div class="card__head"><h3>${ICON.grafico} Carga de trabajo por abogado (casos activos)</h3></div><div class="card__body">${barChart(porAbogado)}</div></div>
+    </div>
 
     <div class="card">
       <div class="card__head"><h3>Próximas audiencias y plazos</h3></div>
@@ -727,6 +846,111 @@ async function renderDashboard() {
 }
 
 // ============================================================
+//  VISTA: AGENDA / CALENDARIO  (audiencias y plazos del bufete)
+// ============================================================
+async function renderAgenda() {
+  loading();
+  const { data } = await supabase.from('procesos').select('*').not('proxima_audiencia', 'is', null);
+  const eventos = (data || []).filter(p => p.proxima_audiencia);
+
+  const hoy = new Date();
+  if (!state.agenda) state.agenda = { y: hoy.getFullYear(), m: hoy.getMonth() };
+  const { y, m } = state.agenda;
+  const primero = new Date(y, m, 1);
+  const diasMes = new Date(y, m + 1, 0).getDate();
+  const inicioSemana = primero.getDay(); // 0=Dom
+  const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+  // Agrupar eventos por día (solo del mes mostrado)
+  const porDia = {};
+  eventos.forEach(p => {
+    const d = new Date(p.proxima_audiencia);
+    if (d.getFullYear() === y && d.getMonth() === m) {
+      const k = d.getDate();
+      (porDia[k] = porDia[k] || []).push(p);
+    }
+  });
+
+  const ahora = new Date();
+  const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const claseEv = p => {
+    const d = new Date(p.proxima_audiencia);
+    if (d < ahora && !['archivado', 'concluido'].includes(p.estado)) return 'cal-ev--red';
+    if (d <= en7) return 'cal-ev--amber';
+    return '';
+  };
+
+  // Construir celdas (incluye huecos del inicio de semana)
+  let celdas = '';
+  for (let i = 0; i < inicioSemana; i++) celdas += '<div class="cal-cell cal-cell--empty"></div>';
+  for (let dia = 1; dia <= diasMes; dia++) {
+    const evs = (porDia[dia] || []).sort((a, b) => new Date(a.proxima_audiencia) - new Date(b.proxima_audiencia));
+    const esHoy = (y === hoy.getFullYear() && m === hoy.getMonth() && dia === hoy.getDate());
+    const evHtml = evs.slice(0, 3).map(p => {
+      const hora = new Date(p.proxima_audiencia).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+      return `<button class="cal-ev ${claseEv(p)}" data-id="${p.id}" title="${esc(p.caratula)}">${hora} ${esc(p.caratula)}</button>`;
+    }).join('');
+    const mas = evs.length > 3 ? `<span class="cal-mas">+${evs.length - 3} más</span>` : '';
+    celdas += `<div class="cal-cell ${esHoy ? 'cal-cell--hoy' : ''}"><span class="cal-daynum">${dia}</span>${evHtml}${mas}</div>`;
+  }
+
+  // Lista de eventos del mes (con botón para exportar a calendario personal)
+  const delMes = eventos.filter(p => {
+    const d = new Date(p.proxima_audiencia);
+    return d.getFullYear() === y && d.getMonth() === m;
+  }).sort((a, b) => new Date(a.proxima_audiencia) - new Date(b.proxima_audiencia));
+
+  content().innerHTML = `
+    <div class="card">
+      <div class="cal-nav">
+        <button class="btn btn--ghost btn--sm" id="calPrev">&larr;</button>
+        <h3 class="cal-title">${meses[m]} ${y}</h3>
+        <button class="btn btn--ghost btn--sm" id="calNext">&rarr;</button>
+        <div class="spacer"></div>
+        <button class="btn btn--ghost btn--sm" id="calHoy">Hoy</button>
+      </div>
+      <div class="card__body--flush">
+        <div class="cal-weekdays">${dias.map(d => `<div>${d}</div>`).join('')}</div>
+        <div class="cal-grid">${celdas}</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>${ICON.audiencia} Audiencias y plazos de ${meses[m]}</h3></div>
+      <div class="card__body--flush">
+        ${delMes.length ? `<div class="table-wrap"><table class="data">
+          <thead><tr><th>Fecha / hora</th><th>Carátula</th><th>Juzgado</th><th>Responsable</th><th></th></tr></thead>
+          <tbody>${delMes.map(p => `
+            <tr>
+              <td>${fmtDateTime(p.proxima_audiencia)}</td>
+              <td class="cell-strong js-open" data-id="${p.id}" style="cursor:pointer">${esc(p.caratula)}</td>
+              <td>${esc(p.juzgado || '—')}</td>
+              <td>${esc(namesFromIds(p.abogados_ids) || profName(p.abogado_id))}</td>
+              <td><button class="btn btn--ghost btn--sm js-ics" data-id="${p.id}">${ICON.descargar} Mi calendario</button></td>
+            </tr>`).join('')}</tbody></table></div>`
+        : `<div class="empty">${ICON.audiencia}<p>No hay audiencias ni plazos registrados en este mes.</p></div>`}
+      </div>
+    </div>`;
+
+  const irMes = (delta) => {
+    let nm = m + delta, ny = y;
+    if (nm < 0) { nm = 11; ny--; } else if (nm > 11) { nm = 0; ny++; }
+    state.agenda = { y: ny, m: nm };
+    renderAgenda();
+  };
+  $('#calPrev').onclick = () => irMes(-1);
+  $('#calNext').onclick = () => irMes(1);
+  $('#calHoy').onclick = () => { state.agenda = { y: hoy.getFullYear(), m: hoy.getMonth() }; renderAgenda(); };
+  content().querySelectorAll('.cal-ev, .js-open').forEach(el => el.onclick = () => openProcesoDetail(el.dataset.id));
+  content().querySelectorAll('.js-ics').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    const p = eventos.find(x => x.id === b.dataset.id);
+    if (p) descargarICS(p);
+  });
+}
+
+// ============================================================
 //  VISTA: PROCESOS
 // ============================================================
 async function renderProcesos() {
@@ -742,16 +966,20 @@ async function renderProcesos() {
       <select id="fMateria" ${hint('Filtra los procesos por área del derecho.')}><option value="">Todas las materias</option>${state.categorias.map(m => `<option>${esc(m)}</option>`).join('')}</select>
       <select id="fEstado" ${hint('Filtra los procesos por su etapa actual.')}><option value="">Todos los estados</option>${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
       <div class="spacer"></div>
+      <button class="btn btn--ghost" id="btnExportCSV" ${hint('Descarga la lista filtrada en un archivo de Excel (CSV).')}>${ICON.descargar} Excel</button>
+      <button class="btn btn--ghost" id="btnExportPDF" ${hint('Abre una vista para imprimir o guardar la lista filtrada como PDF.')}>${ICON.doc} PDF</button>
       <button class="btn btn--primary" id="btnNuevoProc" ${hint('Crea un nuevo caso. Solo la carátula es obligatoria; el resto puede completarlo después.')}>${ICON.plus} Nuevo proceso</button>
     </div>
     <div class="card"><div class="card__body--flush"><div id="procTable"></div></div></div>`;
 
+  let filtradas = procesos;
   function paint() {
     const q = ($('#qProc').value || '').toLowerCase();
     const fm = $('#fMateria').value, fe = $('#fEstado').value;
     const rows = procesos.filter(p =>
       (!fm || p.materia === fm) && (!fe || p.estado === fe) &&
       (!q || [p.caratula, p.numero, p.juzgado, p.parte_contraria].some(v => (v || '').toLowerCase().includes(q))));
+    filtradas = rows;
     $('#procTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
       <thead><tr><th>Carátula</th><th>Materia</th><th>Tipo</th><th>Abogado</th><th>Estado</th><th>Próx. audiencia</th></tr></thead>
       <tbody>${rows.map(p => `
@@ -769,6 +997,52 @@ async function renderProcesos() {
   paint();
   $('#qProc').oninput = paint; $('#fMateria').onchange = paint; $('#fEstado').onchange = paint;
   $('#btnNuevoProc').onclick = () => procesoForm();
+  $('#btnExportCSV').onclick = () => {
+    if (!filtradas.length) { toast('No hay procesos para exportar.', 'error'); return; }
+    descargarArchivo('procesos-lexfive-' + hoyISO() + '.csv', procesosToCSV(filtradas), 'text/csv;charset=utf-8');
+    toast('Lista exportada a Excel (CSV).', 'success');
+  };
+  $('#btnExportPDF').onclick = () => {
+    if (!filtradas.length) { toast('No hay procesos para exportar.', 'error'); return; }
+    imprimirListaProcesos(filtradas);
+  };
+}
+
+// Abre una ventana de impresión con la lista de procesos (para guardar como PDF).
+function imprimirListaProcesos(rows) {
+  const filas = rows.map(p => `<tr>
+    <td>${esc(p.caratula)}${p.numero ? '<br><small>' + esc(p.numero) + '</small>' : ''}</td>
+    <td>${esc(p.materia || '—')}</td>
+    <td>${p.tipo === 'administrativo' ? 'Administrativo' : 'Judicial'}</td>
+    <td>${esc(ESTADOS[p.estado] || p.estado)}</td>
+    <td>${esc(p.juzgado || '—')}</td>
+    <td>${esc(clienteName(p.cliente_id))}</td>
+    <td>${esc(namesFromIds(p.abogados_ids) || profName(p.abogado_id))}</td>
+    <td>${p.proxima_audiencia ? fmtDateTime(p.proxima_audiencia) : '—'}</td>
+  </tr>`).join('');
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+    <title>Procesos · LexFive</title>
+    <style>
+      body{font-family:Arial,Helvetica,sans-serif;color:#1a2330;margin:24px;}
+      h1{font-family:Georgia,serif;color:#0e1b2c;font-size:20px;margin:0 0 2px;}
+      .sub{color:#5c6675;font-size:12px;margin:0 0 16px;}
+      table{width:100%;border-collapse:collapse;font-size:11px;}
+      th,td{border:1px solid #d9dce1;padding:6px 8px;text-align:left;vertical-align:top;}
+      th{background:#0e1b2c;color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}
+      tr:nth-child(even) td{background:#f6f7f9;}
+      small{color:#5c6675;}
+      @media print{@page{size:landscape;margin:10mm;}}
+    </style></head><body>
+    <h1>LexFive — Listado de procesos</h1>
+    <p class="sub">${rows.length} proceso(s) · Generado el ${fmtDate(new Date())}</p>
+    <table><thead><tr>
+      <th>Carátula</th><th>Materia</th><th>Tipo</th><th>Estado</th><th>Juzgado</th><th>Cliente</th><th>Abogados</th><th>Próx. audiencia</th>
+    </tr></thead><tbody>${filas}</tbody></table>
+    <script>window.onload=function(){window.print();}<\/script>
+    </body></html>`;
+  const w = window.open('', '_blank');
+  if (!w) { toast('Permita las ventanas emergentes para generar el PDF.', 'error'); return; }
+  w.document.write(html); w.document.close();
 }
 
 function procesoForm(proc = null) {
@@ -2399,6 +2673,7 @@ function imprimirCredencial() {
 const VIEWS = {
   dashboard: { title: 'Panel general', render: renderDashboard },
   procesos: { title: 'Procesos', render: renderProcesos },
+  agenda: { title: 'Agenda y calendario', render: renderAgenda },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
@@ -2449,6 +2724,68 @@ function buildSidebar() {
 }
 
 // ============================================================
+//  Buscador global (procesos, clientes y consultas)
+// ============================================================
+async function openBuscadorGlobal() {
+  openModal('Buscar en el sistema', `
+    <div class="field" style="margin-bottom:6px">
+      <input id="gqInput" type="search" placeholder="Escriba carátula, número, NUREJ, cliente, correo..." autocomplete="off">
+    </div>
+    <p class="cell-sub" id="gqHint">Busca a la vez en procesos, clientes y consultas.</p>
+    <div id="gqResults"></div>`, [{ label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }], true);
+
+  const input = $('#gqInput');
+  const cont = $('#gqResults');
+  if (input) input.focus();
+
+  // Cargar datos una sola vez al abrir
+  const [{ data: procesos }, { data: clientes }, { data: consultas }] = await Promise.all([
+    supabase.from('procesos').select('*'),
+    supabase.from('clientes').select('*'),
+    supabase.from('consultas').select('*').order('created_at', { ascending: false })
+  ]);
+  const P = procesos || [], C = clientes || [], Q = consultas || [];
+
+  const pinta = () => {
+    const q = (input.value || '').trim().toLowerCase();
+    if (q.length < 2) { cont.innerHTML = ''; $('#gqHint').style.display = ''; return; }
+    $('#gqHint').style.display = 'none';
+    const match = (...vals) => vals.some(v => (v || '').toString().toLowerCase().includes(q));
+
+    const pr = P.filter(p => match(p.caratula, p.numero, p.nurej, p.juzgado, p.parte_contraria, clienteName(p.cliente_id))).slice(0, 8);
+    const cl = C.filter(c => match(c.nombre, c.documento, c.email, c.telefono)).slice(0, 6);
+    const cs = Q.filter(c => match(consultaNombre(c), c.email, c.mensaje, c.area)).slice(0, 6);
+
+    let html = '';
+    if (pr.length) html += `<div class="gq-group"><div class="gq-group__title">${ICON.procesos} Procesos (${pr.length})</div>${pr.map(p => `
+      <button class="gq-item" data-tipo="proceso" data-id="${p.id}">
+        <strong>${esc(p.caratula)}</strong>
+        <span class="cell-sub">${esc(p.numero || 'Sin número')} · ${esc(p.materia || '—')} · ${esc(clienteName(p.cliente_id))}</span>
+      </button>`).join('')}</div>`;
+    if (cl.length) html += `<div class="gq-group"><div class="gq-group__title">${ICON.clientes} Clientes (${cl.length})</div>${cl.map(c => `
+      <button class="gq-item" data-tipo="cliente" data-id="${c.id}">
+        <strong>${esc(c.nombre)}</strong>
+        <span class="cell-sub">${esc([c.documento, c.telefono, c.email].filter(Boolean).join(' · ') || 'Sin datos de contacto')}</span>
+      </button>`).join('')}</div>`;
+    if (cs.length) html += `<div class="gq-group"><div class="gq-group__title">${ICON.consultas} Consultas (${cs.length})</div>${cs.map(c => `
+      <button class="gq-item" data-tipo="consulta" data-id="${c.id}">
+        <strong>${esc(consultaNombre(c))}</strong>
+        <span class="cell-sub">${esc((c.mensaje || '').slice(0, 70))}</span>
+      </button>`).join('')}</div>`;
+    if (!html) html = `<p class="empty" style="padding:20px">Sin resultados para “${esc(q)}”.</p>`;
+    cont.innerHTML = html;
+
+    cont.querySelectorAll('.gq-item').forEach(b => b.onclick = () => {
+      const id = b.dataset.id;
+      if (b.dataset.tipo === 'proceso') openProcesoDetail(id);
+      else if (b.dataset.tipo === 'cliente') { const c = C.find(x => x.id === id); if (c) clienteForm(c); }
+      else { const c = Q.find(x => x.id === id); if (c) openConsultaDetail(c); }
+    });
+  };
+  if (input) input.oninput = pinta;
+}
+
+// ============================================================
 //  Arranque
 // ============================================================
 (async function init() {
@@ -2463,6 +2800,29 @@ function buildSidebar() {
   $('#userAvatar').textContent = initials(profile.nombre);
 
   buildSidebar();
+
+  // Buscador global en la barra superior (solo personal, no clientes).
+  if (profile.rol !== 'cliente') {
+    const actions = $('#topbarActions');
+    if (actions) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn--ghost btn--sm topbar__search';
+      btn.id = 'btnBuscarGlobal';
+      btn.innerHTML = ICON.buscar + '<span>Buscar</span>';
+      btn.setAttribute('data-tip', 'Busque a la vez en procesos, clientes y consultas (atajo: Ctrl/⌘ + K).');
+      btn.onclick = () => openBuscadorGlobal();
+      actions.appendChild(btn);
+    }
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); openBuscadorGlobal(); }
+    });
+  }
+
+  // Registrar el service worker para que el sistema se pueda instalar como
+  // app en el celular y funcione mejor (PWA).
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
 
   // Aplica el logo elegido por el bufete. Primero, pintado rápido con la
   // última versión conocida en este equipo; luego se refresca desde la nube
