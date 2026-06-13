@@ -279,6 +279,88 @@ function borrarImagen(kind) {
   ImgDB.del(kind);
 }
 
+// ============================================================
+//  Configuración compartida del bufete (logo y sello) en Supabase.
+//  Antes el logo se guardaba SOLO en este navegador, por eso un
+//  cambio hecho en la computadora no se veía en el celular. Ahora
+//  se guarda en la nube (tabla "configuracion", clave 'branding')
+//  y se aplica igual en todos los dispositivos y en la web pública.
+// ============================================================
+const Branding = {
+  cache: null,
+  // Lee la configuración guardada en la nube (y la cachea localmente).
+  async load() {
+    try {
+      const { data } = await supabase
+        .from('configuracion').select('valor').eq('clave', 'branding').maybeSingle();
+      this.cache = (data && data.valor) || {};
+    } catch (e) {
+      this.cache = this.local();
+    }
+    try { localStorage.setItem('lexfive_branding', JSON.stringify(this.cache)); } catch (e) {}
+    return this.cache;
+  },
+  // Última versión conocida sin esperar a la red (pintado rápido / sin conexión).
+  local() {
+    if (this.cache) return this.cache;
+    try { return JSON.parse(localStorage.getItem('lexfive_branding') || '{}'); } catch (e) { return {}; }
+  },
+  // Guarda la configuración en la nube para que se vea en todos los equipos.
+  async save(obj) {
+    this.cache = obj;
+    try { localStorage.setItem('lexfive_branding', JSON.stringify(obj)); } catch (e) {}
+    try {
+      const { error } = await supabase.from('configuracion').upsert({
+        clave: 'branding', valor: obj, updated_at: new Date().toISOString()
+      });
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+};
+
+// Toma una "foto" del logo/sello elegido en este equipo (selección + imágenes
+// propias + modelos ocultos) para guardarla en la nube.
+function snapshotBranding() {
+  const readList = k => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
+  return {
+    logoId: localStorage.getItem('lexfive_logo') || null,
+    logoImg: IMG.logo || null,
+    selloId: localStorage.getItem('lexfive_sello') || null,
+    selloImg: IMG.sello || null,
+    logosHidden: readList('lexfive_logos_hidden'),
+    sellosHidden: readList('lexfive_sellos_hidden')
+  };
+}
+
+// Empuja la configuración actual a la nube y avisa si no se pudo.
+async function pushBranding() {
+  const ok = await Branding.save(snapshotBranding());
+  if (!ok) toast('Se guardó en este equipo, pero no se pudo sincronizar con los demás dispositivos. Revise su conexión.', 'error');
+  return ok;
+}
+
+// Trae la configuración de la nube y la aplica a este equipo (selección,
+// imágenes propias y modelos ocultos), dejándolo idéntico a los demás.
+async function hydrateBranding() {
+  const b = await Branding.load();
+  if (!b || !Object.keys(b).length) return b;
+  try {
+    if (b.logoId) localStorage.setItem('lexfive_logo', b.logoId);
+    if (b.selloId) localStorage.setItem('lexfive_sello', b.selloId);
+    localStorage.setItem('lexfive_logos_hidden', JSON.stringify(b.logosHidden || []));
+    localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(b.sellosHidden || []));
+    // La nube es la fuente de verdad para la imagen propia.
+    if (b.logoImg) { IMG.logo = b.logoImg; try { await ImgDB.set('logo', b.logoImg); } catch (e) {} }
+    else { IMG.logo = null; try { await ImgDB.del('logo'); } catch (e) {} localStorage.removeItem('lexfive_logo_custom'); }
+    if (b.selloImg) { IMG.sello = b.selloImg; try { await ImgDB.set('sello', b.selloImg); } catch (e) {} }
+    else { IMG.sello = null; try { await ImgDB.del('sello'); } catch (e) {} localStorage.removeItem('lexfive_sello_custom'); }
+  } catch (e) {}
+  return b;
+}
+
 // Texto amistoso de "hace cuánto" se guardó el borrador
 function draftAgo(ts) {
   if (!ts) return 'hace un momento';
@@ -1660,6 +1742,7 @@ async function deleteConsulta(c) {
 async function renderCredenciales() {
   loading();
   await ensureImgCache();
+  await hydrateBranding();
   const p = state.profile;
   const rolLabel = ROLES[p.rol] || p.rol;
 
@@ -1925,7 +2008,8 @@ async function renderCredenciales() {
     const pv = $('#logoPreviewBig'); if (pv) pv.src = logoSrc(id);
     const dl = $('#logoDownload'); if (dl) { dl.href = logoSrc(id); dl.setAttribute('download', nombreLogo(id)); }
     applyLogo(id);
-    toast('Logo aplicado. Se usará en todo el sistema.', 'success');
+    pushBranding();
+    toast('Logo aplicado. Se usará en todo el sistema y en todos los dispositivos.', 'success');
   });
   const btnLogoBig = $('#btnLogoBig');
   if (btnLogoBig) btnLogoBig.onclick = () => verImagenGrande(logoSrc(logoSel), 'Logo del bufete', nombreLogo(logoSel));
@@ -1940,14 +2024,14 @@ async function renderCredenciales() {
     if (!f) return;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
     if (f.type === 'image/svg+xml' || ext === 'svg') {
-      leerImagenBufete(f, 'logo', () => { applyLogo('custom'); renderCredenciales(); toast('Logo subido y aplicado.', 'success'); });
+      leerImagenBufete(f, 'logo', () => { localStorage.setItem('lexfive_logo', 'custom'); applyLogo('custom'); pushBranding(); renderCredenciales(); toast('Logo subido y aplicado en todos los dispositivos.', 'success'); });
     } else {
       abrirEditorImagen(f, { titulo: 'Ajustar logo', salida: 600, quitarBlanco: false }, async (pngUrl) => {
         const ok = await guardarImagen('logo', pngUrl);
         if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
         localStorage.setItem('lexfive_logo', 'custom');
-        applyLogo('custom'); renderCredenciales();
-        toast('Logo ajustado, convertido a PNG y aplicado.', 'success');
+        applyLogo('custom'); await pushBranding(); renderCredenciales();
+        toast('Logo ajustado, convertido a PNG y aplicado en todos los dispositivos.', 'success');
       });
     }
   };
@@ -1964,11 +2048,12 @@ async function renderCredenciales() {
       const nuevo = pickActive(null, IMG.logo, vis, LOGO_DEFAULT);
       localStorage.setItem('lexfive_logo', nuevo); applyLogo(nuevo);
     }
+    pushBranding();
     renderCredenciales();
     toast('Logo eliminado de la galería.', 'success');
   });
   const btnRestoreLogos = $('#btnRestoreLogos');
-  if (btnRestoreLogos) btnRestoreLogos.onclick = () => { localStorage.removeItem('lexfive_logos_hidden'); renderCredenciales(); toast('Modelos de logo restaurados.', 'success'); };
+  if (btnRestoreLogos) btnRestoreLogos.onclick = () => { localStorage.removeItem('lexfive_logos_hidden'); pushBranding(); renderCredenciales(); toast('Modelos de logo restaurados.', 'success'); };
 
   // Enlazar los campos con la credencial en vivo + autoguardado
   const sync = () => {
@@ -2026,6 +2111,7 @@ async function renderCredenciales() {
     content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const prev = $('#selloPreview'); if (prev) prev.src = selloSrc(id);
     const dl = $('#selloDownload'); if (dl) { dl.href = selloSrc(id); dl.setAttribute('download', id === 'custom' ? 'sello-lexfive.png' : id + '.svg'); }
+    pushBranding();
     toast('Sello seleccionado. Listo para memoriales y documentos.', 'success');
   });
   const btnSelloBig = $('#btnSelloBig');
@@ -2041,14 +2127,15 @@ async function renderCredenciales() {
     if (!f) return;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
     if (f.type === 'image/svg+xml' || ext === 'svg') {
-      leerImagenBufete(f, 'sello', () => { renderCredenciales(); toast('Sello subido.', 'success'); });
+      leerImagenBufete(f, 'sello', () => { localStorage.setItem('lexfive_sello', 'custom'); pushBranding(); renderCredenciales(); toast('Sello subido y sincronizado.', 'success'); });
     } else {
       abrirEditorImagen(f, { titulo: 'Ajustar sello', salida: 1000, quitarBlanco: true }, async (pngUrl) => {
         const ok = await guardarImagen('sello', pngUrl);
         if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
         localStorage.setItem('lexfive_sello', 'custom');
+        await pushBranding();
         renderCredenciales();
-        toast('Sello ajustado, convertido a PNG y aplicado.', 'success');
+        toast('Sello ajustado, convertido a PNG y sincronizado.', 'success');
       });
     }
   };
@@ -2064,11 +2151,12 @@ async function renderCredenciales() {
       const vis = SELLOS.filter(s => readList('lexfive_sellos_hidden').indexOf(s.id) === -1);
       localStorage.setItem('lexfive_sello', pickActive(null, IMG.sello, vis, SELLO_DEFAULT));
     }
+    pushBranding();
     renderCredenciales();
     toast('Sello eliminado de la galería.', 'success');
   });
   const btnRestoreSellos = $('#btnRestoreSellos');
-  if (btnRestoreSellos) btnRestoreSellos.onclick = () => { localStorage.removeItem('lexfive_sellos_hidden'); renderCredenciales(); toast('Sellos restaurados.', 'success'); };
+  if (btnRestoreSellos) btnRestoreSellos.onclick = () => { localStorage.removeItem('lexfive_sellos_hidden'); pushBranding(); renderCredenciales(); toast('Sellos restaurados.', 'success'); };
 
   $('#btnPrintCred').onclick = imprimirCredencial;
   const bps = $('#btnPrintSello');
@@ -2376,9 +2464,20 @@ function buildSidebar() {
 
   buildSidebar();
 
-  // Aplica el logo elegido por el bufete (si se eligió uno)
-  const logoGuardado = localStorage.getItem('lexfive_logo');
-  if (logoGuardado) applyLogo(logoGuardado);
+  // Aplica el logo elegido por el bufete. Primero, pintado rápido con la
+  // última versión conocida en este equipo; luego se refresca desde la nube
+  // para que coincida con lo elegido en cualquier otro dispositivo.
+  try {
+    const cache = Branding.local();
+    if (cache.logoImg) IMG.logo = cache.logoImg;
+    if (cache.logoId) applyLogo(cache.logoId);
+    else { const lg = localStorage.getItem('lexfive_logo'); if (lg) applyLogo(lg); }
+  } catch (e) {}
+  Branding.load().then(b => {
+    if (!b) return;
+    if (b.logoImg) IMG.logo = b.logoImg;
+    if (b.logoId) { localStorage.setItem('lexfive_logo', b.logoId); applyLogo(b.logoId); }
+  }).catch(() => {});
 
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();

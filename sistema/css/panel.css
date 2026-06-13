@@ -341,8 +341,8 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
     display: flex; flex-direction: column;
 }
 .cred-top2 { display: flex; align-items: center; gap: 12px; padding: 10px 14px 6px; }
-.cred-brand { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
-.cred-logo { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+.cred-brand { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 3px; }
+.cred-logo { width: 68px; height: 68px; object-fit: contain; flex-shrink: 0; }
 .cred-brand strong { font-family: var(--font-serif, Georgia, serif); font-size: 1.18rem; line-height: 1; color: var(--navy, #0e1b2c); }
 .cred-brand small { text-transform: uppercase; letter-spacing: 2.5px; font-size: .52rem; color: var(--gold-dark, #a8853c); }
 .cred-band {
