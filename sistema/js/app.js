@@ -33,16 +33,20 @@ const ICON = {
   llave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-3.5 3.5L21 2m-5.5 5.5a3.5 3.5 0 1 1-5 5 3.5 3.5 0 0 1 5-5zm0 0L19 4m0 0l2 2m-2-2-2 2"/><circle cx="8.5" cy="15.5" r="5.5"/></svg>',
   buscar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
   descargar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
-  grafico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>'
+  grafico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>',
+  tareas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>',
+  dinero: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v6M18 9v6"/></svg>'
 };
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
   { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
   { key: 'agenda', label: 'Agenda', icon: ICON.audiencia },
+  { key: 'tareas', label: 'Tareas', icon: ICON.tareas },
   { key: 'modelos', label: 'Modelos', icon: ICON.doc },
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
   { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
+  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
   { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
@@ -192,6 +196,12 @@ function procesosToCSV(rows) {
     ].map(celda).join(';'));
   });
   return '\ufeff' + lineas.join('\r\n');
+}
+
+// Formato de dinero (Bolivianos por defecto).
+function fmtMoneda(monto, moneda = 'Bs') {
+  const n = Number(monto || 0);
+  return (moneda || 'Bs') + ' ' + n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // Gráfico de barras horizontal simple (sin librerías).
@@ -767,6 +777,27 @@ async function renderDashboard() {
     consultasNuevas = count || 0;
   } catch (e) { consultasNuevas = 0; }
 
+  // Tareas pendientes (no completadas)
+  let tareasPend = 0;
+  try {
+    const { count } = await supabase.from('tareas').select('id', { count: 'exact', head: true }).neq('estado', 'hecha');
+    tareasPend = count || 0;
+  } catch (e) { tareasPend = 0; }
+
+  // Por cobrar (solo admin y abogado)
+  let porCobrar = null;
+  if (['admin', 'abogado'].includes(state.profile.rol)) {
+    try {
+      const [{ data: hs }, { data: ps }] = await Promise.all([
+        supabase.from('honorarios').select('monto'),
+        supabase.from('pagos').select('monto')
+      ]);
+      const th = (hs || []).reduce((a, b) => a + Number(b.monto || 0), 0);
+      const tp = (ps || []).reduce((a, b) => a + Number(b.monto || 0), 0);
+      porCobrar = th - tp;
+    } catch (e) { porCobrar = null; }
+  }
+
   // Alertas: audiencias vencidas y dentro de los próximos 7 días
   const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
   const vencidas = list.filter(p => p.proxima_audiencia && new Date(p.proxima_audiencia) < ahora && !['archivado', 'concluido'].includes(p.estado))
@@ -810,6 +841,8 @@ async function renderDashboard() {
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.audiencia}</div></div><div class="metric__num">${proximas.length}</div><div class="metric__label">Audiencias próximas</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.clientes}</div></div><div class="metric__num">${mios}</div><div class="metric__label">Mis procesos</div></div>
       <div class="metric" id="mConsultas" style="cursor:pointer" ${hint('Mensajes nuevos enviados desde el formulario de contacto de la web. Haga clic para verlos y responder.')}><div class="metric__top"><div class="metric__icon">${ICON.consultas}</div></div><div class="metric__num">${consultasNuevas}</div><div class="metric__label">Consultas nuevas</div></div>
+      <div class="metric" id="mTareas" style="cursor:pointer" ${hint('Tareas del equipo que aún no se completan. Haga clic para ver el tablero.')}><div class="metric__top"><div class="metric__icon">${ICON.tareas}</div></div><div class="metric__num">${tareasPend}</div><div class="metric__label">Tareas pendientes</div></div>
+      ${porCobrar !== null ? `<div class="metric" id="mPorCobrar" style="cursor:pointer" ${hint('Honorarios facturados menos lo cobrado. Haga clic para ver el detalle.')}><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.4rem">${fmtMoneda(porCobrar)}</div><div class="metric__label">Por cobrar</div></div>` : ''}
     </div>
 
     ${alertasHtml}
@@ -843,6 +876,8 @@ async function renderDashboard() {
     if (p) recordarPorWhatsApp(p);
   });
   const mc = $('#mConsultas'); if (mc) mc.onclick = () => navigate('consultas');
+  const mt = $('#mTareas'); if (mt) mt.onclick = () => navigate('tareas');
+  const mpc = $('#mPorCobrar'); if (mpc) mpc.onclick = () => navigate('finanzas');
 }
 
 // ============================================================
@@ -850,10 +885,36 @@ async function renderDashboard() {
 // ============================================================
 async function renderAgenda() {
   loading();
-  const { data } = await supabase.from('procesos').select('*').not('proxima_audiencia', 'is', null);
-  const eventos = (data || []).filter(p => p.proxima_audiencia);
+  const [{ data: procs }, { data: evs }] = await Promise.all([
+    supabase.from('procesos').select('*'),
+    supabase.from('eventos').select('*')
+  ]);
+  const procMap = {};
+  (procs || []).forEach(p => { procMap[p.id] = p; });
 
   const hoy = new Date();
+  const ahora = new Date();
+  const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  // Unificar: "próxima audiencia" del proceso (heredado) + eventos/plazos múltiples.
+  const items = [];
+  (procs || []).forEach(p => {
+    if (p.proxima_audiencia) items.push({ procId: p.id, fecha: p.proxima_audiencia, titulo: p.caratula, kind: 'proc', proc: p });
+  });
+  (evs || []).forEach(e => {
+    const p = procMap[e.proceso_id];
+    items.push({ procId: e.proceso_id, fecha: e.fecha, titulo: e.titulo + (p ? ' · ' + p.caratula : ''), kind: 'ev', ev: e, proc: p });
+  });
+  items.forEach((it, i) => { it.i = i; });
+
+  const claseItem = it => {
+    if (it.kind === 'ev' && it.ev.estado === 'cumplido') return 'cal-ev--done';
+    const d = new Date(it.fecha);
+    if (d < ahora && !(it.proc && ['archivado', 'concluido'].includes(it.proc.estado))) return 'cal-ev--red';
+    if (d <= en7) return 'cal-ev--amber';
+    return '';
+  };
+
   if (!state.agenda) state.agenda = { y: hoy.getFullYear(), m: hoy.getMonth() };
   const { y, m } = state.agenda;
   const primero = new Date(y, m, 1);
@@ -862,44 +923,35 @@ async function renderAgenda() {
   const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
   const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-  // Agrupar eventos por día (solo del mes mostrado)
+  // Agrupar por día (solo del mes mostrado)
   const porDia = {};
-  eventos.forEach(p => {
-    const d = new Date(p.proxima_audiencia);
+  items.forEach(it => {
+    const d = new Date(it.fecha);
     if (d.getFullYear() === y && d.getMonth() === m) {
       const k = d.getDate();
-      (porDia[k] = porDia[k] || []).push(p);
+      (porDia[k] = porDia[k] || []).push(it);
     }
   });
-
-  const ahora = new Date();
-  const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const claseEv = p => {
-    const d = new Date(p.proxima_audiencia);
-    if (d < ahora && !['archivado', 'concluido'].includes(p.estado)) return 'cal-ev--red';
-    if (d <= en7) return 'cal-ev--amber';
-    return '';
-  };
 
   // Construir celdas (incluye huecos del inicio de semana)
   let celdas = '';
   for (let i = 0; i < inicioSemana; i++) celdas += '<div class="cal-cell cal-cell--empty"></div>';
   for (let dia = 1; dia <= diasMes; dia++) {
-    const evs = (porDia[dia] || []).sort((a, b) => new Date(a.proxima_audiencia) - new Date(b.proxima_audiencia));
+    const evsDia = (porDia[dia] || []).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
     const esHoy = (y === hoy.getFullYear() && m === hoy.getMonth() && dia === hoy.getDate());
-    const evHtml = evs.slice(0, 3).map(p => {
-      const hora = new Date(p.proxima_audiencia).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
-      return `<button class="cal-ev ${claseEv(p)}" data-id="${p.id}" title="${esc(p.caratula)}">${hora} ${esc(p.caratula)}</button>`;
+    const evHtml = evsDia.slice(0, 3).map(it => {
+      const hora = new Date(it.fecha).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+      return `<button class="cal-ev ${claseItem(it)}" data-pid="${it.procId}" title="${esc(it.titulo)}">${hora} ${esc(it.titulo)}</button>`;
     }).join('');
-    const mas = evs.length > 3 ? `<span class="cal-mas">+${evs.length - 3} más</span>` : '';
+    const mas = evsDia.length > 3 ? `<span class="cal-mas">+${evsDia.length - 3} más</span>` : '';
     celdas += `<div class="cal-cell ${esHoy ? 'cal-cell--hoy' : ''}"><span class="cal-daynum">${dia}</span>${evHtml}${mas}</div>`;
   }
 
   // Lista de eventos del mes (con botón para exportar a calendario personal)
-  const delMes = eventos.filter(p => {
-    const d = new Date(p.proxima_audiencia);
+  const delMes = items.filter(it => {
+    const d = new Date(it.fecha);
     return d.getFullYear() === y && d.getMonth() === m;
-  }).sort((a, b) => new Date(a.proxima_audiencia) - new Date(b.proxima_audiencia));
+  }).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
   content().innerHTML = `
     <div class="card">
@@ -920,14 +972,14 @@ async function renderAgenda() {
       <div class="card__head"><h3>${ICON.audiencia} Audiencias y plazos de ${meses[m]}</h3></div>
       <div class="card__body--flush">
         ${delMes.length ? `<div class="table-wrap"><table class="data">
-          <thead><tr><th>Fecha / hora</th><th>Carátula</th><th>Juzgado</th><th>Responsable</th><th></th></tr></thead>
-          <tbody>${delMes.map(p => `
+          <thead><tr><th>Fecha / hora</th><th>Evento / proceso</th><th>Tipo</th><th>Responsable</th><th></th></tr></thead>
+          <tbody>${delMes.map(it => `
             <tr>
-              <td>${fmtDateTime(p.proxima_audiencia)}</td>
-              <td class="cell-strong js-open" data-id="${p.id}" style="cursor:pointer">${esc(p.caratula)}</td>
-              <td>${esc(p.juzgado || '—')}</td>
-              <td>${esc(namesFromIds(p.abogados_ids) || profName(p.abogado_id))}</td>
-              <td><button class="btn btn--ghost btn--sm js-ics" data-id="${p.id}">${ICON.descargar} Mi calendario</button></td>
+              <td>${fmtDateTime(it.fecha)}</td>
+              <td class="cell-strong js-open" data-pid="${it.procId}" style="cursor:pointer">${esc(it.titulo)}</td>
+              <td>${it.kind === 'ev' ? esc(it.ev.tipo) : 'audiencia'}${it.kind === 'ev' && it.ev.estado === 'cumplido' ? ' ✓' : ''}</td>
+              <td>${esc(it.proc ? (namesFromIds(it.proc.abogados_ids) || profName(it.proc.abogado_id)) : '—')}</td>
+              <td><button class="btn btn--ghost btn--sm js-ics" data-i="${it.i}">${ICON.descargar} Mi calendario</button></td>
             </tr>`).join('')}</tbody></table></div>`
         : `<div class="empty">${ICON.audiencia}<p>No hay audiencias ni plazos registrados en este mes.</p></div>`}
       </div>
@@ -942,12 +994,362 @@ async function renderAgenda() {
   $('#calPrev').onclick = () => irMes(-1);
   $('#calNext').onclick = () => irMes(1);
   $('#calHoy').onclick = () => { state.agenda = { y: hoy.getFullYear(), m: hoy.getMonth() }; renderAgenda(); };
-  content().querySelectorAll('.cal-ev, .js-open').forEach(el => el.onclick = () => openProcesoDetail(el.dataset.id));
+  content().querySelectorAll('.cal-ev, .js-open').forEach(el => el.onclick = () => openProcesoDetail(el.dataset.pid));
   content().querySelectorAll('.js-ics').forEach(b => b.onclick = (e) => {
     e.stopPropagation();
-    const p = eventos.find(x => x.id === b.dataset.id);
-    if (p) descargarICS(p);
+    const it = items[b.dataset.i];
+    if (!it) return;
+    if (it.kind === 'ev') descargarICSEvento(it.ev, it.proc ? it.proc.caratula : '');
+    else descargarICS(it.proc);
   });
+}
+
+// Descarga un evento/plazo como archivo de calendario (.ics).
+function descargarICSEvento(ev, caratula) {
+  const inicio = new Date(ev.fecha);
+  const fin = new Date(inicio.getTime() + 60 * 60 * 1000);
+  const resumen = (ev.titulo || 'Evento') + (caratula ? ' — ' + caratula : '');
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//LexFive//Sistema//ES', 'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT', 'UID:lexfive-ev-' + ev.id + '@lexfive', 'DTSTAMP:' + icsFecha(new Date()),
+    'DTSTART:' + icsFecha(inicio), 'DTEND:' + icsFecha(fin), 'SUMMARY:' + icsEscape(resumen),
+    ev.nota ? 'DESCRIPTION:' + icsEscape(ev.nota) : '',
+    'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEscape(resumen), 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR'
+  ].filter(Boolean).join('\r\n');
+  descargarArchivo('evento-' + (ev.titulo || 'evento').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 30) + '.ics', ics, 'text/calendar;charset=utf-8');
+  toast('Evento descargado. Ábralo para agregarlo a su calendario.', 'success');
+}
+
+// ============================================================
+//  VISTA: TAREAS / PENDIENTES  (tablero del equipo)
+// ============================================================
+const TAREA_ESTADOS = { pendiente: 'Pendiente', en_progreso: 'En progreso', hecha: 'Hecha' };
+const TAREA_PRIOR = { alta: 'Alta', media: 'Media', baja: 'Baja' };
+
+async function renderTareas() {
+  loading();
+  const [{ data: tareas }, { data: procs }] = await Promise.all([
+    supabase.from('tareas').select('*').order('vence', { ascending: true, nullsFirst: false }),
+    supabase.from('procesos').select('id,caratula')
+  ]);
+  const T = tareas || [];
+  const procMap = {}; (procs || []).forEach(p => { procMap[p.id] = p.caratula; });
+
+  content().innerHTML = `
+    <div class="toolbar">
+      <input type="search" id="qTarea" placeholder="Buscar tarea...">
+      <label class="chk-inline"><input type="checkbox" id="fMias"> Solo mías</label>
+      <div class="spacer"></div>
+      <button class="btn btn--primary" id="btnNuevaTarea">${ICON.plus} Nueva tarea</button>
+    </div>
+    <div class="tareas-board" id="tareasBoard"></div>`;
+
+  const hoyStr = hoyISO();
+  const tarjeta = (t) => {
+    const vencida = t.vence && t.vence < hoyStr && t.estado !== 'hecha';
+    const acciones = [];
+    if (t.estado === 'pendiente') acciones.push(`<button class="btn btn--ghost btn--sm js-mv" data-id="${t.id}" data-to="en_progreso">Iniciar</button>`);
+    if (t.estado !== 'hecha') acciones.push(`<button class="btn btn--navy btn--sm js-mv" data-id="${t.id}" data-to="hecha">Completar</button>`);
+    if (t.estado === 'hecha') acciones.push(`<button class="btn btn--ghost btn--sm js-mv" data-id="${t.id}" data-to="pendiente">Reabrir</button>`);
+    return `<div class="tarea-card prio-${t.prioridad}">
+      <div class="tarea-card__top">
+        <span class="badge-prio badge-prio--${t.prioridad}">${TAREA_PRIOR[t.prioridad] || t.prioridad}</span>
+        ${t.vence ? `<span class="tarea-venc ${vencida ? 'is-vencida' : ''}">${vencida ? 'Venció ' : 'Vence '}${fmtDate(t.vence)}</span>` : ''}
+      </div>
+      <div class="tarea-card__title">${esc(t.titulo)}</div>
+      ${t.descripcion ? `<div class="cell-sub">${esc(t.descripcion)}</div>` : ''}
+      <div class="cell-sub">${t.proceso_id && procMap[t.proceso_id] ? 'Proceso: ' + esc(procMap[t.proceso_id]) + ' · ' : ''}Asignado: ${esc(profName(t.asignado_a) || 'Sin asignar')}</div>
+      <div class="tarea-card__actions">
+        ${acciones.join('')}
+        <button class="btn btn--ghost btn--sm js-edit" data-id="${t.id}">Editar</button>
+        ${(t.created_by === state.profile.id || state.profile.rol === 'admin') ? `<button class="btn btn--danger btn--sm js-del" data-id="${t.id}">Eliminar</button>` : ''}
+      </div>
+    </div>`;
+  };
+
+  const paint = () => {
+    const q = ($('#qTarea').value || '').toLowerCase();
+    const mias = $('#fMias').checked;
+    const visibles = T.filter(t =>
+      (!mias || t.asignado_a === state.profile.id) &&
+      (!q || [t.titulo, t.descripcion, procMap[t.proceso_id]].some(v => (v || '').toLowerCase().includes(q))));
+    const board = $('#tareasBoard');
+    board.innerHTML = Object.entries(TAREA_ESTADOS).map(([k, label]) => {
+      const col = visibles.filter(t => t.estado === k);
+      return `<div class="tareas-col">
+        <div class="tareas-col__head">${label} <span class="tareas-col__count">${col.length}</span></div>
+        <div class="tareas-col__body">${col.length ? col.map(tarjeta).join('') : '<p class="cell-sub" style="padding:8px">Sin tareas.</p>'}</div>
+      </div>`;
+    }).join('');
+    board.querySelectorAll('.js-mv').forEach(b => b.onclick = () => toggleTareaEstado(b.dataset.id, b.dataset.to));
+    board.querySelectorAll('.js-edit').forEach(b => b.onclick = () => { const t = T.find(x => x.id === b.dataset.id); if (t) tareaForm(t); });
+    board.querySelectorAll('.js-del').forEach(b => b.onclick = () => { const t = T.find(x => x.id === b.dataset.id); if (t) deleteTarea(t); });
+  };
+  paint();
+  $('#qTarea').oninput = paint;
+  $('#fMias').onchange = paint;
+  $('#btnNuevaTarea').onclick = () => tareaForm();
+}
+
+async function tareaForm(t = null) {
+  const { data: procs } = await supabase.from('procesos').select('id,caratula').order('created_at', { ascending: false });
+  const tarea = t || {};
+  const opcionesProc = `<option value="">— Sin proceso —</option>` +
+    (procs || []).map(p => `<option value="${p.id}" ${tarea.proceso_id === p.id ? 'selected' : ''}>${esc(p.caratula)}</option>`).join('');
+  const body = `
+    <div class="field"><label>Título de la tarea *</label><input id="tf_titulo" value="${esc(tarea.titulo || '')}" placeholder="Ej: Presentar memorial de respuesta"></div>
+    <div class="field"><label>Detalle (opcional)</label><textarea id="tf_desc">${esc(tarea.descripcion || '')}</textarea></div>
+    <div class="field-row">
+      <div class="field"><label>Proceso relacionado</label><select id="tf_proceso">${opcionesProc}</select></div>
+      <div class="field"><label>Asignar a</label><select id="tf_asignado">${optionsProfiles(tarea.asignado_a)}</select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Prioridad</label><select id="tf_prioridad">${Object.entries(TAREA_PRIOR).map(([k, v]) => `<option value="${k}" ${(tarea.prioridad || 'media') === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+      <div class="field"><label>Vence</label><input type="date" id="tf_vence" value="${tarea.vence || ''}"></div>
+    </div>
+    ${t ? `<div class="field"><label>Estado</label><select id="tf_estado">${Object.entries(TAREA_ESTADOS).map(([k, v]) => `<option value="${k}" ${tarea.estado === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>` : ''}`;
+  openModal(t ? 'Editar tarea' : 'Nueva tarea', body, [
+    { label: 'Cancelar', class: 'btn--ghost', onClick: closeModal },
+    { label: 'Guardar', class: 'btn--primary', id: 'tf_save', onClick: () => saveTarea(t) }
+  ]);
+}
+
+async function saveTarea(t) {
+  const titulo = $('#tf_titulo').value.trim();
+  if (!titulo) { toast('Escriba el título de la tarea.', 'error'); return; }
+  $('#tf_save').disabled = true;
+  const payload = {
+    titulo,
+    descripcion: $('#tf_desc').value.trim() || null,
+    proceso_id: $('#tf_proceso').value || null,
+    asignado_a: $('#tf_asignado').value || null,
+    prioridad: $('#tf_prioridad').value,
+    vence: $('#tf_vence').value || null
+  };
+  let error;
+  if (t) {
+    payload.estado = $('#tf_estado').value;
+    payload.updated_at = new Date().toISOString();
+    ({ error } = await supabase.from('tareas').update(payload).eq('id', t.id));
+  } else {
+    payload.created_by = state.profile.id;
+    ({ error } = await supabase.from('tareas').insert(payload));
+  }
+  if (error) { toast('Error al guardar: ' + error.message, 'error'); $('#tf_save').disabled = false; return; }
+  await logAccion(t ? 'editar' : 'crear', 'tarea', t ? t.id : titulo, titulo);
+  closeModal(); toast(t ? 'Tarea actualizada.' : 'Tarea creada.', 'success');
+  renderTareas();
+}
+
+async function toggleTareaEstado(id, nuevo) {
+  const { error } = await supabase.from('tareas').update({ estado: nuevo, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) { toast('No se pudo actualizar: ' + error.message, 'error'); return; }
+  renderTareas();
+}
+
+async function deleteTarea(t) {
+  if (!confirm('¿Eliminar esta tarea?')) return;
+  const { error } = await supabase.from('tareas').delete().eq('id', t.id);
+  if (error) { toast('No se pudo eliminar: ' + error.message, 'error'); return; }
+  await logAccion('eliminar', 'tarea', t.id, t.titulo);
+  toast('Tarea eliminada.', 'success');
+  renderTareas();
+}
+
+// ============================================================
+//  PLAZOS / AUDIENCIAS de un proceso (varios eventos)
+// ============================================================
+async function openPlazos(proc) {
+  const pintar = async () => {
+    const { data } = await supabase.from('eventos').select('*').eq('proceso_id', proc.id).order('fecha', { ascending: true });
+    const evs = data || [];
+    const lista = evs.length ? evs.map(e => {
+      const cumplido = e.estado === 'cumplido';
+      return `<div class="plazo-row ${cumplido ? 'is-done' : ''}" data-id="${e.id}">
+        <div>
+          <div class="cell-strong">${esc(e.titulo)} <span class="badge badge-mat">${esc(e.tipo)}</span></div>
+          <div class="cell-sub">${fmtDateTime(e.fecha)}${e.nota ? ' · ' + esc(e.nota) : ''}</div>
+        </div>
+        <div class="plazo-row__actions">
+          <button class="btn btn--ghost btn--sm js-ics" data-id="${e.id}">${ICON.descargar}</button>
+          <button class="btn btn--ghost btn--sm js-done" data-id="${e.id}">${cumplido ? 'Reabrir' : 'Cumplido'}</button>
+          <button class="btn btn--danger btn--sm js-del" data-id="${e.id}">Eliminar</button>
+        </div>
+      </div>`;
+    }).join('') : '<p class="cell-sub" style="padding:8px 0">Aún no hay plazos ni audiencias registrados.</p>';
+
+    const body = `
+      <p class="cell-sub" style="margin-bottom:10px">Registre todas las audiencias y plazos de este proceso. Aparecerán en la <strong>Agenda</strong> y podrá exportarlos a su calendario.</p>
+      <div class="plazo-list">${lista}</div>
+      <div class="card" style="margin-top:14px"><div class="card__body">
+        <div class="field-row">
+          <div class="field"><label>Título *</label><input id="ev_titulo" placeholder="Ej: Audiencia preliminar"></div>
+          <div class="field"><label>Tipo</label><select id="ev_tipo"><option value="audiencia">Audiencia</option><option value="plazo">Plazo / vencimiento</option><option value="reunion">Reunión</option><option value="otro">Otro</option></select></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Fecha y hora *</label><input type="datetime-local" id="ev_fecha"></div>
+          <div class="field"><label>Nota (opcional)</label><input id="ev_nota" placeholder="Sala, detalle..."></div>
+        </div>
+        <button class="btn btn--navy" id="ev_add">${ICON.plus} Agregar plazo</button>
+      </div></div>`;
+    openModal('Plazos y audiencias · ' + proc.caratula, body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }], true);
+
+    $('#ev_add').onclick = async () => {
+      const titulo = $('#ev_titulo').value.trim();
+      const fecha = $('#ev_fecha').value;
+      if (!titulo || !fecha) { toast('Indique título y fecha.', 'error'); return; }
+      $('#ev_add').disabled = true;
+      const { error } = await supabase.from('eventos').insert({
+        proceso_id: proc.id, titulo, tipo: $('#ev_tipo').value,
+        fecha: new Date(fecha).toISOString(), nota: $('#ev_nota').value.trim() || null,
+        created_by: state.profile.id
+      });
+      if (error) { toast('Error: ' + error.message, 'error'); $('#ev_add').disabled = false; return; }
+      await logAccion('crear', 'evento', proc.id, titulo);
+      toast('Plazo agregado.', 'success');
+      pintar();
+    };
+    document.querySelectorAll('.plazo-row .js-done').forEach(b => b.onclick = async () => {
+      const e = evs.find(x => x.id === b.dataset.id);
+      await supabase.from('eventos').update({ estado: e.estado === 'cumplido' ? 'pendiente' : 'cumplido' }).eq('id', e.id);
+      pintar();
+    });
+    document.querySelectorAll('.plazo-row .js-del').forEach(b => b.onclick = async () => {
+      if (!confirm('¿Eliminar este plazo?')) return;
+      await supabase.from('eventos').delete().eq('id', b.dataset.id);
+      toast('Plazo eliminado.', 'success');
+      pintar();
+    });
+    document.querySelectorAll('.plazo-row .js-ics').forEach(b => b.onclick = () => {
+      const e = evs.find(x => x.id === b.dataset.id);
+      if (e) descargarICSEvento(e, proc.caratula);
+    });
+  };
+  await pintar();
+}
+
+// ============================================================
+//  HONORARIOS y PAGOS de un proceso  (solo admin y abogado)
+// ============================================================
+async function openHonorarios(proc) {
+  const pintar = async () => {
+    const [{ data: hs }, { data: ps }] = await Promise.all([
+      supabase.from('honorarios').select('*').eq('proceso_id', proc.id).order('fecha', { ascending: false }),
+      supabase.from('pagos').select('*').eq('proceso_id', proc.id).order('fecha', { ascending: false })
+    ]);
+    const cargos = hs || [], pagos = ps || [];
+    const totalCargos = cargos.reduce((a, b) => a + Number(b.monto || 0), 0);
+    const totalPagos = pagos.reduce((a, b) => a + Number(b.monto || 0), 0);
+    const saldo = totalCargos - totalPagos;
+
+    const filaH = h => `<div class="fin-row" data-id="${h.id}"><div><div class="cell-strong">${esc(h.concepto)}</div><div class="cell-sub">${fmtDate(h.fecha)} · ${esc(profName(h.created_by))}</div></div><div class="fin-row__right"><span class="fin-monto">${fmtMoneda(h.monto, h.moneda)}</span><button class="btn btn--danger btn--sm js-delh" data-id="${h.id}">✕</button></div></div>`;
+    const filaP = p => `<div class="fin-row" data-id="${p.id}"><div><div class="cell-strong">${fmtMoneda(p.monto, p.moneda)} ${p.metodo ? '<span class="cell-sub">(' + esc(p.metodo) + ')</span>' : ''}</div><div class="cell-sub">${fmtDate(p.fecha)}${p.nota ? ' · ' + esc(p.nota) : ''}</div></div><div class="fin-row__right"><button class="btn btn--danger btn--sm js-delp" data-id="${p.id}">✕</button></div></div>`;
+
+    const body = `
+      <div class="fin-summary">
+        <div><span>Honorarios</span><strong>${fmtMoneda(totalCargos)}</strong></div>
+        <div><span>Pagado</span><strong>${fmtMoneda(totalPagos)}</strong></div>
+        <div class="${saldo > 0 ? 'fin-saldo--debe' : 'fin-saldo--ok'}"><span>Saldo pendiente</span><strong>${fmtMoneda(saldo)}</strong></div>
+      </div>
+
+      <h4 class="section-title">Honorarios (cargos)</h4>
+      <div class="fin-list">${cargos.length ? cargos.map(filaH).join('') : '<p class="cell-sub">Sin honorarios registrados.</p>'}</div>
+      <div class="card" style="margin-top:10px"><div class="card__body"><div class="field-row">
+        <div class="field"><label>Concepto *</label><input id="h_concepto" placeholder="Ej: Honorarios profesionales"></div>
+        <div class="field"><label>Monto (Bs) *</label><input id="h_monto" type="number" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="field"><label>Fecha</label><input id="h_fecha" type="date" value="${hoyISO()}"></div>
+      </div><button class="btn btn--navy" id="h_add">${ICON.plus} Agregar honorario</button></div></div>
+
+      <h4 class="section-title">Pagos recibidos</h4>
+      <div class="fin-list">${pagos.length ? pagos.map(filaP).join('') : '<p class="cell-sub">Sin pagos registrados.</p>'}</div>
+      <div class="card" style="margin-top:10px"><div class="card__body"><div class="field-row">
+        <div class="field"><label>Monto (Bs) *</label><input id="p_monto" type="number" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="field"><label>Método</label><input id="p_metodo" placeholder="Efectivo, transferencia..."></div>
+        <div class="field"><label>Fecha</label><input id="p_fecha" type="date" value="${hoyISO()}"></div>
+      </div>
+      <div class="field"><label>Nota (opcional)</label><input id="p_nota" placeholder="Detalle del pago"></div>
+      <button class="btn btn--navy" id="p_add">${ICON.plus} Registrar pago</button></div></div>`;
+    openModal('Honorarios · ' + proc.caratula, body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }], true);
+
+    $('#h_add').onclick = async () => {
+      const concepto = $('#h_concepto').value.trim();
+      const monto = parseFloat($('#h_monto').value);
+      if (!concepto || isNaN(monto)) { toast('Indique concepto y monto.', 'error'); return; }
+      $('#h_add').disabled = true;
+      const { error } = await supabase.from('honorarios').insert({ proceso_id: proc.id, concepto, monto, fecha: $('#h_fecha').value || hoyISO(), created_by: state.profile.id });
+      if (error) { toast('Error: ' + error.message, 'error'); $('#h_add').disabled = false; return; }
+      await logAccion('crear', 'honorario', proc.id, concepto + ' ' + monto);
+      toast('Honorario agregado.', 'success'); pintar();
+    };
+    $('#p_add').onclick = async () => {
+      const monto = parseFloat($('#p_monto').value);
+      if (isNaN(monto)) { toast('Indique el monto del pago.', 'error'); return; }
+      $('#p_add').disabled = true;
+      const { error } = await supabase.from('pagos').insert({ proceso_id: proc.id, monto, metodo: $('#p_metodo').value.trim() || null, nota: $('#p_nota').value.trim() || null, fecha: $('#p_fecha').value || hoyISO(), created_by: state.profile.id });
+      if (error) { toast('Error: ' + error.message, 'error'); $('#p_add').disabled = false; return; }
+      await logAccion('crear', 'pago', proc.id, String(monto));
+      toast('Pago registrado.', 'success'); pintar();
+    };
+    document.querySelectorAll('.js-delh').forEach(b => b.onclick = async () => {
+      if (!confirm('¿Eliminar este honorario?')) return;
+      await supabase.from('honorarios').delete().eq('id', b.dataset.id); toast('Eliminado.', 'success'); pintar();
+    });
+    document.querySelectorAll('.js-delp').forEach(b => b.onclick = async () => {
+      if (!confirm('¿Eliminar este pago?')) return;
+      await supabase.from('pagos').delete().eq('id', b.dataset.id); toast('Eliminado.', 'success'); pintar();
+    });
+  };
+  await pintar();
+}
+
+// ============================================================
+//  VISTA: FINANZAS  (resumen de honorarios por proceso · admin/abogado)
+// ============================================================
+async function renderFinanzas() {
+  loading();
+  const [{ data: procs }, { data: hs }, { data: ps }] = await Promise.all([
+    supabase.from('procesos').select('id,caratula,cliente_id,estado'),
+    supabase.from('honorarios').select('proceso_id,monto'),
+    supabase.from('pagos').select('proceso_id,monto')
+  ]);
+  await loadClientes();
+  const procList = procs || [];
+  const sumBy = (arr) => { const o = {}; (arr || []).forEach(x => { o[x.proceso_id] = (o[x.proceso_id] || 0) + Number(x.monto || 0); }); return o; };
+  const cargosByProc = sumBy(hs), pagosByProc = sumBy(ps);
+
+  const filas = procList
+    .map(p => ({ p, cargos: cargosByProc[p.id] || 0, pagos: pagosByProc[p.id] || 0 }))
+    .filter(r => r.cargos > 0 || r.pagos > 0)
+    .map(r => ({ ...r, saldo: r.cargos - r.pagos }))
+    .sort((a, b) => b.saldo - a.saldo);
+
+  const totCargos = filas.reduce((a, b) => a + b.cargos, 0);
+  const totPagos = filas.reduce((a, b) => a + b.pagos, 0);
+  const totSaldo = totCargos - totPagos;
+
+  content().innerHTML = `
+    <div class="stats-grid">
+      <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totCargos)}</div><div class="metric__label">Honorarios facturados</div></div>
+      <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totPagos)}</div><div class="metric__label">Cobrado</div></div>
+      <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.alerta}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totSaldo)}</div><div class="metric__label">Por cobrar</div></div>
+    </div>
+    <div class="card"><div class="card__head"><h3>Saldo por proceso</h3></div>
+      <div class="card__body--flush">
+        ${filas.length ? `<div class="table-wrap"><table class="data">
+          <thead><tr><th>Proceso</th><th>Cliente</th><th>Honorarios</th><th>Pagado</th><th>Saldo</th></tr></thead>
+          <tbody>${filas.map(r => `
+            <tr data-id="${r.p.id}" data-cara="${esc(r.p.caratula)}" style="cursor:pointer">
+              <td class="cell-strong">${esc(r.p.caratula)}</td>
+              <td>${esc(clienteName(r.p.cliente_id))}</td>
+              <td>${fmtMoneda(r.cargos)}</td>
+              <td>${fmtMoneda(r.pagos)}</td>
+              <td class="${r.saldo > 0 ? 'fin-debe' : ''}"><strong>${fmtMoneda(r.saldo)}</strong></td>
+            </tr>`).join('')}</tbody></table></div>`
+        : `<div class="empty">${ICON.dinero}<p>Aún no hay honorarios ni pagos registrados. Agréguelos desde el detalle de un proceso (botón “Honorarios”).</p></div>`}
+      </div>
+    </div>`;
+  content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openHonorarios({ id: tr.dataset.id, caratula: tr.dataset.cara }));
 }
 
 // ============================================================
@@ -1201,6 +1603,10 @@ async function openProcesoDetail(id, readonly = false) {
   const buttons = [];
   if (!readonly) {
     buttons.push({ label: 'Editar', class: 'btn--ghost', onClick: () => procesoForm(p) });
+    buttons.push({ label: 'Plazos', class: 'btn--ghost', onClick: () => openPlazos(p) });
+    if (['admin', 'abogado'].includes(state.profile.rol)) {
+      buttons.push({ label: 'Honorarios', class: 'btn--ghost', onClick: () => openHonorarios(p) });
+    }
     if (can(state.profile, 'delete_proceso')) {
       buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteProceso(p) });
     }
@@ -2674,6 +3080,8 @@ const VIEWS = {
   dashboard: { title: 'Panel general', render: renderDashboard },
   procesos: { title: 'Procesos', render: renderProcesos },
   agenda: { title: 'Agenda y calendario', render: renderAgenda },
+  tareas: { title: 'Tareas y pendientes', render: renderTareas },
+  finanzas: { title: 'Honorarios y pagos', render: renderFinanzas },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
@@ -2700,6 +3108,7 @@ function navigate(key) {
     if (!VIEWS[key]) key = 'dashboard';
     if (['usuarios', 'auditoria', 'testimonios', 'categorias'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
     if (key === 'credenciales' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
+    if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
   }
   state.view = key;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
@@ -2716,6 +3125,7 @@ function buildSidebar() {
     : NAV.filter(n => {
         if (n.adminOnly) return rol === 'admin';
         if (n.credOnly) return rol === 'admin' || rol === 'abogado';
+        if (n.finOnly) return rol === 'admin' || rol === 'abogado';
         return true;
       });
   nav.innerHTML = items
