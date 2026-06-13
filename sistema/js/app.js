@@ -36,7 +36,8 @@ const ICON = {
   grafico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="13" width="3" height="4"/></svg>',
   tareas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>',
   dinero: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v6M18 9v6"/></svg>',
-  plantilla: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h5M8 17h8"/></svg>'
+  plantilla: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h5M8 17h8"/></svg>',
+  campana: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>'
 };
 
 const NAV = [
@@ -1547,6 +1548,74 @@ async function usarPlantilla(pl) {
     $('#gen_print').onclick = () => imprimirTexto(pl.titulo, $('#gen_texto').value);
     $('#gen_word').onclick = () => descargarWord(pl.titulo, $('#gen_texto').value);
   };
+}
+
+// ============================================================
+//  CLIENTE: Novedades de sus procesos (actuaciones y documentos)
+// ============================================================
+// Trae las últimas actuaciones y documentos de los procesos del cliente
+// (RLS ya limita a SUS procesos). Devuelve una lista unificada y ordenada.
+async function fetchNovedades() {
+  const [{ data: procs }, { data: acts }, { data: docs }] = await Promise.all([
+    supabase.from('procesos').select('id,caratula'),
+    supabase.from('actuaciones').select('id,proceso_id,descripcion,fecha,created_at').order('created_at', { ascending: false }).limit(40),
+    supabase.from('documentos').select('id,proceso_id,nombre,created_at').order('created_at', { ascending: false }).limit(40)
+  ]);
+  const cara = {}; (procs || []).forEach(p => { cara[p.id] = p.caratula; });
+  const items = [];
+  (acts || []).forEach(a => items.push({ ts: a.created_at || a.fecha, procId: a.proceso_id, cara: cara[a.proceso_id] || 'Proceso', tipo: 'Actuación', texto: a.descripcion || '' }));
+  (docs || []).forEach(d => items.push({ ts: d.created_at, procId: d.proceso_id, cara: cara[d.proceso_id] || 'Proceso', tipo: 'Documento', texto: d.nombre || '' }));
+  items.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+  return items.slice(0, 30);
+}
+
+// Pone (o quita) el contador de novedades nuevas en el menú del cliente.
+async function updateNovedadesBadge() {
+  try {
+    const items = await fetchNovedades();
+    const visto = Number(localStorage.getItem('lexfive_nov_' + state.profile.id) || 0);
+    const nuevos = items.filter(it => new Date(it.ts).getTime() > visto).length;
+    const btn = document.querySelector('.nav-item[data-key="novedades"]');
+    if (!btn) return;
+    let b = btn.querySelector('.nav-badge');
+    if (nuevos > 0) {
+      if (!b) { b = document.createElement('span'); b.className = 'nav-badge'; btn.appendChild(b); }
+      b.textContent = nuevos > 9 ? '9+' : String(nuevos);
+    } else if (b) { b.remove(); }
+  } catch (e) {}
+}
+
+async function renderNovedades() {
+  loading();
+  const items = await fetchNovedades();
+  const key = 'lexfive_nov_' + state.profile.id;
+  const visto = Number(localStorage.getItem(key) || 0);
+
+  content().innerHTML = `
+    <div class="card">
+      <div class="card__head"><h3>${ICON.campana} Novedades de sus procesos</h3></div>
+      <div class="card__body--flush">
+        ${items.length ? `<ul class="novedades">${items.map(it => {
+          const esNuevo = new Date(it.ts).getTime() > visto;
+          return `<li class="novedad ${esNuevo ? 'is-nuevo' : ''}" data-pid="${it.procId}">
+            <div class="novedad__top">
+              <span class="badge badge-mat">${it.tipo}</span>
+              ${esNuevo ? '<span class="novedad__nuevo">Nuevo</span>' : ''}
+              <span class="novedad__fecha">${fmtDate(it.ts)}</span>
+            </div>
+            <div class="cell-strong">${esc(it.cara)}</div>
+            <div class="cell-sub">${esc(it.texto)}</div>
+          </li>`;
+        }).join('')}</ul>`
+        : `<div class="empty">${ICON.campana}<p>Aún no hay novedades en sus procesos. Aquí verá cada avance que registre su abogado.</p></div>`}
+      </div>
+    </div>`;
+
+  content().querySelectorAll('.novedad[data-pid]').forEach(li => li.onclick = () => openProcesoDetail(li.dataset.pid, true));
+
+  // Marcar todo como visto y quitar el contador del menú.
+  try { localStorage.setItem(key, String(Date.now())); } catch (e) {}
+  updateNovedadesBadge();
 }
 
 // ============================================================
@@ -3290,18 +3359,20 @@ const VIEWS = {
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
   misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
+  novedades: { title: 'Novedades de mis procesos', render: renderNovedades },
   opinion: { title: 'Mi opinión', render: renderMiOpinion }
 };
 
 const CLIENT_NAV = [
   { key: 'misprocesos', label: 'Mis procesos', icon: ICON.procesos },
+  { key: 'novedades', label: 'Novedades', icon: ICON.campana },
   { key: 'opinion', label: 'Mi opinión', icon: ICON.estrella }
 ];
 
 function navigate(key) {
   const isClient = state.profile.rol === 'cliente';
   if (isClient) {
-    if (!['misprocesos', 'opinion'].includes(key)) key = 'misprocesos';
+    if (!['misprocesos', 'novedades', 'opinion'].includes(key)) key = 'misprocesos';
   } else {
     if (!VIEWS[key]) key = 'dashboard';
     if (['usuarios', 'auditoria', 'testimonios', 'categorias'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
@@ -3484,4 +3555,5 @@ async function openBuscadorGlobal() {
 
   // Vista inicial según el rol
   navigate(profile.rol === 'cliente' ? 'misprocesos' : 'dashboard');
+  if (profile.rol === 'cliente') updateNovedadesBadge();
 })();

@@ -618,3 +618,15 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .chip-campo { background: #f3eedf; border: 1px solid var(--gold, #c2a25a); color: var(--gold-dark, #a8853c); border-radius: 20px; padding: 3px 10px; font-size: .72rem; font-family: monospace; cursor: pointer; }
 .chip-campo:hover { background: var(--gold, #c2a25a); color: #fff; }
 code { background: #f1f2f4; padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+
+
+/* ---------- Novedades del cliente ---------- */
+.nav-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: auto; background: #c0392b; color: #fff; border-radius: 20px; font-size: .66rem; font-weight: 700; }
+.novedades { list-style: none; margin: 0; padding: 0; }
+.novedad { padding: 12px 16px; border-bottom: 1px solid var(--line, #e6e8ec); cursor: pointer; transition: background .12s; }
+.novedad:hover { background: #fbf9f3; }
+.novedad.is-nuevo { background: #fbf7ec; }
+.novedad.is-nuevo:hover { background: #f7f0dd; }
+.novedad__top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.novedad__nuevo { background: #c0392b; color: #fff; font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 1px 7px; border-radius: 20px; }
+.novedad__fecha { margin-left: auto; font-size: .72rem; color: var(--muted, #5c6675); }
