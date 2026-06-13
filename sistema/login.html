@@ -6,7 +6,7 @@
   <title>Acceso · Sistema LexFive</title>
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0e1b2c">
-  <link rel="apple-touch-icon" href="../assets/pwa/icon.svg">
+  <link rel="apple-touch-icon" href="../assets/pwa/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="LexFive">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -115,6 +115,10 @@
           </form>
         </div>
       </div>
+      <p class="login-back">
+        <a href="../index.html">&larr; Ir al sitio web de LexFive</a>
+        <button type="button" id="btnInstalar" hidden>Instalar app</button>
+      </p>
     </main>
   </div>
 
@@ -126,6 +130,25 @@
         navigator.serviceWorker.register('sw.js').catch(function () {});
       });
     }
+    /* Botón "Instalar app": aparece cuando el navegador permite instalar la PWA
+       (Chrome, Edge, Android). En navegadores que no emiten este evento (como
+       algunas versiones de Brave o iOS), instale desde el menú del navegador
+       → "Instalar app" / "Agregar a pantalla de inicio". */
+    (function () {
+      var diferido = null;
+      var btn = document.getElementById('btnInstalar');
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        diferido = e;
+        if (btn) btn.hidden = false;
+      });
+      if (btn) btn.addEventListener('click', function () {
+        if (!diferido) return;
+        diferido.prompt();
+        diferido.userChoice.finally(function () { diferido = null; btn.hidden = true; });
+      });
+      window.addEventListener('appinstalled', function () { if (btn) btn.hidden = true; });
+    })();
   </script>
   <script type="module">
     import { signIn, signUp, getSession, resetPassword, updatePassword, onPasswordRecovery } from './js/auth.js';

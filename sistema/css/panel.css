@@ -551,3 +551,11 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .bar-row__fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--navy, #0e1b2c), var(--gold, #c2a25a)); transition: width .5s ease; }
 .bar-row__val { font-size: .76rem; font-weight: 700; color: var(--navy, #0e1b2c); text-align: right; }
 @media (max-width: 480px) { .bar-row { grid-template-columns: 90px 1fr 26px; } }
+
+
+/* ---------- Enlace al sitio web + botón instalar (página de login) ---------- */
+.login-back { margin-top: 20px; text-align: center; font-size: .9rem; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; }
+.login-back a { color: var(--navy, #0e1b2c); text-decoration: none; font-weight: 600; }
+.login-back a:hover { text-decoration: underline; }
+.login-back #btnInstalar { background: var(--navy, #0e1b2c); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.login-back #btnInstalar:hover { background: #16273d; }
