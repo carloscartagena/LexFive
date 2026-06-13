@@ -37,7 +37,8 @@ const ICON = {
   tareas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>',
   dinero: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v6M18 9v6"/></svg>',
   plantilla: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h5M8 17h8"/></svg>',
-  campana: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>'
+  campana: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  papelera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/></svg>'
 };
 
 const NAV = [
@@ -55,7 +56,8 @@ const NAV = [
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
   { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
-  { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true }
+  { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true },
+  { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true }
 ];
 // credOnly = solo administrador y abogado (NO procurador ni cliente)
 
@@ -702,7 +704,7 @@ async function renombrarCategoria(nombreActual, nombreNuevo) {
 // procesos/modelos huérfanos sin área).
 async function eliminarCategoria(nombre) {
   const [{ count: cProc }, { count: cMod }] = await Promise.all([
-    supabase.from('procesos').select('id', { count: 'exact', head: true }).eq('materia', nombre),
+    supabase.from('procesos').select('id', { count: 'exact', head: true }).eq('materia', nombre).eq('eliminado', false),
     supabase.from('modelos').select('id', { count: 'exact', head: true }).eq('categoria', nombre)
   ]);
   const usos = (cProc || 0) + (cMod || 0);
@@ -810,7 +812,7 @@ function recordarPorWhatsApp(p) {
 // ============================================================
 async function renderDashboard() {
   loading();
-  const { data: procesos } = await supabase.from('procesos').select('*').order('proxima_audiencia', { ascending: true });
+  const { data: procesos } = await supabase.from('procesos').select('*').eq('eliminado', false).order('proxima_audiencia', { ascending: true });
   const list = procesos || [];
   const activos = list.filter(p => !['archivado', 'concluido'].includes(p.estado)).length;
   const ahora = new Date();
@@ -934,7 +936,7 @@ async function renderDashboard() {
 async function renderAgenda() {
   loading();
   const [{ data: procs }, { data: evs }] = await Promise.all([
-    supabase.from('procesos').select('*'),
+    supabase.from('procesos').select('*').eq('eliminado', false),
     supabase.from('eventos').select('*')
   ]);
   const procMap = {};
@@ -1079,7 +1081,7 @@ async function renderTareas() {
   loading();
   const [{ data: tareas }, { data: procs }] = await Promise.all([
     supabase.from('tareas').select('*').order('vence', { ascending: true, nullsFirst: false }),
-    supabase.from('procesos').select('id,caratula')
+    supabase.from('procesos').select('id,caratula').eq('eliminado', false)
   ]);
   const T = tareas || [];
   const procMap = {}; (procs || []).forEach(p => { procMap[p.id] = p.caratula; });
@@ -1141,7 +1143,7 @@ async function renderTareas() {
 }
 
 async function tareaForm(t = null) {
-  const { data: procs } = await supabase.from('procesos').select('id,caratula').order('created_at', { ascending: false });
+  const { data: procs } = await supabase.from('procesos').select('id,caratula').eq('eliminado', false).order('created_at', { ascending: false });
   const tarea = t || {};
   const opcionesProc = `<option value="">— Sin proceso —</option>` +
     (procs || []).map(p => `<option value="${p.id}" ${tarea.proceso_id === p.id ? 'selected' : ''}>${esc(p.caratula)}</option>`).join('');
@@ -1361,7 +1363,7 @@ async function openHonorarios(proc) {
 async function renderFinanzas() {
   loading();
   const [{ data: procs }, { data: hs }, { data: ps }] = await Promise.all([
-    supabase.from('procesos').select('id,caratula,cliente_id,estado'),
+    supabase.from('procesos').select('id,caratula,cliente_id,estado').eq('eliminado', false),
     supabase.from('honorarios').select('proceso_id,monto'),
     supabase.from('pagos').select('proceso_id,monto')
   ]);
@@ -1644,7 +1646,7 @@ async function deletePlantilla(pl) {
 
 // Usar la plantilla: elegir un proceso y generar el memorial relleno.
 async function usarPlantilla(pl) {
-  const { data: procs } = await supabase.from('procesos').select('*').order('created_at', { ascending: false });
+  const { data: procs } = await supabase.from('procesos').select('*').eq('eliminado', false).order('created_at', { ascending: false });
   const opts = (procs || []).map(p => `<option value="${p.id}">${esc(p.caratula)}</option>`).join('');
   const body = `
     <div class="field"><label>Elija el proceso *</label><select id="gen_proc"><option value="">— Seleccione —</option>${opts}</select></div>
@@ -1678,7 +1680,7 @@ async function usarPlantilla(pl) {
 // (RLS ya limita a SUS procesos). Devuelve una lista unificada y ordenada.
 async function fetchNovedades() {
   const [{ data: procs }, { data: acts }, { data: docs }] = await Promise.all([
-    supabase.from('procesos').select('id,caratula'),
+    supabase.from('procesos').select('id,caratula').eq('eliminado', false),
     supabase.from('actuaciones').select('id,proceso_id,descripcion,fecha,created_at').order('created_at', { ascending: false }).limit(40),
     supabase.from('documentos').select('id,proceso_id,nombre,created_at').order('created_at', { ascending: false }).limit(40)
   ]);
@@ -1746,7 +1748,7 @@ async function renderProcesos() {
   loading();
   await loadClientes();
   await loadCategorias();
-  const { data } = await supabase.from('procesos').select('*').order('created_at', { ascending: false });
+  const { data } = await supabase.from('procesos').select('*').eq('eliminado', false).order('created_at', { ascending: false });
   const procesos = data || [];
 
   content().innerHTML = `
@@ -2171,11 +2173,72 @@ function wireTimelineDocs(procId, readonly, reload) {
 }
 
 async function deleteProceso(p) {
-  if (!confirm(`¿Eliminar definitivamente el proceso "${p.caratula}"? Esta acción no se puede deshacer.`)) return;
-  const { error } = await supabase.from('procesos').delete().eq('id', p.id);
+  if (!confirm(`¿Enviar el proceso "${p.caratula}" a la papelera?\n\nNo se borra definitivamente: el administrador podrá restaurarlo o eliminarlo desde la Papelera.`)) return;
+  const { error } = await supabase.from('procesos').update({
+    eliminado: true, eliminado_at: new Date().toISOString(), eliminado_por: state.profile.id
+  }).eq('id', p.id);
   if (error) { toast('Error: ' + error.message, 'error'); return; }
-  await logAccion('eliminar', 'proceso', p.id, p.caratula);
-  closeModal(); toast('Proceso eliminado.', 'success'); renderProcesos();
+  await logAccion('papelera', 'proceso', p.id, p.caratula);
+  closeModal(); toast('Proceso enviado a la papelera.', 'success'); renderProcesos();
+}
+
+// ============================================================
+//  VISTA: PAPELERA DE PROCESOS (solo administrador)
+// ============================================================
+async function renderPapelera() {
+  loading();
+  const { data, error } = await supabase.from('procesos').select('*').eq('eliminado', true).order('eliminado_at', { ascending: false });
+  if (error) {
+    content().innerHTML = `<div class="card"><div class="card__body"><div class="empty">${ICON.papelera}
+      <p>No se pudo cargar la papelera.<br>Verifique que ejecutó el script <strong>db/14_papelera_procesos.sql</strong> en Supabase.</p></div></div></div>`;
+    return;
+  }
+  const list = data || [];
+  content().innerHTML = `
+    <div class="card"><div class="card__body">
+      <p class="cell-sub">Los procesos enviados a la papelera no aparecen en el sistema, pero <strong>no se borran</strong>. Puede <strong>restaurarlos</strong> o eliminarlos <strong>definitivamente</strong> (esto último no se puede deshacer).</p>
+    </div></div>
+    <div class="card"><div class="card__body--flush"><div id="papTable"></div></div></div>`;
+
+  let page = 1;
+  function paint() {
+    const info = paginar(list, page);
+    $('#papTable').innerHTML = list.length ? `<div class="table-wrap"><table class="data">
+      <thead><tr><th>Carátula</th><th>Materia</th><th>Eliminado</th><th>Por</th><th></th></tr></thead>
+      <tbody>${info.slice.map(p => `
+        <tr>
+          <td class="cell-strong">${esc(p.caratula)}<div class="cell-sub">${esc(p.numero || 'Sin número')}</div></td>
+          <td><span class="badge badge-mat">${esc(p.materia || '—')}</span></td>
+          <td>${p.eliminado_at ? fmtDate(p.eliminado_at) : '—'}</td>
+          <td>${esc(profName(p.eliminado_por))}</td>
+          <td style="white-space:nowrap;text-align:right">
+            <button class="btn btn--navy btn--sm js-rest" data-id="${p.id}">Restaurar</button>
+            <button class="btn btn--danger btn--sm js-purge" data-id="${p.id}" data-cara="${esc(p.caratula)}">Eliminar definitivamente</button>
+          </td>
+        </tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
+      : `<div class="empty">${ICON.papelera}<p>La papelera está vacía.</p></div>`;
+    $('#papTable').querySelectorAll('.js-rest').forEach(b => b.onclick = () => restaurarProceso(b.dataset.id));
+    $('#papTable').querySelectorAll('.js-purge').forEach(b => b.onclick = () => eliminarProcesoDefinitivo(b.dataset.id, b.dataset.cara));
+    wirePager($('#papTable'), info, (n) => { page = n; paint(); });
+  }
+  paint();
+}
+
+async function restaurarProceso(id) {
+  const { error } = await supabase.from('procesos').update({ eliminado: false, eliminado_at: null, eliminado_por: null }).eq('id', id);
+  if (error) { toast('No se pudo restaurar: ' + error.message, 'error'); return; }
+  await logAccion('restaurar', 'proceso', id, '');
+  toast('Proceso restaurado.', 'success');
+  renderPapelera();
+}
+
+async function eliminarProcesoDefinitivo(id, caratula) {
+  if (!confirm(`¿Eliminar DEFINITIVAMENTE el proceso "${caratula}"?\n\nSe borrarán también sus actuaciones y documentos. Esta acción NO se puede deshacer.`)) return;
+  const { error } = await supabase.from('procesos').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+  await logAccion('eliminar_definitivo', 'proceso', id, caratula);
+  toast('Proceso eliminado definitivamente.', 'success');
+  renderPapelera();
 }
 
 // ============================================================
@@ -2407,7 +2470,7 @@ async function renderAuditoria() {
 // ============================================================
 async function renderMisProcesos() {
   loading();
-  const { data } = await supabase.from('procesos').select('*').order('proxima_audiencia', { ascending: true });
+  const { data } = await supabase.from('procesos').select('*').eq('eliminado', false).order('proxima_audiencia', { ascending: true });
   const procesos = data || [];
   const ahora = new Date();
   const proximas = procesos.filter(p => p.proxima_audiencia && new Date(p.proxima_audiencia) >= ahora).length;
@@ -3497,6 +3560,7 @@ const VIEWS = {
   categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
+  papelera: { title: 'Papelera de procesos', render: renderPapelera },
   misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
   novedades: { title: 'Novedades de mis procesos', render: renderNovedades },
   opinion: { title: 'Mi opinión', render: renderMiOpinion }
@@ -3514,7 +3578,7 @@ function navigate(key) {
     if (!['misprocesos', 'novedades', 'opinion'].includes(key)) key = 'misprocesos';
   } else {
     if (!VIEWS[key]) key = 'dashboard';
-    if (['usuarios', 'auditoria', 'testimonios', 'categorias'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
+    if (['usuarios', 'auditoria', 'testimonios', 'categorias', 'papelera'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
     if (key === 'credenciales' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
   }
@@ -3558,7 +3622,7 @@ async function openBuscadorGlobal() {
 
   // Cargar datos una sola vez al abrir
   const [{ data: procesos }, { data: clientes }, { data: consultas }] = await Promise.all([
-    supabase.from('procesos').select('*'),
+    supabase.from('procesos').select('*').eq('eliminado', false),
     supabase.from('clientes').select('*'),
     supabase.from('consultas').select('*').order('created_at', { ascending: false })
   ]);
