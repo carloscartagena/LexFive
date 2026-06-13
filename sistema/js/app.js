@@ -1253,7 +1253,7 @@ async function openHonorarios(proc) {
     const saldo = totalCargos - totalPagos;
 
     const filaH = h => `<div class="fin-row" data-id="${h.id}"><div><div class="cell-strong">${esc(h.concepto)}</div><div class="cell-sub">${fmtDate(h.fecha)} · ${esc(profName(h.created_by))}</div></div><div class="fin-row__right"><span class="fin-monto">${fmtMoneda(h.monto, h.moneda)}</span><button class="btn btn--danger btn--sm js-delh" data-id="${h.id}">✕</button></div></div>`;
-    const filaP = p => `<div class="fin-row" data-id="${p.id}"><div><div class="cell-strong">${fmtMoneda(p.monto, p.moneda)} ${p.metodo ? '<span class="cell-sub">(' + esc(p.metodo) + ')</span>' : ''}</div><div class="cell-sub">${fmtDate(p.fecha)}${p.nota ? ' · ' + esc(p.nota) : ''}</div></div><div class="fin-row__right"><button class="btn btn--danger btn--sm js-delp" data-id="${p.id}">✕</button></div></div>`;
+    const filaP = p => `<div class="fin-row" data-id="${p.id}"><div><div class="cell-strong">${fmtMoneda(p.monto, p.moneda)} ${p.metodo ? '<span class="cell-sub">(' + esc(p.metodo) + ')</span>' : ''}</div><div class="cell-sub">${fmtDate(p.fecha)}${p.nota ? ' · ' + esc(p.nota) : ''}</div></div><div class="fin-row__right"><button class="btn btn--ghost btn--sm js-recibo" data-id="${p.id}">Recibo</button><button class="btn btn--danger btn--sm js-delp" data-id="${p.id}">✕</button></div></div>`;
 
     const body = `
       <div class="fin-summary">
@@ -1308,6 +1308,10 @@ async function openHonorarios(proc) {
       if (!confirm('¿Eliminar este pago?')) return;
       await supabase.from('pagos').delete().eq('id', b.dataset.id); toast('Eliminado.', 'success'); pintar();
     });
+    document.querySelectorAll('.js-recibo').forEach(b => b.onclick = () => {
+      const pago = pagos.find(x => x.id === b.dataset.id);
+      if (pago) imprimirReciboPago(pago, proc);
+    });
   };
   await pintar();
 }
@@ -1343,7 +1347,7 @@ async function renderFinanzas() {
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totPagos)}</div><div class="metric__label">Cobrado</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.alerta}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totSaldo)}</div><div class="metric__label">Por cobrar</div></div>
     </div>
-    <div class="card"><div class="card__head"><h3>Saldo por proceso</h3></div>
+    <div class="card"><div class="card__head"><h3>Saldo por proceso</h3>${filas.length ? `<button class="btn btn--ghost btn--sm" id="btnRepFin">${ICON.doc} Imprimir / PDF</button>` : ''}</div>
       <div class="card__body--flush">
         ${filas.length ? `<div class="table-wrap"><table class="data">
           <thead><tr><th>Proceso</th><th>Cliente</th><th>Honorarios</th><th>Pagado</th><th>Saldo</th></tr></thead>
@@ -1359,6 +1363,23 @@ async function renderFinanzas() {
       </div>
     </div>`;
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openHonorarios({ id: tr.dataset.id, caratula: tr.dataset.cara }));
+  const btnRep = $('#btnRepFin');
+  if (btnRep) btnRep.onclick = () => {
+    const cuerpo = `<h1>Reporte de honorarios — cartera</h1>
+      <table>
+        <thead><tr><th>Proceso</th><th>Cliente</th><th>Honorarios</th><th>Pagado</th><th>Saldo</th></tr></thead>
+        <tbody>${filas.map(r => `<tr>
+          <td>${esc(r.p.caratula)}</td>
+          <td>${esc(clienteName(r.p.cliente_id))}</td>
+          <td>${esc(fmtMoneda(r.cargos))}</td>
+          <td>${esc(fmtMoneda(r.pagos))}</td>
+          <td>${esc(fmtMoneda(r.saldo))}</td>
+        </tr>`).join('')}
+        <tr class="tot"><td colspan="2">TOTALES</td><td>${esc(fmtMoneda(totCargos))}</td><td>${esc(fmtMoneda(totPagos))}</td><td>${esc(fmtMoneda(totSaldo))}</td></tr>
+        </tbody>
+      </table>`;
+    abrirImpresion('Reporte de honorarios', cuerpo);
+  };
 }
 
 // ============================================================
@@ -1406,6 +1427,68 @@ function aplicarCampos(texto, mapa) {
 }
 
 // HTML imprimible / Word del memorial generado.
+// Abre una ventana con cabecera de LexFive lista para imprimir o guardar como PDF.
+function abrirImpresion(titulo, bodyHTML) {
+  const w = window.open('', '_blank');
+  if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title>
+    <style>
+      *{box-sizing:border-box;} body{font-family:Arial,Helvetica,sans-serif;color:#1a2330;margin:0;padding:32px;}
+      .imp-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #0e1b2c;padding-bottom:12px;margin-bottom:18px;}
+      .imp-brand{font-family:Georgia,serif;font-size:22px;font-weight:700;color:#0e1b2c;}
+      .imp-brand span{color:#c2a25a;}
+      .imp-sub{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#a8853c;}
+      .imp-meta{font-size:12px;color:#5c6675;text-align:right;}
+      h1{font-size:18px;color:#0e1b2c;margin:0 0 12px;font-family:Georgia,serif;}
+      table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+      th,td{border:1px solid #d9dce1;padding:7px 9px;text-align:left;vertical-align:top;}
+      thead th{background:#0e1b2c;color:#fff;text-transform:uppercase;font-size:10px;letter-spacing:.5px;}
+      tr:nth-child(even) td{background:#f6f7f9;}
+      .tot td,.tot th{font-weight:700;background:#eef0f3;}
+      .imp-foot{margin-top:28px;font-size:11px;color:#5c6675;}
+      @media print{@page{margin:14mm;}}
+    </style></head><body>
+    <div class="imp-head">
+      <div><div class="imp-brand">Lex<span>Five</span></div><div class="imp-sub">Bufete de Abogados</div></div>
+      <div class="imp-meta">La Paz / El Alto - Bolivia<br>Generado: ${esc(fmtDate(new Date()))}</div>
+    </div>
+    ${bodyHTML}
+    <script>window.onload=function(){window.print();}<\/script>
+    </body></html>`);
+  w.document.close();
+}
+
+// Genera e imprime un recibo de un pago concreto.
+async function imprimirReciboPago(pago, proc) {
+  let clienteNombre = '—';
+  try {
+    const { data: pr } = await supabase.from('procesos').select('cliente_id').eq('id', proc.id).maybeSingle();
+    if (pr && pr.cliente_id) {
+      const { data: cl } = await supabase.from('clientes').select('nombre').eq('id', pr.cliente_id).maybeSingle();
+      if (cl) clienteNombre = cl.nombre;
+    }
+  } catch (e) {}
+  const nro = String(pago.id || '').replace(/-/g, '').slice(0, 8).toUpperCase();
+  const body = `
+    <h1>Recibo de pago N.º ${esc(nro)}</h1>
+    <table>
+      <tr><th style="width:38%">Fecha</th><td>${esc(fmtDate(pago.fecha))}</td></tr>
+      <tr><th>Recibí de</th><td>${esc(clienteNombre)}</td></tr>
+      <tr><th>Por concepto de</th><td>Pago a cuenta de honorarios — ${esc(proc.caratula || '')}</td></tr>
+      ${pago.metodo ? `<tr><th>Forma de pago</th><td>${esc(pago.metodo)}</td></tr>` : ''}
+      ${pago.nota ? `<tr><th>Detalle</th><td>${esc(pago.nota)}</td></tr>` : ''}
+      <tr class="tot"><th>Monto recibido</th><td>${esc(fmtMoneda(pago.monto, pago.moneda))}</td></tr>
+    </table>
+    <div class="imp-foot">
+      <p>Este recibo acredita el pago indicado a favor de LexFive por los servicios profesionales del proceso señalado.</p>
+      <div style="display:flex;justify-content:space-between;gap:40px;margin-top:46px;">
+        <div style="flex:1;border-top:1px solid #888;padding-top:6px;text-align:center;">Firma autorizada · LexFive</div>
+        <div style="flex:1;border-top:1px solid #888;padding-top:6px;text-align:center;">Recibí conforme</div>
+      </div>
+    </div>`;
+  abrirImpresion('Recibo ' + nro, body);
+}
+
 function memorialHTML(titulo, texto) {
   const cuerpo = esc(texto).replace(/\n/g, '<br>');
   return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title></head>
