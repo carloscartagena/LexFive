@@ -22,12 +22,13 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - name: Instalar cliente PostgreSQL 16
+      - name: Instalar cliente PostgreSQL 17
         run: |
           sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
           sudo apt-get update -y
-          sudo apt-get install -y postgresql-client-16
+          sudo apt-get install -y postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
 
       - name: Verificar que el secreto existe
         env:
@@ -41,14 +42,29 @@ jobs:
       - name: Generar respaldo
         env:
           DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGSSLMODE: require
+          PGCONNECT_TIMEOUT: '30'
         run: |
+          set -o pipefail
           stamp=$(date +%Y%m%d-%H%M%S)
-          file="lexfive-backup-$stamp.sql.gz"
-          /usr/lib/postgresql/16/bin/pg_dump "$DB_URL" \
+          file="lexfive-backup-$stamp.sql"
+          echo "Generando volcado con pg_dump..."
+          # Escribe directamente a archivo (sin tubería) para que cualquier
+          # error de pg_dump detenga el paso y quede visible en el registro.
+          /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" \
             --no-owner --no-privileges --clean --if-exists \
-            | gzip -9 > "$file"
-          ls -lh "$file"
-          echo "Respaldo generado: $file"
+            --file="$file"
+          bytes=$(stat -c%s "$file")
+          echo "Tamaño del volcado: $bytes bytes"
+          if [ "$bytes" -lt 2000 ]; then
+            echo "::error::El respaldo es demasiado pequeño ($bytes bytes): la copia no contiene datos. Revise la cadena de conexión (use 'Session pooler')."
+            echo "----- contenido del volcado -----"
+            cat "$file"
+            exit 1
+          fi
+          gzip -9 "$file"
+          ls -lh "$file.gz"
+          echo "Respaldo generado correctamente: $file.gz"
 
       - name: Subir respaldo como artefacto
         uses: actions/upload-artifact@v4
