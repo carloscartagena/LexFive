@@ -1,0 +1,59 @@
+name: Respaldo de base de datos
+
+# Genera un respaldo (pg_dump) de la base de datos de Supabase y lo guarda como
+# ARTEFACTO descargable de GitHub Actions. Se ejecuta a diario y también a demanda.
+#
+# REQUISITO (una sola vez): crear el secreto del repositorio "SUPABASE_DB_URL"
+#   GitHub > Settings > Secrets and variables > Actions > New repository secret
+#   Valor: la cadena de conexión de Supabase
+#   (Supabase > Project Settings > Database > Connection string > URI).
+#   Recomendado usar el "Session pooler" (puerto 5432) e incluir la contraseña.
+#
+# Los respaldos quedan en la pestaña "Actions" del repositorio, dentro de cada
+# ejecución, como artefacto "lexfive-db-backup" (se conservan 90 días).
+
+on:
+  schedule:
+    # 07:00 UTC (03:00 Bolivia) todos los días
+    - cron: '0 7 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instalar cliente PostgreSQL 16
+        run: |
+          sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-client-16
+
+      - name: Verificar que el secreto existe
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DB_URL" ]; then
+            echo "::error::Falta el secreto SUPABASE_DB_URL. Vea las instrucciones en MANTENIMIENTO-SETUP.md"
+            exit 1
+          fi
+
+      - name: Generar respaldo
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          stamp=$(date +%Y%m%d-%H%M%S)
+          file="lexfive-backup-$stamp.sql.gz"
+          /usr/lib/postgresql/16/bin/pg_dump "$DB_URL" \
+            --no-owner --no-privileges --clean --if-exists \
+            | gzip -9 > "$file"
+          ls -lh "$file"
+          echo "Respaldo generado: $file"
+
+      - name: Subir respaldo como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: lexfive-db-backup
+          path: lexfive-backup-*.sql.gz
+          retention-days: 90
+          if-no-files-found: error

@@ -38,7 +38,9 @@ const ICON = {
   dinero: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 9v6M18 9v6"/></svg>',
   plantilla: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h5M8 17h8"/></svg>',
   campana: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
-  papelera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/></svg>'
+  papelera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/></svg>',
+  sol: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8"/></svg>',
+  luna: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>'
 };
 
 const NAV = [
@@ -208,6 +210,45 @@ function procesosToCSV(rows) {
 function fmtMoneda(monto, moneda = 'Bs') {
   const n = Number(monto || 0);
   return (moneda || 'Bs') + ' ' + n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Convierte un monto a su importe en letras para los recibos.
+// Ej: 1500.50 -> "MIL QUINIENTOS 50/100 BOLIVIANOS".
+function montoEnLetras(monto, moneda) {
+  const NUM = Number(monto || 0);
+  const entero = Math.floor(Math.abs(NUM));
+  const centavos = Math.round((Math.abs(NUM) - entero) * 100);
+  const UNI = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE',
+    'DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE',
+    'VEINTE', 'VEINTIÚN', 'VEINTIDÓS', 'VEINTITRÉS', 'VEINTICUATRO', 'VEINTICINCO', 'VEINTISÉIS', 'VEINTISIETE', 'VEINTIOCHO', 'VEINTINUEVE'];
+  const DEC = ['', '', '', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+  const CEN = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
+  const tresCifras = (n) => {
+    if (n === 100) return 'CIEN';
+    let txt = '';
+    const c = Math.floor(n / 100), resto = n % 100;
+    if (c) txt += CEN[c] + ' ';
+    if (resto <= 29) txt += UNI[resto];
+    else { const d = Math.floor(resto / 10), u = resto % 10; txt += DEC[d] + (u ? ' Y ' + UNI[u] : ''); }
+    return txt.trim();
+  };
+  const enteroALetras = (n) => {
+    if (n === 0) return 'CERO';
+    let txt = '';
+    const millones = Math.floor(n / 1000000);
+    const miles = Math.floor((n % 1000000) / 1000);
+    const resto = n % 1000;
+    if (millones) txt += (millones === 1 ? 'UN MILLÓN' : tresCifras(millones) + ' MILLONES') + ' ';
+    if (miles) txt += (miles === 1 ? 'MIL' : tresCifras(miles) + ' MIL') + ' ';
+    if (resto) txt += tresCifras(resto);
+    return txt.trim();
+  };
+  const m = (moneda || 'Bs').toUpperCase();
+  const esDolar = m.includes('USD') || m.includes('$');
+  const nombre = esDolar
+    ? (entero === 1 ? 'DÓLAR AMERICANO' : 'DÓLARES AMERICANOS')
+    : (entero === 1 ? 'BOLIVIANO' : 'BOLIVIANOS');
+  return `${enteroALetras(entero)} ${String(centavos).padStart(2, '0')}/100 ${nombre}`;
 }
 
 // ============================================================
@@ -617,7 +658,9 @@ async function loadProfiles() {
 }
 async function loadClientes() {
   const { data } = await supabase.from('clientes').select('*').order('nombre');
-  state.clientes = data || [];
+  // Oculta los clientes enviados a la papelera (columna "eliminado", migración 16).
+  // El filtro en el navegador funciona aunque la columna aún no exista.
+  state.clientes = (data || []).filter(c => !c.eliminado);
 }
 
 // ---------- Categorías / áreas del derecho (dinámicas) ----------
@@ -1589,7 +1632,9 @@ async function imprimirReciboPago(pago, proc) {
       if (cl) clienteNombre = cl.nombre;
     }
   } catch (e) {}
-  const nro = String(pago.id || '').replace(/-/g, '').slice(0, 8).toUpperCase();
+  const nro = pago.nro_recibo
+    ? String(pago.nro_recibo).padStart(5, '0')
+    : String(pago.id || '').replace(/-/g, '').slice(0, 8).toUpperCase();
   const body = `
     <h1>Recibo de pago N.º ${esc(nro)}</h1>
     <table>
@@ -1599,6 +1644,7 @@ async function imprimirReciboPago(pago, proc) {
       ${pago.metodo ? `<tr><th>Forma de pago</th><td>${esc(pago.metodo)}</td></tr>` : ''}
       ${pago.nota ? `<tr><th>Detalle</th><td>${esc(pago.nota)}</td></tr>` : ''}
       <tr class="tot"><th>Monto recibido</th><td>${esc(fmtMoneda(pago.monto, pago.moneda))}</td></tr>
+      <tr><th>Son</th><td>${esc(montoEnLetras(pago.monto, pago.moneda))}</td></tr>
     </table>
     <div class="imp-foot">
       <p>Este recibo acredita el pago indicado a favor de LexFive por los servicios profesionales del proceso señalado.</p>
@@ -2266,15 +2312,33 @@ async function deleteProceso(p) {
 //  VISTA: PAPELERA DE PROCESOS (solo administrador)
 // ============================================================
 async function renderPapelera() {
-  loading();
+  content().innerHTML = `
+    <div class="tabs-bar" role="tablist">
+      <button class="btn btn--sm btn--navy" id="papTabProc" role="tab">Procesos</button>
+      <button class="btn btn--sm btn--ghost" id="papTabCli" role="tab">Clientes</button>
+    </div>
+    <div id="papContainer"></div>`;
+  const sel = (tab) => {
+    $('#papTabProc').className = 'btn btn--sm ' + (tab === 'proc' ? 'btn--navy' : 'btn--ghost');
+    $('#papTabCli').className = 'btn btn--sm ' + (tab === 'cli' ? 'btn--navy' : 'btn--ghost');
+    if (tab === 'proc') papeleraProcesos(); else papeleraClientes();
+  };
+  $('#papTabProc').onclick = () => sel('proc');
+  $('#papTabCli').onclick = () => sel('cli');
+  sel('proc');
+}
+
+async function papeleraProcesos() {
+  const cont = $('#papContainer');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
   const { data, error } = await supabase.from('procesos').select('*').eq('eliminado', true).order('eliminado_at', { ascending: false });
   if (error) {
-    content().innerHTML = `<div class="card"><div class="card__body"><div class="empty">${ICON.papelera}
+    cont.innerHTML = `<div class="card"><div class="card__body"><div class="empty">${ICON.papelera}
       <p>No se pudo cargar la papelera.<br>Verifique que ejecutó el script <strong>db/14_papelera_procesos.sql</strong> en Supabase.</p></div></div></div>`;
     return;
   }
   const list = data || [];
-  content().innerHTML = `
+  cont.innerHTML = `
     <div class="card"><div class="card__body">
       <p class="cell-sub">Los procesos enviados a la papelera no aparecen en el sistema, pero <strong>no se borran</strong>. Puede <strong>restaurarlos</strong> o eliminarlos <strong>definitivamente</strong> (esto último no se puede deshacer).</p>
     </div></div>
@@ -2296,10 +2360,50 @@ async function renderPapelera() {
             <button class="btn btn--danger btn--sm js-purge" data-id="${p.id}" data-cara="${esc(p.caratula)}">Eliminar definitivamente</button>
           </td>
         </tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
-      : `<div class="empty">${ICON.papelera}<p>La papelera está vacía.</p></div>`;
+      : `<div class="empty">${ICON.papelera}<p>La papelera de procesos está vacía.</p></div>`;
     $('#papTable').querySelectorAll('.js-rest').forEach(b => b.onclick = () => restaurarProceso(b.dataset.id));
     $('#papTable').querySelectorAll('.js-purge').forEach(b => b.onclick = () => eliminarProcesoDefinitivo(b.dataset.id, b.dataset.cara));
     wirePager($('#papTable'), info, (n) => { page = n; paint(); });
+  }
+  paint();
+}
+
+async function papeleraClientes() {
+  const cont = $('#papContainer');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  const { data, error } = await supabase.from('clientes').select('*').eq('eliminado', true).order('eliminado_at', { ascending: false });
+  if (error) {
+    cont.innerHTML = `<div class="card"><div class="card__body"><div class="empty">${ICON.papelera}
+      <p>No se pudo cargar la papelera de clientes.<br>Verifique que ejecutó el script <strong>db/16_papelera_clientes.sql</strong> en Supabase.</p></div></div></div>`;
+    return;
+  }
+  const list = data || [];
+  cont.innerHTML = `
+    <div class="card"><div class="card__body">
+      <p class="cell-sub">Los clientes enviados a la papelera no aparecen en el sistema, pero <strong>no se borran</strong>. Puede <strong>restaurarlos</strong> o eliminarlos <strong>definitivamente</strong> (esto último no se puede deshacer).</p>
+    </div></div>
+    <div class="card"><div class="card__body--flush"><div id="papCliTable"></div></div></div>`;
+
+  let page = 1;
+  function paint() {
+    const info = paginar(list, page);
+    $('#papCliTable').innerHTML = list.length ? `<div class="table-wrap"><table class="data">
+      <thead><tr><th>Nombre</th><th>Documento</th><th>Eliminado</th><th>Por</th><th></th></tr></thead>
+      <tbody>${info.slice.map(c => `
+        <tr>
+          <td class="cell-strong">${esc(c.nombre)}<div class="cell-sub">${esc(c.email || c.telefono || '')}</div></td>
+          <td>${esc(c.documento || '—')}</td>
+          <td>${c.eliminado_at ? fmtDate(c.eliminado_at) : '—'}</td>
+          <td>${esc(profName(c.eliminado_por))}</td>
+          <td style="white-space:nowrap;text-align:right">
+            <button class="btn btn--navy btn--sm js-crest" data-id="${c.id}">Restaurar</button>
+            <button class="btn btn--danger btn--sm js-cpurge" data-id="${c.id}" data-nom="${esc(c.nombre)}">Eliminar definitivamente</button>
+          </td>
+        </tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
+      : `<div class="empty">${ICON.papelera}<p>La papelera de clientes está vacía.</p></div>`;
+    $('#papCliTable').querySelectorAll('.js-crest').forEach(b => b.onclick = () => restaurarCliente(b.dataset.id));
+    $('#papCliTable').querySelectorAll('.js-cpurge').forEach(b => b.onclick = () => eliminarClienteDefinitivo(b.dataset.id, b.dataset.nom));
+    wirePager($('#papCliTable'), info, (n) => { page = n; paint(); });
   }
   paint();
 }
@@ -2319,6 +2423,23 @@ async function eliminarProcesoDefinitivo(id, caratula) {
   await logAccion('eliminar_definitivo', 'proceso', id, caratula);
   toast('Proceso eliminado definitivamente.', 'success');
   renderPapelera();
+}
+
+async function restaurarCliente(id) {
+  const { error } = await supabase.from('clientes').update({ eliminado: false, eliminado_at: null, eliminado_por: null }).eq('id', id);
+  if (error) { toast('No se pudo restaurar: ' + error.message, 'error'); return; }
+  await logAccion('restaurar', 'cliente', id, '');
+  toast('Cliente restaurado.', 'success');
+  papeleraClientes();
+}
+
+async function eliminarClienteDefinitivo(id, nombre) {
+  if (!confirm(`¿Eliminar DEFINITIVAMENTE al cliente "${nombre}"?\n\nEsta acción NO se puede deshacer. Los procesos vinculados quedarán sin cliente asignado.`)) return;
+  const { error } = await supabase.from('clientes').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message, 'error'); return; }
+  await logAccion('eliminar_definitivo', 'cliente', id, nombre);
+  toast('Cliente eliminado definitivamente.', 'success');
+  papeleraClientes();
 }
 
 // ============================================================
@@ -2392,11 +2513,13 @@ async function saveCliente(cli) {
   closeModal(); toast('Cliente guardado.', 'success'); renderClientes();
 }
 async function deleteCliente(cli) {
-  if (!confirm(`¿Eliminar al cliente "${cli.nombre}"?`)) return;
-  const { error } = await supabase.from('clientes').delete().eq('id', cli.id);
+  if (!confirm(`¿Enviar al cliente "${cli.nombre}" a la papelera?\n\nNo se borra definitivamente: el administrador podrá restaurarlo o eliminarlo desde la Papelera.`)) return;
+  const { error } = await supabase.from('clientes').update({
+    eliminado: true, eliminado_at: new Date().toISOString(), eliminado_por: state.profile.id
+  }).eq('id', cli.id);
   if (error) { toast('Error: ' + error.message, 'error'); return; }
   await logAccion('eliminar', 'cliente', cli.id, cli.nombre);
-  closeModal(); toast('Cliente eliminado.', 'success'); renderClientes();
+  closeModal(); toast('Cliente enviado a la papelera.', 'success'); renderClientes();
 }
 
 // ============================================================
@@ -3641,7 +3764,7 @@ const VIEWS = {
   categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
-  papelera: { title: 'Papelera de procesos', render: renderPapelera },
+  papelera: { title: 'Papelera', render: renderPapelera },
   misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
   novedades: { title: 'Novedades de mis procesos', render: renderNovedades },
   opinion: { title: 'Mi opinión', render: renderMiOpinion }
@@ -3707,7 +3830,7 @@ async function openBuscadorGlobal() {
     supabase.from('clientes').select('*'),
     supabase.from('consultas').select('*').order('created_at', { ascending: false })
   ]);
-  const P = procesos || [], C = clientes || [], Q = consultas || [];
+  const P = procesos || [], C = (clientes || []).filter(c => !c.eliminado), Q = consultas || [];
 
   const pinta = () => {
     const q = (input.value || '').trim().toLowerCase();
@@ -3746,6 +3869,31 @@ async function openBuscadorGlobal() {
     });
   };
   if (input) input.oninput = pinta;
+}
+
+// ============================================================
+//  Modo oscuro / claro
+// ============================================================
+const THEME_KEY = 'lexfive_theme';
+function currentTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+}
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  const dark = t === 'dark';
+  const btn = $('#btnTheme');
+  if (btn) {
+    btn.innerHTML = dark ? ICON.sol : ICON.luna;
+    btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    btn.title = dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  }
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', dark ? '#0b131e' : '#0e1b2c');
+}
+function toggleTheme() {
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  applyTheme(next);
 }
 
 // ============================================================
@@ -3805,6 +3953,11 @@ async function openBuscadorGlobal() {
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();
   initTooltipEngine();
+
+  // Modo claro/oscuro: sincroniza el botón con el tema ya aplicado y permite alternarlo.
+  applyTheme(currentTheme());
+  const btnTheme = $('#btnTheme');
+  if (btnTheme) btnTheme.onclick = toggleTheme;
 
   // Al hacer clic en el logo (ir al sitio público), cerrar la sesión por
   // seguridad. El autoguardado conserva lo que se estaba escribiendo, así que

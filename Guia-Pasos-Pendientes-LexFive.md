@@ -43,6 +43,13 @@ En Supabase hay que ejecutar, una sola vez y en orden, los archivos de la carpet
 - 07_sync_clientes.sql — que los clientes registrados aparezcan en el panel.
 - 08_categorias.sql — áreas del derecho que se pueden crear desde el panel.
 - 09_actuaciones_archivos.sql — adjuntar archivos a cada paso del historial.
+- 10_branding.sql — logo y personalización visual del bufete.
+- 11_gestion_avanzada.sql — tareas, plazos/eventos, honorarios y pagos.
+- 12_plantillas.sql — plantillas de memoriales.
+- 13_privacidad_personal.sql — privacidad de los datos del personal.
+- 14_papelera_procesos.sql — papelera (borrado seguro) de procesos.
+- 15_recibos_correlativos.sql — numeración correlativa de los recibos de pago.
+- 16_papelera_clientes.sql — papelera (borrado seguro) de clientes.
 
 > **Si aparece un error:** Si un script muestra un error de «columna que no existe» o «ya existe», vuelva a ejecutarlo: están preparados para correrse sin romper ni borrar datos. Si el error persiste, cópielo y páselo al desarrollo.
 
