@@ -1,0 +1,15 @@
+# robots.txt - LexFive Abogados
+# Permite a los buscadores indexar el sitio público y bloquea áreas privadas.
+
+User-agent: *
+Allow: /
+
+# Áreas privadas / técnicas (no deben indexarse)
+Disallow: /sistema/
+Disallow: /db/
+Disallow: /scripts/
+Disallow: /supabase/
+Disallow: /assets/equipo/
+
+# Mapa del sitio
+Sitemap: https://lexfive.netlify.app/sitemap.xml
