@@ -1,0 +1,30 @@
+name: Keep-alive Supabase
+
+# Evita que el proyecto de Supabase (plan gratuito) se PAUSE por inactividad.
+# Hace una petición mínima de solo lectura a la API REST cada 3 días.
+# Usa la clave PÚBLICA (publishable), por lo que no requiere configurar secretos.
+
+on:
+  schedule:
+    # 06:00 UTC (02:00 Bolivia) cada 3 días
+    - cron: '0 6 */3 * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping a la API de Supabase
+        run: |
+          URL="https://soazmibvesvuwgxeealo.supabase.co/rest/v1/articulos?select=id&limit=1"
+          KEY="sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT"
+          code=$(curl -s -o /tmp/resp.txt -w "%{http_code}" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL")
+          echo "HTTP $code"
+          cat /tmp/resp.txt
+          # 200 (con o sin datos) significa que la base respondió: objetivo cumplido.
+          if [ "$code" != "200" ]; then
+            echo "::error::Supabase respondió $code (se esperaba 200)"
+            exit 1
+          fi
+          echo "Keep-alive OK"

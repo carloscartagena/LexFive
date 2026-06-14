@@ -13,6 +13,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/panel.css">
+  <script>
+    // Aplica el tema guardado (o el del sistema) antes de pintar, para evitar parpadeo.
+    (function () {
+      try {
+        var t = localStorage.getItem('lexfive_theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <div class="layout">
@@ -45,7 +57,10 @@
           <button class="menu-toggle btn btn--ghost btn--sm" id="menuToggle" aria-label="Menú">&#9776;</button>
           <h1 id="pageTitle">Panel</h1>
         </div>
-        <div class="topbar__actions" id="topbarActions"></div>
+        <div class="topbar__right">
+          <button class="theme-toggle btn btn--ghost btn--sm" id="btnTheme" type="button" aria-label="Cambiar entre modo claro y oscuro" aria-pressed="false" title="Modo claro / oscuro"></button>
+          <div class="topbar__actions" id="topbarActions"></div>
+        </div>
       </header>
       <main class="content" id="content">
         <div class="loading"><div class="spinner"></div>Cargando...</div>
