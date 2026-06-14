@@ -21,6 +21,7 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Instalar cliente PostgreSQL 17
         run: |
@@ -51,8 +52,13 @@ jobs:
           echo "Generando volcado con pg_dump..."
           # Escribe directamente a archivo (sin tubería) para que cualquier
           # error de pg_dump detenga el paso y quede visible en el registro.
+          # Solo el esquema "public" (los datos de la aplicación): evita los
+          # esquemas internos de Supabase (auth, storage, etc.), que pueden
+          # colgar el volcado o requerir permisos especiales.
           /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" \
+            --schema=public \
             --no-owner --no-privileges --clean --if-exists \
+            --verbose \
             --file="$file"
           bytes=$(stat -c%s "$file")
           echo "Tamaño del volcado: $bytes bytes"
