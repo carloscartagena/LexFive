@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, follow">
+    <meta name="description" content="La página que busca no existe. Vuelva al inicio de LexFive Abogados.">
+    <meta name="theme-color" content="#0e1b2c">
+    <link rel="icon" type="image/svg+xml" href="/assets/logo-emblem.svg">
+    <link rel="apple-touch-icon" href="/assets/pwa/icon-192.png">
+    <title>Página no encontrada | LexFive Abogados</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --nv: #0e1b2c; --nv2: #16273d; --gd: #c2a25a; --gdl: #e7d3a1; --cream: #e4e0d6; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+            background: linear-gradient(160deg, var(--nv2) 0%, var(--nv) 100%);
+            color: var(--cream); text-align: center;
+        }
+        .nf {
+            max-width: 540px; width: 100%;
+            border: 1px solid rgba(194,162,90,.35); border-radius: 18px;
+            padding: 48px 32px; background: rgba(0,0,0,.12);
+            box-shadow: 0 24px 60px rgba(0,0,0,.35);
+        }
+        .nf__emblem { width: 84px; height: 84px; margin: 0 auto 18px; display: block; }
+        .nf__code {
+            font-family: 'Cormorant Garamond', serif; font-weight: 700;
+            font-size: clamp(72px, 18vw, 120px); line-height: 1;
+            color: var(--gd); letter-spacing: 2px;
+        }
+        .nf__title {
+            font-family: 'Cormorant Garamond', serif; font-weight: 600;
+            font-size: clamp(24px, 5vw, 32px); margin: 8px 0 14px; color: #fff;
+        }
+        .nf__text { font-size: 16px; line-height: 1.65; color: rgba(228,224,214,.82); margin-bottom: 28px; }
+        .nf__actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .nf__btn {
+            display: inline-block; text-decoration: none; font-weight: 600; font-size: 15px;
+            padding: 13px 26px; border-radius: 999px; transition: transform .15s ease, opacity .15s ease;
+        }
+        .nf__btn:hover { transform: translateY(-2px); }
+        .nf__btn--primary { background: linear-gradient(135deg, var(--gdl), var(--gd)); color: var(--nv); }
+        .nf__btn--ghost { border: 1px solid rgba(194,162,90,.55); color: var(--gdl); }
+        .nf__links { margin-top: 26px; font-size: 14px; color: rgba(228,224,214,.7); }
+        .nf__links a { color: var(--gdl); text-decoration: none; }
+        .nf__links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <main class="nf">
+        <img class="nf__emblem" src="/assets/logo-emblem.svg" alt="LexFive Abogados" width="84" height="84">
+        <div class="nf__code">404</div>
+        <h1 class="nf__title">No encontramos esta página</h1>
+        <p class="nf__text">
+            Es posible que el enlace esté roto o que la página se haya movido.
+            Le invitamos a volver al inicio o contactarnos para ayudarle con su consulta legal.
+        </p>
+        <div class="nf__actions">
+            <a class="nf__btn nf__btn--primary" href="/">Volver al inicio</a>
+            <a class="nf__btn nf__btn--ghost" href="/index.html#contacto">Contáctenos</a>
+        </div>
+        <p class="nf__links">
+            <a href="/casos.html">Casos de éxito</a> &middot;
+            <a href="/blog.html">Blog</a> &middot;
+            <a href="/faq.html">Preguntas frecuentes</a>
+        </p>
+    </main>
+</body>
+</html>
