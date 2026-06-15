@@ -384,15 +384,15 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 
 @media (max-width: 520px) { .cred-card { width: 100%; height: auto; min-height: 5.5cm; } }
 
-/* Impresión: tamaño carnet estándar 8.5 x 5.5 cm, una cara por página. */
-@page { size: auto; margin: 10mm; }
+/* Impresión: ambas caras (anverso y reverso) en una sola hoja de 4 x 6 pulgadas. */
+@page { size: 4in 6in; margin: 6mm; }
 @media print {
     body.printing > *:not(#printRoot) { display: none !important; }
     #printRoot { display: block; }
     #printRoot, #printRoot * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #printRoot img { display: block !important; }
-    #printRoot .cred-card { box-shadow: none; border: 1px solid #999; width: 8.5cm; height: 5.5cm; margin: 0 auto; page-break-inside: avoid; }
-    #printRoot .cred-card + .cred-card { page-break-before: always; }
+    #printRoot .cred-card { box-shadow: none; border: 1px solid #999; width: 8.5cm; height: 5.5cm; margin: 0 auto 7mm; page-break-inside: avoid; }
+    #printRoot .cred-card:last-child { margin-bottom: 0; }
     #printRoot .cred-card--back { height: 5.5cm; }
 }
 
