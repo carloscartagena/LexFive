@@ -145,13 +145,15 @@ function perfil() {
 function portada() {
   const W = 820, H = 312, c = makeCanvas(W * SS, H * SS);
   bgGradient(c);
-  rectBorder(c, 14 * SS, 14 * SS, (W - 14) * SS, (H - 14) * SS, 3 * SS, GOLD);
-  rectBorder(c, 21 * SS, 21 * SS, (W - 21) * SS, (H - 21) * SS, 1.3 * SS, GOLD);
-  drawScales(c, 215 * SS, 156 * SS, 1.55 * SS);
-  drawTextCentered(c, 'LEXFIVE', 545 * SS, 92 * SS, 6.0 * SS, 3.0 * SS, CREAM);
-  line(c, 392 * SS, 168 * SS, 698 * SS, 168 * SS, 2 * SS, GOLD);
-  drawTextCentered(c, 'BUFETE DE ABOGADOS', 545 * SS, 188 * SS, 2.5 * SS, 1.7 * SS, GOLD_L);
-  drawTextCentered(c, 'EL ALTO \u00B7 BOLIVIA', 545 * SS, 226 * SS, 2.2 * SS, 1.6 * SS, GOLD);
+  rectBorder(c, 16 * SS, 16 * SS, (W - 16) * SS, (H - 16) * SS, 2.4 * SS, GOLD);
+  rectBorder(c, 23 * SS, 23 * SS, (W - 23) * SS, (H - 23) * SS, 1.2 * SS, GOLD);
+  // Balanza más pequeña y centrada verticalmente, sin salirse del marco ni tocar el texto.
+  drawScales(c, 192 * SS, 156 * SS, 0.70 * SS);
+  // Bloque de texto centrado en la mitad derecha; el conjunto (balanza + texto) queda centrado.
+  drawTextCentered(c, 'LEXFIVE', 548 * SS, 92 * SS, 5.8 * SS, 2.8 * SS, CREAM);
+  line(c, 408 * SS, 162 * SS, 688 * SS, 162 * SS, 2 * SS, GOLD);
+  drawTextCentered(c, 'BUFETE DE ABOGADOS', 548 * SS, 178 * SS, 2.3 * SS, 1.5 * SS, GOLD_L);
+  drawTextCentered(c, 'EL ALTO \u00B7 BOLIVIA', 548 * SS, 214 * SS, 2.1 * SS, 1.5 * SS, GOLD);
   return downsample(c, W, H);
 }
 
