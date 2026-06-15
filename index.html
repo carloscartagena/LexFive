@@ -90,6 +90,13 @@
      theme-charcoal (negro/dorado), theme-emerald (verde/dorado) o theme-burgundy (vino/dorado).
      Ejemplo: <body class="theme-emerald"> -->
 <body>
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v19.0"></script>
+
+    <!-- Botón flotante de Messenger -->
+    <a class="msgr-fab" href="https://m.me/61590416447764" target="_blank" rel="noopener" aria-label="Escríbenos por Messenger">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="#fff" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.5 2 2 6.13 2 11.2c0 2.89 1.46 5.46 3.74 7.15V22l3.42-1.88c.91.25 1.87.39 2.84.39 5.5 0 10-4.13 10-9.2S17.5 2 12 2zm1.13 12.34l-2.62-2.79-4.93 2.79 5.42-5.76 2.68 2.79 4.87-2.79-5.42 5.76z"/></svg>
+    </a>
 
     <!-- ===== Barra superior de contacto ===== -->
     <div class="topbar">
@@ -549,6 +556,32 @@
                     <button type="submit" class="btn btn--primary btn--block">Enviar solicitud</button>
                     <p class="form__feedback" id="formFeedback" role="status" aria-live="polite"></p>
                 </form>
+            </div>
+        </section>
+
+        <!-- ===== Síguenos en Facebook ===== -->
+        <section class="section fb-section" id="facebook">
+            <div class="container">
+                <header class="section__head">
+                    <p class="section__eyebrow">Redes sociales</p>
+                    <h2 class="section__title">Síguenos en Facebook</h2>
+                    <p class="section__lead">Novedades, consejos legales y anuncios del bufete.</p>
+                </header>
+                <div class="fb-embed">
+                    <div class="fb-page"
+                        data-href="https://www.facebook.com/profile.php?id=61590416447764"
+                        data-tabs="timeline"
+                        data-width="500"
+                        data-height="640"
+                        data-small-header="false"
+                        data-adapt-container-width="true"
+                        data-hide-cover="false"
+                        data-show-facepile="true">
+                        <blockquote cite="https://www.facebook.com/profile.php?id=61590416447764" class="fb-xfbml-parse-ignore">
+                            <a href="https://www.facebook.com/profile.php?id=61590416447764">LexFive Abogados</a>
+                        </blockquote>
+                    </div>
+                </div>
             </div>
         </section>
     </main>

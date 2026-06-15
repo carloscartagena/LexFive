@@ -852,3 +852,27 @@ body.theme-burgundy {
 }
 .footer__social a:hover { color: #c2a25a; }
 .footer__social svg { flex-shrink: 0; }
+
+
+
+/* ===== Widget de publicaciones de Facebook ===== */
+.fb-section { text-align: center; }
+.fb-embed { display: flex; justify-content: center; margin-top: 28px; }
+.fb-embed .fb-page,
+.fb-embed span,
+.fb-embed iframe { max-width: 100% !important; }
+
+/* ===== Botón flotante de Messenger ===== */
+.msgr-fab {
+    position: fixed; right: 22px; bottom: 22px; z-index: 200;
+    width: 58px; height: 58px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 30% 25%, #00b2ff 0%, #006aff 55%, #a033ff 130%);
+    box-shadow: 0 8px 22px rgba(0, 106, 255, .45);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.msgr-fab:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 12px 28px rgba(0, 106, 255, .55); }
+.msgr-fab svg { width: 30px; height: 30px; }
+@media (max-width: 600px) {
+    .msgr-fab { width: 52px; height: 52px; right: 16px; bottom: 16px; }
+}
