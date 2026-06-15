@@ -20,7 +20,7 @@
     // Datos PÚBLICOS de Supabase (mismos que en sistema/js/config.js).
     var SB_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
     var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
-    var LOGOS_VALIDOS = ['ds1-balanza-codigo', 'ds2-L5-circuito', 'ds3-mazo-pulso', 'ds4-columna-circuito', 'ds5-balanza-chip', 'opcion-6-LF-circuito'];
+    var LOGOS_VALIDOS = ['ds1-balanza-codigo', 'ds2-L5-circuito', 'ds3-mazo-pulso', 'ds4-columna-circuito', 'ds5-balanza-chip', 'opcion-6-LF-circuito', 'ds7-balanza-binario', 'ds8-balanza-red', 'ds9-codigo-justicia', 'ds10-engranaje-ley', 'ds11-LF-binario'];
 
     // Ruta a los logos según dónde esté la página (raíz o /sistema/).
     var ASSET_BASE = location.pathname.indexOf('/sistema/') !== -1 ? '../assets/logos/' : 'assets/logos/';

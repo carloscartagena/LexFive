@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive - Balanza dentro de un engranaje">
+  <defs>
+    <linearGradient id="d10bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2f49"/><stop offset="1" stop-color="#0d1826"/></linearGradient>
+    <linearGradient id="d10g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eadbb0"/><stop offset="0.45" stop-color="#cba765"/><stop offset="1" stop-color="#a07f3a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#d10bg)"/>
+  <rect x="3.25" y="3.25" width="57.5" height="57.5" rx="11" fill="none" stroke="url(#d10g)" stroke-width="0.8" opacity="0.55"/>
+  <!-- Engranaje (ingeniería): círculo + dientes -->
+  <g stroke="url(#d10g)" stroke-width="2.2" stroke-linecap="round" opacity="0.9">
+    <path d="M32 6 L32 9.5"/><path d="M32 41.5 L32 45"/>
+    <path d="M14.1 25.5 L17.6 25.5"/><path d="M46.4 25.5 L49.9 25.5"/>
+    <path d="M19.3 12.8 L21.8 15.3"/><path d="M42.2 35.7 L44.7 38.2"/>
+    <path d="M44.7 12.8 L42.2 15.3"/><path d="M21.8 35.7 L19.3 38.2"/>
+  </g>
+  <circle cx="32" cy="25.5" r="16" fill="none" stroke="url(#d10g)" stroke-width="1.5"/>
+  <g fill="none" stroke="url(#d10g)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 15 L32 36.5"/>
+    <path d="M21 19.5 L43 19.5"/>
+    <path d="M21 19.5 L17.8 25.5 M21 19.5 L24.2 25.5"/>
+    <path d="M43 19.5 L39.8 25.5 M43 19.5 L46.2 25.5"/>
+    <path d="M16.2 25.5 Q21 30.4 25.8 25.5"/>
+    <path d="M38.2 25.5 Q43 30.4 47.8 25.5"/>
+    <path d="M27.5 36.5 L36.5 36.5"/>
+  </g>
+  <circle cx="32" cy="14" r="1.9" fill="url(#d10g)"/>
+  <text x="32" y="58.6" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="8" font-weight="700" letter-spacing="3" fill="url(#d10g)">LEXFIVE</text>
+</svg>
