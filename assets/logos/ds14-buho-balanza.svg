@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive - Búho con balanza">
+  <defs>
+    <linearGradient id="d14bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2f49"/><stop offset="1" stop-color="#0d1826"/></linearGradient>
+    <linearGradient id="d14g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eadbb0"/><stop offset="0.45" stop-color="#cba765"/><stop offset="1" stop-color="#a07f3a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#d14bg)"/>
+  <rect x="3.25" y="3.25" width="57.5" height="57.5" rx="11" fill="none" stroke="url(#d14g)" stroke-width="0.8" opacity="0.55"/>
+  <!-- Búho -->
+  <g fill="url(#d14g)"><path d="M23.5 14 L27 8 L30 14 Z"/><path d="M40.5 14 L37 8 L34 14 Z"/></g>
+  <ellipse cx="32" cy="22.5" rx="12" ry="11" fill="none" stroke="url(#d14g)" stroke-width="1.8"/>
+  <g fill="none" stroke="url(#d14g)" stroke-width="1.6" stroke-linecap="round">
+    <path d="M22 17.5 L27 20"/><path d="M42 17.5 L37 20"/>
+  </g>
+  <circle cx="27" cy="22" r="4.4" fill="#0d1826" stroke="url(#d14g)" stroke-width="1.4"/>
+  <circle cx="37" cy="22" r="4.4" fill="#0d1826" stroke="url(#d14g)" stroke-width="1.4"/>
+  <circle cx="27" cy="22" r="1.9" fill="url(#d14g)"/>
+  <circle cx="37" cy="22" r="1.9" fill="url(#d14g)"/>
+  <path d="M30.5 24.6 L33.5 24.6 L32 28 Z" fill="url(#d14g)"/>
+  <!-- Balanza bajo el búho -->
+  <g fill="none" stroke="url(#d14g)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 31 L32 41"/>
+    <path d="M23 34 L41 34"/>
+    <path d="M23 34 L20.5 38 M23 34 L25.5 38"/>
+    <path d="M41 34 L38.5 38 M41 34 L43.5 38"/>
+    <path d="M19 38 Q23 41.5 27 38"/>
+    <path d="M37 38 Q41 41.5 45 38"/>
+    <path d="M28 41 L36 41"/>
+  </g>
+  <circle cx="32" cy="30.4" r="1.5" fill="url(#d14g)"/>
+  <text x="32" y="58.6" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="8" font-weight="700" letter-spacing="3" fill="url(#d14g)">LEXFIVE</text>
+</svg>

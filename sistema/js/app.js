@@ -3144,7 +3144,10 @@ async function renderCredenciales() {
     { id: 'ds8-balanza-red', nombre: 'Balanza · Red de nodos' },
     { id: 'ds9-codigo-justicia', nombre: 'Balanza · Código </>' },
     { id: 'ds10-engranaje-ley', nombre: 'Balanza · Engranaje' },
-    { id: 'ds11-LF-binario', nombre: 'Monograma LF · Binario' }
+    { id: 'ds11-LF-binario', nombre: 'Monograma LF · Binario' },
+    { id: 'ds12-buho-circuito', nombre: 'Búho · Circuito' },
+    { id: 'ds13-buho-hexagono', nombre: 'Búho · Hexágono tech' },
+    { id: 'ds14-buho-balanza', nombre: 'Búho · Balanza' }
   ];
   const LOGO_DEFAULT = 'ds1-balanza-codigo';
 
