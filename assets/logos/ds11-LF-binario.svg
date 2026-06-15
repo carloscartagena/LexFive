@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive - Monograma LF con binario">
+  <defs>
+    <linearGradient id="d11bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2f49"/><stop offset="1" stop-color="#0d1826"/></linearGradient>
+    <linearGradient id="d11g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eadbb0"/><stop offset="0.45" stop-color="#cba765"/><stop offset="1" stop-color="#a07f3a"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#d11bg)"/>
+  <rect x="3.25" y="3.25" width="57.5" height="57.5" rx="11" fill="none" stroke="url(#d11g)" stroke-width="0.8" opacity="0.55"/>
+  <circle cx="32" cy="26" r="17.5" fill="none" stroke="url(#d11g)" stroke-width="1.4"/>
+  <!-- Anillo de binario alrededor del monograma (ingeniería en sistemas) -->
+  <g font-family="'Courier New', monospace" font-size="3" fill="url(#d11g)" opacity="0.55" text-anchor="middle">
+    <text x="32" y="13.4">0 1 0 1 1 0</text>
+    <text x="32" y="41.6">1 0 1 0 0 1</text>
+  </g>
+  <!-- Trazas laterales con nodos -->
+  <g fill="none" stroke="url(#d11g)" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
+    <path d="M17.6 26 L21 26 M46.4 26 L43 26"/>
+  </g>
+  <g fill="url(#d11g)" opacity="0.7"><circle cx="17.6" cy="26" r="1.1"/><circle cx="46.4" cy="26" r="1.1"/></g>
+  <text x="32" y="33.8" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" letter-spacing="0.5" fill="url(#d11g)">LF</text>
+  <text x="32" y="58.6" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="8" font-weight="700" letter-spacing="3" fill="url(#d11g)">LEXFIVE</text>
+</svg>

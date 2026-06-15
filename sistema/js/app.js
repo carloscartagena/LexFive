@@ -3124,7 +3124,12 @@ async function renderCredenciales() {
     { id: 'ds3-mazo-pulso', nombre: 'Emblema · Mazo del juez' },
     { id: 'ds4-columna-circuito', nombre: 'Emblema · Templo de justicia' },
     { id: 'ds5-balanza-chip', nombre: 'Emblema · Balanza en chip' },
-    { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' }
+    { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' },
+    { id: 'ds7-balanza-binario', nombre: 'Balanza · Código binario' },
+    { id: 'ds8-balanza-red', nombre: 'Balanza · Red de nodos' },
+    { id: 'ds9-codigo-justicia', nombre: 'Balanza · Código </>' },
+    { id: 'ds10-engranaje-ley', nombre: 'Balanza · Engranaje' },
+    { id: 'ds11-LF-binario', nombre: 'Monograma LF · Binario' }
   ];
   const LOGO_DEFAULT = 'ds1-balanza-codigo';
 
