@@ -3269,10 +3269,10 @@ async function renderCredenciales() {
         <div class="field-row">
           <div class="field"><label>Válido hasta (automático · 3 años)</label><input id="cr_validez_view" type="text" readonly value="" style="background:#f4f5f7;font-weight:600"></div>
           <div class="field">
-            <label>Foto del procurador (3×3)</label>
+            <label>Foto del procurador (2,5 × 2,5)</label>
             <div style="display:flex;align-items:center;gap:8px">
               <button class="btn btn--ghost btn--sm" id="btnUploadFoto" type="button">Subir foto</button>
-              ${IMG.foto ? '<button class="btn btn--ghost btn--sm" id="btnRemoveFoto" type="button">Quitar</button><img src="' + IMG.foto + '" alt="foto" style="width:34px;height:34px;border-radius:5px;object-fit:cover;border:1px solid #e6e8ec">' : '<span class="cell-sub">Se recorta cuadrada (3×3)</span>'}
+              ${IMG.foto ? '<button class="btn btn--ghost btn--sm" id="btnRemoveFoto" type="button">Quitar</button><img src="' + IMG.foto + '" alt="foto" style="width:34px;height:34px;border-radius:5px;object-fit:cover;border:1px solid #e6e8ec">' : '<span class="cell-sub">Se recorta cuadrada (2,5 × 2,5)</span>'}
             </div>
             <input type="file" id="fileFoto" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
           </div>
@@ -3292,16 +3292,10 @@ async function renderCredenciales() {
     <div class="cred-wrap" id="credPrintArea">
       <!-- ANVERSO -->
       <div class="cred-card">
-        <div class="cred-top2">
-          <div class="cred-photo" id="cv_foto">${IMG.foto ? '<img src="' + IMG.foto + '" alt="Foto del portador">' : esc(initials(datos.nombre) || '')}</div>
-          <div class="cred-brand">
-            <img class="cred-logo" id="cv_logo" src="${logoSrc(logoActual)}" alt="Logo del bufete">
-            <strong>LexFive</strong>
-            <small>Bufete de Abogados</small>
-          </div>
-        </div>
-        <div class="cred-band">CREDENCIAL &middot; <span id="cv_cargo_band">${esc(datos.cargo || '')}</span></div>
+        <img class="cred-wm" id="cv_logo" src="${logoSrc(logoActual)}" alt="">
+        <div class="cred-band"><strong>LexFive</strong> &middot; Credencial &middot; <span id="cv_cargo_band">${esc(datos.cargo || '')}</span></div>
         <div class="cred-body">
+          <div class="cred-photo" id="cv_foto">${IMG.foto ? '<img src="' + IMG.foto + '" alt="Foto del portador">' : esc(initials(datos.nombre) || '')}</div>
           <div class="cred-data">
             <div class="cred-row"><span>Nombre</span><strong id="cv_nombre">${esc(datos.nombre || '')}</strong></div>
             <div class="cred-row"><span>Carnet de identidad</span><strong id="cv_ci">${esc(datos.ci || '')}</strong></div>
@@ -3320,6 +3314,7 @@ async function renderCredenciales() {
 
       <!-- REVERSO -->
       <div class="cred-card cred-card--back">
+        <img class="cred-wm" id="cv_logo_back" src="${logoSrc(logoActual)}" alt="">
         <div class="cred-band">LexFive &middot; La Paz / El Alto - Bolivia</div>
         <p class="cred-cert" id="cv_repre">${resaltarRepre(datos.representacion || REPRE_DEFAULT)}</p>
         <p class="cred-cert cred-frase" id="cv_frase">${esc(datos.frase || '')}</p>
@@ -3356,6 +3351,7 @@ async function renderCredenciales() {
     localStorage.setItem('lexfive_logo', id);
     content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const cv = $('#cv_logo'); if (cv) cv.src = logoSrc(id);
+    const cvb = $('#cv_logo_back'); if (cvb) cvb.src = logoSrc(id);
     const pv = $('#logoPreviewBig'); if (pv) pv.src = logoSrc(id);
     const dl = $('#logoDownload'); if (dl) { dl.href = logoSrc(id); dl.setAttribute('download', nombreLogo(id)); }
     applyLogo(id);
@@ -3443,7 +3439,7 @@ async function renderCredenciales() {
     const f = fileFoto.files && fileFoto.files[0];
     fileFoto.value = '';
     if (!f) return;
-    abrirEditorImagen(f, { titulo: 'Ajustar foto (3×3)', salida: 360, quitarBlanco: false }, async (png) => {
+    abrirEditorImagen(f, { titulo: 'Ajustar foto (2,5 × 2,5)', salida: 360, quitarBlanco: false }, async (png) => {
       const ok = await guardarImagen('foto', png);
       if (!ok) { toast('No se pudo guardar la foto.', 'error'); return; }
       renderCredenciales();
