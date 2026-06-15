@@ -432,7 +432,7 @@ const ImgDB = {
 };
 
 // Caché sincrónica de las imágenes para que el render no tenga que esperar.
-const IMG = { logo: null, sello: null, foto: null, logosCustom: [], loaded: false };
+const IMG = { logo: null, sello: null, foto: null, logosCustom: [], sellosCustom: [], loaded: false };
 
 async function ensureImgCache() {
   if (IMG.loaded) return;
@@ -452,6 +452,12 @@ async function ensureImgCache() {
   if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) {
     IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo });
     try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {}
+  }
+  // Galería de sellos propios subidos (varios), igual que los logos.
+  IMG.sellosCustom = (await ImgDB.get('sellosCustom')) || [];
+  if (IMG.sello && !IMG.sellosCustom.some(x => x && x.img === IMG.sello)) {
+    IMG.sellosCustom.unshift({ id: 's' + Date.now(), img: IMG.sello });
+    try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {}
   }
   // Respaldo: si quedó un data URL en localStorage (no se pudo migrar), úsalo.
   if (!IMG.logo) { const ol = localStorage.getItem('lexfive_logo_custom'); if (ol && ol.indexOf('data:') === 0) IMG.logo = ol; }
@@ -480,6 +486,7 @@ function borrarImagen(kind) {
 
 // Guarda en el equipo la lista de logos propios subidos (galería con varios).
 async function saveLogosCustom() { try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
+async function saveSellosCustom() { try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {} }
 
 // ============================================================
 //  Configuración compartida del bufete (logo y sello) en Supabase.
@@ -529,10 +536,12 @@ function snapshotBranding() {
   const readList = k => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
   let logoId = localStorage.getItem('lexfive_logo') || null;
   if (logoId && logoId.indexOf('custom') === 0) logoId = 'custom'; // compatibilidad con la web pública
+  let selloId = localStorage.getItem('lexfive_sello') || null;
+  if (selloId && selloId.indexOf('custom') === 0) selloId = 'custom';
   return {
     logoId: logoId,
     logoImg: IMG.logo || null,
-    selloId: localStorage.getItem('lexfive_sello') || null,
+    selloId: selloId,
     selloImg: IMG.sello || null,
     logosHidden: readList('lexfive_logos_hidden'),
     sellosHidden: readList('lexfive_sellos_hidden')
@@ -563,7 +572,8 @@ async function hydrateBranding() {
     if (Array.isArray(b.logosCustom) && b.logosCustom.length) { IMG.logosCustom = b.logosCustom; try { await ImgDB.set('logosCustom', b.logosCustom); } catch (e) {} }
     if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) { IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo }); try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
     if (b.selloImg) { IMG.sello = b.selloImg; try { await ImgDB.set('sello', b.selloImg); } catch (e) {} }
-    else { IMG.sello = null; try { await ImgDB.del('sello'); } catch (e) {} localStorage.removeItem('lexfive_sello_custom'); }
+    else if (b.selloId && b.selloId !== 'custom') { IMG.sello = null; try { await ImgDB.del('sello'); } catch (e) {} localStorage.removeItem('lexfive_sello_custom'); }
+    if (IMG.sello && !IMG.sellosCustom.some(x => x && x.img === IMG.sello)) { IMG.sellosCustom.unshift({ id: 's' + Date.now(), img: IMG.sello }); try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {} }
   } catch (e) {}
   return b;
 }
@@ -3189,7 +3199,16 @@ async function renderCredenciales() {
     return LOGO_DEFAULT;
   };
   const logoActual = pickActiveLogo(localStorage.getItem('lexfive_logo'));
-  const selloActual = pickActive(localStorage.getItem('lexfive_sello'), customSello, sellosVisibles, SELLO_DEFAULT);
+  const findSello = sid => IMG.sellosCustom.find(x => x && x.id === sid);
+  const pickActiveSello = (saved) => {
+    if (saved && saved.indexOf('custom:') === 0 && findSello(saved.slice(7))) return saved;
+    if (saved === 'custom' && IMG.sellosCustom.length) return 'custom:' + IMG.sellosCustom[0].id;
+    if (sellosVisibles.some(x => x.id === saved)) return saved;
+    if (IMG.sellosCustom.length) return 'custom:' + IMG.sellosCustom[0].id;
+    if (sellosVisibles.length) return sellosVisibles[0].id;
+    return SELLO_DEFAULT;
+  };
+  const selloActual = pickActiveSello(localStorage.getItem('lexfive_sello'));
 
   // Devuelven la fuente correcta: archivo del repo o imagen subida por el bufete (data URL)
   const logoSrc = id => {
@@ -3197,7 +3216,11 @@ async function renderCredenciales() {
     if (id === 'custom') return IMG.logo || (IMG.logosCustom[0] && IMG.logosCustom[0].img) || '';
     return `../assets/logos/${id}.svg`;
   };
-  const selloSrc = id => id === 'custom' ? (IMG.sello || '') : `../assets/sellos/${id}.svg`;
+  const selloSrc = id => {
+    if (id && id.indexOf('custom:') === 0) { const sc = findSello(id.slice(7)); return (sc && sc.img) || ''; }
+    if (id === 'custom') return IMG.sello || (IMG.sellosCustom[0] && IMG.sellosCustom[0].img) || '';
+    return `../assets/sellos/${id}.svg`;
+  };
 
   // Frases sugeridas para el reverso
   const FRASES = [
@@ -3263,12 +3286,12 @@ async function renderCredenciales() {
               <img src="../assets/sellos/${s.id}.svg" alt="${esc(s.nombre)}">
               <span>${esc(s.nombre)}</span>
             </div>`).join('')}
-          ${customSello ? `
-            <div class="logo-option sello-option ${selloActual === 'custom' ? 'is-selected' : ''}" data-sello="custom">
-              <button class="tile-del" data-del-sello="custom" type="button" title="Quitar mi sello">&times;</button>
-              <img src="${customSello}" alt="Mi sello">
-              <span>Mi sello</span>
-            </div>` : ''}
+          ${IMG.sellosCustom.map((sc, i) => `
+            <div class="logo-option sello-option ${selloActual === 'custom:' + sc.id ? 'is-selected' : ''}" data-sello="custom:${sc.id}">
+              <button class="tile-del" data-del-sello="custom:${sc.id}" type="button" title="Quitar este sello">&times;</button>
+              <img src="${sc.img}" alt="Mi sello ${i + 1}">
+              <span>Mi sello ${i + 1}</span>
+            </div>`).join('')}
           <button class="logo-option logo-upload" id="btnUploadSello" type="button">
             <span class="logo-upload__plus">+</span>
             <span>Subir mi sello</span>
@@ -3515,54 +3538,77 @@ async function renderCredenciales() {
 
   // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
   let selloElegido = selloActual;
-  content().querySelectorAll('.sello-option[data-sello]').forEach(tile => tile.onclick = () => {
+  content().querySelectorAll('.sello-option[data-sello]').forEach(tile => tile.onclick = async () => {
     const id = tile.dataset.sello;
     selloElegido = id;
+    if (id.indexOf('custom:') === 0) { const sc = findSello(id.slice(7)); if (sc) { IMG.sello = sc.img; try { await ImgDB.set('sello', sc.img); } catch (e) {} localStorage.setItem('lexfive_sello_custom', '1'); } }
     localStorage.setItem('lexfive_sello', id);
     content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const prev = $('#selloPreview'); if (prev) prev.src = selloSrc(id);
-    const dl = $('#selloDownload'); if (dl) { dl.href = selloSrc(id); dl.setAttribute('download', id === 'custom' ? 'sello-lexfive.png' : id + '.svg'); }
+    const dl = $('#selloDownload'); if (dl) { dl.href = selloSrc(id); dl.setAttribute('download', (id && id.indexOf('custom') === 0) ? 'sello-lexfive.png' : id + '.svg'); }
     pushBranding();
     toast('Sello seleccionado. Listo para memoriales y documentos.', 'success');
   });
   const btnSelloBig = $('#btnSelloBig');
-  if (btnSelloBig) btnSelloBig.onclick = () => verImagenGrande(selloSrc(selloElegido), 'Sello del bufete', selloElegido === 'custom' ? 'sello-lexfive.png' : selloElegido + '.svg');
+  if (btnSelloBig) btnSelloBig.onclick = () => verImagenGrande(selloSrc(selloElegido), 'Sello del bufete', (selloElegido && selloElegido.indexOf('custom') === 0) ? 'sello-lexfive.png' : selloElegido + '.svg');
 
   // Subir mi sello (SVG tal cual; foto pasa por el editor y se convierte a PNG)
   const fileSello = $('#fileSello');
   const btnUploadSello = $('#btnUploadSello');
   if (btnUploadSello) btnUploadSello.onclick = () => fileSello.click();
+  // Tras subir un sello, lo AGREGA a la galería (sin borrar los anteriores) y lo deja seleccionado.
+  const trasSubirSello = async () => {
+    const img = IMG.sello;
+    let entry = IMG.sellosCustom.find(x => x && x.img === img);
+    if (!entry && img) { entry = { id: 's' + Date.now(), img }; IMG.sellosCustom.push(entry); }
+    await saveSellosCustom();
+    localStorage.setItem('lexfive_sello', entry ? 'custom:' + entry.id : 'custom');
+    await pushBranding();
+    renderCredenciales();
+  };
   if (fileSello) fileSello.onchange = () => {
     const f = fileSello.files && fileSello.files[0];
     fileSello.value = '';
     if (!f) return;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
     if (f.type === 'image/svg+xml' || ext === 'svg') {
-      leerImagenBufete(f, 'sello', () => { localStorage.setItem('lexfive_sello', 'custom'); pushBranding(); renderCredenciales(); toast('Sello subido y sincronizado.', 'success'); });
+      leerImagenBufete(f, 'sello', async () => { await trasSubirSello(); toast('Sello subido. Se conserva junto a los anteriores.', 'success'); });
     } else {
       abrirEditorImagen(f, { titulo: 'Ajustar sello', salida: 1000, quitarBlanco: true }, async (pngUrl) => {
         const ok = await guardarImagen('sello', pngUrl);
         if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
-        localStorage.setItem('lexfive_sello', 'custom');
-        await pushBranding();
-        renderCredenciales();
-        toast('Sello ajustado, convertido a PNG y sincronizado.', 'success');
+        await trasSubirSello();
+        toast('Sello ajustado, convertido a PNG y guardado junto a los anteriores.', 'success');
       });
     }
   };
 
   // Eliminar / restaurar sellos
-  content().querySelectorAll('[data-del-sello]').forEach(b => b.onclick = (e) => {
+  content().querySelectorAll('[data-del-sello]').forEach(b => b.onclick = async (e) => {
     e.stopPropagation();
     const id = b.dataset.delSello;
     if (!confirm('¿Eliminar este sello de la galería?')) return;
-    if (id === 'custom') borrarImagen('sello');
-    else { const arr = readList('lexfive_sellos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(arr)); }
-    if (localStorage.getItem('lexfive_sello') === id) {
-      const vis = SELLOS.filter(s => readList('lexfive_sellos_hidden').indexOf(s.id) === -1);
-      localStorage.setItem('lexfive_sello', pickActive(null, IMG.sello, vis, SELLO_DEFAULT));
+    if (id.indexOf('custom:') === 0) {
+      IMG.sellosCustom = IMG.sellosCustom.filter(x => x && x.id !== id.slice(7));
+      await saveSellosCustom();
+    } else if (id === 'custom') {
+      borrarImagen('sello');
+    } else {
+      const arr = readList('lexfive_sellos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(arr));
     }
-    pushBranding();
+    const sel = localStorage.getItem('lexfive_sello');
+    let valida = false;
+    if (sel && sel.indexOf('custom:') === 0) valida = !!findSello(sel.slice(7));
+    else if (sel === 'custom') valida = IMG.sellosCustom.length > 0;
+    else valida = SELLOS.some(s => s.id === sel) && readList('lexfive_sellos_hidden').indexOf(sel) === -1;
+    if (!valida) {
+      const vis = SELLOS.filter(s => readList('lexfive_sellos_hidden').indexOf(s.id) === -1);
+      let nuevo;
+      if (IMG.sellosCustom.length) { const f = IMG.sellosCustom[0]; nuevo = 'custom:' + f.id; IMG.sello = f.img; try { await ImgDB.set('sello', f.img); } catch (er) {} }
+      else { IMG.sello = null; try { await ImgDB.del('sello'); } catch (er) {} nuevo = vis.length ? vis[0].id : SELLO_DEFAULT; }
+      localStorage.setItem('lexfive_sello', nuevo);
+    }
+    await pushBranding();
     renderCredenciales();
     toast('Sello eliminado de la galería.', 'success');
   });
