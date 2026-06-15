@@ -3714,7 +3714,7 @@ function applyLogo(id) {
 }
 
 // Imprime la credencial: clona las dos caras en un contenedor a nivel de <body>
-// para imprimir cada cara en su propia hoja (4x6), de tamaño idéntico.
+// para imprimir ambas caras (anverso y reverso) juntas en una sola hoja de 4x6.
 function imprimirCredencial() {
   const area = document.getElementById('credPrintArea');
   if (!area) { window.print(); return; }
