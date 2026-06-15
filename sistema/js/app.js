@@ -532,7 +532,6 @@ function snapshotBranding() {
   return {
     logoId: logoId,
     logoImg: IMG.logo || null,
-    logosCustom: IMG.logosCustom || [],
     selloId: localStorage.getItem('lexfive_sello') || null,
     selloImg: IMG.sello || null,
     logosHidden: readList('lexfive_logos_hidden'),
@@ -559,8 +558,9 @@ async function hydrateBranding() {
     localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(b.sellosHidden || []));
     // La nube es la fuente de verdad para la imagen propia.
     if (b.logoImg) { IMG.logo = b.logoImg; try { await ImgDB.set('logo', b.logoImg); } catch (e) {} }
-    else { IMG.logo = null; try { await ImgDB.del('logo'); } catch (e) {} localStorage.removeItem('lexfive_logo_custom'); }
-    if (Array.isArray(b.logosCustom)) { IMG.logosCustom = b.logosCustom; try { await ImgDB.set('logosCustom', b.logosCustom); } catch (e) {} }
+    else if (b.logoId && b.logoId !== 'custom') { IMG.logo = null; try { await ImgDB.del('logo'); } catch (e) {} localStorage.removeItem('lexfive_logo_custom'); }
+    // Si la nube no trae imagen pero el logo elegido es propio (o no hay dato), se conserva el del equipo.
+    if (Array.isArray(b.logosCustom) && b.logosCustom.length) { IMG.logosCustom = b.logosCustom; try { await ImgDB.set('logosCustom', b.logosCustom); } catch (e) {} }
     if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) { IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo }); try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
     if (b.selloImg) { IMG.sello = b.selloImg; try { await ImgDB.set('sello', b.selloImg); } catch (e) {} }
     else { IMG.sello = null; try { await ImgDB.del('sello'); } catch (e) {} localStorage.removeItem('lexfive_sello_custom'); }
