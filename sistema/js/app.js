@@ -432,7 +432,7 @@ const ImgDB = {
 };
 
 // Caché sincrónica de las imágenes para que el render no tenga que esperar.
-const IMG = { logo: null, sello: null, foto: null, loaded: false };
+const IMG = { logo: null, sello: null, foto: null, logosCustom: [], loaded: false };
 
 async function ensureImgCache() {
   if (IMG.loaded) return;
@@ -446,6 +446,13 @@ async function ensureImgCache() {
   IMG.logo = await ImgDB.get('logo');
   IMG.sello = await ImgDB.get('sello');
   IMG.foto = await ImgDB.get('foto');
+  // Galería de logos propios subidos (varios). Antes solo había un espacio,
+  // por eso al subir uno nuevo se perdía el anterior; ahora se conservan todos.
+  IMG.logosCustom = (await ImgDB.get('logosCustom')) || [];
+  if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) {
+    IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo });
+    try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {}
+  }
   // Respaldo: si quedó un data URL en localStorage (no se pudo migrar), úsalo.
   if (!IMG.logo) { const ol = localStorage.getItem('lexfive_logo_custom'); if (ol && ol.indexOf('data:') === 0) IMG.logo = ol; }
   if (!IMG.sello) { const os = localStorage.getItem('lexfive_sello_custom'); if (os && os.indexOf('data:') === 0) IMG.sello = os; }
@@ -470,6 +477,9 @@ function borrarImagen(kind) {
   localStorage.removeItem('lexfive_' + kind + '_custom');
   ImgDB.del(kind);
 }
+
+// Guarda en el equipo la lista de logos propios subidos (galería con varios).
+async function saveLogosCustom() { try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
 
 // ============================================================
 //  Configuración compartida del bufete (logo y sello) en Supabase.
@@ -517,9 +527,12 @@ const Branding = {
 // propias + modelos ocultos) para guardarla en la nube.
 function snapshotBranding() {
   const readList = k => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
+  let logoId = localStorage.getItem('lexfive_logo') || null;
+  if (logoId && logoId.indexOf('custom') === 0) logoId = 'custom'; // compatibilidad con la web pública
   return {
-    logoId: localStorage.getItem('lexfive_logo') || null,
+    logoId: logoId,
     logoImg: IMG.logo || null,
+    logosCustom: IMG.logosCustom || [],
     selloId: localStorage.getItem('lexfive_sello') || null,
     selloImg: IMG.sello || null,
     logosHidden: readList('lexfive_logos_hidden'),
@@ -547,6 +560,8 @@ async function hydrateBranding() {
     // La nube es la fuente de verdad para la imagen propia.
     if (b.logoImg) { IMG.logo = b.logoImg; try { await ImgDB.set('logo', b.logoImg); } catch (e) {} }
     else { IMG.logo = null; try { await ImgDB.del('logo'); } catch (e) {} localStorage.removeItem('lexfive_logo_custom'); }
+    if (Array.isArray(b.logosCustom)) { IMG.logosCustom = b.logosCustom; try { await ImgDB.set('logosCustom', b.logosCustom); } catch (e) {} }
+    if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) { IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo }); try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
     if (b.selloImg) { IMG.sello = b.selloImg; try { await ImgDB.set('sello', b.selloImg); } catch (e) {} }
     else { IMG.sello = null; try { await ImgDB.del('sello'); } catch (e) {} localStorage.removeItem('lexfive_sello_custom'); }
   } catch (e) {}
@@ -3161,11 +3176,24 @@ async function renderCredenciales() {
     if (visibles.length) return visibles[0].id;
     return def;
   };
-  const logoActual = pickActive(localStorage.getItem('lexfive_logo'), customLogo, logosVisibles, LOGO_DEFAULT);
+  const findCustom = cid => IMG.logosCustom.find(x => x && x.id === cid);
+  const pickActiveLogo = (saved) => {
+    if (saved && saved.indexOf('custom:') === 0 && findCustom(saved.slice(7))) return saved;
+    if (saved === 'custom' && IMG.logosCustom.length) return 'custom:' + IMG.logosCustom[0].id;
+    if (logosVisibles.some(x => x.id === saved)) return saved;
+    if (IMG.logosCustom.length) return 'custom:' + IMG.logosCustom[0].id;
+    if (logosVisibles.length) return logosVisibles[0].id;
+    return LOGO_DEFAULT;
+  };
+  const logoActual = pickActiveLogo(localStorage.getItem('lexfive_logo'));
   const selloActual = pickActive(localStorage.getItem('lexfive_sello'), customSello, sellosVisibles, SELLO_DEFAULT);
 
   // Devuelven la fuente correcta: archivo del repo o imagen subida por el bufete (data URL)
-  const logoSrc = id => id === 'custom' ? (IMG.logo || '') : `../assets/logos/${id}.svg`;
+  const logoSrc = id => {
+    if (id && id.indexOf('custom:') === 0) { const lc = findCustom(id.slice(7)); return (lc && lc.img) || ''; }
+    if (id === 'custom') return IMG.logo || (IMG.logosCustom[0] && IMG.logosCustom[0].img) || '';
+    return `../assets/logos/${id}.svg`;
+  };
   const selloSrc = id => id === 'custom' ? (IMG.sello || '') : `../assets/sellos/${id}.svg`;
 
   // Frases sugeridas para el reverso
@@ -3197,12 +3225,12 @@ async function renderCredenciales() {
               <img src="../assets/logos/${l.id}.svg" alt="${esc(l.nombre)}">
               <span>${esc(l.nombre)}</span>
             </div>`).join('')}
-          ${customLogo ? `
-            <div class="logo-option ${logoActual === 'custom' ? 'is-selected' : ''}" data-logo="custom">
-              <button class="tile-del" data-del-logo="custom" type="button" title="Quitar mi logo">&times;</button>
-              <img src="${customLogo}" alt="Mi logo">
-              <span>Mi logo</span>
-            </div>` : ''}
+          ${IMG.logosCustom.map((lc, i) => `
+            <div class="logo-option ${logoActual === 'custom:' + lc.id ? 'is-selected' : ''}" data-logo="custom:${lc.id}">
+              <button class="tile-del" data-del-logo="custom:${lc.id}" type="button" title="Quitar este logo">&times;</button>
+              <img src="${lc.img}" alt="Mi logo ${i + 1}">
+              <span>Mi logo ${i + 1}</span>
+            </div>`).join('')}
           <button class="logo-option logo-upload" id="btnUploadLogo" type="button">
             <span class="logo-upload__plus">+</span>
             <span>Subir mi logo</span>
@@ -3349,10 +3377,14 @@ async function renderCredenciales() {
 
   // Selección de logo: aplica al sistema (se guarda en este equipo)
   let logoSel = logoActual;
-  const nombreLogo = id => id === 'custom' ? 'logo-lexfive.png' : id + '.svg';
-  content().querySelectorAll('.logo-option[data-logo]').forEach(tile => tile.onclick = () => {
+  const nombreLogo = id => (id && id.indexOf('custom') === 0) ? 'logo-lexfive.png' : id + '.svg';
+  content().querySelectorAll('.logo-option[data-logo]').forEach(tile => tile.onclick = async () => {
     const id = tile.dataset.logo;
     logoSel = id;
+    if (id.indexOf('custom:') === 0) {
+      const lc = findCustom(id.slice(7));
+      if (lc) { IMG.logo = lc.img; try { await ImgDB.set('logo', lc.img); } catch (e) {} localStorage.setItem('lexfive_logo_custom', '1'); }
+    }
     localStorage.setItem('lexfive_logo', id);
     content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const cv = $('#cv_logo'); if (cv) cv.src = logoSrc(id);
@@ -3370,37 +3402,61 @@ async function renderCredenciales() {
   const fileLogo = $('#fileLogo');
   const btnUploadLogo = $('#btnUploadLogo');
   if (btnUploadLogo) btnUploadLogo.onclick = () => fileLogo.click();
+  // Tras subir un logo, lo AGREGA a la galería (sin borrar los anteriores) y lo deja seleccionado.
+  const trasSubirLogo = async () => {
+    const img = IMG.logo;
+    let entry = IMG.logosCustom.find(x => x && x.img === img);
+    if (!entry && img) { entry = { id: 'c' + Date.now(), img }; IMG.logosCustom.push(entry); }
+    await saveLogosCustom();
+    localStorage.setItem('lexfive_logo', entry ? 'custom:' + entry.id : 'custom');
+    applyLogo('custom');
+    await pushBranding();
+    renderCredenciales();
+  };
   if (fileLogo) fileLogo.onchange = () => {
     const f = fileLogo.files && fileLogo.files[0];
     fileLogo.value = '';
     if (!f) return;
     const ext = (f.name.split('.').pop() || '').toLowerCase();
     if (f.type === 'image/svg+xml' || ext === 'svg') {
-      leerImagenBufete(f, 'logo', () => { localStorage.setItem('lexfive_logo', 'custom'); applyLogo('custom'); pushBranding(); renderCredenciales(); toast('Logo subido y aplicado en todos los dispositivos.', 'success'); });
+      leerImagenBufete(f, 'logo', async () => { await trasSubirLogo(); toast('Logo subido y aplicado. Se conserva junto a los anteriores.', 'success'); });
     } else {
       abrirEditorImagen(f, { titulo: 'Ajustar logo', salida: 600, quitarBlanco: false }, async (pngUrl) => {
         const ok = await guardarImagen('logo', pngUrl);
         if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
-        localStorage.setItem('lexfive_logo', 'custom');
-        applyLogo('custom'); await pushBranding(); renderCredenciales();
-        toast('Logo ajustado, convertido a PNG y aplicado en todos los dispositivos.', 'success');
+        await trasSubirLogo();
+        toast('Logo ajustado, convertido a PNG y guardado junto a los anteriores.', 'success');
       });
     }
   };
 
   // Eliminar / restaurar logos
-  content().querySelectorAll('[data-del-logo]').forEach(b => b.onclick = (e) => {
+  content().querySelectorAll('[data-del-logo]').forEach(b => b.onclick = async (e) => {
     e.stopPropagation();
     const id = b.dataset.delLogo;
     if (!confirm('¿Eliminar este logo de la galería?')) return;
-    if (id === 'custom') borrarImagen('logo');
-    else { const arr = readList('lexfive_logos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_logos_hidden', JSON.stringify(arr)); }
-    if (localStorage.getItem('lexfive_logo') === id) {
+    if (id.indexOf('custom:') === 0) {
+      IMG.logosCustom = IMG.logosCustom.filter(x => x && x.id !== id.slice(7));
+      await saveLogosCustom();
+    } else if (id === 'custom') {
+      borrarImagen('logo');
+    } else {
+      const arr = readList('lexfive_logos_hidden'); if (arr.indexOf(id) === -1) arr.push(id); localStorage.setItem('lexfive_logos_hidden', JSON.stringify(arr));
+    }
+    // ¿La selección actual sigue siendo válida? Si no, reasignar.
+    const sel = localStorage.getItem('lexfive_logo');
+    let valida = false;
+    if (sel && sel.indexOf('custom:') === 0) valida = !!findCustom(sel.slice(7));
+    else if (sel === 'custom') valida = IMG.logosCustom.length > 0;
+    else valida = LOGOS.some(l => l.id === sel) && readList('lexfive_logos_hidden').indexOf(sel) === -1;
+    if (!valida) {
       const vis = LOGOS.filter(l => readList('lexfive_logos_hidden').indexOf(l.id) === -1);
-      const nuevo = pickActive(null, IMG.logo, vis, LOGO_DEFAULT);
+      let nuevo;
+      if (IMG.logosCustom.length) { const f = IMG.logosCustom[0]; nuevo = 'custom:' + f.id; IMG.logo = f.img; try { await ImgDB.set('logo', f.img); } catch (er) {} }
+      else { IMG.logo = null; try { await ImgDB.del('logo'); } catch (er) {} nuevo = vis.length ? vis[0].id : LOGO_DEFAULT; }
       localStorage.setItem('lexfive_logo', nuevo); applyLogo(nuevo);
     }
-    pushBranding();
+    await pushBranding();
     renderCredenciales();
     toast('Logo eliminado de la galería.', 'success');
   });
@@ -3714,7 +3770,7 @@ function verImagenGrande(src, titulo, nombreArchivo) {
 function applyLogo(id) {
   let st = document.getElementById('lexfiveLogoStyle');
   if (!st) { st = document.createElement('style'); st.id = 'lexfiveLogoStyle'; document.head.appendChild(st); }
-  const url = id === 'custom' ? (IMG.logo || '') : `../../assets/logos/${id}.svg`;
+  const url = (id && id.indexOf('custom') === 0) ? (IMG.logo || '') : `../../assets/logos/${id}.svg`;
   st.textContent = `.logo__mark{background-image:url(${url})!important;}`;
 }
 
