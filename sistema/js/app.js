@@ -4088,8 +4088,8 @@ function toggleTheme() {
   function resetIdle() {
     clearTimeout(idleTimer);
     idleTimer = setTimeout(async () => {
-      alert('Su sesión se cerró automáticamente por 10 minutos de inactividad. Por seguridad, vuelva a iniciar sesión.\n\nTranquilo: lo que estaba escribiendo (descripción del caso, memorial, etc.) quedó guardado y podrá recuperarlo al volver a abrir ese formulario.');
-      await signOut();
+      alert('Su sesión se cerró automáticamente por 10 minutos de inactividad.\n\nTranquilo: lo que estaba escribiendo (descripción del caso, memorial, etc.) quedó guardado y podrá recuperarlo al volver a iniciar sesión.');
+      await signOutTo('../index.html');
     }, IDLE_MS);
   }
   ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(ev =>
