@@ -406,6 +406,34 @@ const Draft = {
 };
 
 // ============================================================
+//  Credenciales guardadas (lista persistente por usuario).
+//  Antes la credencial solo se autoguardaba como un único borrador, así que
+//  al crear otra se perdía la anterior. Ahora cada credencial creada se puede
+//  GUARDAR en una lista, EDITAR y REIMPRIMIR cuando se necesite. Las fotos
+//  pueden ser grandes, por eso la lista se guarda en IndexedDB (más espacio)
+//  y no en localStorage.
+// ============================================================
+const CredStore = {
+  key() { return 'credList_' + (state.profile ? state.profile.id : 'anon'); },
+  async list() { try { return (await ImgDB.get(this.key())) || []; } catch (e) { return []; } },
+  async saveAll(arr) { try { await ImgDB.set(this.key(), arr || []); return true; } catch (e) { return false; } },
+  async upsert(rec) {
+    const arr = await this.list();
+    const i = arr.findIndex(x => x && x.id === rec.id);
+    if (i >= 0) arr[i] = rec; else arr.unshift(rec);
+    await this.saveAll(arr);
+    return arr;
+  },
+  async remove(id) {
+    const arr = (await this.list()).filter(x => x && x.id !== id);
+    await this.saveAll(arr);
+    return arr;
+  }
+};
+// Credencial que se está editando en este momento (null = se creará una nueva).
+let credEditId = null;
+
+// ============================================================
 //  Almacén de imágenes del bufete (logo y sello) en IndexedDB.
 //  Antes se guardaban en localStorage, pero las imágenes en base64
 //  son grandes y llenaban el cupo (~5MB), lo que hacía que el
@@ -3119,6 +3147,7 @@ async function renderCredenciales() {
   loading();
   await ensureImgCache();
   await hydrateBranding();
+  const credList = await CredStore.list();
   const p = state.profile;
   const rolLabel = ROLES[p.rol] || p.rol;
 
@@ -3387,6 +3416,30 @@ async function renderCredenciales() {
 
     <div class="cred-actions">
       <button class="btn btn--primary" id="btnPrintCred">${ICON.doc} Imprimir / Guardar PDF</button>
+      <button class="btn" id="btnSaveCred">${ICON.llave || ''} ${credEditId ? 'Actualizar credencial' : 'Guardar credencial'}</button>
+      ${credEditId ? '<button class="btn btn--ghost" id="btnSaveCredNew" type="button">Guardar como nueva</button><button class="btn btn--ghost" id="btnNewCred" type="button">Nueva credencial (limpiar)</button>' : ''}
+    </div>
+    ${credEditId ? `<p class="cell-sub" id="credEditBanner" style="text-align:center;margin-top:4px;color:var(--navy,#0e1b2c)"><strong>Editando una credencial guardada.</strong> Los cambios se aplicarán al actualizar.</p>` : ''}
+
+    <div class="card" id="credSavedCard">
+      <div class="card__head"><h3>${ICON.usuarios || ''} Credenciales guardadas (${credList.length})</h3></div>
+      <div class="card__body">
+        ${credList.length ? `
+        <p class="cell-sub" style="margin-bottom:12px">Aquí quedan guardadas todas las credenciales que creó. Puede <strong>editarlas</strong>, <strong>volver a imprimirlas</strong> o eliminarlas. Se guardan en este equipo.</p>
+        <div class="cred-saved-list">
+          ${credList.map(c => `
+            <div class="cred-saved-item" data-cred="${esc(c.id)}">
+              <div class="cred-saved-item__info">
+                <strong>${esc(c.nombre || 'Sin nombre')}</strong>
+                <span class="cell-sub">${esc(c.cargo || '')}${c.ci ? ' &middot; CI ' + esc(c.ci) : ''}${c.emision ? ' &middot; Emisión ' + esc(fmtFechaCorta(c.emision)) : ''}</span>
+              </div>
+              <div class="cred-saved-item__actions">
+                <button class="btn btn--ghost btn--sm" data-cred-edit="${esc(c.id)}" type="button">Editar</button>
+                <button class="btn btn--ghost btn--sm" data-cred-del="${esc(c.id)}" type="button">Eliminar</button>
+              </div>
+            </div>`).join('')}
+        </div>` : '<p class="cell-sub">Todavía no ha guardado ninguna credencial. Complete los datos y pulse <strong>Guardar credencial</strong> para conservarla aquí.</p>'}
+      </div>
     </div>
 
     <div class="card">
@@ -3616,6 +3669,65 @@ async function renderCredenciales() {
   if (btnRestoreSellos) btnRestoreSellos.onclick = () => { localStorage.removeItem('lexfive_sellos_hidden'); pushBranding(); renderCredenciales(); toast('Sellos restaurados.', 'success'); };
 
   $('#btnPrintCred').onclick = imprimirCredencial;
+
+  // ---- Guardado, edición y eliminación de credenciales ----
+  const leerCred = () => {
+    const v = id => ((($('#' + id) || {}).value) || '').trim();
+    const emi = v('cr_emision') || hoyISO();
+    return {
+      nombre: v('cr_nombre'), cargo: v('cr_cargo'), ci: v('cr_ci'),
+      telPersonal: v('cr_telpers'), telOficina: v('cr_teloff'),
+      emision: emi, validez: addAnios(emi, 3),
+      frase: v('cr_frase'), representacion: v('cr_repre'),
+      foto: IMG.foto || null
+    };
+  };
+  const guardarCred = async (forzarNueva) => {
+    const datosCred = leerCred();
+    if (!datosCred.nombre) { toast('Escriba al menos el nombre antes de guardar la credencial.', 'error'); return; }
+    const editando = !forzarNueva && !!credEditId;
+    const id = editando ? credEditId : 'cred_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+    await CredStore.upsert(Object.assign({ id, ts: Date.now() }, datosCred));
+    credEditId = id;
+    toast(editando ? 'Credencial actualizada.' : 'Credencial guardada en la lista.', 'success');
+    renderCredenciales();
+  };
+  const bSaveCred = $('#btnSaveCred'); if (bSaveCred) bSaveCred.onclick = () => guardarCred(false);
+  const bSaveCredNew = $('#btnSaveCredNew'); if (bSaveCredNew) bSaveCredNew.onclick = () => guardarCred(true);
+  const bNewCred = $('#btnNewCred');
+  if (bNewCred) bNewCred.onclick = () => {
+    credEditId = null;
+    Draft.clear('credencial');
+    borrarImagen('foto');
+    renderCredenciales();
+    toast('Formulario listo para una credencial nueva.', 'success');
+  };
+  content().querySelectorAll('[data-cred-edit]').forEach(b => b.onclick = async () => {
+    const rec = credList.find(c => c.id === b.dataset.credEdit);
+    if (!rec) return;
+    credEditId = rec.id;
+    Draft.save('credencial', {
+      nombre: rec.nombre || '', cargo: rec.cargo || '', ci: rec.ci || '',
+      telPersonal: rec.telPersonal || '', telOficina: rec.telOficina || '',
+      emision: rec.emision || hoyISO(), validez: rec.validez || '',
+      frase: rec.frase || '', representacion: rec.representacion || ''
+    });
+    if (rec.foto) { IMG.foto = rec.foto; try { await ImgDB.set('foto', rec.foto); } catch (e) {} }
+    else { borrarImagen('foto'); }
+    renderCredenciales();
+    const cap = content().querySelector('#credPrintArea');
+    if (cap && cap.scrollIntoView) cap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast('Credencial cargada. Edite los datos y pulse «Actualizar credencial».', 'success');
+  });
+  content().querySelectorAll('[data-cred-del]').forEach(b => b.onclick = async () => {
+    if (!confirm('¿Eliminar esta credencial guardada? No se podrá recuperar.')) return;
+    const id = b.dataset.credDel;
+    await CredStore.remove(id);
+    if (credEditId === id) credEditId = null;
+    renderCredenciales();
+    toast('Credencial eliminada de la lista.', 'success');
+  });
+
   const bps = $('#btnPrintSello');
   if (bps) bps.onclick = () => {
     const src = selloSrc(selloElegido);

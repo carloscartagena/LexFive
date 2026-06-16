@@ -380,9 +380,20 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-sign { display: flex; gap: 14px; padding: 12px 11px 4px; margin-top: auto; }
 .cred-sign__line { flex: 1; border-top: 1px solid #b8bdc6; padding-top: 3px; font-size: .42rem; text-align: center; color: var(--muted, #5c6675); }
 .cred-note { font-size: .4rem; color: var(--muted, #5c6675); padding: 3px 11px 6px; text-align: center; }
-.cred-actions { margin-bottom: 22px; }
+.cred-actions { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* ---------- Lista de credenciales guardadas ---------- */
+.cred-saved-list { display: flex; flex-direction: column; gap: 10px; }
+.cred-saved-item {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border: 1px solid var(--line, #e6e8ec); border-radius: 8px; background: #fafbfc;
+}
+.cred-saved-item__info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cred-saved-item__info strong { color: var(--navy, #0e1b2c); font-size: .98rem; }
+.cred-saved-item__actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 @media (max-width: 520px) { .cred-card { width: 100%; height: auto; min-height: 5.5cm; } }
+
 
 /* Impresión: ambas caras (anverso y reverso) en una sola hoja de 4 x 6 pulgadas. */
 @page { size: 4in 6in; margin: 6mm; }
