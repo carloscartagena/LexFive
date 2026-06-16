@@ -239,10 +239,210 @@
         document.body.appendChild(ov);
       }
 
+      // ===== Artículos de ejemplo con su contenido completo =====
+      // Si el bufete aún no ha publicado artículos propios desde el panel,
+      // estos textos de ejemplo quedan disponibles y el botón «Leer más» abre
+      // el artículo completo en una ventana, en el mismo orden que las tarjetas.
+      const EJEMPLOS = [
+        {
+          categoria: 'Laboral',
+          fecha: '2026-05-15',
+          titulo: '¿Qué hacer ante un despido injustificado?',
+          contenido:
+`En Bolivia, ningún trabajador puede ser despedido sin una causa legal justificada. Cuando un empleador pone fin a la relación laboral sin motivo válido, el trabajador tiene derecho a elegir entre dos caminos: pedir su reincorporación al puesto o cobrar sus beneficios sociales con la indemnización correspondiente.
+
+1. Identifique si el despido fue injustificado
+La ley solo permite despedir con causa (por ejemplo, faltas graves debidamente comprobadas según el Decreto Ley 16896 o el Reglamento de la Ley General del Trabajo). Si lo despidieron por reducción de personal, por reclamar sus derechos, o sin explicación, lo más probable es que se trate de un despido injustificado.
+
+2. Reúna sus pruebas cuanto antes
+Guarde su contrato, boletas de pago, mensajes, memorándums y cualquier documento que demuestre la fecha de ingreso, el cargo, el sueldo y la forma en que terminó la relación. Estas pruebas serán decisivas.
+
+3. Conozca el plazo clave: 90 días
+Para solicitar la reincorporación ante el Ministerio de Trabajo, el trabajador cuenta con un plazo de 90 días calendario desde la fecha del despido. Si deja pasar ese plazo, aún puede reclamar el pago de sus beneficios sociales, pero ya no la reincorporación por esta vía.
+
+4. Elija su vía
+- Reincorporación: se tramita ante la Jefatura Departamental del Trabajo. Si procede, el empleador debe reincorporarlo y pagarle los sueldos que dejó de percibir.
+- Beneficios sociales: incluye desahucio (3 sueldos), indemnización (un sueldo por cada año trabajado), aguinaldo y vacaciones pendientes, entre otros.
+
+5. Asesórese antes de firmar cualquier finiquito
+Muchos trabajadores firman documentos de renuncia o finiquitos que no reflejan lo que realmente les corresponde. Antes de firmar, conviene revisar los cálculos con un abogado.
+
+En LexFive lo ayudamos a calcular lo que le corresponde y a iniciar el trámite dentro de los plazos legales. Una consulta a tiempo evita perder derechos.`
+        },
+        {
+          categoria: 'Familiar',
+          fecha: '2026-04-28',
+          titulo: 'Guía básica del divorcio en Bolivia',
+          contenido:
+`El Código de las Familias y del Proceso Familiar (Ley 603) regula el divorcio en Bolivia. Hoy el proceso es más ágil que antes, pero conviene entender las dos formas principales en que puede tramitarse.
+
+Divorcio por mutuo acuerdo
+Es la vía más rápida y económica. Ambos cónyuges están de acuerdo en separarse y firman un convenio regulador que define:
+- La guarda y el régimen de visitas de los hijos.
+- El monto de la asistencia familiar.
+- La división de los bienes en común.
+
+Cuando hay acuerdo total y no hay hijos menores en conflicto, el trámite puede resolverse en pocas audiencias.
+
+Divorcio contencioso
+Procede cuando uno de los cónyuges no está de acuerdo o cuando no hay consenso sobre los hijos o los bienes. El juez de familia resuelve cada punto en disputa con base en las pruebas presentadas. Es un proceso más largo, pero garantiza que se protejan los derechos de quien lo necesita.
+
+Documentos que normalmente necesita
+- Certificado de matrimonio actualizado.
+- Certificados de nacimiento de los hijos.
+- Documentos de identidad de ambos.
+- Documentación de los bienes (folios reales, facturas, títulos).
+
+Temas que el divorcio resuelve
+El divorcio no solo disuelve el vínculo: también define la asistencia familiar, la guarda de los hijos, el régimen de visitas y la división de los bienes gananciales. Por eso es importante llegar con todo bien planteado.
+
+Recomendación
+Aunque exista buena relación entre las partes, un convenio mal redactado genera problemas a futuro (sobre todo con la asistencia familiar y los bienes). En LexFive redactamos convenios claros y lo acompañamos en todo el proceso, sea por mutuo acuerdo o contencioso.`
+        },
+        {
+          categoria: 'Penal',
+          fecha: '2026-04-10',
+          titulo: 'Sus derechos durante una detención',
+          contenido:
+`Saber qué puede y qué no puede hacer la autoridad durante una detención es fundamental para proteger su libertad. La Constitución Política del Estado y el Código de Procedimiento Penal reconocen una serie de garantías a toda persona.
+
+Sus derechos básicos
+- A guardar silencio: nadie está obligado a declarar contra sí mismo. Puede negarse a declarar hasta contar con su abogado.
+- A ser informado: debe saber el motivo de su detención y quién la ordena.
+- A un abogado: tiene derecho a una defensa técnica desde el primer momento. Si no puede pagar uno, el Estado debe proporcionarle un defensor público.
+- A comunicarse: puede avisar a un familiar o persona de confianza sobre su situación.
+- A no sufrir tortura ni tratos degradantes: cualquier declaración obtenida bajo presión o violencia es nula.
+
+Sobre los plazos
+La regla general es que una persona aprehendida debe ser puesta a disposición de la autoridad competente dentro de las primeras horas. La detención preventiva solo puede ser ordenada por un juez y debe estar debidamente fundamentada.
+
+Qué NO debe hacer la autoridad
+- Detenerlo sin orden judicial, salvo en caso de flagrancia.
+- Obligarlo a declarar o firmar documentos sin su abogado.
+- Mantenerlo incomunicado.
+
+Qué hacer si lo detienen
+1. Mantenga la calma y no firme nada sin asesoría.
+2. Exija que se informe a su familia.
+3. Pida la presencia de su abogado antes de cualquier declaración.
+4. Anote nombres, horas y lugares: todo dato sirve para su defensa.
+
+Contar con defensa técnica desde el primer minuto cambia el resultado de un caso. En LexFive brindamos asistencia inmediata para proteger su libertad y sus garantías.`
+        },
+        {
+          categoria: 'Civil',
+          fecha: '2026-03-22',
+          titulo: 'Cómo redactar un contrato de alquiler seguro',
+          contenido:
+`Un buen contrato de alquiler evita la mayoría de los conflictos entre propietario e inquilino. Estas son las cláusulas indispensables que todo contrato debería incluir para proteger a ambas partes.
+
+1. Identificación clara de las partes
+Nombres completos, números de carnet de identidad y domicilios del propietario y del inquilino. Si hay garante, también debe figurar.
+
+2. Descripción del inmueble
+Dirección exacta, descripción del bien y de lo que incluye (muebles, garaje, depósitos). Conviene adjuntar un inventario con el estado en que se entrega.
+
+3. Monto, forma y fecha de pago
+El canon mensual, la moneda, el día de pago y el medio (depósito, transferencia, efectivo con recibo). Definir desde el inicio cómo se acredita el pago evita discusiones.
+
+4. Plazo y renovación
+La duración del contrato y las condiciones para renovarlo o darlo por terminado. Indique con cuántos días de anticipación debe avisar cada parte.
+
+5. Garantía o depósito
+El monto que se entrega en garantía, en qué casos se descuenta y cuándo se devuelve.
+
+6. Responsabilidades de cada parte
+Quién paga los servicios (agua, luz, gas, expensas), quién se hace cargo de las reparaciones menores y mayores, y las reglas de uso del inmueble.
+
+7. Causales de terminación
+Las situaciones en que el contrato puede terminar antes de tiempo (falta de pago, daños, uso indebido) y sus consecuencias.
+
+Recomendaciones finales
+- Firme dos ejemplares, uno para cada parte.
+- Considere reconocer las firmas ante notario para dar mayor seguridad jurídica.
+- Tome fotos del inmueble al entregarlo y al recibirlo.
+
+Un contrato bien redactado es la mejor prevención. En LexFive elaboramos y revisamos contratos de alquiler para que usted quede protegido frente a cualquier eventualidad.`
+        },
+        {
+          categoria: 'Familiar',
+          fecha: '2026-03-05',
+          titulo: 'Asistencia familiar: cómo se calcula',
+          contenido:
+`La asistencia familiar es el aporte económico destinado a cubrir las necesidades de los hijos (alimentación, salud, educación, vivienda, vestimenta y recreación). No existe un monto fijo: el juez lo determina caso por caso.
+
+Criterios que toma en cuenta el juez
+- Las necesidades reales del hijo o hija: edad, salud, gastos de estudio y nivel de vida.
+- La capacidad económica del obligado: sus ingresos, su patrimonio y sus posibilidades reales de pago.
+- El principio de proporcionalidad: se busca un equilibrio justo entre lo que el hijo necesita y lo que el obligado puede dar.
+
+Cómo se fija el monto
+El juez analiza las pruebas de ingresos (boletas de pago, actividad económica, bienes) y los gastos del menor. Si el obligado no demuestra ingresos formales, el juez puede estimar su capacidad económica a partir de su forma de vida y su actividad.
+
+Actualización del monto
+La asistencia familiar puede aumentar o disminuir si cambian las circunstancias: si suben los gastos del hijo, si mejora o empeora la situación económica del obligado, etc. Para ello se inicia un trámite de aumento o reducción.
+
+¿Qué pasa si no se cumple con el pago?
+El incumplimiento tiene consecuencias serias. El beneficiario puede solicitar al juez medidas de cobro y, en casos de incumplimiento reiterado, la ley contempla la posibilidad de apremio (arresto) del obligado hasta que regularice los pagos atrasados.
+
+Recomendaciones
+- Guarde comprobantes de todos los pagos realizados.
+- Si su situación económica cambia, tramite el ajuste por la vía legal en lugar de dejar de pagar por cuenta propia.
+- Priorice siempre el interés superior del niño.
+
+En LexFive lo asesoramos tanto para solicitar una asistencia familiar justa como para tramitar su aumento, reducción o cobro cuando no se cumple.`
+        },
+        {
+          categoria: 'Laboral',
+          fecha: '2026-02-18',
+          titulo: 'Beneficios sociales: lo que todo trabajador debe saber',
+          contenido:
+`Los beneficios sociales son los derechos económicos que protegen al trabajador. Conocerlos es la mejor forma de asegurarse de recibir lo que le corresponde al terminar una relación laboral.
+
+Aguinaldo
+Equivale a un sueldo y se paga cada año hasta el 20 de diciembre. Si el trabajador no completó el año, recibe la parte proporcional al tiempo trabajado.
+
+Indemnización
+Corresponde a un sueldo por cada año de trabajo (y la parte proporcional por meses). Es un derecho adquirido a partir de los primeros años de servicio y se paga tanto en despido como, en muchos casos, en retiro voluntario.
+
+Desahucio
+Equivale a tres sueldos. Se paga cuando el trabajador es despedido sin causa justificada y sin el preaviso que manda la ley.
+
+Vacaciones
+Según los años de antigüedad, el trabajador tiene derecho a un número creciente de días de descanso pagados al año. Si no las usó, debe recibir su pago al finalizar la relación.
+
+Otros conceptos
+Dependiendo del caso, también pueden corresponder horas extra, bonos de antigüedad, primas (cuando la empresa tiene utilidades) y otros pagos acordados.
+
+Plazo de pago del finiquito
+Una vez terminada la relación laboral, el empleador debe pagar los beneficios sociales en un plazo breve. Si no lo hace dentro del plazo legal, la deuda puede actualizarse y generar una multa a favor del trabajador.
+
+Cómo reclamarlos
+1. Solicite por escrito el pago de su finiquito.
+2. Si no hay respuesta, acuda al Ministerio de Trabajo.
+3. Conserve siempre copias de sus boletas, contratos y comunicaciones.
+
+Cada caso tiene particularidades. En LexFive calculamos con precisión lo que le corresponde y lo acompañamos en el reclamo para que reciba todos sus beneficios sociales.`
+        }
+      ];
+
+      function wireEjemplos() {
+        const cards = grid.querySelectorAll('.post-card');
+        cards.forEach((card, i) => {
+          const link = card.querySelector('.post-card__link');
+          if (!link || !EJEMPLOS[i]) return;
+          link.addEventListener('click', e => { e.preventDefault(); showArticle(EJEMPLOS[i]); });
+        });
+      }
+
       (async () => {
         if (!grid) return;
-        const { data, error } = await sb.from('articulos').select('*').eq('estado', 'publicado').order('fecha', { ascending: false });
-        if (error || !data || !data.length) return; // si no hay publicados, deja los artículos de ejemplo
+        let data = null, error = null;
+        try {
+          const res = await sb.from('articulos').select('*').eq('estado', 'publicado').order('fecha', { ascending: false });
+          data = res.data; error = res.error;
+        } catch (e) { error = e; }
+        if (error || !data || !data.length) { wireEjemplos(); return; } // si no hay publicados, usa los artículos de ejemplo
         grid.innerHTML = data.map(a => `
           <article class="post-card">
             <div class="post-card__media"></div>
