@@ -349,7 +349,8 @@ def build_blocks():
     h1("20. Credenciales del bufete (administrador y abogados)")
     p("El panel incluye una pestaña «Credenciales», visible solo para el administrador y los "
       "abogados (los procuradores y clientes no la ven). Genera una credencial o carnet de "
-      "LexFive con fondo blanco, tamaño 8.5 x 6 cm, lista para imprimir o guardar como PDF.")
+      "LexFive con fondo blanco, tamaño 9 x 6 cm y con una guía de corte punteada para "
+      "recortarla, lista para imprimir o guardar como PDF.")
     bul([
         "Usted llena los datos: nombre, cargo, carnet de identidad, correo, teléfono personal "
         "y de oficina, y las fechas de emisión y validez. La credencial se actualiza en vivo.",

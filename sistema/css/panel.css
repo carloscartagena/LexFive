@@ -329,11 +329,13 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 
 
 /* ============================================================
-   Credencial / carnet del bufete  (fondo blanco, tamaño 8.5 x 5.5 cm)
+   Credencial / carnet del bufete  (fondo blanco, tamaño 9 x 6 cm, con guía de corte)
    ============================================================ */
 .cred-wrap { display: flex; flex-wrap: wrap; gap: 22px; margin: 4px 0 18px; }
+/* Guía de corte: marco punteado alrededor de cada cara para recortar la credencial. */
+.cred-cut { padding: 2mm; border: 1px dashed #9aa1ab; border-radius: 4px; background: #fff; display: inline-block; }
 .cred-card {
-    width: 8.5cm; height: 5.5cm; box-sizing: border-box;
+    width: 9cm; height: 6cm; box-sizing: border-box;
     background: #ffffff; color: var(--ink, #1a2330);
     border-radius: 10px; overflow: hidden; position: relative;
     box-shadow: 0 10px 30px rgba(14,27,44,.18);
@@ -373,7 +375,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-foot strong { font-size: .58rem; color: var(--ink, #1a2330); }
 
 /* Reverso (también fondo blanco para que se vea el sello y la firma) */
-.cred-card--back { padding-bottom: 0; height: 5.5cm; }
+.cred-card--back { padding-bottom: 0; height: 6cm; }
 .cred-cert { font-size: .44rem; line-height: 1.3; color: var(--ink, #1a2330); padding: 6px 12px 0; text-align: justify; }
 .cred-cert strong { font-weight: 700; color: var(--navy, #0e1b2c); }
 .cred-card--back .cred-cert.cred-frase { color: var(--gold-dark, #a8853c) !important; font-weight: 700; letter-spacing: .3px; padding-top: 3px; text-align: center; font-size: .46rem; }
@@ -392,19 +394,21 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-saved-item__info strong { color: var(--navy, #0e1b2c); font-size: .98rem; }
 .cred-saved-item__actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-@media (max-width: 520px) { .cred-card { width: 100%; height: auto; min-height: 5.5cm; } }
+@media (max-width: 520px) { .cred-cut { display: block; } .cred-card { width: 100%; height: auto; min-height: 6cm; } }
 
 
 /* Impresión: ambas caras (anverso y reverso) en una sola hoja de 4 x 6 pulgadas. */
-@page { size: 4in 6in; margin: 6mm; }
+@page { size: 4in 6in; margin: 3mm; }
 @media print {
     body.printing > *:not(#printRoot) { display: none !important; }
     #printRoot { display: block; }
     #printRoot, #printRoot * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     #printRoot img { display: block !important; }
-    #printRoot .cred-card { box-shadow: none; border: 1px solid #999; width: 8.5cm; height: 5.5cm; margin: 0 auto 7mm; page-break-inside: avoid; }
-    #printRoot .cred-card:last-child { margin-bottom: 0; }
-    #printRoot .cred-card--back { height: 5.5cm; }
+    /* Guía de corte punteada alrededor de cada cara (recortar por la línea). */
+    #printRoot .cred-cut { display: block; width: max-content; margin: 0 auto 5mm; padding: 1.5mm; border: 1px dashed #999; border-radius: 0; background: #fff; page-break-inside: avoid; }
+    #printRoot .cred-cut:last-child { margin-bottom: 0; }
+    #printRoot .cred-card { box-shadow: none; border: 1px solid #ccc; width: 9cm; height: 6cm; page-break-inside: avoid; }
+    #printRoot .cred-card--back { height: 6cm; }
 }
 
 

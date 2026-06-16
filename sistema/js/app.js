@@ -3411,8 +3411,10 @@ async function renderCredenciales() {
       </div>
     </div>
 
+    <p class="cell-sub" style="margin:2px 0 10px">La línea punteada alrededor de cada cara es la <strong>guía de corte</strong>: imprima y recorte por ahí. Tamaño final: 9 × 6 cm.</p>
     <div class="cred-wrap" id="credPrintArea">
       <!-- ANVERSO -->
+      <div class="cred-cut">
       <div class="cred-card">
         <img class="cred-wm" id="cv_logo" src="${logoSrc(logoActual)}" alt="">
         <div class="cred-band"><strong>LexFive</strong> &middot; Credencial &middot; <span id="cv_cargo_band">${esc(datos.cargo || '')}</span></div>
@@ -3433,8 +3435,10 @@ async function renderCredenciales() {
           <div><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong></div>
         </div>
       </div>
+      </div>
 
       <!-- REVERSO -->
+      <div class="cred-cut">
       <div class="cred-card cred-card--back">
         <img class="cred-wm" id="cv_logo_back" src="${logoSrc(logoActual)}" alt="">
         <div class="cred-band">LexFive &middot; La Paz / El Alto - Bolivia</div>
@@ -3445,6 +3449,7 @@ async function renderCredenciales() {
           <div class="cred-sign__line">Sello del bufete</div>
         </div>
         <p class="cred-note">Documento de uso institucional. Si la encuentra, devuélvala a LexFive.</p>
+      </div>
       </div>
     </div>
 
