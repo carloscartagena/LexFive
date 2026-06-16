@@ -7,13 +7,15 @@
    Estrategia por tipo de recurso:
    - HTML / navegación: "red primero" (para no quedarse con código viejo),
      con copia de respaldo en caché si no hay internet.
-   - Recursos estáticos (CSS, JS, imágenes, logos, fuentes): "stale-while-
+   - JavaScript de la app: "red primero" también, para que tras un despliegue
+     el navegador ejecute SIEMPRE la última versión (antes se servía la copia
+     en caché y el sistema podía quedarse con código viejo).
+   - Otros recursos estáticos (CSS, imágenes, logos, fuentes): "stale-while-
      revalidate": se sirven AL INSTANTE desde la caché y se actualizan en
-     segundo plano. Así el panel se siente rápido y los re-render (después
-     de subir o eliminar) no esperan la red para cada ícono o estilo.
+     segundo plano. Así el panel se siente rápido.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v5';
+const CACHE = 'lexfive-sistema-v6';
 const SHELL = [
   './',
   './index.html',
@@ -69,6 +71,18 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(req).then((res) => actualizarCache(req, res))
         .catch(() => caches.match(req).then((hit) => hit || caches.match('./offline.html') || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // JavaScript de la app: RED PRIMERO. Así, tras un despliegue, el navegador
+  // ejecuta siempre la última versión y no se queda con código viejo (que era
+  // lo que dejaba el panel atascado en "Cargando..."). Si no hay internet,
+  // usa la copia en caché como respaldo.
+  if (/\.m?js$/i.test(url.pathname)) {
+    event.respondWith(
+      fetch(req).then((res) => actualizarCache(req, res))
+        .catch(() => caches.match(req))
     );
     return;
   }
