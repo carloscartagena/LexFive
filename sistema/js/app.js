@@ -406,28 +406,62 @@ const Draft = {
 };
 
 // ============================================================
-//  Credenciales guardadas (lista persistente por usuario).
-//  Antes la credencial solo se autoguardaba como un único borrador, así que
-//  al crear otra se perdía la anterior. Ahora cada credencial creada se puede
-//  GUARDAR en una lista, EDITAR y REIMPRIMIR cuando se necesite. Las fotos
-//  pueden ser grandes, por eso la lista se guarda en IndexedDB (más espacio)
-//  y no en localStorage.
+//  Credenciales guardadas (compartidas en la nube vía Supabase).
+//  Antes la credencial solo se autoguardaba como un único borrador
+//  local, así que al crear otra se perdía la anterior y no se veía en
+//  otros equipos. Ahora cada credencial creada se GUARDA en la tabla
+//  "credenciales" de Supabase, por lo que se puede EDITAR, REIMPRIMIR
+//  y eliminar IGUAL desde cualquier dispositivo del bufete.
+//  Se mantiene una caché local para pintar rápido y tolerar cortes de red.
 // ============================================================
+// Convierte una fila de la tabla (snake_case) al formato que usa la interfaz.
+function normCred(r) {
+  r = r || {};
+  return {
+    id: r.id,
+    nombre: r.nombre || '', cargo: r.cargo || '', ci: r.ci || '',
+    telPersonal: r.tel_personal || '', telOficina: r.tel_oficina || '',
+    emision: r.emision || '', validez: r.validez || '',
+    frase: r.frase || '', representacion: r.representacion || '',
+    foto: r.foto || null
+  };
+}
 const CredStore = {
-  key() { return 'credList_' + (state.profile ? state.profile.id : 'anon'); },
-  async list() { try { return (await ImgDB.get(this.key())) || []; } catch (e) { return []; } },
-  async saveAll(arr) { try { await ImgDB.set(this.key(), arr || []); return true; } catch (e) { return false; } },
-  async upsert(rec) {
-    const arr = await this.list();
-    const i = arr.findIndex(x => x && x.id === rec.id);
-    if (i >= 0) arr[i] = rec; else arr.unshift(rec);
-    await this.saveAll(arr);
-    return arr;
+  cache: null,
+  // Trae las credenciales de la nube (y guarda copia local por si no hay red).
+  async list() {
+    try {
+      const { data, error } = await supabase
+        .from('credenciales').select('*').order('updated_at', { ascending: false });
+      if (error) throw error;
+      this.cache = (data || []).map(normCred);
+      try { localStorage.setItem('lexfive_cred_cache', JSON.stringify(this.cache)); } catch (e) {}
+      return this.cache;
+    } catch (e) {
+      if (this.cache) return this.cache;
+      try { return JSON.parse(localStorage.getItem('lexfive_cred_cache') || '[]'); } catch (e2) { return []; }
+    }
   },
+  // Crea o actualiza una credencial en la nube. Devuelve la fila guardada.
+  async upsert(rec) {
+    const row = {
+      nombre: rec.nombre || '', cargo: rec.cargo || null, ci: rec.ci || null,
+      tel_personal: rec.telPersonal || null, tel_oficina: rec.telOficina || null,
+      emision: rec.emision || null, validez: rec.validez || null,
+      frase: rec.frase || null, representacion: rec.representacion || null,
+      foto: rec.foto || null, updated_at: new Date().toISOString()
+    };
+    if (rec.id) row.id = rec.id;
+    const { data, error } = await supabase.from('credenciales').upsert(row).select().maybeSingle();
+    if (error) throw error;
+    this.cache = null; // forzar relectura desde la nube en el próximo render
+    return normCred(data);
+  },
+  // Elimina una credencial de la nube.
   async remove(id) {
-    const arr = (await this.list()).filter(x => x && x.id !== id);
-    await this.saveAll(arr);
-    return arr;
+    const { error } = await supabase.from('credenciales').delete().eq('id', id);
+    if (error) throw error;
+    this.cache = null;
   }
 };
 // Credencial que se está editando en este momento (null = se creará una nueva).
@@ -3425,7 +3459,7 @@ async function renderCredenciales() {
       <div class="card__head"><h3>${ICON.usuarios || ''} Credenciales guardadas (${credList.length})</h3></div>
       <div class="card__body">
         ${credList.length ? `
-        <p class="cell-sub" style="margin-bottom:12px">Aquí quedan guardadas todas las credenciales que creó. Puede <strong>editarlas</strong>, <strong>volver a imprimirlas</strong> o eliminarlas. Se guardan en este equipo.</p>
+        <p class="cell-sub" style="margin-bottom:12px">Aquí quedan guardadas todas las credenciales que creó. Puede <strong>editarlas</strong>, <strong>volver a imprimirlas</strong> o eliminarlas. Se guardan en la nube y se ven en todos los dispositivos del bufete.</p>
         <div class="cred-saved-list">
           ${credList.map(c => `
             <div class="cred-saved-item" data-cred="${esc(c.id)}">
@@ -3686,11 +3720,18 @@ async function renderCredenciales() {
     const datosCred = leerCred();
     if (!datosCred.nombre) { toast('Escriba al menos el nombre antes de guardar la credencial.', 'error'); return; }
     const editando = !forzarNueva && !!credEditId;
-    const id = editando ? credEditId : 'cred_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-    await CredStore.upsert(Object.assign({ id, ts: Date.now() }, datosCred));
-    credEditId = id;
-    toast(editando ? 'Credencial actualizada.' : 'Credencial guardada en la lista.', 'success');
-    renderCredenciales();
+    if (editando) datosCred.id = credEditId;
+    const btns = content().querySelectorAll('#btnSaveCred,#btnSaveCredNew');
+    btns.forEach(b => b.disabled = true);
+    try {
+      const saved = await CredStore.upsert(datosCred);
+      credEditId = (saved && saved.id) || credEditId;
+      toast(editando ? 'Credencial actualizada y sincronizada.' : 'Credencial guardada y sincronizada en todos los dispositivos.', 'success');
+      renderCredenciales();
+    } catch (e) {
+      btns.forEach(b => b.disabled = false);
+      toast('No se pudo sincronizar la credencial. Revise su conexión e intente de nuevo.', 'error');
+    }
   };
   const bSaveCred = $('#btnSaveCred'); if (bSaveCred) bSaveCred.onclick = () => guardarCred(false);
   const bSaveCredNew = $('#btnSaveCredNew'); if (bSaveCredNew) bSaveCredNew.onclick = () => guardarCred(true);
@@ -3720,12 +3761,18 @@ async function renderCredenciales() {
     toast('Credencial cargada. Edite los datos y pulse «Actualizar credencial».', 'success');
   });
   content().querySelectorAll('[data-cred-del]').forEach(b => b.onclick = async () => {
-    if (!confirm('¿Eliminar esta credencial guardada? No se podrá recuperar.')) return;
+    if (!confirm('¿Eliminar esta credencial guardada? Se quitará de todos los dispositivos y no se podrá recuperar.')) return;
     const id = b.dataset.credDel;
-    await CredStore.remove(id);
-    if (credEditId === id) credEditId = null;
-    renderCredenciales();
-    toast('Credencial eliminada de la lista.', 'success');
+    b.disabled = true;
+    try {
+      await CredStore.remove(id);
+      if (credEditId === id) credEditId = null;
+      renderCredenciales();
+      toast('Credencial eliminada en todos los dispositivos.', 'success');
+    } catch (e) {
+      b.disabled = false;
+      toast('No se pudo eliminar la credencial. Revise su conexión e intente de nuevo.', 'error');
+    }
   });
 
   const bps = $('#btnPrintSello');

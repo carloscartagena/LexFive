@@ -50,6 +50,7 @@ En Supabase hay que ejecutar, una sola vez y en orden, los archivos de la carpet
 - 14_papelera_procesos.sql — papelera (borrado seguro) de procesos.
 - 15_recibos_correlativos.sql — numeración correlativa de los recibos de pago.
 - 16_papelera_clientes.sql — papelera (borrado seguro) de clientes.
+- 17_credenciales.sql — credenciales del bufete compartidas en la nube (se ven en todos los dispositivos).
 
 > **Si aparece un error:** Si un script muestra un error de «columna que no existe» o «ya existe», vuelva a ejecutarlo: están preparados para correrse sin romper ni borrar datos. Si el error persiste, cópielo y páselo al desarrollo.
 
