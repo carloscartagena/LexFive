@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sin conexión · Sistema LexFive</title>
+  <meta name="theme-color" content="#0e1b2c">
+  <link rel="apple-touch-icon" href="../assets/pwa/icon-192.png">
+  <link rel="stylesheet" href="css/panel.css">
+  <style>
+    body { display: grid; place-items: center; min-height: 100vh; background: var(--navy, #0e1b2c); color: #fff; padding: 24px; text-align: center; }
+    .off-card { max-width: 420px; }
+    .off-emblem { width: 64px; height: 64px; border-radius: 14px; background: var(--gold, #c2a25a); color: var(--navy, #0e1b2c); display: grid; place-items: center; font-family: Georgia, serif; font-weight: 700; font-size: 1.6rem; margin: 0 auto 22px; }
+    .off-card h1 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2rem; margin: 0 0 10px; }
+    .off-card p { color: rgba(255,255,255,.82); line-height: 1.6; margin: 0 0 22px; }
+    .off-btn { display: inline-block; background: var(--gold, #c2a25a); color: var(--navy, #0e1b2c); font-weight: 600; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font: inherit; font-weight: 600; }
+    .off-tip { font-size: .85rem; color: rgba(255,255,255,.55); margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="off-card">
+    <div class="off-emblem">L5</div>
+    <h1>Sin conexión a internet</h1>
+    <p>No pudimos cargar esta página porque no hay conexión. No se preocupe: lo que haya guardado en su equipo se sincronizará automáticamente cuando vuelva el internet.</p>
+    <button class="off-btn" onclick="location.reload()">Reintentar</button>
+    <p class="off-tip">Si ya tiene internet y sigue viendo esto, cierre y vuelva a abrir la aplicación.</p>
+  </div>
+  <script>
+    // Cuando vuelva la conexión, recargar automáticamente.
+    window.addEventListener('online', function () { location.reload(); });
+  </script>
+</body>
+</html>

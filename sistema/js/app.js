@@ -331,6 +331,25 @@ function toast(msg, type = '') {
   setTimeout(() => t.classList.remove('show'), 3200);
 }
 
+// Indicador discreto de "borrador guardado" para los formularios con
+// autoguardado, para tranquilidad del usuario en textos largos.
+let _autosaveTimer = null;
+function flashAutosave() {
+  let el = document.getElementById('autosaveTip');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'autosaveTip';
+    el.className = 'autosave-tip';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.textContent = '\u2713 Borrador guardado';
+    document.body.appendChild(el);
+  }
+  el.classList.add('show');
+  clearTimeout(_autosaveTimer);
+  _autosaveTimer = setTimeout(() => el.classList.remove('show'), 1500);
+}
+
 // ============================================================
 //  AYUDA EN PANTALLA (tooltips)
 //  - tip('texto'): genera un ícono "?" con ayuda al pasar el mouse.
@@ -412,6 +431,12 @@ function openModal(title, bodyHTML, buttons = [], wide = false) {
     foot.appendChild(btn);
   });
   $('#modalOverlay').classList.add('open');
+  // Accesibilidad: llevar el foco al modal para teclado y lectores de pantalla.
+  try {
+    const m = $('#modal');
+    const focusable = m.querySelector('input, select, textarea, button:not(.modal__close)') || $('#modalClose');
+    if (focusable) setTimeout(() => focusable.focus(), 50);
+  } catch (e) {}
 }
 function closeModal() { $('#modalOverlay').classList.remove('open'); }
 
@@ -915,7 +940,7 @@ function wireDraft(draftName, fieldIds, checkboxClasses = []) {
       document.querySelectorAll('.' + cls).forEach(c => { c.checked = vals.includes(c.value); });
     });
   };
-  const onChange = () => Draft.save(draftName, collect());
+  const onChange = () => { Draft.save(draftName, collect()); flashAutosave(); };
   fieldIds.forEach(id => { const el = document.getElementById(id); if (el) { el.addEventListener('input', onChange); el.addEventListener('change', onChange); } });
   checkboxClasses.forEach(cls => document.querySelectorAll('.' + cls).forEach(c => c.addEventListener('change', onChange)));
   return { collect, apply };
@@ -4670,6 +4695,19 @@ function toggleTheme() {
   // Aplica la intensidad guardada del logo de fondo y activa el aviso de "sin conexión".
   applyWmOpacity(wmOpacityActual());
   initOfflineIndicator();
+
+  // Manejo global de errores: en vez de fallar en silencio, avisa con un mensaje
+  // amable (sin abrumar: máximo uno cada 8 segundos).
+  let _lastErr = 0;
+  const avisoError = () => {
+    const now = Date.now();
+    if (now - _lastErr < 8000) return;
+    _lastErr = now;
+    if (!navigator.onLine) return; // el banner de "sin conexión" ya lo cubre
+    toast('Ocurrió un problema. Si persiste, recargue la página.', 'error');
+  };
+  window.addEventListener('error', avisoError);
+  window.addEventListener('unhandledrejection', avisoError);
 
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();
