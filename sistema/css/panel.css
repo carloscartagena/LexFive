@@ -352,7 +352,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-wm {
     position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
     width: 4.4cm; height: 4.4cm; object-fit: contain;
-    opacity: .15; pointer-events: none; z-index: 0;
+    opacity: var(--cred-wm-op, .15); pointer-events: none; z-index: 0;
 }
 .cred-band, .cred-body, .cred-foot, .cred-cert, .cred-sign, .cred-note { position: relative; z-index: 1; }
 .cred-band {
@@ -399,6 +399,33 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-saved-item__info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .cred-saved-item__info strong { color: var(--navy, #0e1b2c); font-size: .98rem; }
 .cred-saved-item__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Control de intensidad de la marca de agua del logo */
+.cred-wm-control { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 2px 0 14px; font-size: .85rem; color: var(--muted); }
+.cred-wm-control label { font-weight: 600; color: var(--ink); }
+.cred-wm-control input[type=range] { flex: 1; min-width: 140px; max-width: 280px; accent-color: var(--gold); }
+.cred-wm-control output { min-width: 42px; text-align: right; font-weight: 600; color: var(--ink); }
+
+/* Buscador de credenciales guardadas */
+.cred-search { width: 100%; max-width: 360px; padding: 9px 12px; font: inherit; font-size: .9rem; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); margin-bottom: 12px; }
+.cred-search:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(194,162,90,.15); }
+.cred-saved-empty-search { color: var(--muted); font-size: .9rem; padding: 6px 2px; }
+
+/* Vista previa de impresión de la credencial (dentro del modal) */
+.cred-preview-stage { background: #e9ebef; padding: 18px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.cred-preview-stage .cred-cut { background: #fff; }
+
+/* Banner de "sin conexión" */
+.offline-banner {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%) translateY(160%);
+  z-index: 1200; max-width: 92vw;
+  background: var(--amber, #b8860b); color: #fff; font-size: .88rem; font-weight: 500;
+  padding: 10px 18px; border-radius: 30px; box-shadow: 0 8px 26px rgba(0,0,0,.28);
+  display: flex; align-items: center; gap: 9px; transition: transform .3s ease;
+}
+.offline-banner.show { transform: translateX(-50%) translateY(0); }
+.offline-banner__dot { width: 9px; height: 9px; border-radius: 50%; background: #fff; opacity: .9; }
+
 
 @media (max-width: 520px) { .cred-cut { display: block; } .cred-card { width: 100%; height: auto; min-height: 6cm; } }
 
@@ -696,7 +723,7 @@ html[data-theme="dark"] {
   --bg: #0b131e;
   --white: #15212f;
   --ink: #e6ecf3;
-  --muted: #9aa9bb;
+  --muted: #aebccd;
   --line: #28384b;
   --shadow-sm: 0 2px 10px rgba(0,0,0,.35);
   --shadow-md: 0 14px 38px rgba(0,0,0,.55);
