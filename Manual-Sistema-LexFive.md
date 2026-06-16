@@ -24,7 +24,8 @@ _Guía completa de uso y gestión · Versión: junio de 2026 · lexfive.netlify.
 - 18. Mantenimiento y buenas prácticas
 - 19. Solución de problemas frecuentes
 - 20. Credenciales del bufete (administrador y abogados)
-- 21. Soporte
+- 21. Respaldos, instalación y conexión a internet
+- 22. Soporte
 
 
 ## 1. Introducción: qué es el sistema
@@ -274,7 +275,10 @@ Debe haberse registrado con el mismo correo que figura en su ficha de cliente y 
 El panel incluye una pestaña «Credenciales», visible solo para el administrador y los abogados (los procuradores y clientes no la ven). Genera una credencial o carnet de LexFive con fondo blanco, tamaño 9 x 6 cm y con una guía de corte punteada para recortarla, lista para imprimir o guardar como PDF.
 
 - Usted llena los datos: nombre, cargo, carnet de identidad, correo, teléfono personal y de oficina, y las fechas de emisión y validez. La credencial se actualiza en vivo.
-- Puede elegir el logotipo del bufete entre varios modelos; el elegido se aplica en toda la página, el panel y la credencial.
+- Puede elegir el logotipo del bufete entre varios modelos; el elegido se aplica en toda la página, el panel y la credencial. El logo y el sello se sincronizan en la nube y se actualizan en vivo en todos los dispositivos (computadora y celular).
+- Puede regular la «Intensidad del logo de fondo» (la marca de agua de la credencial) con un control deslizante; el ajuste se guarda y se aplica en todos los dispositivos.
+- Las credenciales que crea quedan GUARDADAS en la nube: en «Credenciales guardadas» puede verlas, editarlas, volver a imprimirlas o eliminarlas desde cualquier dispositivo. Si tiene muchas, use el buscador por nombre, carnet o cargo.
+- Con el botón «Vista previa» revisa cómo saldrá la credencial (ambas caras) antes de imprimir o guardar el PDF.
 - En el reverso puede escribir una frase del bufete y la base legal que faculta la representación del procurador (texto que redacta usted como abogado).
 - Hay líneas para la firma autorizada y el sello del bufete, sobre fondo blanco.
 
@@ -282,7 +286,18 @@ El administrador y los abogados entregan las credenciales a sus procuradores: el
 
 > **Importante:** La base legal de la representación la redacta usted con su criterio profesional; el sistema no inventa números de artículo. Cada persona tiene su propia cuenta y no se comparten contraseñas.
 
-## 21. Soporte
+## 21. Respaldos, instalación y conexión a internet
+
+El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:
+
+- Respaldo automático: la base de datos se respalda sola cada día (mediante GitHub Actions). No tiene que hacer nada.
+- Respaldo manual: en el «Panel general», el administrador puede pulsar «Exportar respaldo (JSON)» para descargar una copia de los datos principales en su equipo. Se muestra la fecha del último respaldo manual.
+- Instalar como app: en el celular puede «Agregar a la pantalla de inicio» desde el navegador y usar el sistema como una aplicación (abre más rápido y a pantalla completa).
+- Aviso de «sin conexión»: si se queda sin internet, aparece un aviso. Lo que guarde queda en el equipo y se sincroniza al volver la conexión.
+
+> **Recomendación:** Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o restaurar datos antiguos.
+
+## 22. Soporte
 
 Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle posible lo que necesita.
 
