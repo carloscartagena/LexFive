@@ -66,7 +66,53 @@ export async function requireAuth() {
     await signOut();
     return null;
   }
+  // Si el usuario tiene la verificación en dos pasos (2FA) ACTIVADA pero la
+  // sesión sigue en nivel 1 (solo contraseña), exigir completar el código en
+  // el login. Si no tiene 2FA, nextLevel = 'aal1' y no cambia nada (opt-in).
+  // Falla "abierto": si la consulta de MFA da error, no se bloquea el acceso.
+  try {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal && aal.currentLevel === 'aal1' && aal.nextLevel === 'aal2') {
+      window.location.href = 'login.html';
+      return null;
+    }
+  } catch (e) { /* no bloquear el acceso si la verificación de MFA falla */ }
   return profile;
+}
+
+// ============================================================
+//  Verificación en dos pasos (MFA / TOTP)  — opcional, por usuario
+// ============================================================
+
+// Nivel de garantía de la sesión: { currentLevel, nextLevel }.
+// nextLevel === 'aal2' indica que el usuario tiene un factor TOTP activado.
+export async function mfaAssuranceLevel() {
+  const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  return data;
+}
+
+// Lista los factores MFA del usuario (data.totp = [...]).
+export async function mfaFactors() {
+  const { data, error } = await supabase.auth.mfa.listFactors();
+  if (error) return { totp: [] };
+  return data;
+}
+
+// Inicia el alta de un factor TOTP. Devuelve { data: { id, totp: { qr_code, secret } } }.
+export async function mfaEnroll() {
+  return supabase.auth.mfa.enroll({ factorType: 'totp' });
+}
+
+// Verifica un código de 6 dígitos contra un factor (para activar o para iniciar sesión).
+export async function mfaVerify(factorId, code) {
+  const ch = await supabase.auth.mfa.challenge({ factorId });
+  if (ch.error) return { error: ch.error };
+  return supabase.auth.mfa.verify({ factorId, challengeId: ch.data.id, code });
+}
+
+// Quita (desactiva) un factor MFA.
+export async function mfaUnenroll(factorId) {
+  return supabase.auth.mfa.unenroll({ factorId });
 }
 
 export async function signIn(email, password) {

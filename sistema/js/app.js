@@ -2,7 +2,7 @@
 //  LexFive — Sistema de Gestión Legal · Lógica principal
 // ============================================================
 import { supabase } from './supabase.js';
-import { requireAuth, getProfile, signOut, signOutTo, logAccion, can, withTimeout } from './auth.js';
+import { requireAuth, getProfile, signOut, signOutTo, logAccion, can, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from './auth.js';
 import { ROLES, ESTADOS, MATERIAS, WHATSAPP, ABOGADOS } from './config.js';
 
 // ---------- Estado global ----------
@@ -1356,6 +1356,15 @@ async function renderDashboard() {
       </div>
     </div>
 
+    ${state.profile.rol !== 'cliente' ? `
+    <div class="card">
+      <div class="card__head"><h3>${ICON.llave} Seguridad de la cuenta</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:10px">Active la <strong>verificación en dos pasos (2FA)</strong> para proteger su acceso: además de la contraseña, se le pedirá un código que genera una app en su teléfono (Google Authenticator, Microsoft Authenticator, Authy…).</p>
+        <button class="btn btn--ghost btn--sm" id="btn2FA" type="button">Verificación en dos pasos</button>
+      </div>
+    </div>` : ''}
+
     ${state.profile.rol === 'admin' ? `
     <div class="card">
       <div class="card__head"><h3>${ICON.doc} Respaldos y datos</h3></div>
@@ -1378,6 +1387,60 @@ async function renderDashboard() {
   const mpc = $('#mPorCobrar'); if (mpc) mpc.onclick = () => navigate('finanzas');
   const beb = $('#btnExportBackup'); if (beb) beb.onclick = () => exportarRespaldo(beb);
   const brb = $('#btnRevisarBackup'); if (brb) brb.onclick = () => revisarRespaldo();
+  const b2fa = $('#btn2FA'); if (b2fa) b2fa.onclick = () => openSeguridad2FA();
+}
+
+// ============================================================
+//  SEGURIDAD: verificación en dos pasos (2FA / TOTP)
+// ============================================================
+async function openSeguridad2FA() {
+  openModal('Verificación en dos pasos', '<div class="loading"><div class="spinner"></div>Cargando...</div>', [], true);
+  const factors = await mfaFactors();
+  const activos = (factors.totp || []).filter(f => f.status === 'verified');
+
+  // Ya está activado -> ofrecer desactivar.
+  if (activos.length) {
+    const body = `<p class="cell-sub">La verificación en dos pasos está <strong style="color:var(--navy,#0e1b2c)">ACTIVADA</strong> en su cuenta. Cada vez que inicie sesión se le pedirá el código de su app de autenticación.</p>
+      <p class="cell-sub" style="margin-top:8px">Si desactiva la 2FA, su cuenta volverá a protegerse solo con la contraseña.</p>`;
+    openModal('Verificación en dos pasos', body, [
+      { label: 'Desactivar 2FA', class: 'btn--danger', onClick: async () => {
+          if (!confirm('¿Seguro que desea desactivar la verificación en dos pasos?')) return;
+          for (const f of activos) { try { await mfaUnenroll(f.id); } catch (e) {} }
+          toast('Verificación en dos pasos desactivada.', 'success');
+          closeModal();
+        } },
+      { label: 'Cerrar', class: 'btn--primary', onClick: closeModal }
+    ], true);
+    return;
+  }
+
+  // No activado -> iniciar el alta (enroll) y mostrar el QR.
+  const { data, error } = await mfaEnroll();
+  if (error || !data) {
+    openModal('Verificación en dos pasos', `<p class="cell-sub">No se pudo iniciar la activación: ${esc(error ? error.message : 'error desconocido')}</p>`, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }]);
+    return;
+  }
+  const factorId = data.id;
+  const qr = data.totp && data.totp.qr_code;
+  const secret = data.totp && data.totp.secret;
+  const body = `
+    <p class="cell-sub" style="margin-bottom:8px"><strong>Paso 1.</strong> Escanee este código QR con una app de autenticación (Google Authenticator, Microsoft Authenticator, Authy…).</p>
+    <div style="text-align:center;margin:10px 0">${qr ? `<img src="${qr}" alt="Código QR para 2FA" style="width:200px;height:200px;background:#fff;border-radius:8px;padding:6px">` : ''}</div>
+    <p class="cell-sub">¿No puede escanear? Ingrese esta clave manualmente en la app:<br><code style="font-size:.9rem;word-break:break-all">${esc(secret || '')}</code></p>
+    <div class="field" style="margin-top:14px"><label><strong>Paso 2.</strong> Escriba el código de 6 dígitos que muestra la app</label><input id="mfa_code" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"></div>
+    <p class="form-msg" id="mfa_msg" role="status" aria-live="polite"></p>`;
+  openModal('Activar verificación en dos pasos', body, [
+    { label: 'Activar', class: 'btn--primary', onClick: async () => {
+        const code = ($('#mfa_code').value || '').trim();
+        const msg = $('#mfa_msg');
+        if (!/^\d{6}$/.test(code)) { if (msg) { msg.textContent = 'Ingrese el código de 6 dígitos.'; msg.className = 'form-msg error'; } return; }
+        const { error: vErr } = await mfaVerify(factorId, code);
+        if (vErr) { if (msg) { msg.textContent = 'Código incorrecto o expirado. Intente de nuevo.'; msg.className = 'form-msg error'; } return; }
+        toast('¡Verificación en dos pasos activada!', 'success');
+        closeModal();
+      } },
+    { label: 'Cancelar', class: 'btn--ghost', onClick: async () => { try { await mfaUnenroll(factorId); } catch (e) {} closeModal(); } }
+  ], true);
 }
 
 // ============================================================

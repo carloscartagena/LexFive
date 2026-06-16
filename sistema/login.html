@@ -119,6 +119,20 @@
             <p class="form-msg" id="resetMsg" role="status" aria-live="polite"></p>
           </form>
         </div>
+
+        <!-- 2FA: verificación en dos pasos al iniciar sesión -->
+        <div id="viewMFA" style="display:none;">
+          <h2>Verificación en dos pasos</h2>
+          <p class="sub">Ingrese el código de 6 dígitos que muestra su app de autenticación.</p>
+          <form id="mfaForm" novalidate>
+            <div class="field">
+              <label for="mfaCode">Código</label>
+              <input type="text" id="mfaCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--block" id="btnMfa">Verificar</button>
+            <p class="form-msg" id="mfaMsg" role="status" aria-live="polite"></p>
+          </form>
+        </div>
       </div>
       <p class="login-back">
         <a href="../index.html">&larr; Ir al sitio web de LexFive</a>
@@ -156,17 +170,36 @@
     })();
   </script>
   <script type="module">
-    import { signIn, signUp, getSession, resetPassword, updatePassword, onPasswordRecovery } from './js/auth.js';
+    import { signIn, signUp, getSession, resetPassword, updatePassword, onPasswordRecovery, mfaAssuranceLevel, mfaFactors, mfaVerify } from './js/auth.js';
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    const VIEWS = ['viewLogin', 'viewRegister', 'viewRecuperar', 'viewReset'];
+    const VIEWS = ['viewLogin', 'viewRegister', 'viewRecuperar', 'viewReset', 'viewMFA'];
     const show = (id) => VIEWS.forEach(v => document.getElementById(v).style.display = (v === id ? 'block' : 'none'));
+
+    // Guarda el id del factor TOTP cuando hace falta verificar el 2do paso.
+    let mfaFactorId = null;
+    // ¿El usuario tiene 2FA activado pero la sesión aún está en nivel 1?
+    async function mfaPendiente() {
+      try {
+        const aal = await mfaAssuranceLevel();
+        if (aal && aal.currentLevel === 'aal1' && aal.nextLevel === 'aal2') {
+          const f = await mfaFactors();
+          const totp = (f.totp || []).find(x => x.status === 'verified');
+          if (totp) { mfaFactorId = totp.id; return true; }
+        }
+      } catch (e) {}
+      return false;
+    }
 
     // ¿Llegamos por el enlace de recuperación del correo?
     const isRecovery = window.location.hash.includes('type=recovery');
     if (!isRecovery) {
-      // Si ya hay sesión activa, ir directo al panel
-      getSession().then(s => { if (s) window.location.href = 'index.html'; });
+      // Si ya hay sesión activa: si falta el 2FA, pedir el código; si no, ir al panel.
+      getSession().then(async s => {
+        if (!s) return;
+        if (await mfaPendiente()) { show('viewMFA'); document.getElementById('mfaCode').focus(); return; }
+        window.location.href = 'index.html';
+      });
     } else {
       show('viewReset');
     }
@@ -197,6 +230,34 @@
         loginMsg.textContent = 'Correo o contraseña incorrectos.';
         loginMsg.classList.add('error');
         btn.disabled = false; btn.textContent = 'Entrar';
+        return;
+      }
+      // Si el usuario tiene 2FA activado, pedir el código antes de entrar.
+      if (await mfaPendiente()) {
+        btn.disabled = false; btn.textContent = 'Entrar';
+        show('viewMFA');
+        document.getElementById('mfaCode').focus();
+        return;
+      }
+      window.location.href = 'index.html';
+    });
+
+    // 2FA: verificar el código de 6 dígitos
+    const mfaForm = document.getElementById('mfaForm');
+    const mfaMsg = document.getElementById('mfaMsg');
+    mfaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btnM = document.getElementById('btnMfa');
+      mfaMsg.textContent = ''; mfaMsg.className = 'form-msg';
+      const code = (document.getElementById('mfaCode').value || '').trim();
+      if (!/^\d{6}$/.test(code)) { mfaMsg.textContent = 'Ingrese el código de 6 dígitos.'; mfaMsg.classList.add('error'); return; }
+      if (!mfaFactorId) { mfaMsg.textContent = 'No se pudo identificar el factor. Vuelva a iniciar sesión.'; mfaMsg.classList.add('error'); return; }
+      btnM.disabled = true; btnM.textContent = 'Verificando...';
+      const { error } = await mfaVerify(mfaFactorId, code);
+      if (error) {
+        mfaMsg.textContent = 'Código incorrecto o expirado. Intente de nuevo.';
+        mfaMsg.classList.add('error');
+        btnM.disabled = false; btnM.textContent = 'Verificar';
         return;
       }
       window.location.href = 'index.html';
