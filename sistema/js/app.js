@@ -4784,7 +4784,11 @@ async function arrancarSesion() {
   window.addEventListener('unhandledrejection', avisoError);
 
   // Eventos globales
-  $('#btnLogout').onclick = () => signOut();
+  // Al cerrar sesión, llevar al sitio web público (front-end) en vez de a la
+  // pantalla de login. Así es coherente con el cierre por inactividad y con el
+  // clic en el logo, que también van al sitio público. Lo autoguardado se
+  // conserva y se puede recuperar al volver a iniciar sesión.
+  $('#btnLogout').onclick = () => signOutTo('../index.html');
   initTooltipEngine();
 
   // Modo claro/oscuro: sincroniza el botón con el tema ya aplicado y permite alternarlo.
