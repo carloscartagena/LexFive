@@ -4,13 +4,16 @@
    Permite instalar el sistema como app en el celular y que
    funcione mejor con conexiones lentas.
 
-   Estrategia "network-first" para los archivos propios:
-   siempre intenta traer la última versión desde la red (para
-   no quedarse con código viejo) y, si no hay internet, usa la
-   copia guardada. Las peticiones a Supabase y otros servicios
-   externos NO se interceptan (van directo a la red).
+   Estrategia por tipo de recurso:
+   - HTML / navegación: "red primero" (para no quedarse con código viejo),
+     con copia de respaldo en caché si no hay internet.
+   - Recursos estáticos (CSS, JS, imágenes, logos, fuentes): "stale-while-
+     revalidate": se sirven AL INSTANTE desde la caché y se actualizan en
+     segundo plano. Así el panel se siente rápido y los re-render (después
+     de subir o eliminar) no esperan la red para cada ícono o estilo.
+   - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v3';
+const CACHE = 'lexfive-sistema-v4';
 const SHELL = [
   './',
   './index.html',
@@ -40,6 +43,16 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+const ASSET_RE = /\.(?:css|js|mjs|svg|png|jpg|jpeg|webp|gif|ico|woff2?|ttf|otf|webmanifest)$/i;
+
+function actualizarCache(req, res) {
+  if (res && res.ok) {
+    const copia = res.clone();
+    caches.open(CACHE).then((c) => c.put(req, copia)).catch(() => {});
+  }
+  return res;
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -48,15 +61,31 @@ self.addEventListener('fetch', (event) => {
   // fuentes, API de QR) va directo a la red.
   if (url.origin !== self.location.origin) return;
 
-  event.respondWith(
-    fetch(req)
-      .then((res) => {
-        if (res && res.ok) {
-          const copia = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copia)).catch(() => {});
-        }
-        return res;
+  const aceptaHtml = (req.headers.get('accept') || '').indexOf('text/html') !== -1;
+
+  // HTML / navegación: red primero (para no servir código viejo), con respaldo.
+  if (req.mode === 'navigate' || aceptaHtml) {
+    event.respondWith(
+      fetch(req).then((res) => actualizarCache(req, res))
+        .catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Recursos estáticos: stale-while-revalidate (caché al instante + refresco
+  // en segundo plano). Hace que el panel y los re-render se sientan rápidos.
+  if (ASSET_RE.test(url.pathname)) {
+    event.respondWith(
+      caches.match(req).then((cached) => {
+        const red = fetch(req).then((res) => actualizarCache(req, res)).catch(() => cached);
+        return cached || red;
       })
-      .catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Resto: red con respaldo en caché.
+  event.respondWith(
+    fetch(req).then((res) => actualizarCache(req, res)).catch(() => caches.match(req))
   );
 });
