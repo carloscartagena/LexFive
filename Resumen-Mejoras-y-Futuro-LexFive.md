@@ -65,6 +65,7 @@ Para que el sistema funcione, en Supabase (SQL Editor) se ejecutaron los scripts
 | `17_credenciales.sql` | Credenciales del bufete compartidas en la nube |
 | `18_realtime_branding.sql` | Logo y sello en tiempo real (se actualizan en vivo) |
 | `19_branding_galerias.sql` | Galerías de logos/sellos en fila aparte (carga más liviana) |
+| `20_seguridad_eventos.sql` | Privacidad de plazos/audiencias (el cliente solo ve los suyos) |
 
 > Regla práctica: cada vez que se agregue una función que necesite base de datos, habrá un nuevo script `db/NN_*.sql` que se ejecuta **una sola vez** en Supabase.
 
