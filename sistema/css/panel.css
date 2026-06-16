@@ -415,6 +415,9 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-preview-stage { background: #e9ebef; padding: 18px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .cred-preview-stage .cred-cut { background: #fff; }
 
+/* Enlaces de descarga de manuales (dashboard) */
+.manual-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
 /* Banner de "sin conexión" */
 .offline-banner {
   position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%) translateY(160%);

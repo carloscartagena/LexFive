@@ -404,6 +404,193 @@ def build_blocks():
 
 
 # ============================================================
+#  CONTENIDO: MANUAL PARA ABOGADOS (uso diario del panel)
+# ============================================================
+def build_blocks_abogados():
+    B = []
+    h1 = lambda t: B.append(('h1', t))
+    p = lambda t: B.append(('p', t))
+    bul = lambda items: B.append(('bullets', items))
+    stp = lambda items: B.append(('steps', items))
+    note = lambda t, titulo='Nota': B.append(('note', t, titulo))
+    sp = lambda h=6: B.append(('spacer', h))
+
+    h1("1. Bienvenido al panel de LexFive")
+    p("Este manual es para los abogados del bufete. Explica, en lenguaje sencillo, cómo usar "
+      "el panel de gestión para llevar sus procesos, clientes, audiencias, honorarios y más. "
+      "No necesita conocimientos técnicos: si sabe usar el correo o WhatsApp, puede usar esto.")
+    bul([
+        "El panel está en %s/sistema (entra con su correo y contraseña)." % SITIO,
+        "Todo se guarda en la nube de forma segura: lo que registra se ve al instante en "
+        "cualquier dispositivo, computadora o celular.",
+        "Cada persona tiene su propia cuenta. No comparta su contraseña.",
+    ])
+
+    h1("2. Ingresar y salir del sistema")
+    stp([
+        "Abra %s/sistema/login.html en su navegador." % SITIO,
+        "Escriba su correo y contraseña y pulse «Ingresar».",
+        "Para salir, use «Cerrar sesión» (abajo a la izquierda), sobre todo en equipos "
+        "compartidos.",
+    ])
+    note("La sesión se cierra sola tras 10 minutos sin actividad, por seguridad. Lo que estaba "
+         "escribiendo queda autoguardado y podrá recuperarlo al volver a entrar.", "Importante")
+    note("Puede instalar el panel como app en el celular: en el navegador elija «Agregar a la "
+         "pantalla de inicio». Abre más rápido y a pantalla completa.", "Consejo")
+
+    h1("3. Panel general (su resumen del día)")
+    p("Al entrar verá tarjetas con el resumen: procesos totales y activos, audiencias "
+      "próximas, sus procesos, consultas nuevas, tareas pendientes y, si es abogado o "
+      "administrador, cuánto hay por cobrar.")
+    bul([
+        "Las «Alertas de audiencias y plazos» muestran lo vencido y lo que vence en 7 días.",
+        "Con «Recordar a los 5» envía por WhatsApp un recordatorio de la audiencia.",
+        "Puede buscar en todo el sistema (procesos, clientes y consultas) con el botón "
+        "«Buscar» o el atajo Ctrl/Cmd + K.",
+        "Puede cambiar entre modo claro y oscuro con el botón de la luna/sol.",
+    ])
+
+    h1("4. Procesos judiciales")
+    p("Es el corazón del sistema. Aquí registra y sigue cada caso.")
+    stp([
+        "Vaya a «Procesos» y pulse «Nuevo proceso».",
+        "Complete la carátula, número, NUREJ, tipo, materia, estado, juzgado, el cliente, la "
+        "parte contraria, las fechas de inicio y de próxima audiencia, y una descripción.",
+        "Asigne uno o varios abogados y procuradores responsables.",
+        "Guarde. El proceso aparecerá en la lista y en las alertas si tiene audiencia próxima.",
+    ])
+    bul([
+        "Abra un proceso para ver su detalle, editarlo y subir documentos o memoriales (PDF, "
+        "Word, imágenes).",
+        "Cambie el «estado» a medida que avanza el caso (en trámite, con sentencia, "
+        "archivado, etc.).",
+        "Si elimina un proceso por error, queda en la «Papelera» (el administrador puede "
+        "restaurarlo).",
+    ])
+    note("Mientras escribe la descripción o un memorial largo, el sistema lo guarda solo. Si "
+         "se corta la sesión, al volver le ofrecerá «Recuperar» lo que había dejado.", "Autoguardado")
+
+    h1("5. Clientes")
+    p("En «Clientes» registra a las personas que atiende: nombre, documento, teléfono, correo "
+      "y notas. Use el mismo correo del cliente en su ficha y en sus procesos: así, cuando el "
+      "cliente cree su cuenta, podrá ver el avance de sus casos en su portal.")
+
+    h1("6. Consultas (mensajes de la web)")
+    p("Cada mensaje enviado desde el formulario de contacto del sitio web llega a la bandeja "
+      "«Consultas». Ábralo para leerlo, responder al interesado y cambiar su estado (nueva, "
+      "atendida, etc.).")
+
+    h1("7. Agenda y audiencias")
+    p("En «Agenda» ve el calendario con las audiencias y plazos del bufete. Puede exportar un "
+      "evento a su calendario personal (celular o computadora) para que le avise.")
+
+    h1("8. Honorarios y pagos")
+    p("Los abogados y el administrador registran honorarios y los pagos recibidos de cada "
+      "proceso o cliente. El sistema calcula automáticamente cuánto queda «por cobrar».")
+
+    h1("9. Blog del bufete")
+    p("En «Blog» puede redactar artículos jurídicos. Mientras escribe, se guarda solo. Cuando "
+      "lo marca como «publicado», aparece automáticamente en el blog del sitio web.")
+
+    h1("10. Credenciales de procuradores")
+    p("Los abogados y el administrador pueden generar carnets (credenciales) para sus "
+      "procuradores desde la pestaña «Credenciales»: llenan los datos, eligen el logo, ajustan "
+      "el fondo, usan «Vista previa» y luego «Imprimir / Guardar PDF». Las credenciales quedan "
+      "guardadas en la nube para editarlas o reimprimirlas. (Vea el detalle en el Manual "
+      "completo del Sistema.)")
+
+    h1("11. Consejos y seguridad")
+    bul([
+        "Cierre sesión al terminar, sobre todo en computadoras compartidas.",
+        "Si pierde el internet, aparece un aviso de «sin conexión»: lo que guarde queda en el "
+        "equipo y se sincroniza al volver la conexión.",
+        "No comparta su contraseña. Si la olvida, pídale al administrador que la reinicie.",
+        "Revise el panel general al iniciar el día para no perder audiencias ni plazos.",
+    ])
+
+    h1("12. Soporte")
+    p("Ante cualquier duda, contacte al administrador del bufete. Para el detalle completo de "
+      "cada función, consulte el «Manual del Sistema».")
+    sp(8)
+    note("Versión del manual a la fecha de la portada. Si el sistema se actualiza, solicite una "
+         "versión nueva.", "Versión")
+    return B
+
+
+# ============================================================
+#  CONTENIDO: MANUAL PARA CLIENTES (portal del cliente)
+# ============================================================
+def build_blocks_clientes():
+    B = []
+    h1 = lambda t: B.append(('h1', t))
+    p = lambda t: B.append(('p', t))
+    bul = lambda items: B.append(('bullets', items))
+    stp = lambda items: B.append(('steps', items))
+    note = lambda t, titulo='Nota': B.append(('note', t, titulo))
+    sp = lambda h=6: B.append(('spacer', h))
+
+    h1("1. Bienvenido a su portal de cliente")
+    p("LexFive Abogados pone a su disposición un portal donde usted puede seguir el avance de "
+      "sus casos de forma sencilla y segura, desde su computadora o su celular. Esta guía le "
+      "explica, paso a paso, cómo usarlo. No necesita conocimientos técnicos.")
+    bul([
+        "Verá únicamente SUS procesos: nadie más puede ver su información, y usted no ve la de "
+        "otros clientes.",
+        "Funciona en el celular y en la computadora.",
+    ])
+
+    h1("2. Crear su cuenta")
+    p("Para ver sus casos, primero cree su cuenta. Es muy importante que use el MISMO correo "
+      "que entregó al bufete (el que figura en su ficha), porque así el sistema enlaza su "
+      "cuenta con sus procesos.")
+    stp([
+        "Entre a %s/sistema/login.html" % SITIO,
+        "Elija «Crear cuenta» (o «Registrarse»).",
+        "Escriba su correo (el mismo que dio al bufete) y una contraseña que recuerde.",
+        "Listo: ya puede ingresar.",
+    ])
+    note("Si no ve sus procesos al entrar, probablemente se registró con un correo distinto al "
+         "que figura en el bufete. Avise a su abogado para corregirlo.", "Importante")
+
+    h1("3. Ingresar al portal")
+    stp([
+        "Entre a %s/sistema/login.html" % SITIO,
+        "Escriba su correo y contraseña y pulse «Ingresar».",
+        "Para salir, use «Cerrar sesión», sobre todo si usa un equipo compartido.",
+    ])
+
+    h1("4. Ver el avance de sus procesos")
+    p("Al ingresar verá «Mis procesos». Por cada caso podrá ver, según lo que registre su "
+      "abogado: la carátula (nombre del caso), el estado actual, la próxima audiencia o "
+      "diligencia y una descripción del avance.")
+    bul([
+        "Toque o haga clic en un proceso para ver más detalles.",
+        "La información se actualiza cuando su abogado registra novedades.",
+    ])
+
+    h1("5. Dejar su opinión")
+    p("Si lo desea, puede dejar su opinión sobre la atención recibida. El bufete la revisa y, "
+      "una vez aprobada, puede mostrarse como testimonio en el sitio web. Su opinión nos "
+      "ayuda a mejorar.")
+
+    h1("6. Su privacidad")
+    p("Su información está protegida. Usted solo ve sus propios procesos y nadie más que el "
+      "bufete tiene acceso a ellos. La sesión se cierra sola tras un tiempo sin uso, por "
+      "seguridad.")
+
+    h1("7. Si olvida su contraseña o tiene dudas")
+    bul([
+        "Si olvida su contraseña, comuníquese con el bufete para que lo ayuden.",
+        "Puede contactar a su abogado por WhatsApp desde el botón del sitio web.",
+        "Para cualquier consulta sobre su caso, escriba o llame a su abogado de confianza.",
+    ])
+    sp(8)
+    note("Este portal es solo para consultar el avance de sus casos. Las gestiones legales las "
+         "realiza su abogado del bufete.", "Recuerde")
+    return B
+
+
+# ============================================================
 #  Métricas de fuente (Helvetica y Helvetica-Bold) - unidades/1000
 # ============================================================
 _HELV_ASCII = [278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,
@@ -828,21 +1015,45 @@ def render_docx(blocks, path):
 
 
 # ============================================================
-def main():
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    blocks = build_blocks()
+def _set_doc(title, subtitle, intro, header):
+    global DOC_TITLE, DOC_SUBTITLE, DOC_INTRO, DOC_HEADER
+    DOC_TITLE, DOC_SUBTITLE, DOC_INTRO, DOC_HEADER = title, subtitle, intro, header
 
-    pdf_path = os.path.join(root, "Manual-Sistema-LexFive.pdf")
-    md_path = os.path.join(root, "Manual-Sistema-LexFive.md")
-    docx_path = os.path.join(root, "Manual-Sistema-LexFive.docx")
 
+def _generar(root, base, blocks):
+    pdf_path = os.path.join(root, base + ".pdf")
+    md_path = os.path.join(root, base + ".md")
+    docx_path = os.path.join(root, base + ".docx")
     pages, pdf_size = render_pdf(blocks, pdf_path)
     md_size = render_md(blocks, md_path)
     docx_size = render_docx(blocks, docx_path)
-
     print("PDF : %s  (%d páginas, %.1f KB)" % (pdf_path, pages, pdf_size / 1024.0))
     print("MD  : %s  (%.1f KB)" % (md_path, md_size / 1024.0))
     print("DOCX: %s  (%.1f KB)" % (docx_path, docx_size / 1024.0))
+
+
+def main():
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # 1) Manual completo del sistema (administrador / referencia general)
+    _set_doc("Manual del Sistema", "Guía completa de uso y gestión",
+             "Sitio web público, panel de gestión de procesos, bandeja de consultas y "
+             "portal del cliente.",
+             "Manual del Sistema")
+    _generar(root, "Manual-Sistema-LexFive", build_blocks())
+
+    # 2) Manual para abogados (uso diario del panel)
+    _set_doc("Manual para Abogados", "Guía de uso del panel para el equipo legal",
+             "Procesos, clientes, audiencias, consultas, honorarios, blog y credenciales, "
+             "explicados paso a paso.",
+             "Manual para Abogados")
+    _generar(root, "Manual-Abogados-LexFive", build_blocks_abogados())
+
+    # 3) Manual para clientes (portal del cliente)
+    _set_doc("Manual para Clientes", "Guía del portal del cliente",
+             "Cómo ingresar, seguir el avance de sus procesos y dejar su opinión.",
+             "Manual para Clientes")
+    _generar(root, "Manual-Clientes-LexFive", build_blocks_clientes())
 
 
 if __name__ == "__main__":

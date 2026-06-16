@@ -1153,6 +1153,19 @@ async function renderDashboard() {
       </div>
     </div>
 
+    <div class="card">
+      <div class="card__head"><h3>${ICON.doc} Manuales y guías</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:10px">Descargue los manuales en PDF para aprender a usar el sistema o para compartirlos con su equipo y sus clientes.</p>
+        <div class="manual-links">
+          <a class="btn btn--ghost btn--sm" href="../Manual-Sistema-LexFive.pdf" download>Manual completo del sistema</a>
+          <a class="btn btn--ghost btn--sm" href="../Manual-Abogados-LexFive.pdf" download>Manual para abogados</a>
+          <a class="btn btn--ghost btn--sm" href="../Manual-Clientes-LexFive.pdf" download>Manual para clientes</a>
+        </div>
+        <p class="cell-sub" style="margin-top:8px">El «Manual para clientes» es ideal para enviárselo a sus clientes cuando creen su cuenta.</p>
+      </div>
+    </div>
+
     ${state.profile.rol === 'admin' ? `
     <div class="card">
       <div class="card__head"><h3>${ICON.doc} Respaldos y datos</h3></div>
@@ -2886,6 +2899,13 @@ async function renderMisProcesos() {
     <div class="stats-grid">
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.procesos}</div></div><div class="metric__num">${procesos.length}</div><div class="metric__label">Mis procesos</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.audiencia}</div></div><div class="metric__num">${proximas}</div><div class="metric__label">Audiencias próximas</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card__body" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between">
+        <p class="cell-sub" style="margin:0">¿Primera vez aquí? Descargue la guía rápida para aprender a usar su portal.</p>
+        <a class="btn btn--ghost btn--sm" href="../Manual-Clientes-LexFive.pdf" download>${ICON.doc} Descargar guía del cliente</a>
+      </div>
     </div>
 
     <div class="card">
