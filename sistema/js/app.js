@@ -126,6 +126,10 @@ function fmtDateTime(d) {
 function initials(name) {
   return (name || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 }
+// Valida de forma sencilla un correo electrónico (algo@algo.dominio).
+function esEmailValido(s) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim());
+}
 
 // ============================================================
 //  Utilidades de exportación (descargas, calendario .ics, CSV)
@@ -2775,16 +2779,18 @@ function mostrarCorreoBienvenida(cli) {
 
 async function saveCliente(cli) {
   const nombre = $('#cf_nombre').value.trim();
-  if (!nombre) { toast('El nombre es obligatorio.', 'error'); return; }
+  if (!nombre) { toast('El nombre es obligatorio.', 'error'); $('#cf_nombre').focus(); return; }
+  const email = $('#cf_email').value.trim();
+  if (email && !esEmailValido(email)) { toast('El correo no parece válido. Revíselo (ejemplo: nombre@correo.com).', 'error'); $('#cf_email').focus(); return; }
   const payload = {
     nombre, documento: $('#cf_doc').value.trim() || null, telefono: $('#cf_tel').value.trim() || null,
-    email: $('#cf_email').value.trim() || null, direccion: $('#cf_dir').value.trim() || null, notas: $('#cf_notas').value.trim() || null
+    email: email || null, direccion: $('#cf_dir').value.trim() || null, notas: $('#cf_notas').value.trim() || null
   };
   $('#cf_save').disabled = true;
   let error;
   if (cli) ({ error } = await supabase.from('clientes').update(payload).eq('id', cli.id));
   else { payload.created_by = state.profile.id; ({ error } = await supabase.from('clientes').insert(payload)); }
-  if (error) { toast('Error: ' + error.message, 'error'); $('#cf_save').disabled = false; return; }
+  if (error) { toast('No se pudo guardar el cliente: ' + (error.message || 'revise su conexión e intente de nuevo.'), 'error'); $('#cf_save').disabled = false; return; }
   Draft.clear('cliente_' + (cli ? cli.id : 'nuevo'));
   await logAccion(cli ? 'editar' : 'crear', 'cliente', cli ? cli.id : nombre, nombre);
   closeModal(); toast('Cliente guardado.', 'success'); renderClientes();
@@ -3823,7 +3829,7 @@ async function renderCredenciales() {
     const f = fileFoto.files && fileFoto.files[0];
     fileFoto.value = '';
     if (!f) return;
-    abrirEditorImagen(f, { titulo: 'Ajustar foto (2,5 × 2,5)', salida: 360, quitarBlanco: false }, async (png) => {
+    abrirEditorImagen(f, { titulo: 'Ajustar foto (2,5 × 2,5)', salida: 360, quitarBlanco: false, formato: 'jpeg', calidad: 0.82 }, async (png) => {
       const ok = await guardarImagen('foto', png);
       if (!ok) { toast('No se pudo guardar la foto.', 'error'); return; }
       renderCredenciales();
@@ -4193,9 +4199,13 @@ function abrirEditorImagen(file, opts, onDone) {
       out.width = SALIDA; out.height = SALIDA;
       const octx = out.getContext('2d');
       const k = SALIDA / LIENZO;
+      const esJpeg = opts.formato === 'jpeg';
+      // El JPEG no tiene transparencia: se rellena de blanco para que las zonas
+      // vacías no salgan en negro. (Las fotos son opacas; pesan mucho menos en JPEG.)
+      if (esJpeg) { octx.fillStyle = '#ffffff'; octx.fillRect(0, 0, SALIDA, SALIDA); }
       octx.drawImage(img, st.x * k, st.y * k, img.width * st.scale * k, img.height * st.scale * k);
       if (whiteEl.checked) quitarBlanco(octx, SALIDA);
-      const url = out.toDataURL('image/png');
+      const url = esJpeg ? out.toDataURL('image/jpeg', opts.calidad || 0.82) : out.toDataURL('image/png');
       cerrar();
       if (typeof onDone === 'function') onDone(url);
     };
