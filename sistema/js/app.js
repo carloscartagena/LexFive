@@ -190,6 +190,19 @@ function descargarICS(proc) {
   toast('Evento descargado. Ábralo para agregarlo a su calendario.', 'success');
 }
 
+// Genera un enlace para agregar el evento a Google Calendar en UN CLIC
+// (abre el formulario de nuevo evento ya pre-rellenado). Dura 1 hora.
+function googleCalURL(inicio, resumen, detalles, lugar) {
+  if (!inicio || isNaN(inicio)) return '';
+  const fin = new Date(inicio.getTime() + 60 * 60 * 1000);
+  const fechas = icsFecha(inicio) + '/' + icsFecha(fin); // formato UTC AAAAMMDDTHHMMSSZ
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+    + '&text=' + encodeURIComponent(resumen || 'Evento')
+    + '&dates=' + fechas
+    + '&details=' + encodeURIComponent(detalles || '')
+    + (lugar ? '&location=' + encodeURIComponent(lugar) : '');
+}
+
 // Convierte filas de procesos a CSV (compatible con Excel: separador ; y BOM UTF-8).
 function procesosToCSV(rows) {
   const cab = ['Carátula', 'Número', 'NUREJ', 'Materia', 'Tipo', 'Estado', 'Juzgado', 'Cliente', 'Parte contraria', 'Abogados', 'Procuradores', 'Fecha inicio', 'Próxima audiencia'];
@@ -1195,16 +1208,26 @@ function waRecordatorio(p) {
   return `https://wa.me/${WHATSAPP}?text=${t}`;
 }
 
-// Abre un modal para enviar el recordatorio por WhatsApp a los 5 abogados
+// Abre un modal para enviar el recordatorio por WhatsApp (a los 5 abogados)
+// o por correo (a todo el personal del bufete).
 function recordarPorWhatsApp(p) {
-  const enc = encodeURIComponent(
-    `Recordatorio LexFive\nProceso: ${p.caratula}\nAudiencia/plazo: ${fmtDateTime(p.proxima_audiencia)}\nResponsable: ${profName(p.abogado_id)}`
-  );
+  const texto = `Recordatorio LexFive\nProceso: ${p.caratula}\nAudiencia/plazo: ${fmtDateTime(p.proxima_audiencia)}\nResponsable: ${profName(p.abogado_id)}`;
+  const enc = encodeURIComponent(texto);
+  // Correos del personal del bufete (desde los perfiles), para el recordatorio por correo.
+  const correosEquipo = (state.profiles || [])
+    .filter(u => ['admin', 'procurador', 'abogado'].includes(u.rol) && u.email)
+    .map(u => u.email);
+  const asunto = encodeURIComponent('Recordatorio de audiencia/plazo — ' + (p.caratula || 'Proceso'));
+  const mailtoEquipo = 'mailto:' + correosEquipo.join(',') + '?subject=' + asunto + '&body=' + enc;
   const body = `
     <p class="cell-sub" style="margin-bottom:14px">Toque cada botón para enviar el recordatorio por WhatsApp a cada abogado del equipo:</p>
     <div style="display:flex;flex-direction:column;gap:8px">
       ${ABOGADOS.map(a => `<a class="btn" style="justify-content:flex-start;background:#25d366;color:#fff;border-color:#25d366" target="_blank" rel="noopener" href="https://wa.me/${a.wa}?text=${enc}">Enviar a ${esc(a.nombre)}</a>`).join('')}
-    </div>`;
+    </div>
+    <p class="cell-sub" style="margin:18px 0 8px">O envíelo por <strong>correo</strong> a todo el personal del bufete de una sola vez:</p>
+    ${correosEquipo.length
+      ? `<a class="btn btn--primary" style="justify-content:flex-start" href="${mailtoEquipo}">✉️ Enviar recordatorio por correo (${correosEquipo.length})</a>`
+      : `<p class="cell-sub" style="color:var(--danger,#c0392b)">No hay correos registrados en los perfiles del personal, así que no se puede enviar por correo todavía.</p>`}`;
   openModal('Recordar audiencia / plazo', body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }]);
 }
 
@@ -1450,14 +1473,22 @@ async function renderAgenda() {
       <div class="card__body--flush">
         ${delMes.length ? `<div class="table-wrap"><table class="data">
           <thead><tr><th>Fecha / hora</th><th>Evento / proceso</th><th>Tipo</th><th>Responsable</th><th></th></tr></thead>
-          <tbody>${delMes.map(it => `
+          <tbody>${delMes.map(it => {
+            const detalleGcal = it.kind === 'ev'
+              ? (it.ev.nota || '')
+              : [it.proc && it.proc.numero ? ('Nº ' + it.proc.numero) : '', it.proc && it.proc.materia ? it.proc.materia : ''].filter(Boolean).join(' · ');
+            const gcal = googleCalURL(new Date(it.fecha), it.titulo, detalleGcal, it.proc ? it.proc.juzgado : '');
+            return `
             <tr>
               <td>${fmtDateTime(it.fecha)}</td>
               <td class="cell-strong js-open" data-pid="${it.procId}" style="cursor:pointer">${esc(it.titulo)}</td>
               <td>${it.kind === 'ev' ? esc(it.ev.tipo) : 'audiencia'}${it.kind === 'ev' && it.ev.estado === 'cumplido' ? ' ✓' : ''}</td>
               <td>${esc(it.proc ? (namesFromIds(it.proc.abogados_ids) || profName(it.proc.abogado_id)) : '—')}</td>
-              <td><button class="btn btn--ghost btn--sm js-ics" data-i="${it.i}">${ICON.descargar} Mi calendario</button></td>
-            </tr>`).join('')}</tbody></table></div>`
+              <td style="white-space:nowrap">
+                <button class="btn btn--ghost btn--sm js-ics" data-i="${it.i}">${ICON.descargar} .ics</button>
+                ${gcal ? `<a class="btn btn--ghost btn--sm" target="_blank" rel="noopener" href="${gcal}" title="Agregar a Google Calendar">📅 Google</a>` : ''}
+              </td>
+            </tr>`; }).join('')}</tbody></table></div>`
         : `<div class="empty">${ICON.audiencia}<p>No hay audiencias ni plazos registrados en este mes.</p></div>`}
       </div>
     </div>`;
@@ -1643,13 +1674,15 @@ async function openPlazos(proc) {
     const evs = data || [];
     const lista = evs.length ? evs.map(e => {
       const cumplido = e.estado === 'cumplido';
+      const gcalEv = googleCalURL(new Date(e.fecha), (e.titulo || 'Evento') + (proc.caratula ? ' — ' + proc.caratula : ''), e.nota || '', proc.juzgado || '');
       return `<div class="plazo-row ${cumplido ? 'is-done' : ''}" data-id="${e.id}">
         <div>
           <div class="cell-strong">${esc(e.titulo)} <span class="badge badge-mat">${esc(e.tipo)}</span></div>
           <div class="cell-sub">${fmtDateTime(e.fecha)}${e.nota ? ' · ' + esc(e.nota) : ''}</div>
         </div>
         <div class="plazo-row__actions">
-          <button class="btn btn--ghost btn--sm js-ics" data-id="${e.id}">${ICON.descargar}</button>
+          <button class="btn btn--ghost btn--sm js-ics" data-id="${e.id}" title="Descargar .ics">${ICON.descargar}</button>
+          ${gcalEv ? `<a class="btn btn--ghost btn--sm" target="_blank" rel="noopener" href="${gcalEv}" title="Agregar a Google Calendar">📅</a>` : ''}
           <button class="btn btn--ghost btn--sm js-done" data-id="${e.id}">${cumplido ? 'Reabrir' : 'Cumplido'}</button>
           <button class="btn btn--danger btn--sm js-del" data-id="${e.id}">Eliminar</button>
         </div>
