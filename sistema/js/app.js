@@ -2701,6 +2701,7 @@ function clienteForm(cli = null) {
     <div class="field"><label>Notas${tip('Anotaciones internas sobre el cliente. Solo las ve el personal del bufete.')}</label><textarea id="cf_notas">${esc(c.notas || '')}</textarea></div>`;
   const buttons = [{ label: 'Cancelar', class: 'btn--ghost', onClick: closeModal }];
   if (cli && can(state.profile, 'delete_cliente')) buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteCliente(cli) });
+  if (cli) buttons.push({ label: 'Correo de bienvenida', class: 'btn--ghost', onClick: () => mostrarCorreoBienvenida(cli) });
   buttons.push({ label: 'Guardar', class: 'btn--primary', id: 'cf_save', onClick: () => saveCliente(cli) });
   openModal(cli ? 'Editar cliente' : 'Nuevo cliente', body, buttons);
 
@@ -2708,6 +2709,55 @@ function clienteForm(cli = null) {
   const draftName = 'cliente_' + (cli ? cli.id : 'nuevo');
   const draft = wireDraft(draftName, ['cf_nombre', 'cf_doc', 'cf_tel', 'cf_email', 'cf_dir', 'cf_notas']);
   maybeOfferDraft(draftName, draft);
+}
+
+// Plantilla del correo/mensaje de bienvenida para un cliente nuevo: incluye los
+// pasos para registrarse y el enlace a la guía del cliente. Lista para copiar.
+function welcomeEmailText(cli) {
+  const nombre = (cli && cli.nombre) ? cli.nombre : 'cliente';
+  const correo = (cli && cli.email) ? cli.email : '(el correo que registró en el bufete)';
+  return [
+    'Estimado/a ' + nombre + ':',
+    '',
+    'Le damos la bienvenida a LexFive Abogados. Habilitamos un portal en línea donde puede '
+    + 'seguir el avance de sus procesos de forma segura, desde su computadora o su celular.',
+    '',
+    'Para crear su cuenta:',
+    '1) Ingrese a: ' + SITIO_URL + 'sistema/login.html',
+    '2) Elija «¿Es cliente del bufete? Cree su cuenta aquí».',
+    '3) Regístrese con ESTE MISMO correo: ' + correo,
+    '   (es importante usar este correo para que vea automáticamente sus casos).',
+    '4) Cree una contraseña que recuerde. ¡Listo!',
+    '',
+    'Le compartimos una guía sencilla de uso del portal (PDF):',
+    SITIO_URL + 'Manual-Clientes-LexFive.pdf',
+    '',
+    'Ante cualquier duda, estamos a su disposición.',
+    '',
+    'Atentamente,',
+    'LexFive Abogados'
+  ].join('\n');
+}
+
+function mostrarCorreoBienvenida(cli) {
+  const texto = welcomeEmailText(cli);
+  const correo = (cli && cli.email) ? cli.email : '';
+  const tel = (cli && cli.telefono) ? String(cli.telefono).replace(/\D/g, '') : '';
+  const body = `
+    <p class="cell-sub" style="margin-bottom:10px">Copie este mensaje y envíelo al cliente por correo o WhatsApp. Ya viene con sus datos y el enlace a la guía del cliente.${correo ? '' : ' <strong>Sugerencia:</strong> agregue el correo del cliente en su ficha para personalizarlo.'}</p>
+    <textarea id="welcomeMail" rows="15" style="width:100%;font:inherit;font-size:.9rem;line-height:1.5;padding:12px;border:1.5px solid var(--line);border-radius:8px;background:var(--white);color:var(--ink);resize:vertical">${esc(texto)}</textarea>`;
+  const copiar = () => {
+    const ta = document.getElementById('welcomeMail');
+    const done = () => toast('Texto copiado. Péguelo en su correo o WhatsApp.', 'success');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(done).catch(() => { try { ta.select(); document.execCommand('copy'); done(); } catch (e) {} });
+    } else { try { ta.select(); document.execCommand('copy'); done(); } catch (e) {} }
+  };
+  const buttons = [{ label: 'Copiar texto', class: 'btn--primary', onClick: copiar }];
+  if (tel) buttons.push({ label: 'Enviar por WhatsApp', class: 'btn--ghost', onClick: () => window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(texto), '_blank') });
+  if (correo) buttons.push({ label: 'Abrir en correo', class: 'btn--ghost', onClick: () => { window.location.href = 'mailto:' + correo + '?subject=' + encodeURIComponent('Bienvenido a LexFive Abogados') + '&body=' + encodeURIComponent(texto); } });
+  buttons.push({ label: 'Cerrar', class: 'btn--ghost', onClick: closeModal });
+  openModal('Correo de bienvenida para el cliente', body, buttons, true);
 }
 
 async function saveCliente(cli) {
