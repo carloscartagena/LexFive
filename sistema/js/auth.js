@@ -20,9 +20,12 @@ export function withTimeout(promise, ms = 12000, label = 'operación') {
   });
 }
 
-// Devuelve la sesión actual (o null)
+// Devuelve la sesión actual (o null). Con tiempo límite: si la recuperación
+// de la sesión se cuelga (p. ej. al refrescar el token contra una base
+// "dormida"), lanza un error para que el arranque reintente en vez de quedarse
+// esperando para siempre.
 export async function getSession() {
-  const { data } = await supabase.auth.getSession();
+  const { data } = await withTimeout(supabase.auth.getSession(), 12000, 'sesión');
   return data.session;
 }
 
