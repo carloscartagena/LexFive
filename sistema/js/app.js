@@ -1815,7 +1815,7 @@ async function renderFinanzas() {
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totPagos)}</div><div class="metric__label">Cobrado</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.alerta}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totSaldo)}</div><div class="metric__label">Por cobrar</div></div>
     </div>
-    <div class="card"><div class="card__head"><h3>Saldo por proceso</h3>${filas.length ? `<button class="btn btn--ghost btn--sm" id="btnRepFin">${ICON.doc} Imprimir / PDF</button>` : ''}</div>
+    <div class="card"><div class="card__head"><h3>Saldo por proceso</h3>${filas.length ? `<span style="display:flex;gap:8px"><button class="btn btn--ghost btn--sm" id="btnFinCSV">${ICON.descargar} Excel</button><button class="btn btn--ghost btn--sm" id="btnRepFin">${ICON.doc} Imprimir / PDF</button></span>` : ''}</div>
       <div class="card__body--flush">
         ${filas.length ? `<div class="table-wrap"><table class="data">
           <thead><tr><th>Proceso</th><th>Cliente</th><th>Honorarios</th><th>Pagado</th><th>Saldo</th></tr></thead>
@@ -1831,6 +1831,15 @@ async function renderFinanzas() {
       </div>
     </div>`;
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openHonorarios({ id: tr.dataset.id, caratula: tr.dataset.cara }));
+  const btnFinCsv = $('#btnFinCSV');
+  if (btnFinCsv) btnFinCsv.onclick = () => {
+    const celda = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const lineas = [['Proceso', 'Cliente', 'Honorarios', 'Pagado', 'Saldo'].map(celda).join(';')];
+    filas.forEach(r => lineas.push([r.p.caratula, clienteName(r.p.cliente_id), r.cargos.toFixed(2), r.pagos.toFixed(2), r.saldo.toFixed(2)].map(celda).join(';')));
+    lineas.push(['TOTALES', '', totCargos.toFixed(2), totPagos.toFixed(2), totSaldo.toFixed(2)].map(celda).join(';'));
+    descargarArchivo('honorarios-lexfive-' + hoyISO() + '.csv', '\ufeff' + lineas.join('\r\n'), 'text/csv;charset=utf-8');
+    toast('Honorarios exportados a Excel (CSV).', 'success');
+  };
   const btnRep = $('#btnRepFin');
   if (btnRep) btnRep.onclick = () => {
     const cuerpo = `<h1>Reporte de honorarios — cartera</h1>
@@ -2506,7 +2515,7 @@ async function openProcesoDetail(id, readonly = false) {
         <input id="actDesc" placeholder="Describa el paso (ej: Respuesta del juzgado, Nuevo memorial...)" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
       </div>
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-        <div style="flex-grow:1;min-width:200px;"><label style="font-size:.8rem;color:var(--muted)">Adjuntar archivos (opcional): respuesta del juzgado, nuevo memorial, etc.</label><input type="file" id="actFiles" multiple></div>
+        <div style="flex-grow:1;min-width:200px;"><label style="font-size:.8rem;color:var(--muted)">Adjuntar archivos (opcional, máx. 10 MB c/u): respuesta del juzgado, nuevo memorial, etc.</label><input type="file" id="actFiles" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.txt,.png,.jpg,.jpeg,.webp,.gif,.svg" multiple><span class="cell-sub" id="actFilesPreview" style="display:block;margin-top:4px"></span></div>
         <button class="btn btn--navy" id="btnActuacion">Agregar al historial</button>
       </div>
       <span class="cell-sub" id="actProgreso"></span>
@@ -2582,6 +2591,17 @@ async function openProcesoDetail(id, readonly = false) {
   }
   wireTimelineDocs(id, readonly, reloadTimeline);
 
+  // Vista previa + validación de los adjuntos de la actuación (varios archivos).
+  const actFilesEl = $('#actFiles');
+  if (actFilesEl) actFilesEl.onchange = () => {
+    const pv = $('#actFilesPreview');
+    const files = [...actFilesEl.files];
+    if (!files.length) { if (pv) pv.textContent = ''; return; }
+    const pesados = files.filter(f => f.size > 10 * 1024 * 1024);
+    if (pesados.length && pv) pv.innerHTML = `<span style="color:var(--red)">${pesados.length} archivo(s) superan 10 MB y se omitirán.</span>`;
+    else if (pv) pv.innerHTML = `${files.length} archivo(s) listo(s): ${esc(files.map(f => f.name).join(', '))}`;
+  };
+
   // Agregar actuación + adjuntos (solo personal)
   if ($('#btnActuacion')) $('#btnActuacion').onclick = async () => {
     const desc = $('#actDesc').value.trim();
@@ -2602,6 +2622,7 @@ async function openProcesoDetail(id, readonly = false) {
     let ok = 0, fallos = 0;
     for (let i = 0; i < archivos.length; i++) {
       const file = archivos[i];
+      if (file.size > 10 * 1024 * 1024) { fallos++; continue; }
       prog.textContent = `Subiendo adjunto ${i + 1} de ${archivos.length}...`;
       const path = `${id}/${Date.now()}_${i}_${file.name.replace(/[^\w.\-]/g, '_')}`;
       const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
