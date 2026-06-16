@@ -658,15 +658,28 @@ const Branding = {
 // propias + modelos ocultos) para guardarla en la nube.
 function snapshotBranding() {
   const readList = k => { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } };
+  const cache = (Branding && Branding.local) ? (Branding.local() || {}) : {};
   let logoId = localStorage.getItem('lexfive_logo') || null;
   if (logoId && logoId.indexOf('custom') === 0) logoId = 'custom'; // compatibilidad con la web pública
   let selloId = localStorage.getItem('lexfive_sello') || null;
   if (selloId && selloId.indexOf('custom') === 0) selloId = 'custom';
+  // No perder el logo/sello propio: si la imagen no está cargada en memoria pero
+  // el modelo elegido es 'custom', se conserva la última imagen conocida (caché)
+  // para NO guardar un logo vacío que haría aparecer el de por defecto en todos
+  // los dispositivos.
+  let logoImg = IMG.logo || null;
+  if (!logoImg && logoId === 'custom') logoImg = cache.logoImg || null;
+  let selloImg = IMG.sello || null;
+  if (!selloImg && selloId === 'custom') selloImg = cache.selloImg || null;
+  // Si quedó 'custom' pero no hay imagen por ningún lado, no forzar 'custom'
+  // (evita un logo vacío): se conserva lo último válido conocido en la caché.
+  if (logoId === 'custom' && !logoImg && cache.logoId) { logoId = cache.logoId; logoImg = cache.logoImg || null; }
+  if (selloId === 'custom' && !selloImg && cache.selloId) { selloId = cache.selloId; selloImg = cache.selloImg || null; }
   return {
     logoId: logoId,
-    logoImg: IMG.logo || null,
+    logoImg: logoImg,
     selloId: selloId,
-    selloImg: IMG.sello || null,
+    selloImg: selloImg,
     logosCustom: IMG.logosCustom || [],
     sellosCustom: IMG.sellosCustom || [],
     wmOpacity: wmOpacityActual(),
@@ -4211,9 +4224,23 @@ function verImagenGrande(src, titulo, nombreArchivo) {
 // Aplica el logo elegido en todo el panel (inyecta un estilo que sobreescribe
 // el fondo del .logo__mark). Se guarda en este equipo (localStorage).
 function applyLogo(id) {
+function applyLogo(id) {
+  // Calcula la URL del logo. Para logos propios ('custom') usa la imagen en
+  // memoria y, si no está cargada, la última imagen conocida (caché). Si no hay
+  // ninguna imagen, NO se sobrescribe el estilo (así no aparece el logo por
+  // defecto por un dato momentáneamente vacío).
+  let url;
+  if (id && id.indexOf('custom') === 0) {
+    url = IMG.logo || '';
+    if (!url) { try { url = (JSON.parse(localStorage.getItem('lexfive_branding') || '{}').logoImg) || ''; } catch (e) { url = ''; } }
+  } else if (id) {
+    url = `../../assets/logos/${id}.svg`;
+  } else {
+    url = '';
+  }
+  if (!url) return;
   let st = document.getElementById('lexfiveLogoStyle');
   if (!st) { st = document.createElement('style'); st.id = 'lexfiveLogoStyle'; document.head.appendChild(st); }
-  const url = (id && id.indexOf('custom') === 0) ? (IMG.logo || '') : `../../assets/logos/${id}.svg`;
   st.textContent = `.logo__mark{background-image:url(${url})!important;}`;
 }
 
@@ -4452,6 +4479,19 @@ function toggleTheme() {
 
   // Escuchar cambios de logo/sello en vivo desde otros dispositivos.
   subscribeBrandingRealtime();
+
+  // Respaldo del tiempo real: al volver a esta pestaña/app, refresca el logo y
+  // el sello desde la nube. Así se actualiza aunque el canal en vivo no esté
+  // disponible (p. ej. si aún no se ejecutó db/18 o el navegador lo bloquea).
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    Branding.load().then(b => {
+      if (!b) return;
+      if (b.logoImg) IMG.logo = b.logoImg;
+      if (b.selloImg) IMG.sello = b.selloImg;
+      if (b.logoId) { localStorage.setItem('lexfive_logo', b.logoId); applyLogo(b.logoId); }
+    }).catch(() => {});
+  });
 
   // Aplica la intensidad guardada del logo de fondo y activa el aviso de "sin conexión".
   applyWmOpacity(wmOpacityActual());
