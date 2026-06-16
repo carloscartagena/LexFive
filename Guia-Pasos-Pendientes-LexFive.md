@@ -53,6 +53,7 @@ En Supabase hay que ejecutar, una sola vez y en orden, los archivos de la carpet
 - 17_credenciales.sql — credenciales del bufete compartidas en la nube (se ven en todos los dispositivos).
 - 18_realtime_branding.sql — logo y sello en tiempo real (se actualizan en vivo en todos los dispositivos).
 - 19_branding_galerias.sql — galerías de logos/sellos en una fila aparte (carga más liviana y rápida).
+- 20_seguridad_eventos.sql — corrige la privacidad de los plazos/audiencias (el cliente solo ve los suyos).
 
 > **Si aparece un error:** Si un script muestra un error de «columna que no existe» o «ya existe», vuelva a ejecutarlo: están preparados para correrse sin romper ni borrar datos. Si el error persiste, cópielo y páselo al desarrollo.
 
