@@ -429,6 +429,20 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .offline-banner.show { transform: translateX(-50%) translateY(0); }
 .offline-banner__dot { width: 9px; height: 9px; border-radius: 50%; background: #fff; opacity: .9; }
 
+/* Indicador discreto de "borrador guardado" (autoguardado de formularios) */
+.autosave-tip {
+  position: fixed; right: 16px; bottom: 16px; z-index: 1150;
+  background: var(--navy, #0e1b2c); color: #fff; font-size: .8rem; font-weight: 500;
+  padding: 7px 14px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,.28);
+  opacity: 0; transform: translateY(10px); transition: opacity .25s, transform .25s; pointer-events: none;
+}
+.autosave-tip.show { opacity: .96; transform: translateY(0); }
+
+/* Accesibilidad: foco visible y claro al navegar con teclado (Tab) */
+:focus-visible { outline: 2px solid var(--gold, #c2a25a); outline-offset: 2px; border-radius: 4px; }
+.nav-item:focus-visible { outline: 2px solid var(--gold-light, #e7d3a1); outline-offset: -2px; }
+
+
 
 @media (max-width: 520px) { .cred-cut { display: block; } .cred-card { width: 100%; height: auto; min-height: 6cm; } }
 

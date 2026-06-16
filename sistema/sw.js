@@ -13,11 +13,12 @@
      de subir o eliminar) no esperan la red para cada ícono o estilo.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v4';
+const CACHE = 'lexfive-sistema-v5';
 const SHELL = [
   './',
   './index.html',
   './login.html',
+  './offline.html',
   './css/panel.css',
   './js/app.js',
   './js/auth.js',
@@ -67,7 +68,7 @@ self.addEventListener('fetch', (event) => {
   if (req.mode === 'navigate' || aceptaHtml) {
     event.respondWith(
       fetch(req).then((res) => actualizarCache(req, res))
-        .catch(() => caches.match(req).then((hit) => hit || caches.match('./index.html')))
+        .catch(() => caches.match(req).then((hit) => hit || caches.match('./offline.html') || caches.match('./index.html')))
     );
     return;
   }
