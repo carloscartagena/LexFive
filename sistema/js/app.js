@@ -550,6 +550,68 @@ function borrarImagen(kind) {
 async function saveLogosCustom() { try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
 async function saveSellosCustom() { try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {} }
 
+// ---- Intensidad (opacidad) de la marca de agua del logo en la credencial ----
+// Se guarda como porcentaje (3–40) y se sincroniza con los demás dispositivos
+// junto al resto del branding.
+function wmOpacityActual() {
+  const v = Number(localStorage.getItem('lexfive_wm_op'));
+  return (v >= 3 && v <= 40) ? v : 15;
+}
+function applyWmOpacity(pct) {
+  const p = Math.max(3, Math.min(40, Number(pct) || 15));
+  document.documentElement.style.setProperty('--cred-wm-op', (p / 100).toFixed(2));
+}
+
+// ---- Indicador de "sin conexión" (offline) ----
+// Avisa cuando no hay internet: los cambios se guardan localmente y se
+// sincronizan al volver la conexión.
+function initOfflineIndicator() {
+  let b = document.getElementById('offlineBanner');
+  if (!b) {
+    b = document.createElement('div');
+    b.id = 'offlineBanner';
+    b.className = 'offline-banner';
+    b.innerHTML = '<span class="offline-banner__dot"></span><span>Sin conexión. Lo que guarde queda en este equipo y se sincronizará al volver el internet.</span>';
+    document.body.appendChild(b);
+  }
+  const upd = () => b.classList.toggle('show', !navigator.onLine);
+  window.addEventListener('offline', upd);
+  window.addEventListener('online', () => { b.classList.remove('show'); toast('Conexión restablecida.', 'success'); });
+  upd();
+}
+
+// ---- Respaldo manual de datos (exportar a JSON) ----
+function lastBackupText() {
+  const ts = Number(localStorage.getItem('lexfive_last_backup'));
+  if (!ts) return 'Aún no ha exportado un respaldo manual.';
+  return 'Último respaldo manual: ' + new Date(ts).toLocaleString('es-BO');
+}
+async function exportarRespaldo(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Generando...'; }
+  try {
+    const tablas = ['profiles', 'clientes', 'procesos', 'consultas', 'articulos', 'testimonios',
+      'tareas', 'eventos', 'honorarios', 'pagos', 'categorias', 'credenciales'];
+    const dump = { generado: new Date().toISOString(), version: 1, tablas: {} };
+    for (const t of tablas) {
+      try { const { data } = await supabase.from(t).select('*'); dump.tablas[t] = data || []; }
+      catch (e) { dump.tablas[t] = []; }
+    }
+    const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'lexfive-respaldo-' + hoyISO() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    localStorage.setItem('lexfive_last_backup', String(Date.now()));
+    const info = document.getElementById('lastBackupInfo'); if (info) info.textContent = lastBackupText();
+    toast('Respaldo descargado en este equipo.', 'success');
+  } catch (e) {
+    toast('No se pudo generar el respaldo. Revise su conexión.', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Exportar respaldo (JSON)'; }
+  }
+}
+
 // ============================================================
 //  Configuración compartida del bufete (logo y sello) en Supabase.
 //  Antes el logo se guardaba SOLO en este navegador, por eso un
@@ -607,6 +669,7 @@ function snapshotBranding() {
     selloImg: IMG.sello || null,
     logosCustom: IMG.logosCustom || [],
     sellosCustom: IMG.sellosCustom || [],
+    wmOpacity: wmOpacityActual(),
     logosHidden: readList('lexfive_logos_hidden'),
     sellosHidden: readList('lexfive_sellos_hidden')
   };
@@ -627,6 +690,7 @@ async function hydrateBranding() {
   try {
     if (b.logoId) localStorage.setItem('lexfive_logo', b.logoId);
     if (b.selloId) localStorage.setItem('lexfive_sello', b.selloId);
+    if (b.wmOpacity) { localStorage.setItem('lexfive_wm_op', b.wmOpacity); applyWmOpacity(b.wmOpacity); }
     localStorage.setItem('lexfive_logos_hidden', JSON.stringify(b.logosHidden || []));
     localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(b.sellosHidden || []));
     // La nube es la fuente de verdad para la imagen propia.
@@ -1087,7 +1151,17 @@ async function renderDashboard() {
             </tr>`).join('')}</tbody></table></div>`
         : `<div class="empty">${ICON.audiencia}<p>No hay audiencias ni plazos próximos registrados.</p></div>`}
       </div>
-    </div>`;
+    </div>
+
+    ${state.profile.rol === 'admin' ? `
+    <div class="card">
+      <div class="card__head"><h3>${ICON.doc} Respaldos y datos</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:10px">La base de datos se respalda <strong>automáticamente cada día</strong> en GitHub (pestaña «Actions» → «Respaldo de base de datos»). Además, puede descargar cuando quiera una copia manual de los datos principales en formato JSON.</p>
+        <button class="btn btn--ghost btn--sm" id="btnExportBackup" type="button">Exportar respaldo (JSON)</button>
+        <span class="cell-sub" id="lastBackupInfo" style="margin-left:10px">${lastBackupText()}</span>
+      </div>
+    </div>` : ''}`;
 
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id));
   content().querySelectorAll('.js-recordar').forEach(btn => btn.onclick = (e) => {
@@ -1098,6 +1172,7 @@ async function renderDashboard() {
   const mc = $('#mConsultas'); if (mc) mc.onclick = () => navigate('consultas');
   const mt = $('#mTareas'); if (mt) mt.onclick = () => navigate('tareas');
   const mpc = $('#mPorCobrar'); if (mpc) mpc.onclick = () => navigate('finanzas');
+  const beb = $('#btnExportBackup'); if (beb) beb.onclick = () => exportarRespaldo(beb);
 }
 
 // ============================================================
@@ -3450,6 +3525,11 @@ async function renderCredenciales() {
       </div>
     </div>
 
+    <div class="cred-wm-control">
+      <label for="cr_wm">Intensidad del logo de fondo</label>
+      <input type="range" id="cr_wm" min="3" max="40" step="1" value="${wmOpacityActual()}">
+      <output id="cr_wm_out">${wmOpacityActual()}%</output>
+    </div>
     <p class="cell-sub" style="margin:2px 0 10px">La línea punteada alrededor de cada cara es la <strong>guía de corte</strong>: imprima y recorte por ahí. Tamaño final: 9 × 6 cm.</p>
     <div class="cred-wrap" id="credPrintArea">
       <!-- ANVERSO -->
@@ -3494,6 +3574,7 @@ async function renderCredenciales() {
 
     <div class="cred-actions">
       <button class="btn btn--primary" id="btnPrintCred">${ICON.doc} Imprimir / Guardar PDF</button>
+      <button class="btn btn--ghost" id="btnPreviewCred" type="button">Vista previa</button>
       <button class="btn" id="btnSaveCred">${ICON.llave || ''} ${credEditId ? 'Actualizar credencial' : 'Guardar credencial'}</button>
       ${credEditId ? '<button class="btn btn--ghost" id="btnSaveCredNew" type="button">Guardar como nueva</button><button class="btn btn--ghost" id="btnNewCred" type="button">Nueva credencial (limpiar)</button>' : ''}
     </div>
@@ -3504,6 +3585,7 @@ async function renderCredenciales() {
       <div class="card__body">
         ${credList.length ? `
         <p class="cell-sub" style="margin-bottom:12px">Aquí quedan guardadas todas las credenciales que creó. Puede <strong>editarlas</strong>, <strong>volver a imprimirlas</strong> o eliminarlas. Se guardan en la nube y se ven en todos los dispositivos del bufete.</p>
+        ${credList.length > 3 ? '<input type="text" class="cred-search" id="credSearch" placeholder="Buscar por nombre, CI o cargo...">' : ''}
         <div class="cred-saved-list">
           ${credList.map(c => `
             <div class="cred-saved-item" data-cred="${esc(c.id)}">
@@ -3516,7 +3598,8 @@ async function renderCredenciales() {
                 <button class="btn btn--ghost btn--sm" data-cred-del="${esc(c.id)}" type="button">Eliminar</button>
               </div>
             </div>`).join('')}
-        </div>` : '<p class="cell-sub">Todavía no ha guardado ninguna credencial. Complete los datos y pulse <strong>Guardar credencial</strong> para conservarla aquí.</p>'}
+        </div>
+        <p class="cred-saved-empty-search" id="credSearchNone" style="display:none">No se encontraron credenciales con ese texto.</p>` : '<p class="cell-sub">Todavía no ha guardado ninguna credencial. Complete los datos y pulse <strong>Guardar credencial</strong> para conservarla aquí.</p>'}
       </div>
     </div>
 
@@ -3747,6 +3830,44 @@ async function renderCredenciales() {
   if (btnRestoreSellos) btnRestoreSellos.onclick = () => { localStorage.removeItem('lexfive_sellos_hidden'); pushBranding(); renderCredenciales(); toast('Sellos restaurados.', 'success'); };
 
   $('#btnPrintCred').onclick = imprimirCredencial;
+
+  // Intensidad de la marca de agua del logo (slider).
+  applyWmOpacity(wmOpacityActual());
+  const wm = $('#cr_wm');
+  if (wm) {
+    const wmOut = $('#cr_wm_out');
+    wm.addEventListener('input', () => { applyWmOpacity(wm.value); if (wmOut) wmOut.textContent = wm.value + '%'; });
+    wm.addEventListener('change', () => { localStorage.setItem('lexfive_wm_op', wm.value); pushBranding(); });
+  }
+
+  // Vista previa de impresión: muestra ambas caras tal como saldrán.
+  const bPrev = $('#btnPreviewCred');
+  if (bPrev) bPrev.onclick = () => {
+    const area = document.getElementById('credPrintArea');
+    if (!area) return;
+    openModal('Vista previa de la credencial',
+      `<p class="cell-sub" style="margin-bottom:12px">Así se imprimirá (tamaño real aproximado). Recorte por la línea punteada. Use «Imprimir / Guardar PDF» para descargarla.</p>
+       <div class="cred-preview-stage">${area.innerHTML}</div>`,
+      [
+        { label: 'Imprimir / Guardar PDF', class: 'btn--primary', onClick: () => { closeModal(); setTimeout(imprimirCredencial, 250); } },
+        { label: 'Cerrar', onClick: closeModal }
+      ], true);
+  };
+
+  // Buscador de credenciales guardadas (filtra en vivo por nombre, CI o cargo).
+  const cs = $('#credSearch');
+  if (cs) cs.addEventListener('input', () => {
+    const q = cs.value.trim().toLowerCase();
+    let visibles = 0;
+    content().querySelectorAll('.cred-saved-item').forEach(it => {
+      const ok = !q || it.textContent.toLowerCase().includes(q);
+      it.style.display = ok ? '' : 'none';
+      if (ok) visibles++;
+    });
+    const none = $('#credSearchNone');
+    if (none) none.style.display = (visibles || !q) ? 'none' : 'block';
+  });
+
 
   // ---- Guardado, edición y eliminación de credenciales ----
   const leerCred = () => {
@@ -4261,6 +4382,10 @@ function toggleTheme() {
 
   // Escuchar cambios de logo/sello en vivo desde otros dispositivos.
   subscribeBrandingRealtime();
+
+  // Aplica la intensidad guardada del logo de fondo y activa el aviso de "sin conexión".
+  applyWmOpacity(wmOpacityActual());
+  initOfflineIndicator();
 
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();

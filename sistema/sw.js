@@ -10,7 +10,7 @@
    copia guardada. Las peticiones a Supabase y otros servicios
    externos NO se interceptan (van directo a la red).
    ========================================================= */
-const CACHE = 'lexfive-sistema-v2';
+const CACHE = 'lexfive-sistema-v3';
 const SHELL = [
   './',
   './index.html',
