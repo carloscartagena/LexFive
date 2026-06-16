@@ -203,6 +203,20 @@ function googleCalURL(inicio, resumen, detalles, lugar) {
     + (lugar ? '&location=' + encodeURIComponent(lugar) : '');
 }
 
+// Suma "n" días HÁBILES a una fecha (omite sábados y domingos).
+// Nota: no contempla feriados (varían por año y por departamento).
+function sumarDiasHabiles(fechaBase, n) {
+  const d = new Date(fechaBase);
+  if (isNaN(d)) return null;
+  let restantes = Math.max(0, parseInt(n, 10) || 0);
+  while (restantes > 0) {
+    d.setDate(d.getDate() + 1);
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) restantes--;
+  }
+  return d;
+}
+
 // Convierte filas de procesos a CSV (compatible con Excel: separador ; y BOM UTF-8).
 function procesosToCSV(rows) {
   const cab = ['Carátula', 'Número', 'NUREJ', 'Materia', 'Tipo', 'Estado', 'Juzgado', 'Cliente', 'Parte contraria', 'Abogados', 'Procuradores', 'Fecha inicio', 'Próxima audiencia'];
@@ -1231,6 +1245,25 @@ function recordarPorWhatsApp(p) {
   openModal('Recordar audiencia / plazo', body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }]);
 }
 
+// Abre un modal para recordar el COBRO de un saldo pendiente a un cliente,
+// por WhatsApp y/o correo, con un mensaje cordial pre-redactado.
+function recordarCobro(cli, saldo) {
+  if (!cli) return;
+  const texto = `Estimado/a ${cli.nombre}:\n\nLe recordamos cordialmente que su cuenta con LexFive Abogados presenta un saldo pendiente de ${fmtMoneda(saldo)}. Agradeceremos coordinar su pago a la brevedad.\n\nQuedamos atentos. Saludos cordiales,\nLexFive Abogados`;
+  const enc = encodeURIComponent(texto);
+  let tel = (cli.telefono || '').replace(/[^\d]/g, '');
+  if (tel && tel.length <= 8) tel = '591' + tel; // prefijo Bolivia si es número local
+  const wa = tel ? `https://wa.me/${tel}?text=${enc}` : '';
+  const mailto = cli.email ? `mailto:${cli.email}?subject=${encodeURIComponent('Recordatorio de pago — LexFive Abogados')}&body=${enc}` : '';
+  const body = `
+    <p class="cell-sub" style="margin-bottom:12px">Recordatorio de cobro para <strong>${esc(cli.nombre)}</strong> — saldo pendiente <strong>${fmtMoneda(saldo)}</strong>:</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${wa ? `<a class="btn" style="justify-content:flex-start;background:#25d366;color:#fff;border-color:#25d366" target="_blank" rel="noopener" href="${wa}">${ICON.whatsapp} Enviar por WhatsApp</a>` : '<p class="cell-sub">Este cliente no tiene teléfono registrado.</p>'}
+      ${mailto ? `<a class="btn btn--primary" style="justify-content:flex-start" href="${mailto}">✉️ Enviar por correo</a>` : '<p class="cell-sub">Este cliente no tiene correo registrado.</p>'}
+    </div>`;
+  openModal('Recordar cobro', body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }]);
+}
+
 // ============================================================
 //  VISTA: DASHBOARD
 // ============================================================
@@ -1702,6 +1735,16 @@ async function openPlazos(proc) {
           <div class="field"><label>Nota (opcional)</label><input id="ev_nota" placeholder="Sala, detalle..."></div>
         </div>
         <button class="btn btn--navy" id="ev_add">${ICON.plus} Agregar plazo</button>
+      </div></div>
+      <div class="card" style="margin-top:14px"><div class="card__body">
+        <h4 class="section-title" style="margin-top:0">Calculadora de plazo (días hábiles)</h4>
+        <p class="cell-sub" style="margin-bottom:10px">Calcule la fecha de vencimiento contando días hábiles (omite sábados y domingos). No incluye feriados.</p>
+        <div class="field-row">
+          <div class="field"><label>Fecha base</label><input type="date" id="pl_base" value="${new Date().toISOString().slice(0, 10)}"></div>
+          <div class="field"><label>Días hábiles</label><input type="number" id="pl_dias" min="1" value="5"></div>
+        </div>
+        <button class="btn btn--ghost btn--sm" id="pl_calc">Calcular vencimiento</button>
+        <span class="cell-sub" id="pl_result" style="margin-left:10px"></span>
       </div></div>`;
     openModal('Plazos y audiencias · ' + proc.caratula, body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }], true);
 
@@ -1735,6 +1778,23 @@ async function openPlazos(proc) {
       const e = evs.find(x => x.id === b.dataset.id);
       if (e) descargarICSEvento(e, proc.caratula);
     });
+
+    // Calculadora de plazo en días hábiles.
+    const plCalc = $('#pl_calc');
+    if (plCalc) plCalc.onclick = () => {
+      const base = $('#pl_base').value;
+      const dias = $('#pl_dias').value;
+      if (!base || !dias) { toast('Indique la fecha base y los días hábiles.', 'error'); return; }
+      const venc = sumarDiasHabiles(base + 'T00:00:00', dias);
+      if (!venc) { toast('Fecha base no válida.', 'error'); return; }
+      const iso = venc.getFullYear() + '-' + pad2(venc.getMonth() + 1) + '-' + pad2(venc.getDate());
+      $('#pl_result').innerHTML = `Vence el <strong>${fmtDate(iso)}</strong> &nbsp;<button class="btn btn--ghost btn--sm" id="pl_usar" type="button">Usar en el plazo</button>`;
+      const usar = $('#pl_usar');
+      if (usar) usar.onclick = () => {
+        const f = $('#ev_fecha'); if (f) f.value = iso + 'T09:00';
+        toast('Fecha colocada en el formulario de plazo (9:00). Ajústela si hace falta.', 'success');
+      };
+    };
   };
   await pintar();
 }
@@ -1842,13 +1902,31 @@ async function renderFinanzas() {
   const totPagos = filas.reduce((a, b) => a + b.pagos, 0);
   const totSaldo = totCargos - totPagos;
 
-  content().innerHTML = `
+  // Estado de cuenta agrupado por CLIENTE (suma de todos sus procesos).
+  const cliAgg = {};
+  filas.forEach(r => {
+    const cid = r.p.cliente_id || '__sin__';
+    const a = cliAgg[cid] || (cliAgg[cid] = { cid, cargos: 0, pagos: 0, nprocs: 0 });
+    a.cargos += r.cargos; a.pagos += r.pagos; a.nprocs += 1;
+  });
+  const filasCli = Object.values(cliAgg).map(a => ({ ...a, saldo: a.cargos - a.pagos }))
+    .sort((a, b) => b.saldo - a.saldo);
+  const nombreCli = cid => cid === '__sin__' ? 'Sin cliente asignado' : clienteName(cid);
+
+  const vista = state.finVista === 'cliente' ? 'cliente' : 'proceso';
+  const toggle = `
+    <div class="tabs-bar" role="tablist" style="margin-bottom:14px">
+      <button class="btn btn--sm ${vista === 'proceso' ? 'btn--navy' : 'btn--ghost'}" id="finTabProc" role="tab">Por proceso</button>
+      <button class="btn btn--sm ${vista === 'cliente' ? 'btn--navy' : 'btn--ghost'}" id="finTabCli" role="tab">Por cliente (estado de cuenta)</button>
+    </div>`;
+  const metrics = `
     <div class="stats-grid">
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totCargos)}</div><div class="metric__label">Honorarios facturados</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totPagos)}</div><div class="metric__label">Cobrado</div></div>
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.alerta}</div></div><div class="metric__num" style="font-size:1.5rem">${fmtMoneda(totSaldo)}</div><div class="metric__label">Por cobrar</div></div>
-    </div>
-    <div class="card"><div class="card__head"><h3>Saldo por proceso</h3>${filas.length ? `<span style="display:flex;gap:8px"><button class="btn btn--ghost btn--sm" id="btnFinCSV">${ICON.descargar} Excel</button><button class="btn btn--ghost btn--sm" id="btnRepFin">${ICON.doc} Imprimir / PDF</button></span>` : ''}</div>
+    </div>`;
+
+  const tablaProc = `<div class="card"><div class="card__head"><h3>Saldo por proceso</h3>${filas.length ? `<span style="display:flex;gap:8px"><button class="btn btn--ghost btn--sm" id="btnFinCSV">${ICON.descargar} Excel</button><button class="btn btn--ghost btn--sm" id="btnRepFin">${ICON.doc} Imprimir / PDF</button></span>` : ''}</div>
       <div class="card__body--flush">
         ${filas.length ? `<div class="table-wrap"><table class="data">
           <thead><tr><th>Proceso</th><th>Cliente</th><th>Honorarios</th><th>Pagado</th><th>Saldo</th></tr></thead>
@@ -1863,6 +1941,46 @@ async function renderFinanzas() {
         : `<div class="empty">${ICON.dinero}<p>Aún no hay honorarios ni pagos registrados. Agréguelos desde el detalle de un proceso (botón “Honorarios”).</p></div>`}
       </div>
     </div>`;
+
+  const tablaCli = `<div class="card"><div class="card__head"><h3>Estado de cuenta por cliente</h3>${filasCli.length ? `<span style="display:flex;gap:8px"><button class="btn btn--ghost btn--sm" id="btnFinCliCSV">${ICON.descargar} Excel</button></span>` : ''}</div>
+      <div class="card__body--flush">
+        ${filasCli.length ? `<div class="table-wrap"><table class="data">
+          <thead><tr><th>Cliente</th><th>Procesos</th><th>Honorarios</th><th>Pagado</th><th>Saldo</th><th></th></tr></thead>
+          <tbody>${filasCli.map(r => `
+            <tr>
+              <td class="cell-strong">${esc(nombreCli(r.cid))}</td>
+              <td>${r.nprocs}</td>
+              <td>${fmtMoneda(r.cargos)}</td>
+              <td>${fmtMoneda(r.pagos)}</td>
+              <td class="${r.saldo > 0 ? 'fin-debe' : ''}"><strong>${fmtMoneda(r.saldo)}</strong></td>
+              <td>${r.saldo > 0 && r.cid !== '__sin__' ? `<button class="btn btn--ghost btn--sm js-cobro" data-cid="${r.cid}" data-saldo="${r.saldo}">${ICON.whatsapp} Recordar cobro</button>` : ''}</td>
+            </tr>`).join('')}</tbody></table></div>`
+        : `<div class="empty">${ICON.dinero}<p>Aún no hay honorarios ni pagos registrados.</p></div>`}
+      </div>
+    </div>`;
+
+  content().innerHTML = toggle + metrics + (vista === 'cliente' ? tablaCli : tablaProc);
+
+  $('#finTabProc').onclick = () => { state.finVista = 'proceso'; renderFinanzas(); };
+  $('#finTabCli').onclick = () => { state.finVista = 'cliente'; renderFinanzas(); };
+
+  if (vista === 'cliente') {
+    content().querySelectorAll('.js-cobro').forEach(b => b.onclick = () => {
+      const cli = (state.clientes || []).find(c => c.id === b.dataset.cid);
+      if (cli) recordarCobro(cli, Number(b.dataset.saldo));
+    });
+    const btnCliCsv = $('#btnFinCliCSV');
+    if (btnCliCsv) btnCliCsv.onclick = () => {
+      const celda = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+      const lineas = [['Cliente', 'Procesos', 'Honorarios', 'Pagado', 'Saldo'].map(celda).join(';')];
+      filasCli.forEach(r => lineas.push([nombreCli(r.cid), r.nprocs, r.cargos.toFixed(2), r.pagos.toFixed(2), r.saldo.toFixed(2)].map(celda).join(';')));
+      lineas.push(['TOTALES', '', totCargos.toFixed(2), totPagos.toFixed(2), totSaldo.toFixed(2)].map(celda).join(';'));
+      descargarArchivo('estado-cuenta-clientes-' + hoyISO() + '.csv', '\ufeff' + lineas.join('\r\n'), 'text/csv;charset=utf-8');
+      toast('Estado de cuenta exportado a Excel (CSV).', 'success');
+    };
+    return;
+  }
+
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openHonorarios({ id: tr.dataset.id, caratula: tr.dataset.cara }));
   const btnFinCsv = $('#btnFinCSV');
   if (btnFinCsv) btnFinCsv.onclick = () => {
