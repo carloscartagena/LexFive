@@ -100,6 +100,12 @@ ul { list-style: none; }
 .nav-item:hover { background: rgba(255,255,255,.07); color: #fff; }
 .nav-item.active { background: var(--gold); color: var(--navy); font-weight: 600; }
 .sidebar__foot { padding: 16px; border-top: 1px solid rgba(255,255,255,.08); }
+/* El menú lateral siempre es azul oscuro, así que el botón "Cerrar sesión"
+   debe verse claro en AMBOS temas (antes en modo claro quedaba casi invisible). */
+.sidebar__foot .btn--ghost {
+  color: rgba(255,255,255,.92); border-color: rgba(255,255,255,.32); background: transparent;
+}
+.sidebar__foot .btn--ghost:hover { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.5); }
 .user-chip { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
 .avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg,var(--gold),var(--gold-dark)); color: var(--navy); display: grid; place-items: center; font-weight: 700; font-family: var(--font-serif); flex-shrink: 0; }
 .user-chip__info strong { display: block; color: #fff; font-size: .9rem; line-height: 1.2; }
@@ -346,7 +352,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-wm {
     position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
     width: 4.4cm; height: 4.4cm; object-fit: contain;
-    opacity: .07; pointer-events: none; z-index: 0;
+    opacity: .15; pointer-events: none; z-index: 0;
 }
 .cred-band, .cred-body, .cred-foot, .cred-cert, .cred-sign, .cred-note { position: relative; z-index: 1; }
 .cred-band {
@@ -722,4 +728,17 @@ html[data-theme="dark"] .badge-mat { background: rgba(194,162,90,.16); color: va
 html[data-theme="dark"] .btn--danger { background: transparent; }
 html[data-theme="dark"] .btn--ghost:hover { background: rgba(255,255,255,.06); }
 
-/* Las credenciales/carnets se mantienen con fondo blanco (están pensadas para imprimir). */
+/* Las credenciales/carnets se mantienen con fondo blanco y texto oscuro
+   (están pensadas para imprimir), sin importar el tema claro/oscuro.
+   Se fija la paleta clara dentro de la credencial para que el texto NO
+   salga gris/blanco en modo oscuro ni al descargar el PDF. */
+.cred-cut, .cred-card, .cred-cut *, .cred-card * {
+  --ink: #1a2330;
+  --navy: #0e1b2c;
+  --muted: #5c6675;
+  --gold: #c2a25a;
+  --gold-dark: #a8853c;
+  --gold-light: #e7d3a1;
+  --line: #e6e8ec;
+}
+.cred-card, #printRoot .cred-card { color: #1a2330; }
