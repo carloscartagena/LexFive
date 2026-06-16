@@ -654,6 +654,42 @@ const Branding = {
   }
 };
 
+// ============================================================
+//  Galerías de logos/sellos propios (fila aparte en la nube).
+//  Antes vivían DENTRO de la fila 'branding', que se descarga en CADA
+//  carga de página: con varias imágenes en base64 se volvía pesada y
+//  lenta. Ahora viven en la clave 'branding_galerias' y SOLO se cargan
+//  al abrir Credenciales. Requiere db/19_branding_galerias.sql.
+// ============================================================
+const Galerias = {
+  async load() {
+    try {
+      const { data } = await supabase
+        .from('configuracion').select('valor').eq('clave', 'branding_galerias').maybeSingle();
+      return (data && data.valor) || {};
+    } catch (e) { return {}; }
+  },
+  async save(obj) {
+    try {
+      const { error } = await supabase.from('configuracion').upsert({
+        clave: 'branding_galerias', valor: obj, updated_at: new Date().toISOString()
+      });
+      if (error) throw error;
+      return true;
+    } catch (e) { return false; }
+  }
+};
+function snapshotGalerias() {
+  return { logosCustom: IMG.logosCustom || [], sellosCustom: IMG.sellosCustom || [] };
+}
+// Sube las galerías a la nube (y avisa si no se pudo). Se llama al subir o
+// eliminar un logo/sello propio.
+async function pushGalerias() {
+  const ok = await Galerias.save(snapshotGalerias());
+  if (!ok) toast('El logo/sello se guardó en este equipo, pero no se pudo sincronizar. Revise su conexión.', 'error');
+  return ok;
+}
+
 // Toma una "foto" del logo/sello elegido en este equipo (selección + imágenes
 // propias + modelos ocultos) para guardarla en la nube.
 function snapshotBranding() {
@@ -680,8 +716,6 @@ function snapshotBranding() {
     logoImg: logoImg,
     selloId: selloId,
     selloImg: selloImg,
-    logosCustom: IMG.logosCustom || [],
-    sellosCustom: IMG.sellosCustom || [],
     wmOpacity: wmOpacityActual(),
     logosHidden: readList('lexfive_logos_hidden'),
     sellosHidden: readList('lexfive_sellos_hidden')
@@ -710,19 +744,23 @@ async function hydrateBranding() {
     if (b.logoImg) { IMG.logo = b.logoImg; try { await ImgDB.set('logo', b.logoImg); } catch (e) {} }
     else if (b.logoId && b.logoId !== 'custom') { IMG.logo = null; try { await ImgDB.del('logo'); } catch (e) {} localStorage.removeItem('lexfive_logo_custom'); }
     // Si la nube no trae imagen pero el logo elegido es propio (o no hay dato), se conserva el del equipo.
-    if (Array.isArray(b.logosCustom) && b.logosCustom.length) { IMG.logosCustom = b.logosCustom; try { await ImgDB.set('logosCustom', b.logosCustom); } catch (e) {} }
-    if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) { IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo }); try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
     if (b.selloImg) { IMG.sello = b.selloImg; try { await ImgDB.set('sello', b.selloImg); } catch (e) {} }
     else if (b.selloId && b.selloId !== 'custom') { IMG.sello = null; try { await ImgDB.del('sello'); } catch (e) {} localStorage.removeItem('lexfive_sello_custom'); }
-    // La nube es la fuente de verdad para la galería de sellos propios subidos.
-    if (Array.isArray(b.sellosCustom) && b.sellosCustom.length) { IMG.sellosCustom = b.sellosCustom; try { await ImgDB.set('sellosCustom', b.sellosCustom); } catch (e) {} }
+
+    // Galerías de logos/sellos propios: ahora viven en una fila aparte
+    // ('branding_galerias'). Se admite la ubicación antigua (dentro de
+    // 'branding') como respaldo, para migrar sin perder nada.
+    const g = await Galerias.load();
+    const logosG = (Array.isArray(g.logosCustom) && g.logosCustom.length) ? g.logosCustom : (Array.isArray(b.logosCustom) ? b.logosCustom : []);
+    const sellosG = (Array.isArray(g.sellosCustom) && g.sellosCustom.length) ? g.sellosCustom : (Array.isArray(b.sellosCustom) ? b.sellosCustom : []);
+    if (logosG.length) { IMG.logosCustom = logosG; try { await ImgDB.set('logosCustom', logosG); } catch (e) {} }
+    if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) { IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo }); try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
+    if (sellosG.length) { IMG.sellosCustom = sellosG; try { await ImgDB.set('sellosCustom', sellosG); } catch (e) {} }
     if (IMG.sello && !IMG.sellosCustom.some(x => x && x.img === IMG.sello)) { IMG.sellosCustom.unshift({ id: 's' + Date.now(), img: IMG.sello }); try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {} }
-    // Auto-sincronización: si la nube todavía no tiene las galerías de logos/sellos
-    // propios pero este equipo sí (p. ej. la computadora donde se subieron), se
-    // suben para que aparezcan en el celular y en los demás dispositivos.
-    const faltanLogosNube = (!Array.isArray(b.logosCustom) || !b.logosCustom.length) && IMG.logosCustom.length;
-    const faltanSellosNube = (!Array.isArray(b.sellosCustom) || !b.sellosCustom.length) && IMG.sellosCustom.length;
-    if (faltanLogosNube || faltanSellosNube) { try { await Branding.save(snapshotBranding()); } catch (e) {} }
+    // Auto-migración: si la fila de galerías aún no existe en la nube pero este
+    // equipo sí tiene galerías, se suben (para que aparezcan en otros dispositivos).
+    const faltanGalerias = (!Array.isArray(g.logosCustom) || !g.logosCustom.length) && (!Array.isArray(g.sellosCustom) || !g.sellosCustom.length);
+    if (faltanGalerias && (IMG.logosCustom.length || IMG.sellosCustom.length)) { try { await Galerias.save(snapshotGalerias()); } catch (e) {} }
   } catch (e) {}
   return b;
 }
@@ -3731,6 +3769,7 @@ async function renderCredenciales() {
     let entry = IMG.logosCustom.find(x => x && x.img === img);
     if (!entry && img) { entry = { id: 'c' + Date.now(), img }; IMG.logosCustom.push(entry); }
     await saveLogosCustom();
+    await pushGalerias();
     localStorage.setItem('lexfive_logo', entry ? 'custom:' + entry.id : 'custom');
     applyLogo('custom');
     await pushBranding();
@@ -3761,6 +3800,7 @@ async function renderCredenciales() {
     if (id.indexOf('custom:') === 0) {
       IMG.logosCustom = IMG.logosCustom.filter(x => x && x.id !== id.slice(7));
       await saveLogosCustom();
+      await pushGalerias();
     } else if (id === 'custom') {
       borrarImagen('logo');
     } else {
@@ -3859,6 +3899,7 @@ async function renderCredenciales() {
     let entry = IMG.sellosCustom.find(x => x && x.img === img);
     if (!entry && img) { entry = { id: 's' + Date.now(), img }; IMG.sellosCustom.push(entry); }
     await saveSellosCustom();
+    await pushGalerias();
     localStorage.setItem('lexfive_sello', entry ? 'custom:' + entry.id : 'custom');
     await pushBranding();
     renderCredenciales();
@@ -3888,6 +3929,7 @@ async function renderCredenciales() {
     if (id.indexOf('custom:') === 0) {
       IMG.sellosCustom = IMG.sellosCustom.filter(x => x && x.id !== id.slice(7));
       await saveSellosCustom();
+      await pushGalerias();
     } else if (id === 'custom') {
       borrarImagen('sello');
     } else {
