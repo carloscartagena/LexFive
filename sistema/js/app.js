@@ -2,7 +2,7 @@
 //  LexFive — Sistema de Gestión Legal · Lógica principal
 // ============================================================
 import { supabase } from './supabase.js';
-import { requireAuth, getProfile, signOut, signOutTo, logAccion, can } from './auth.js';
+import { requireAuth, getProfile, signOut, signOutTo, logAccion, can, withTimeout } from './auth.js';
 import { ROLES, ESTADOS, MATERIAS, WHATSAPP, ABOGADOS } from './config.js';
 
 // ---------- Estado global ----------
@@ -4646,11 +4646,65 @@ function toggleTheme() {
 // ============================================================
 //  Arranque
 // ============================================================
+
+// Muestra un estado amable mientras se conecta con la base. Incluye botones
+// para reintentar de inmediato o cerrar sesión, para que el usuario nunca se
+// quede atrapado en un "Cargando..." que no avanza.
+function mostrarEstadoArranque(intento) {
+  const cont = content();
+  if (!cont) return;
+  cont.innerHTML = `
+    <div class="loading" style="flex-direction:column;gap:14px;text-align:center;max-width:440px;margin:64px auto;">
+      <div class="spinner"></div>
+      <div>
+        <p style="margin:0 0 6px;font-weight:600;">Conectando con la base de datos…</p>
+        <p class="cell-sub" style="margin:0;">La base puede tardar unos segundos en «despertar» (plan gratuito). Reintentando automáticamente… (intento ${intento})</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn btn--primary btn--sm" id="btnReintentarArranque" type="button">Reintentar ahora</button>
+        <button class="btn btn--ghost btn--sm" id="btnSalirArranque" type="button">Cerrar sesión</button>
+      </div>
+    </div>`;
+  const salir = document.getElementById('btnSalirArranque');
+  if (salir) salir.onclick = () => signOut();
+}
+
+// Espera "ms" milisegundos, pero se interrumpe antes si el usuario pulsa
+// "Reintentar ahora".
+function esperarOReintento(ms) {
+  return new Promise((resolve) => {
+    const t = setTimeout(resolve, ms);
+    const btn = document.getElementById('btnReintentarArranque');
+    if (btn) btn.onclick = () => { clearTimeout(t); resolve(); };
+  });
+}
+
+// Carga el perfil y los usuarios con reintentos. Solo devuelve null cuando NO
+// hay sesión válida (en ese caso requireAuth ya redirige al login o cierra
+// sesión). Si la base no responde, reintenta indefinidamente con una espera
+// progresiva en vez de quedarse colgado.
+async function arrancarSesion() {
+  let intento = 0;
+  while (true) {
+    intento++;
+    try {
+      const profile = await requireAuth();
+      if (!profile) return null;
+      state.profile = profile;
+      await withTimeout(loadProfiles(), 12000, 'usuarios');
+      return profile;
+    } catch (e) {
+      console.warn('Arranque: la base no respondió a tiempo, reintentando…', e);
+      mostrarEstadoArranque(intento);
+      // Espera progresiva: 3s, 6s, 9s… (máximo 9s) antes de reintentar.
+      await esperarOReintento(Math.min(3000 * intento, 9000));
+    }
+  }
+}
+
 (async function init() {
-  const profile = await requireAuth();
+  const profile = await arrancarSesion();
   if (!profile) return;
-  state.profile = profile;
-  await loadProfiles();
 
   // Cabecera de usuario
   $('#userName').textContent = profile.nombre;

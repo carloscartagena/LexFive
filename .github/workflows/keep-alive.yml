@@ -1,13 +1,13 @@
 name: Keep-alive Supabase
 
 # Evita que el proyecto de Supabase (plan gratuito) se PAUSE por inactividad.
-# Hace una petición mínima de solo lectura a la API REST cada 3 días.
+# Hace una petición mínima de solo lectura a la API REST cada día.
 # Usa la clave PÚBLICA (publishable), por lo que no requiere configurar secretos.
 
 on:
   schedule:
-    # 06:00 UTC (02:00 Bolivia) cada 3 días
-    - cron: '0 6 */3 * *'
+    # 06:00 UTC (02:00 Bolivia) todos los días
+    - cron: '0 6 * * *'
   workflow_dispatch: {}
 
 jobs:

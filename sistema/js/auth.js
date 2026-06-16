@@ -5,22 +5,39 @@ import { supabase } from './supabase.js';
 
 let _profile = null;
 
+// Ejecuta una promesa con un TIEMPO LÍMITE. Si se excede, rechaza con un error
+// identificable (mensaje que empieza con "TIMEOUT"). Sirve para que, cuando la
+// base de Supabase (plan gratuito) está "despertando" y la primera petición
+// tarda demasiado o se cuelga, el arranque pueda detectarlo y reintentar en
+// vez de quedarse congelado para siempre en "Cargando...".
+export function withTimeout(promise, ms = 12000, label = 'operación') {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('TIMEOUT: ' + label)), ms);
+    Promise.resolve(promise).then(
+      (v) => { clearTimeout(t); resolve(v); },
+      (e) => { clearTimeout(t); reject(e); }
+    );
+  });
+}
+
 // Devuelve la sesión actual (o null)
 export async function getSession() {
   const { data } = await supabase.auth.getSession();
   return data.session;
 }
 
-// Carga (y cachea) el perfil del usuario autenticado
+// Carga (y cachea) el perfil del usuario autenticado.
+// La consulta lleva un tiempo límite: si la base no responde a tiempo (p. ej.
+// está "despertando"), LANZA un error TIMEOUT para que el arranque reintente.
 export async function getProfile(force = false) {
   if (_profile && !force) return _profile;
   const session = await getSession();
   if (!session) return null;
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', session.user.id)
-    .single();
+  const { data, error } = await withTimeout(
+    supabase.from('profiles').select('*').eq('id', session.user.id).single(),
+    12000,
+    'perfil'
+  );
   if (error) {
     console.error('Error al cargar perfil:', error);
     return null;
