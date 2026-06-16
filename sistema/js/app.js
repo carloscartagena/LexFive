@@ -216,6 +216,25 @@ function fmtMoneda(monto, moneda = 'Bs') {
   return (moneda || 'Bs') + ' ' + n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// Convierte filas de clientes a CSV (compatible con Excel).
+function clientesToCSV(rows) {
+  const cab = ['Nombre', 'Documento', 'Teléfono', 'Correo', 'Dirección', 'Notas'];
+  const celda = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lineas = [cab.map(celda).join(';')];
+  rows.forEach(c => lineas.push([c.nombre, c.documento, c.telefono, c.email, c.direccion, c.notas].map(celda).join(';')));
+  return '\ufeff' + lineas.join('\r\n');
+}
+
+// Convierte filas de honorarios + pagos a CSV.
+function honorariosToCSV(honorarios, pagos) {
+  const cab = ['Tipo', 'Proceso', 'Cliente', 'Monto', 'Fecha', 'Descripción'];
+  const celda = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lineas = [cab.map(celda).join(';')];
+  (honorarios || []).forEach(h => lineas.push(['Honorario', h.proceso || '', h.cliente || '', h.monto, h.fecha || '', h.descripcion || ''].map(celda).join(';')));
+  (pagos || []).forEach(p => lineas.push(['Pago', p.proceso || '', p.cliente || '', p.monto, p.fecha || '', p.descripcion || ''].map(celda).join(';')));
+  return '\ufeff' + lineas.join('\r\n');
+}
+
 // Convierte un monto a su importe en letras para los recibos.
 // Ej: 1500.50 -> "MIL QUINIENTOS 50/100 BOLIVIANOS".
 function montoEnLetras(monto, moneda) {
@@ -614,6 +633,74 @@ async function exportarRespaldo(btn) {
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Exportar respaldo (JSON)'; }
   }
+}
+
+// Permite abrir un archivo de respaldo JSON exportado previamente y explorar
+// su contenido en una tabla interactiva (solo lectura). No modifica la base.
+function revisarRespaldo() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json,application/json';
+  input.onchange = () => {
+    const f = input.files && input.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const dump = JSON.parse(reader.result);
+        if (!dump || !dump.tablas) { toast('El archivo no parece un respaldo válido de LexFive.', 'error'); return; }
+        const tablas = Object.keys(dump.tablas);
+        const resumen = tablas.map(t => `<tr><td class="cell-strong">${esc(t)}</td><td>${(dump.tablas[t] || []).length} registros</td></tr>`).join('');
+        const body = `
+          <p class="cell-sub" style="margin-bottom:10px">Archivo: <strong>${esc(f.name)}</strong> · Generado: ${dump.generado ? new Date(dump.generado).toLocaleString('es-BO') : 'desconocido'}</p>
+          <p class="cell-sub" style="margin-bottom:14px">Este visor es de <strong>solo lectura</strong>. No modifica la base de datos.</p>
+          <div class="table-wrap" style="max-height:320px;overflow:auto"><table class="data"><thead><tr><th>Tabla</th><th>Registros</th></tr></thead><tbody>${resumen}</tbody></table></div>
+          <p class="cell-sub" style="margin-top:12px">Haga clic en una tabla para ver sus datos en detalle.</p>`;
+        openModal('Revisar respaldo', body, [{ label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }], true);
+        // Click en una tabla para ver sus registros.
+        $('#modalBody').querySelectorAll('tr').forEach(tr => {
+          tr.style.cursor = 'pointer';
+          tr.onclick = () => {
+            const nombre = (tr.querySelector('.cell-strong') || {}).textContent;
+            const rows = dump.tablas[nombre] || [];
+            if (!rows.length) { toast('Esa tabla está vacía en el respaldo.', 'error'); return; }
+            const cols = Object.keys(rows[0]);
+            const head = cols.map(c => `<th>${esc(c)}</th>`).join('');
+            const filas = rows.slice(0, 100).map(r => `<tr>${cols.map(c => `<td style="font-size:.78rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(String(r[c] != null ? r[c] : ''))}</td>`).join('')}</tr>`).join('');
+            openModal(`${esc(nombre)} (${rows.length} registros${rows.length > 100 ? ', primeros 100' : ''})`,
+              `<div class="table-wrap" style="max-height:420px;overflow:auto"><table class="data"><thead><tr>${head}</tr></thead><tbody>${filas}</tbody></table></div>`,
+              [{ label: '← Volver', class: 'btn--ghost', onClick: () => revisarRespaldoConDump(dump, f.name) }, { label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }], true);
+          };
+        });
+      } catch (e) { toast('Error al leer el archivo. ¿Está corrupto?', 'error'); }
+    };
+    reader.readAsText(f);
+  };
+  input.click();
+}
+// Re-abre el resumen del respaldo (para el botón "← Volver" desde el detalle de una tabla).
+function revisarRespaldoConDump(dump, nombre) {
+  const tablas = Object.keys(dump.tablas);
+  const resumen = tablas.map(t => `<tr><td class="cell-strong">${esc(t)}</td><td>${(dump.tablas[t] || []).length} registros</td></tr>`).join('');
+  const body = `
+    <p class="cell-sub" style="margin-bottom:10px">Archivo: <strong>${esc(nombre)}</strong> · Generado: ${dump.generado ? new Date(dump.generado).toLocaleString('es-BO') : 'desconocido'}</p>
+    <p class="cell-sub" style="margin-bottom:14px">Este visor es de <strong>solo lectura</strong>. No modifica la base de datos.</p>
+    <div class="table-wrap" style="max-height:320px;overflow:auto"><table class="data"><thead><tr><th>Tabla</th><th>Registros</th></tr></thead><tbody>${resumen}</tbody></table></div>
+    <p class="cell-sub" style="margin-top:12px">Haga clic en una tabla para ver sus datos.</p>`;
+  openModal('Revisar respaldo', body, [{ label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }], true);
+  $('#modalBody').querySelectorAll('tr').forEach(tr => {
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => {
+      const n = (tr.querySelector('.cell-strong') || {}).textContent;
+      const rows = dump.tablas[n] || [];
+      if (!rows.length) { toast('Tabla vacía.', 'error'); return; }
+      const cols = Object.keys(rows[0]);
+      const head = cols.map(c => `<th>${esc(c)}</th>`).join('');
+      const filas = rows.slice(0, 100).map(r => `<tr>${cols.map(c => `<td style="font-size:.78rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(String(r[c] != null ? r[c] : ''))}</td>`).join('')}</tr>`).join('');
+      openModal(`${esc(n)} (${rows.length} registros${rows.length > 100 ? ', primeros 100' : ''})`,
+        `<div class="table-wrap" style="max-height:420px;overflow:auto"><table class="data"><thead><tr>${head}</tr></thead><tbody>${filas}</tbody></table></div>`,
+        [{ label: '← Volver', class: 'btn--ghost', onClick: () => revisarRespaldoConDump(dump, nombre) }, { label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }], true);
+    };
+  });
 }
 
 // ============================================================
@@ -1227,6 +1314,7 @@ async function renderDashboard() {
       <div class="card__body">
         <p class="cell-sub" style="margin-bottom:10px">La base de datos se respalda <strong>automáticamente cada día</strong> en GitHub (pestaña «Actions» → «Respaldo de base de datos»). Además, puede descargar cuando quiera una copia manual de los datos principales en formato JSON.</p>
         <button class="btn btn--ghost btn--sm" id="btnExportBackup" type="button">Exportar respaldo (JSON)</button>
+        <button class="btn btn--ghost btn--sm" id="btnRevisarBackup" type="button">Revisar un respaldo</button>
         <span class="cell-sub" id="lastBackupInfo" style="margin-left:10px">${lastBackupText()}</span>
       </div>
     </div>` : ''}`;
@@ -1241,6 +1329,7 @@ async function renderDashboard() {
   const mt = $('#mTareas'); if (mt) mt.onclick = () => navigate('tareas');
   const mpc = $('#mPorCobrar'); if (mpc) mpc.onclick = () => navigate('finanzas');
   const beb = $('#btnExportBackup'); if (beb) beb.onclick = () => exportarRespaldo(beb);
+  const brb = $('#btnRevisarBackup'); if (brb) brb.onclick = () => revisarRespaldo();
 }
 
 // ============================================================
@@ -2151,6 +2240,11 @@ async function renderProcesos() {
       <input type="search" id="qProc" placeholder="Buscar por carátula, número, juzgado..." ${hint('Escriba para filtrar la lista por carátula, número, juzgado o parte contraria.')}>
       <select id="fMateria" ${hint('Filtra los procesos por área del derecho.')}><option value="">Todas las materias</option>${state.categorias.map(m => `<option>${esc(m)}</option>`).join('')}</select>
       <select id="fEstado" ${hint('Filtra los procesos por su etapa actual.')}><option value="">Todos los estados</option>${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select>
+      <select id="fAbogado" ${hint('Filtra los procesos por abogado responsable.')}><option value="">Todos los abogados</option>${state.profiles.filter(p => p.rol === 'abogado' || p.rol === 'admin').map(p => `<option value="${p.id}">${esc(p.nombre)}</option>`).join('')}</select>
+      <div class="field-row" style="gap:6px;margin:0">
+        <input type="date" id="fDesde" ${hint('Filtra audiencias desde esta fecha.')} title="Desde" style="padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:.85rem">
+        <input type="date" id="fHasta" ${hint('Filtra audiencias hasta esta fecha.')} title="Hasta" style="padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:.85rem">
+      </div>
       <div class="spacer"></div>
       <button class="btn btn--ghost" id="btnExportCSV" ${hint('Descarga la lista filtrada en un archivo de Excel (CSV).')}>${ICON.descargar} Excel</button>
       <button class="btn btn--ghost" id="btnExportPDF" ${hint('Abre una vista para imprimir o guardar la lista filtrada como PDF.')}>${ICON.doc} PDF</button>
@@ -2163,8 +2257,13 @@ async function renderProcesos() {
   function paint() {
     const q = ($('#qProc').value || '').toLowerCase();
     const fm = $('#fMateria').value, fe = $('#fEstado').value;
+    const fa = $('#fAbogado').value;
+    const desde = $('#fDesde').value, hasta = $('#fHasta').value;
     const rows = procesos.filter(p =>
       (!fm || p.materia === fm) && (!fe || p.estado === fe) &&
+      (!fa || (p.abogados_ids || []).includes(fa) || p.abogado_id === fa) &&
+      (!desde || (p.proxima_audiencia && p.proxima_audiencia >= desde)) &&
+      (!hasta || (p.proxima_audiencia && p.proxima_audiencia.slice(0, 10) <= hasta)) &&
       (!q || [p.caratula, p.numero, p.juzgado, p.parte_contraria].some(v => (v || '').toLowerCase().includes(q))));
     filtradas = rows;
     const info = paginar(rows, page);
@@ -2186,6 +2285,7 @@ async function renderProcesos() {
   paint();
   const rePaint = () => { page = 1; paint(); };
   $('#qProc').oninput = rePaint; $('#fMateria').onchange = rePaint; $('#fEstado').onchange = rePaint;
+  $('#fAbogado').onchange = rePaint; $('#fDesde').onchange = rePaint; $('#fHasta').onchange = rePaint;
   $('#btnNuevoProc').onclick = () => procesoForm();
   $('#btnExportCSV').onclick = () => {
     if (!filtradas.length) { toast('No hay procesos para exportar.', 'error'); return; }
@@ -2367,9 +2467,10 @@ async function openProcesoDetail(id, readonly = false) {
 
     <h4 class="section-title">Memoriales y documentos${tip('Documentos generales del caso (poder, carátula, anexos). Para la respuesta del juzgado y el nuevo memorial, mejor adjúntelos en el paso correspondiente del historial de abajo.')}</h4>
     ${readonly ? '' : `<div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-      <div style="flex-grow:1;min-width:180px;"><label style="font-size:.8rem;">Subir archivo (PDF, Word, imagen...)</label><input type="file" id="docFile"></div>
+      <div style="flex-grow:1;min-width:180px;"><label style="font-size:.8rem;">Subir archivo (PDF, Word, imagen... máx. 10 MB)</label><input type="file" id="docFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.txt,.png,.jpg,.jpeg,.webp,.gif,.svg"></div>
       <input id="docNombre" placeholder="Descripción (ej: Memorial de respuesta)" style="flex-grow:1;min-width:180px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
       <button class="btn btn--navy" id="btnUpload">Subir</button>
+      <span class="cell-sub" id="docPreview"></span>
     </div>`}
     <div id="docList">${renderDocs((docs || []).filter(d => !d.actuacion_id), readonly)}</div>
 
@@ -2407,9 +2508,22 @@ async function openProcesoDetail(id, readonly = false) {
   buttons.forEach(b => { const x = document.createElement('button'); x.className = 'btn ' + b.class; x.textContent = b.label; x.onclick = b.onClick; foot.appendChild(x); });
 
   // Subir documento (solo personal)
-  if ($('#btnUpload')) $('#btnUpload').onclick = async () => {
+  if ($('#btnUpload')) {
+    // Vista previa al seleccionar archivo + validación de tamaño.
+    const docFileEl = $('#docFile');
+    if (docFileEl) docFileEl.onchange = () => {
+      const pv = $('#docPreview');
+      const f = docFileEl.files && docFileEl.files[0];
+      if (!f) { if (pv) pv.textContent = ''; return; }
+      if (f.size > 10 * 1024 * 1024) { toast('El archivo pesa más de 10 MB. Elija uno más liviano.', 'error'); docFileEl.value = ''; if (pv) pv.textContent = ''; return; }
+      const ext = f.name.split('.').pop().toLowerCase();
+      const tipoIcono = { pdf: '📄', doc: '📝', docx: '📝', xls: '📊', xlsx: '📊', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', webp: '🖼️', gif: '🖼️' };
+      if (pv) pv.innerHTML = `${tipoIcono[ext] || '📎'} <strong>${esc(f.name)}</strong> (${(f.size / 1024).toFixed(0)} KB)`;
+    };
+    $('#btnUpload').onclick = async () => {
     const file = $('#docFile').files[0];
     if (!file) { toast('Seleccione un archivo.', 'error'); return; }
+    if (file.size > 10 * 1024 * 1024) { toast('El archivo pesa más de 10 MB. Elija uno más liviano.', 'error'); return; }
     $('#btnUpload').disabled = true; $('#btnUpload').textContent = 'Subiendo...';
     const path = `${id}/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
     const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
@@ -2425,7 +2539,9 @@ async function openProcesoDetail(id, readonly = false) {
       toast('Documento cargado.', 'success');
     }
     $('#btnUpload').disabled = false; $('#btnUpload').textContent = 'Subir'; $('#docNombre').value = ''; $('#docFile').value = '';
+    const pv2 = $('#docPreview'); if (pv2) pv2.textContent = '';
   };
+  }
   wireDocs(id);
 
   // Helper: recarga el historial (actuaciones + sus documentos) y reconecta botones
@@ -2721,6 +2837,7 @@ async function renderClientes() {
     <div class="toolbar">
       <input type="search" id="qCli" placeholder="Buscar cliente...">
       <div class="spacer"></div>
+      <button class="btn btn--ghost" id="btnExportCli" ${hint('Descarga la lista de clientes en un archivo de Excel (CSV).')}>${ICON.descargar} Excel</button>
       <button class="btn btn--primary" id="btnNuevoCli">${ICON.plus} Nuevo cliente</button>
     </div>
     <div class="card"><div class="card__body--flush"><div id="cliTable"></div></div></div>`;
@@ -2741,6 +2858,11 @@ async function renderClientes() {
   paint();
   $('#qCli').oninput = () => { page = 1; paint(); };
   $('#btnNuevoCli').onclick = () => clienteForm();
+  $('#btnExportCli').onclick = () => {
+    if (!state.clientes.length) { toast('No hay clientes para exportar.', 'error'); return; }
+    descargarArchivo('clientes-lexfive-' + hoyISO() + '.csv', clientesToCSV(state.clientes), 'text/csv;charset=utf-8');
+    toast('Lista de clientes exportada a Excel (CSV).', 'success');
+  };
 }
 
 function clienteForm(cli = null) {
@@ -4592,4 +4714,31 @@ function toggleTheme() {
   // Vista inicial según el rol
   navigate(profile.rol === 'cliente' ? 'misprocesos' : 'dashboard');
   if (profile.rol === 'cliente') updateNovedadesBadge();
+
+  // Recordatorio automático de audiencias vencidas/próximas al abrir el panel.
+  if (profile.rol !== 'cliente') {
+    const lastRemind = Number(localStorage.getItem('lexfive_remind_ts') || 0);
+    const now = Date.now();
+    // Solo avisar una vez cada 4 horas (para no molestar en cada recarga).
+    if (now - lastRemind > 4 * 60 * 60 * 1000) {
+      (async () => {
+        try {
+          const { data: pp } = await supabase.from('procesos').select('caratula,proxima_audiencia,estado')
+            .eq('eliminado', false).not('proxima_audiencia', 'is', null);
+          if (!pp || !pp.length) return;
+          const ahora = new Date();
+          const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+          const vencidas = pp.filter(p => new Date(p.proxima_audiencia) < ahora && !['archivado', 'concluido'].includes(p.estado));
+          const proximas = pp.filter(p => { const d = new Date(p.proxima_audiencia); return d >= ahora && d <= en7 && !['archivado', 'concluido'].includes(p.estado); });
+          if (vencidas.length || proximas.length) {
+            const msgs = [];
+            if (vencidas.length) msgs.push(vencidas.length + ' audiencia(s) VENCIDA(S)');
+            if (proximas.length) msgs.push(proximas.length + ' audiencia(s) en los próximos 7 días');
+            toast('Atención: ' + msgs.join(' y ') + '. Revise el panel general.', vencidas.length ? 'error' : '');
+            localStorage.setItem('lexfive_remind_ts', String(now));
+          }
+        } catch (e) {}
+      })();
+    }
+  }
 })();
