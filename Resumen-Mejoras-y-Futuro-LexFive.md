@@ -62,6 +62,7 @@ Para que el sistema funcione, en Supabase (SQL Editor) se ejecutaron los scripts
 | `14_papelera_procesos.sql` | Papelera de procesos |
 | `15_recibos_correlativos.sql` | Numeración correlativa de recibos de pago |
 | `16_papelera_clientes.sql` | Papelera de clientes |
+| `17_credenciales.sql` | Credenciales del bufete compartidas en la nube |
 
 > Regla práctica: cada vez que se agregue una función que necesite base de datos, habrá un nuevo script `db/NN_*.sql` que se ejecuta **una sola vez** en Supabase.
 
