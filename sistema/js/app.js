@@ -4444,7 +4444,6 @@ function verImagenGrande(src, titulo, nombreArchivo) {
 // Aplica el logo elegido en todo el panel (inyecta un estilo que sobreescribe
 // el fondo del .logo__mark). Se guarda en este equipo (localStorage).
 function applyLogo(id) {
-function applyLogo(id) {
   // Calcula la URL del logo. Para logos propios ('custom') usa la imagen en
   // memoria y, si no está cargada, la última imagen conocida (caché). Si no hay
   // ninguna imagen, NO se sobrescribe el estilo (así no aparece el logo por
