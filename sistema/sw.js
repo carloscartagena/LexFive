@@ -15,7 +15,7 @@
      segundo plano. Así el panel se siente rápido.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v6';
+const CACHE = 'lexfive-sistema-v7';
 const SHELL = [
   './',
   './index.html',
@@ -102,5 +102,35 @@ self.addEventListener('fetch', (event) => {
   // Resto: red con respaldo en caché.
   event.respondWith(
     fetch(req).then((res) => actualizarCache(req, res)).catch(() => caches.match(req))
+  );
+});
+
+// ---------------------------------------------------------
+//  Notificaciones push (función #10 — Fase A)
+//  Muestra la notificación que llega desde el servidor (Edge Function)
+//  y, al hacer clic, abre el sistema.
+// ---------------------------------------------------------
+self.addEventListener('push', (event) => {
+  let data = { title: 'LexFive', body: '', url: './index.html' };
+  try { if (event.data) data = Object.assign(data, event.data.json()); }
+  catch (e) { if (event.data) data.body = event.data.text(); }
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'LexFive', {
+      body: data.body || '',
+      icon: '../assets/pwa/icon-192.png',
+      badge: '../assets/pwa/icon-192.png',
+      data: { url: data.url || './index.html' }
+    })
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const destino = (event.notification.data && event.notification.data.url) || './index.html';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((wins) => {
+      for (const w of wins) { if ('focus' in w) return w.focus(); }
+      if (self.clients.openWindow) return self.clients.openWindow(destino);
+    })
   );
 });

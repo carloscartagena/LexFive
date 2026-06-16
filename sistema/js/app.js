@@ -3,7 +3,7 @@
 // ============================================================
 import { supabase } from './supabase.js';
 import { requireAuth, getProfile, signOut, signOutTo, logAccion, can, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from './auth.js';
-import { ROLES, ESTADOS, MATERIAS, WHATSAPP, ABOGADOS } from './config.js';
+import { ROLES, ESTADOS, MATERIAS, WHATSAPP, ABOGADOS, VAPID_PUBLIC_KEY } from './config.js';
 
 // ---------- Estado global ----------
 const state = {
@@ -1395,6 +1395,7 @@ async function renderDashboard() {
       <div class="card__body">
         <p class="cell-sub" style="margin-bottom:10px">Active la <strong>verificación en dos pasos (2FA)</strong> para proteger su acceso: además de la contraseña, se le pedirá un código que genera una app en su teléfono (Google Authenticator, Microsoft Authenticator, Authy…).</p>
         <button class="btn btn--ghost btn--sm" id="btn2FA" type="button">Verificación en dos pasos</button>
+        <button class="btn btn--ghost btn--sm" id="btnPush" type="button">Notificaciones</button>
       </div>
     </div>` : ''}
 
@@ -1421,6 +1422,7 @@ async function renderDashboard() {
   const beb = $('#btnExportBackup'); if (beb) beb.onclick = () => exportarRespaldo(beb);
   const brb = $('#btnRevisarBackup'); if (brb) brb.onclick = () => revisarRespaldo();
   const b2fa = $('#btn2FA'); if (b2fa) b2fa.onclick = () => openSeguridad2FA();
+  const bpush = $('#btnPush'); if (bpush) bpush.onclick = () => openNotificaciones();
 }
 
 // ============================================================
@@ -1474,6 +1476,90 @@ async function openSeguridad2FA() {
       } },
     { label: 'Cancelar', class: 'btn--ghost', onClick: async () => { try { await mfaUnenroll(factorId); } catch (e) {} closeModal(); } }
   ], true);
+}
+
+// ============================================================
+//  NOTIFICACIONES PUSH (función #10 — Fase A: activar + prueba local)
+// ============================================================
+async function openNotificaciones() {
+  const soporta = ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
+  if (!soporta) {
+    openModal('Notificaciones', '<p class="cell-sub">Este navegador no soporta notificaciones push. En iPhone/iPad primero debe <strong>instalar la app</strong> en la pantalla de inicio (iOS 16.4+).</p>', [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }]);
+    return;
+  }
+  openModal('Notificaciones', '<div class="loading"><div class="spinner"></div>Cargando...</div>', [], true);
+  const reg = await navigator.serviceWorker.ready;
+  const sub = await reg.pushManager.getSubscription();
+  const activo = !!sub && Notification.permission === 'granted';
+  const estado = Notification.permission === 'denied'
+    ? 'El permiso está <strong>bloqueado</strong> en este navegador. Actívelo desde la configuración del sitio (el candado junto a la dirección).'
+    : (activo ? 'Las notificaciones están <strong style="color:var(--navy,#0e1b2c)">ACTIVADAS</strong> en este dispositivo.' : 'Las notificaciones están <strong>desactivadas</strong> en este dispositivo.');
+  const body = `
+    <p class="cell-sub" style="margin-bottom:10px">${estado}</p>
+    <p class="cell-sub">Cuando estén activas, recibirá avisos de audiencias y plazos próximos aunque el sistema esté cerrado. <em>(El envío automático se completa en una fase posterior; por ahora puede probar una notificación local.)</em></p>`;
+  const botones = [];
+  if (activo) {
+    botones.push({ label: 'Enviar prueba', class: 'btn--ghost', onClick: async () => {
+      const r = await navigator.serviceWorker.ready;
+      r.showNotification('LexFive — prueba', { body: 'Las notificaciones funcionan en este dispositivo. ✅', icon: '../assets/pwa/icon-192.png' });
+    } });
+    botones.push({ label: 'Desactivar', class: 'btn--danger', onClick: async () => {
+      try {
+        const s = await (await navigator.serviceWorker.ready).pushManager.getSubscription();
+        if (s) { await supabase.from('push_subscriptions').delete().eq('endpoint', s.endpoint); await s.unsubscribe(); }
+        toast('Notificaciones desactivadas en este dispositivo.', 'success');
+      } catch (e) { toast('No se pudo desactivar.', 'error'); }
+      closeModal();
+    } });
+  } else if (Notification.permission !== 'denied') {
+    botones.push({ label: 'Activar', class: 'btn--primary', onClick: async () => { await activarPush(); closeModal(); } });
+  }
+  botones.push({ label: 'Cerrar', class: 'btn--ghost', onClick: closeModal });
+  openModal('Notificaciones', body, botones, true);
+}
+
+async function activarPush() {
+  try {
+    const permiso = await Notification.requestPermission();
+    if (permiso !== 'granted') { toast('No se concedió el permiso de notificaciones.', 'error'); return; }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+    const json = sub.toJSON();
+    const { error } = await supabase.from('push_subscriptions').upsert({
+      user_id: state.profile.id,
+      endpoint: json.endpoint,
+      p256dh: json.keys.p256dh,
+      auth: json.keys.auth
+    }, { onConflict: 'endpoint' });
+    if (error) {
+      if (/push_subscriptions/.test(error.message) && /exist|relation/i.test(error.message)) {
+        toast('Falta crear la tabla. Ejecute db/22_push_subscriptions.sql en Supabase.', 'error');
+      } else {
+        toast('Activado en el navegador, pero no se pudo guardar: ' + error.message, 'error');
+      }
+      return;
+    }
+    toast('Notificaciones activadas en este dispositivo.', 'success');
+  } catch (e) {
+    toast('No se pudieron activar las notificaciones.', 'error');
+    console.error('push:', e);
+  }
+}
+
+// Convierte la clave VAPID (base64url) al formato que exige pushManager.subscribe.
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  const arr = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
 }
 
 // ============================================================
