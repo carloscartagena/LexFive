@@ -650,6 +650,35 @@ async function hydrateBranding() {
   return b;
 }
 
+// ============================================================
+//  Branding en tiempo real: si el logo o el sello del bufete cambia en
+//  otro dispositivo, este equipo lo aplica al instante (sin recargar).
+//  Requiere haber ejecutado db/18_realtime_branding.sql en Supabase.
+// ============================================================
+let brandingRealtimeOn = false;
+function subscribeBrandingRealtime() {
+  if (brandingRealtimeOn) return;
+  brandingRealtimeOn = true;
+  try {
+    supabase
+      .channel('lexfive-branding')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'configuracion', filter: 'clave=eq.branding' },
+        async () => {
+          try {
+            await ensureImgCache();
+            await hydrateBranding();
+            const lg = localStorage.getItem('lexfive_logo'); if (lg) applyLogo(lg);
+            // Si está abierta la pestaña de Credenciales, se refresca para ver
+            // los nuevos logos/sellos (el formulario se recupera del autoguardado).
+            if (state.view === 'credenciales') { try { await renderCredenciales(); } catch (e) {} }
+            else { toast('Se actualizó el logo o sello del bufete en este dispositivo.', 'success'); }
+          } catch (e) {}
+        })
+      .subscribe();
+  } catch (e) { brandingRealtimeOn = false; }
+}
+
 // Texto amistoso de "hace cuánto" se guardó el borrador
 function draftAgo(ts) {
   if (!ts) return 'hace un momento';
@@ -4224,6 +4253,9 @@ function toggleTheme() {
     if (b.logoImg) IMG.logo = b.logoImg;
     if (b.logoId) { localStorage.setItem('lexfive_logo', b.logoId); applyLogo(b.logoId); }
   }).catch(() => {});
+
+  // Escuchar cambios de logo/sello en vivo desde otros dispositivos.
+  subscribeBrandingRealtime();
 
   // Eventos globales
   $('#btnLogout').onclick = () => signOut();
