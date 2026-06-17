@@ -144,6 +144,25 @@ function descargarArchivo(nombre, contenido, mime = 'text/plain;charset=utf-8') 
   setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
+// --- Operaciones de Storage con TIEMPO LÍMITE ---------------------------------
+// Suben/descargan documentos sin riesgo de quedarse colgados para siempre. Si la
+// red no responde a tiempo, devuelven { error } (no lanzan), para que los botones
+// se reactiven y el usuario reciba un aviso, en vez de un "Subiendo..." eterno.
+async function subirDocumento(path, file) {
+  try {
+    return await withTimeout(supabase.storage.from('documentos').upload(path, file), 30000, 'subida de archivo');
+  } catch (e) {
+    return { error: (e instanceof Error) ? e : new Error(String(e)) };
+  }
+}
+async function enlaceDocumento(path) {
+  try {
+    return await withTimeout(supabase.storage.from('documentos').createSignedUrl(path, 120), 15000, 'enlace de descarga');
+  } catch (e) {
+    return { error: (e instanceof Error) ? e : new Error(String(e)) };
+  }
+}
+
 function pad2(n) { return String(n).padStart(2, '0'); }
 
 // Convierte una fecha a formato UTC para iCalendar (AAAAMMDDTHHMMSSZ).
@@ -2841,7 +2860,7 @@ async function saveProceso(proc) {
       const file = fileInput && fileInput.files[0];
       if (file) {
         const path = `${nuevo.id}/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
-        const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+        const { error: upErr } = await subirDocumento(path, file);
         if (!upErr) {
           await supabase.from('documentos').insert({ proceso_id: nuevo.id, nombre: file.name, tipo: 'memorial', storage_path: path, subido_por: state.profile.id });
         }
@@ -2943,7 +2962,7 @@ async function openProcesoDetail(id, readonly = false) {
     if (file.size > 10 * 1024 * 1024) { toast('El archivo pesa más de 10 MB. Elija uno más liviano.', 'error'); return; }
     $('#btnUpload').disabled = true; $('#btnUpload').textContent = 'Subiendo...';
     const path = `${id}/${Date.now()}_${file.name.replace(/[^\w.\-]/g, '_')}`;
-    const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+    const { error: upErr } = await subirDocumento(path, file);
     if (upErr) { toast('Error al subir: ' + upErr.message, 'error'); $('#btnUpload').disabled = false; $('#btnUpload').textContent = 'Subir'; return; }
     const { error: insErr } = await supabase.from('documentos').insert({
       proceso_id: id, nombre: $('#docNombre').value.trim() || file.name, tipo: 'memorial', storage_path: path, subido_por: state.profile.id
@@ -3008,7 +3027,7 @@ async function openProcesoDetail(id, readonly = false) {
       if (file.size > 10 * 1024 * 1024) { fallos++; continue; }
       prog.textContent = `Subiendo adjunto ${i + 1} de ${archivos.length}...`;
       const path = `${id}/${Date.now()}_${i}_${file.name.replace(/[^\w.\-]/g, '_')}`;
-      const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+      const { error: upErr } = await subirDocumento(path, file);
       if (upErr) { fallos++; continue; }
       const { error: insErr } = await supabase.from('documentos').insert({
         proceso_id: id, actuacion_id: actData.id, nombre: file.name, tipo: 'actuacion',
@@ -3059,7 +3078,7 @@ function wireDocs(procId) {
     const path = row.dataset.path, docId = row.dataset.id;
     const dl = row.querySelector('.js-dl');
     if (dl) dl.onclick = async () => {
-      const { data, error } = await supabase.storage.from('documentos').createSignedUrl(path, 120);
+      const { data, error } = await enlaceDocumento(path);
       if (error) { toast('No se pudo generar el enlace.', 'error'); return; }
       window.open(data.signedUrl, '_blank');
     };
@@ -3096,7 +3115,7 @@ function wireTimelineDocs(procId, readonly, reload) {
     const path = row.dataset.path, docId = row.dataset.id;
     const dl = row.querySelector('.js-tl-dl');
     if (dl) dl.onclick = async () => {
-      const { data, error } = await supabase.storage.from('documentos').createSignedUrl(path, 120);
+      const { data, error } = await enlaceDocumento(path);
       if (error) { toast('No se pudo generar el enlace.', 'error'); return; }
       window.open(data.signedUrl, '_blank');
     };
@@ -3790,7 +3809,7 @@ async function renderModelos() {
       </div>`).join('');
 
     $('#md_list').querySelectorAll('.js-dl').forEach(b => b.onclick = async () => {
-      const { data: d, error } = await supabase.storage.from('documentos').createSignedUrl(b.dataset.path, 120);
+      const { data: d, error } = await enlaceDocumento(b.dataset.path);
       if (error) { toast('No se pudo generar el enlace.', 'error'); return; }
       window.open(d.signedUrl, '_blank');
     });
@@ -3829,7 +3848,7 @@ async function renderModelos() {
         : file.name.replace(/\.[^.]+$/, '');
       const safe = file.name.replace(/[^\w.\-]/g, '_');
       const path = `modelos/${area.toLowerCase()}/${Date.now()}_${i}_${safe}`;
-      const { error: upErr } = await supabase.storage.from('documentos').upload(path, file);
+      const { error: upErr } = await subirDocumento(path, file);
       if (upErr) { fallos++; continue; }
       const { error: insErr } = await supabase.from('modelos').insert({
         nombre: baseName, categoria: area, storage_path: path, subido_por: state.profile.id
