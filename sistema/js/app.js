@@ -3971,9 +3971,13 @@ async function deleteConsulta(c) {
 // ============================================================
 async function renderCredenciales() {
   loading();
-  await ensureImgCache();
-  await hydrateBranding();
-  const credList = await CredStore.list();
+  // Blindaje: si la carga de imágenes/branding/credenciales se cuelga o falla,
+  // NO dejamos la vista atascada en "Cargando..."; se renderiza igual con lo
+  // que haya disponible (mismo criterio que el arranque con reintentos).
+  try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) { console.warn('Credenciales: ensureImgCache falló/timeout', e); }
+  try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) { console.warn('Credenciales: hydrateBranding falló/timeout', e); }
+  let credList = [];
+  try { credList = (await withTimeout(CredStore.list(), 8000, 'credenciales')) || []; } catch (e) { console.warn('Credenciales: CredStore.list falló/timeout', e); credList = []; }
   const p = state.profile;
   const rolLabel = ROLES[p.rol] || p.rol;
 
