@@ -1525,10 +1525,26 @@ async function activarPush() {
     const reg = await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
     if (!sub) {
-      sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-      });
+      try {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        });
+      } catch (subErr) {
+        console.error('push subscribe:', subErr);
+        openModal('No se pudo activar', `
+          <p class="cell-sub">El navegador no permitió crear la suscripción de notificaciones.</p>
+          <p class="cell-sub" style="margin-top:10px"><strong>Si usa Brave</strong> (es lo más común): las push vienen desactivadas. Actívelas así:</p>
+          <ol class="cell-sub" style="margin:6px 0 0 18px">
+            <li>Abra una pestaña nueva y vaya a <code>brave://settings/privacy</code></li>
+            <li>Active <strong>«Usar los servicios de Google para la mensajería push»</strong></li>
+            <li><strong>Cierre y vuelva a abrir Brave</strong> y reintente aquí.</li>
+          </ol>
+          <p class="cell-sub" style="margin-top:10px">También funciona en <strong>Chrome</strong> o <strong>Edge</strong> sin configurar nada. En iPhone/iPad, primero instale la app en la pantalla de inicio (iOS 16.4+).</p>
+          <p class="cell-sub" style="margin-top:10px;opacity:.65">Detalle técnico: ${esc(subErr && subErr.message ? subErr.message : String(subErr))}</p>`,
+          [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }], true);
+        return;
+      }
     }
     const json = sub.toJSON();
     const { error } = await supabase.from('push_subscriptions').upsert({
@@ -1547,8 +1563,8 @@ async function activarPush() {
     }
     toast('Notificaciones activadas en este dispositivo.', 'success');
   } catch (e) {
-    toast('No se pudieron activar las notificaciones.', 'error');
     console.error('push:', e);
+    toast('No se pudieron activar: ' + (e && e.message ? e.message : e), 'error');
   }
 }
 
