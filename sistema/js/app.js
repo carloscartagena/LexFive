@@ -1500,8 +1500,20 @@ async function openNotificaciones() {
   const botones = [];
   if (activo) {
     botones.push({ label: 'Enviar prueba', class: 'btn--ghost', onClick: async () => {
-      const r = await navigator.serviceWorker.ready;
-      r.showNotification('LexFive — prueba', { body: 'Las notificaciones funcionan en este dispositivo. ✅', icon: '../assets/pwa/icon-192.png' });
+      try {
+        const r = await navigator.serviceWorker.ready;
+        await r.showNotification('LexFive — prueba ✅', {
+          body: 'Si ve esto, las notificaciones funcionan en este dispositivo.',
+          icon: '../assets/pwa/icon-192.png',
+          badge: '../assets/pwa/icon-192.png',
+          requireInteraction: true,
+          tag: 'lexfive-prueba'
+        });
+        toast('Notificación enviada. Si no aparece, revise en Windows: «No molestar» desactivado y notificaciones permitidas para Chrome.', 'success');
+      } catch (e) {
+        console.error('showNotification:', e);
+        toast('No se pudo mostrar la notificación: ' + (e && e.message ? e.message : e), 'error');
+      }
     } });
     botones.push({ label: 'Desactivar', class: 'btn--danger', onClick: async () => {
       try {
