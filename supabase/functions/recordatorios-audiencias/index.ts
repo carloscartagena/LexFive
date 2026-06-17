@@ -19,6 +19,8 @@
 //  Ver la guía completa en: RECORDATORIOS-SETUP.md
 // ============================================================
 
+import webpush from "npm:web-push@3.6.7";
+
 interface Perfil { id: string; nombre: string; email: string | null; }
 interface Proceso { id: string; caratula: string; numero: string | null; juzgado: string | null; proxima_audiencia: string | null; abogados_ids: string[] | null; abogado_id: string | null; estado: string | null; }
 interface Evento { id: string; proceso_id: string; titulo: string; tipo: string; fecha: string; estado: string; }
@@ -28,6 +30,8 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const MAIL_FROM = Deno.env.get("MAIL_FROM") ?? "LexFive <onboarding@resend.dev>";
 const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
+const VAPID_PUBLIC = Deno.env.get("VAPID_PUBLIC") ?? "";
+const VAPID_PRIVATE = Deno.env.get("VAPID_PRIVATE") ?? "";
 
 const esc = (s: string) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
@@ -94,14 +98,21 @@ Deno.serve(async (req) => {
     // Agrupar por destinatario (abogados responsables).
     type Item = { hora: string; titulo: string; detalle: string };
     const porEmail = new Map<string, { nombre: string; items: Item[] }>();
+    const porUser = new Map<string, Item[]>();
 
     const agregar = (abogadosIds: string[] | null, abogadoId: string | null, item: Item) => {
       const ids = (abogadosIds && abogadosIds.length) ? abogadosIds : (abogadoId ? [abogadoId] : []);
       for (const id of ids) {
         const perfil = perfilPorId.get(id);
-        if (!perfil || !perfil.email) continue;
-        if (!porEmail.has(perfil.email)) porEmail.set(perfil.email, { nombre: perfil.nombre, items: [] });
-        porEmail.get(perfil.email)!.items.push(item);
+        if (!perfil) continue;
+        // Correo (si el abogado tiene email).
+        if (perfil.email) {
+          if (!porEmail.has(perfil.email)) porEmail.set(perfil.email, { nombre: perfil.nombre, items: [] });
+          porEmail.get(perfil.email)!.items.push(item);
+        }
+        // Push (por id de usuario; se enviará a sus dispositivos suscritos).
+        if (!porUser.has(id)) porUser.set(id, []);
+        porUser.get(id)!.push(item);
       }
     };
 
@@ -150,8 +161,46 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ---- Notificaciones push (a los abogados que las activaron) ----
+    let pushEnviados = 0, pushBorradas = 0;
+    if (VAPID_PUBLIC && VAPID_PRIVATE && porUser.size) {
+      try {
+        webpush.setVapidDetails("mailto:notificaciones@lexfive.app", VAPID_PUBLIC, VAPID_PRIVATE);
+        const userIds = [...porUser.keys()];
+        const subs = await sb(`push_subscriptions?select=id,user_id,endpoint,p256dh,auth&user_id=in.(${userIds.join(",")})`);
+        for (const s of subs) {
+          const items = (porUser.get(s.user_id) ?? []).slice().sort((a, b) => a.hora.localeCompare(b.hora));
+          if (!items.length) continue;
+          const payload = JSON.stringify({
+            title: items.length === 1 ? "Recordatorio LexFive" : `LexFive: ${items.length} para mañana`,
+            body: items.slice(0, 4).map((it) => `${it.hora} · ${it.titulo}`).join("\n"),
+            url: "https://lexfive.netlify.app/sistema/index.html",
+          });
+          try {
+            await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload);
+            pushEnviados++;
+          } catch (err) {
+            const code = (err as any)?.statusCode;
+            if (code === 404 || code === 410) {
+              // Suscripción dada de baja: la eliminamos.
+              await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions?id=eq.${s.id}`, {
+                method: "DELETE",
+                headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+              });
+              pushBorradas++;
+            } else {
+              console.error("push error", code, (err as any)?.body ?? (err as Error)?.message);
+            }
+          }
+        }
+      } catch (e) {
+        console.error("push general", (e as Error).message);
+      }
+    }
+
     return new Response(JSON.stringify({
       ok: true, fecha: etiqueta, destinatarios: porEmail.size, enviados, errores,
+      push: { enviados: pushEnviados, borradas: pushBorradas },
       audiencias: procesos.length, eventos: eventos.length,
     }), { headers: { "Content-Type": "application/json" } });
   } catch (e) {

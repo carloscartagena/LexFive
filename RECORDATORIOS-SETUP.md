@@ -108,3 +108,54 @@ select cron.unschedule('recordatorios-lexfive');
   registrados en la pestaña *Plazos* que caigan al día siguiente.
 - Es independiente del sitio web: si algún día no configura esto, el resto del
   sistema funciona igual; solo no se enviarán los correos automáticos.
+
+
+---
+
+## Notificaciones push (además del correo) — Fase B/C
+
+La misma función `recordatorios-audiencias` puede enviar también **notificaciones
+push** (avisos al teléfono/PC aunque el sistema esté cerrado) a los abogados que
+las hayan **activado** desde *Panel → Seguridad de la cuenta → Notificaciones*.
+
+> Requisito previo: ejecutar el script `db/22_push_subscriptions.sql` en Supabase
+> (crea la tabla de suscripciones) — ya hecho en la Fase A.
+
+### 1. Cargar las claves VAPID como secretos en Supabase
+
+Las claves ya están generadas. La **pública** vive en `sistema/js/config.js`; la
+**privada** es secreta y se carga así (con el CLI de Supabase):
+
+```bash
+supabase secrets set VAPID_PUBLIC=BJuUujdB6P6tH48gmshCfa63RaqbteCF59mUulKGQLi2H6c-yA-Qpl1w9FVCwOaBzALpaorRmhlC9Zhnv1Pr2rM
+supabase secrets set VAPID_PRIVATE=LA_CLAVE_PRIVADA_QUE_LE_PASARON_EN_EL_CHAT
+```
+
+> La clave privada **no** está en el repositorio (por seguridad). Si la perdió,
+> se puede regenerar el par y actualizar la pública en `config.js`.
+
+### 2. Re-desplegar la función
+
+```bash
+supabase functions deploy recordatorios-audiencias --no-verify-jwt
+```
+
+### 3. Programar el envío diario (cron) con GitHub Actions
+
+Ya se incluye el workflow `.github/workflows/recordatorios.yml` (08:00 Bolivia).
+Solo falta crear **un secreto de repositorio** en GitHub:
+
+- Repositorio → **Settings → Secrets and variables → Actions → New repository secret**
+- **Name:** `CRON_SECRET`
+- **Secret:** el mismo texto que puso en `supabase secrets set CRON_SECRET=...`
+
+Para probar: pestaña **Actions** → *Recordatorios diarios (correo + push)* → **Run workflow**.
+La respuesta incluye `push: { enviados, borradas }` además del conteo de correos.
+
+### Notas
+
+- Si no configura las claves VAPID, la función simplemente **no envía push**
+  (sigue enviando los correos con normalidad).
+- En iPhone/iPad el abogado debe **instalar la app** en la pantalla de inicio
+  (iOS 16.4+) para recibir push. En Android y PC funciona en el navegador.
+- Las suscripciones de dispositivos dados de baja se eliminan solas (errores 404/410).

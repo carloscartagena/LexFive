@@ -1,0 +1,29 @@
+name: Recordatorios diarios (correo + push)
+
+# Llama una vez al día a la Edge Function "recordatorios-audiencias", que envía
+# a cada abogado un correo y/o una notificación push con sus audiencias y plazos
+# del día siguiente. Requiere el secreto de repositorio CRON_SECRET (el mismo
+# valor configurado como secreto en Supabase).
+
+on:
+  schedule:
+    # 12:00 UTC = 08:00 en Bolivia (UTC-4), todos los días.
+    - cron: '0 12 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  enviar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar recordatorios
+        run: |
+          URL="https://soazmibvesvuwgxeealo.supabase.co/functions/v1/recordatorios-audiencias"
+          code=$(curl -s -o /tmp/resp.txt -w "%{http_code}" --max-time 60 -X POST "$URL" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}")
+          echo "HTTP $code"
+          cat /tmp/resp.txt; echo
+          if [ "$code" != "200" ]; then
+            echo "::error::La función respondió $code (se esperaba 200)"
+            exit 1
+          fi
+          echo "Recordatorios disparados OK"
