@@ -15,7 +15,7 @@
      segundo plano. Así el panel se siente rápido.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v7';
+const CACHE = 'lexfive-sistema-v8';
 const SHELL = [
   './',
   './index.html',
@@ -75,11 +75,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // JavaScript de la app: RED PRIMERO. Así, tras un despliegue, el navegador
-  // ejecuta siempre la última versión y no se queda con código viejo (que era
-  // lo que dejaba el panel atascado en "Cargando..."). Si no hay internet,
-  // usa la copia en caché como respaldo.
-  if (/\.m?js$/i.test(url.pathname)) {
+  // JavaScript y CSS de la app: RED PRIMERO. Así, tras un despliegue, el
+  // navegador usa siempre la última versión y no se queda con código o estilos
+  // viejos (esto evitaba que los arreglos visuales no aparecieran hasta recargar
+  // dos veces). Si no hay internet, usa la copia en caché como respaldo.
+  if (/\.(?:m?js|css)$/i.test(url.pathname)) {
     event.respondWith(
       fetch(req).then((res) => actualizarCache(req, res))
         .catch(() => caches.match(req))
