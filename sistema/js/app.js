@@ -163,6 +163,28 @@ async function enlaceDocumento(path) {
   }
 }
 
+// Devuelve la fuente de una imagen de galería: la URL de Storage (nuevo) o el
+// data URL antiguo en base64 (compatibilidad). Así conviven los dos formatos.
+function srcDe(item) { return (item && (item.url || item.img)) || ''; }
+
+// Sube una imagen (data URL) al bucket PÚBLICO "branding" de Storage y devuelve
+// su URL pública. Si algo falla (p. ej. el bucket aún no existe, o no hay red),
+// devuelve null y el sistema sigue funcionando guardando la imagen como antes
+// (base64), sin romperse. Requiere db/23_branding_storage.sql.
+async function subirImagenBranding(dataUrl, prefijo) {
+  try {
+    if (!dataUrl || dataUrl.indexOf('data:') !== 0) return null;
+    const blob = await (await fetch(dataUrl)).blob();
+    const tipo = blob.type || 'image/png';
+    const ext = tipo.indexOf('svg') >= 0 ? 'svg' : tipo.indexOf('webp') >= 0 ? 'webp' : tipo.indexOf('jpeg') >= 0 ? 'jpg' : 'png';
+    const path = (prefijo || 'img') + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+    const up = await withTimeout(supabase.storage.from('branding').upload(path, blob, { contentType: tipo, upsert: true }), 30000, 'subida de imagen');
+    if (up.error) return null;
+    const { data } = supabase.storage.from('branding').getPublicUrl(path);
+    return (data && data.publicUrl) || null;
+  } catch (e) { return null; }
+}
+
 function pad2(n) { return String(n).padStart(2, '0'); }
 
 // Convierte una fecha a formato UTC para iCalendar (AAAAMMDDTHHMMSSZ).
@@ -605,13 +627,13 @@ async function ensureImgCache() {
   // Galería de logos propios subidos (varios). Antes solo había un espacio,
   // por eso al subir uno nuevo se perdía el anterior; ahora se conservan todos.
   IMG.logosCustom = (await ImgDB.get('logosCustom')) || [];
-  if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) {
+  if (IMG.logo && !IMG.logosCustom.some(x => x && srcDe(x) === IMG.logo)) {
     IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo });
     try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {}
   }
   // Galería de sellos propios subidos (varios), igual que los logos.
   IMG.sellosCustom = (await ImgDB.get('sellosCustom')) || [];
-  if (IMG.sello && !IMG.sellosCustom.some(x => x && x.img === IMG.sello)) {
+  if (IMG.sello && !IMG.sellosCustom.some(x => x && srcDe(x) === IMG.sello)) {
     IMG.sellosCustom.unshift({ id: 's' + Date.now(), img: IMG.sello });
     try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {}
   }
@@ -916,9 +938,9 @@ async function hydrateBranding() {
     const logosG = (Array.isArray(g.logosCustom) && g.logosCustom.length) ? g.logosCustom : (Array.isArray(b.logosCustom) ? b.logosCustom : []);
     const sellosG = (Array.isArray(g.sellosCustom) && g.sellosCustom.length) ? g.sellosCustom : (Array.isArray(b.sellosCustom) ? b.sellosCustom : []);
     if (logosG.length) { IMG.logosCustom = logosG; try { await ImgDB.set('logosCustom', logosG); } catch (e) {} }
-    if (IMG.logo && !IMG.logosCustom.some(x => x && x.img === IMG.logo)) { IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo }); try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
+    if (IMG.logo && !IMG.logosCustom.some(x => x && srcDe(x) === IMG.logo)) { IMG.logosCustom.unshift({ id: 'c' + Date.now(), img: IMG.logo }); try { await ImgDB.set('logosCustom', IMG.logosCustom); } catch (e) {} }
     if (sellosG.length) { IMG.sellosCustom = sellosG; try { await ImgDB.set('sellosCustom', sellosG); } catch (e) {} }
-    if (IMG.sello && !IMG.sellosCustom.some(x => x && x.img === IMG.sello)) { IMG.sellosCustom.unshift({ id: 's' + Date.now(), img: IMG.sello }); try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {} }
+    if (IMG.sello && !IMG.sellosCustom.some(x => x && srcDe(x) === IMG.sello)) { IMG.sellosCustom.unshift({ id: 's' + Date.now(), img: IMG.sello }); try { await ImgDB.set('sellosCustom', IMG.sellosCustom); } catch (e) {} }
     // Auto-migración: si la fila de galerías aún no existe en la nube pero este
     // equipo sí tiene galerías, se suben (para que aparezcan en otros dispositivos).
     const faltanGalerias = (!Array.isArray(g.logosCustom) || !g.logosCustom.length) && (!Array.isArray(g.sellosCustom) || !g.sellosCustom.length);
@@ -4090,13 +4112,13 @@ async function renderCredenciales() {
 
   // Devuelven la fuente correcta: archivo del repo o imagen subida por el bufete (data URL)
   const logoSrc = id => {
-    if (id && id.indexOf('custom:') === 0) { const lc = findCustom(id.slice(7)); return (lc && lc.img) || ''; }
-    if (id === 'custom') return IMG.logo || (IMG.logosCustom[0] && IMG.logosCustom[0].img) || '';
+    if (id && id.indexOf('custom:') === 0) { const lc = findCustom(id.slice(7)); return srcDe(lc); }
+    if (id === 'custom') return IMG.logo || srcDe(IMG.logosCustom[0]);
     return `../assets/logos/${id}.svg`;
   };
   const selloSrc = id => {
-    if (id && id.indexOf('custom:') === 0) { const sc = findSello(id.slice(7)); return (sc && sc.img) || ''; }
-    if (id === 'custom') return IMG.sello || (IMG.sellosCustom[0] && IMG.sellosCustom[0].img) || '';
+    if (id && id.indexOf('custom:') === 0) { const sc = findSello(id.slice(7)); return srcDe(sc); }
+    if (id === 'custom') return IMG.sello || srcDe(IMG.sellosCustom[0]);
     return `../assets/sellos/${id}.svg`;
   };
 
@@ -4132,7 +4154,7 @@ async function renderCredenciales() {
           ${IMG.logosCustom.map((lc, i) => `
             <div class="logo-option ${logoActual === 'custom:' + lc.id ? 'is-selected' : ''}" data-logo="custom:${lc.id}">
               <button class="tile-del" data-del-logo="custom:${lc.id}" type="button" title="Quitar este logo">&times;</button>
-              <img src="${lc.img}" alt="Mi logo ${i + 1}">
+              <img src="${srcDe(lc)}" alt="Mi logo ${i + 1}">
               <span>Mi logo ${i + 1}</span>
             </div>`).join('')}
           <button class="logo-option logo-upload" id="btnUploadLogo" type="button">
@@ -4167,7 +4189,7 @@ async function renderCredenciales() {
           ${IMG.sellosCustom.map((sc, i) => `
             <div class="logo-option sello-option ${selloActual === 'custom:' + sc.id ? 'is-selected' : ''}" data-sello="custom:${sc.id}">
               <button class="tile-del" data-del-sello="custom:${sc.id}" type="button" title="Quitar este sello">&times;</button>
-              <img src="${sc.img}" alt="Mi sello ${i + 1}">
+              <img src="${srcDe(sc)}" alt="Mi sello ${i + 1}">
               <span>Mi sello ${i + 1}</span>
             </div>`).join('')}
           <button class="logo-option logo-upload" id="btnUploadSello" type="button">
@@ -4325,7 +4347,7 @@ async function renderCredenciales() {
     logoSel = id;
     if (id.indexOf('custom:') === 0) {
       const lc = findCustom(id.slice(7));
-      if (lc) { IMG.logo = lc.img; try { await ImgDB.set('logo', lc.img); } catch (e) {} localStorage.setItem('lexfive_logo_custom', '1'); }
+      if (lc) { const s = srcDe(lc); IMG.logo = s; try { await ImgDB.set('logo', s); } catch (e) {} localStorage.setItem('lexfive_logo_custom', '1'); }
     }
     localStorage.setItem('lexfive_logo', id);
     content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === tile));
@@ -4346,9 +4368,15 @@ async function renderCredenciales() {
   if (btnUploadLogo) btnUploadLogo.onclick = () => fileLogo.click();
   // Tras subir un logo, lo AGREGA a la galería (sin borrar los anteriores) y lo deja seleccionado.
   const trasSubirLogo = async () => {
-    const img = IMG.logo;
-    let entry = IMG.logosCustom.find(x => x && x.img === img);
-    if (!entry && img) { entry = { id: 'c' + Date.now(), img }; IMG.logosCustom.push(entry); }
+    let img = IMG.logo;
+    // Subir a Storage y quedarnos con la URL pública (mucho más liviano que el
+    // base64). Si falla, se conserva el base64 como antes (sin romper nada).
+    if (img && img.indexOf('data:') === 0) {
+      const url = await subirImagenBranding(img, 'logos');
+      if (url) { img = url; IMG.logo = url; try { await ImgDB.set('logo', url); } catch (e) {} }
+    }
+    let entry = IMG.logosCustom.find(x => x && srcDe(x) === img);
+    if (!entry && img) { entry = (img.indexOf('http') === 0) ? { id: 'c' + Date.now(), url: img } : { id: 'c' + Date.now(), img }; IMG.logosCustom.push(entry); }
     await saveLogosCustom();
     await pushGalerias();
     localStorage.setItem('lexfive_logo', entry ? 'custom:' + entry.id : 'custom');
@@ -4396,7 +4424,7 @@ async function renderCredenciales() {
     if (!valida) {
       const vis = LOGOS.filter(l => readList('lexfive_logos_hidden').indexOf(l.id) === -1);
       let nuevo;
-      if (IMG.logosCustom.length) { const f = IMG.logosCustom[0]; nuevo = 'custom:' + f.id; IMG.logo = f.img; try { await ImgDB.set('logo', f.img); } catch (er) {} }
+      if (IMG.logosCustom.length) { const f = IMG.logosCustom[0]; nuevo = 'custom:' + f.id; const s = srcDe(f); IMG.logo = s; try { await ImgDB.set('logo', s); } catch (er) {} }
       else { IMG.logo = null; try { await ImgDB.del('logo'); } catch (er) {} nuevo = vis.length ? vis[0].id : LOGO_DEFAULT; }
       localStorage.setItem('lexfive_logo', nuevo); applyLogo(nuevo);
     }
@@ -4459,7 +4487,7 @@ async function renderCredenciales() {
   content().querySelectorAll('.sello-option[data-sello]').forEach(tile => tile.onclick = async () => {
     const id = tile.dataset.sello;
     selloElegido = id;
-    if (id.indexOf('custom:') === 0) { const sc = findSello(id.slice(7)); if (sc) { IMG.sello = sc.img; try { await ImgDB.set('sello', sc.img); } catch (e) {} localStorage.setItem('lexfive_sello_custom', '1'); } }
+    if (id.indexOf('custom:') === 0) { const sc = findSello(id.slice(7)); if (sc) { const s = srcDe(sc); IMG.sello = s; try { await ImgDB.set('sello', s); } catch (e) {} localStorage.setItem('lexfive_sello_custom', '1'); } }
     localStorage.setItem('lexfive_sello', id);
     content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === tile));
     const prev = $('#selloPreview'); if (prev) prev.src = selloSrc(id);
@@ -4476,9 +4504,13 @@ async function renderCredenciales() {
   if (btnUploadSello) btnUploadSello.onclick = () => fileSello.click();
   // Tras subir un sello, lo AGREGA a la galería (sin borrar los anteriores) y lo deja seleccionado.
   const trasSubirSello = async () => {
-    const img = IMG.sello;
-    let entry = IMG.sellosCustom.find(x => x && x.img === img);
-    if (!entry && img) { entry = { id: 's' + Date.now(), img }; IMG.sellosCustom.push(entry); }
+    let img = IMG.sello;
+    if (img && img.indexOf('data:') === 0) {
+      const url = await subirImagenBranding(img, 'sellos');
+      if (url) { img = url; IMG.sello = url; try { await ImgDB.set('sello', url); } catch (e) {} }
+    }
+    let entry = IMG.sellosCustom.find(x => x && srcDe(x) === img);
+    if (!entry && img) { entry = (img.indexOf('http') === 0) ? { id: 's' + Date.now(), url: img } : { id: 's' + Date.now(), img }; IMG.sellosCustom.push(entry); }
     await saveSellosCustom();
     await pushGalerias();
     localStorage.setItem('lexfive_sello', entry ? 'custom:' + entry.id : 'custom');
@@ -4524,7 +4556,7 @@ async function renderCredenciales() {
     if (!valida) {
       const vis = SELLOS.filter(s => readList('lexfive_sellos_hidden').indexOf(s.id) === -1);
       let nuevo;
-      if (IMG.sellosCustom.length) { const f = IMG.sellosCustom[0]; nuevo = 'custom:' + f.id; IMG.sello = f.img; try { await ImgDB.set('sello', f.img); } catch (er) {} }
+      if (IMG.sellosCustom.length) { const f = IMG.sellosCustom[0]; nuevo = 'custom:' + f.id; const s = srcDe(f); IMG.sello = s; try { await ImgDB.set('sello', s); } catch (er) {} }
       else { IMG.sello = null; try { await ImgDB.del('sello'); } catch (er) {} nuevo = vis.length ? vis[0].id : SELLO_DEFAULT; }
       localStorage.setItem('lexfive_sello', nuevo);
     }
