@@ -4204,7 +4204,7 @@ async function renderCredenciales() {
           <div class="field"><label>Fecha de emisión</label><input id="cr_emision" type="date" value="${esc(datos.emision)}"></div>
         </div>
         <div class="field-row">
-          <div class="field"><label>Válido hasta (automático · 3 años)</label><input id="cr_validez_view" type="text" readonly value="" style="background:#f4f5f7;font-weight:600"></div>
+          <div class="field"><label>Válido hasta (automático · 3 años)</label><input id="cr_validez_view" type="text" readonly value="" style="background:#f4f5f7;color:#0e1b2c;font-weight:600"></div>
           <div class="field">
             <label>Foto del procurador (2,5 × 2,5)</label>
             <div style="display:flex;align-items:center;gap:8px">
@@ -4295,8 +4295,9 @@ async function renderCredenciales() {
                 <span class="cell-sub">${esc(c.cargo || '')}${c.ci ? ' &middot; CI ' + esc(c.ci) : ''}${c.emision ? ' &middot; Emisión ' + esc(fmtFechaCorta(c.emision)) : ''}</span>
               </div>
               <div class="cred-saved-item__actions">
+                <button class="btn btn--primary btn--sm" data-cred-print="${esc(c.id)}" type="button">${ICON.doc} Imprimir / PDF</button>
                 <button class="btn btn--ghost btn--sm" data-cred-edit="${esc(c.id)}" type="button">Editar</button>
-                <button class="btn btn--ghost btn--sm" data-cred-del="${esc(c.id)}" type="button">Eliminar</button>
+                <button class="btn btn--danger btn--sm" data-cred-del="${esc(c.id)}" type="button">Eliminar</button>
               </div>
             </div>`).join('')}
         </div>
@@ -4613,6 +4614,22 @@ async function renderCredenciales() {
     renderCredenciales();
     toast('Formulario listo para una credencial nueva.', 'success');
   };
+  content().querySelectorAll('[data-cred-print]').forEach(b => b.onclick = async () => {
+    const rec = credList.find(c => c.id === b.dataset.credPrint);
+    if (!rec) return;
+    credEditId = rec.id;
+    Draft.save('credencial', {
+      nombre: rec.nombre || '', cargo: rec.cargo || '', ci: rec.ci || '',
+      telPersonal: rec.telPersonal || '', telOficina: rec.telOficina || '',
+      emision: rec.emision || hoyISO(), validez: rec.validez || '',
+      frase: rec.frase || '', representacion: rec.representacion || ''
+    });
+    if (rec.foto) { IMG.foto = rec.foto; try { await ImgDB.set('foto', rec.foto); } catch (e) {} }
+    else { borrarImagen('foto'); }
+    await renderCredenciales();
+    toast('Preparando la credencial para imprimir/descargar...', 'success');
+    setTimeout(imprimirCredencial, 250);
+  });
   content().querySelectorAll('[data-cred-edit]').forEach(b => b.onclick = async () => {
     const rec = credList.find(c => c.id === b.dataset.credEdit);
     if (!rec) return;
@@ -4942,7 +4959,27 @@ function navigate(key) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
   $('#pageTitle').textContent = VIEWS[key].title;
   $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show');
-  VIEWS[key].render();
+  // Render con red de seguridad: si la vista falla o tarda demasiado, en vez de
+  // quedarse en "Cargando..." se muestra un aviso con botón para reintentar.
+  const cont = content();
+  let settled = false;
+  Promise.resolve().then(() => VIEWS[key].render())
+    .then(() => { settled = true; })
+    .catch((e) => {
+      settled = true;
+      console.error('Error al cargar la vista «' + key + '»', e);
+      if (cont && state.view === key) {
+        cont.innerHTML = '<div class="empty"><p>No se pudo cargar esta sección.</p><button class="btn btn--primary btn--sm" id="btnReintentarVista" type="button">Reintentar</button></div>';
+        const r = document.getElementById('btnReintentarVista'); if (r) r.onclick = () => navigate(key);
+      }
+    });
+  setTimeout(() => {
+    if (settled || state.view !== key) return;
+    if (cont && cont.querySelector('.loading')) {
+      cont.innerHTML = '<div class="empty"><p>Esta sección está tardando más de lo normal. Puede reintentar.</p><button class="btn btn--primary btn--sm" id="btnReintentarVista" type="button">Reintentar</button></div>';
+      const r = document.getElementById('btnReintentarVista'); if (r) r.onclick = () => navigate(key);
+    }
+  }, 15000);
 }
 
 function buildSidebar() {

@@ -772,6 +772,12 @@ html[data-theme="dark"] .badge-mat { background: rgba(194,162,90,.16); color: va
 html[data-theme="dark"] .btn--danger { background: transparent; }
 html[data-theme="dark"] .btn--ghost:hover { background: rgba(255,255,255,.06); }
 
+/* Lista de credenciales guardadas: en modo oscuro la fila tenía fondo claro
+   fijo, lo que dejaba los botones (Editar/Eliminar) y el nombre ilegibles.
+   Se usa la superficie oscura del tema y se aclara el nombre. */
+html[data-theme="dark"] .cred-saved-item { background: var(--white); border-color: var(--line); }
+html[data-theme="dark"] .cred-saved-item__info strong { color: #eaf0f7; }
+
 /* Las credenciales/carnets se mantienen con fondo blanco y texto oscuro
    (están pensadas para imprimir), sin importar el tema claro/oscuro.
    Se fija la paleta clara dentro de la credencial para que el texto NO
