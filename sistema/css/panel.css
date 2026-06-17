@@ -182,7 +182,7 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 .modal__head h3 { font-family: var(--font-serif); font-size: 1.45rem; color: var(--navy); font-weight: 600; }
 .modal__close { background: none; border: none; font-size: 1.6rem; color: var(--muted); line-height: 1; }
 .modal__body { padding: 24px; max-height: 70vh; overflow-y: auto; }
-.modal__foot { padding: 16px 24px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; gap: 10px; }
+.modal__foot { padding: 16px 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 
 /* ---------- Detalle de proceso ---------- */
 .detail-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 24px; margin-bottom: 8px; }
@@ -230,6 +230,12 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
   .stats-grid { grid-template-columns: 1fr; }
   .content { padding: 18px; }
   .topbar { padding: 0 16px; }
+  /* Modal en celular: menos relleno y botones del pie que se reparten y
+     envuelven, para que ninguno se salga del cuadro. */
+  .modal__head { padding: 16px 16px; }
+  .modal__body { padding: 18px 16px; }
+  .modal__foot { padding: 14px 16px; gap: 8px; }
+  .modal__foot .btn { flex: 1 1 130px; justify-content: center; }
 }
 
 
