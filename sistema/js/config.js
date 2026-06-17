@@ -6,6 +6,10 @@
 export const SUPABASE_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
 export const SUPABASE_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
 
+// Clave PÚBLICA VAPID para notificaciones push (es pública y segura en el navegador).
+// La clave privada va como secreto en Supabase (Edge Function), nunca aquí.
+export const VAPID_PUBLIC_KEY = 'BJuUujdB6P6tH48gmshCfa63RaqbteCF59mUulKGQLi2H6c-yA-Qpl1w9FVCwOaBzALpaorRmhlC9Zhnv1Pr2rM';
+
 // Etiquetas legibles para roles, estados y materias
 export const ROLES = {
   admin:      'Administrador',
