@@ -4016,7 +4016,14 @@ async function renderCredenciales() {
   // NO dejamos la vista atascada en "Cargando..."; se renderiza igual con lo
   // que haya disponible (mismo criterio que el arranque con reintentos).
   try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) { console.warn('Credenciales: ensureImgCache falló/timeout', e); }
-  try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) { console.warn('Credenciales: hydrateBranding falló/timeout', e); }
+  // Solo trae el branding de la nube la PRIMERA vez en la sesión. Así, al
+  // re-renderizar tras subir/eliminar/seleccionar un logo o sello, ya NO vuelve
+  // a descargar todas las galerías (eso hacía lenta cada acción). Los cambios
+  // hechos en otros dispositivos llegan por el canal en tiempo real, que sí re-hidrata.
+  if (!state.brandingHydrated) {
+    try { await withTimeout(hydrateBranding(), 8000, 'branding'); state.brandingHydrated = true; }
+    catch (e) { console.warn('Credenciales: hydrateBranding falló/timeout', e); }
+  }
   let credList = [];
   try { credList = (await withTimeout(CredStore.list(), 8000, 'credenciales')) || []; } catch (e) { console.warn('Credenciales: CredStore.list falló/timeout', e); credList = []; }
   const p = state.profile;
@@ -4342,15 +4349,14 @@ async function renderCredenciales() {
   // Selección de logo: aplica al sistema (se guarda en este equipo)
   let logoSel = logoActual;
   const nombreLogo = id => (id && id.indexOf('custom') === 0) ? 'logo-lexfive.png' : id + '.svg';
-  content().querySelectorAll('.logo-option[data-logo]').forEach(tile => tile.onclick = async () => {
-    const id = tile.dataset.logo;
+  const aplicarLogo = async (id) => {
     logoSel = id;
     if (id.indexOf('custom:') === 0) {
       const lc = findCustom(id.slice(7));
       if (lc) { const s = srcDe(lc); IMG.logo = s; try { await ImgDB.set('logo', s); } catch (e) {} localStorage.setItem('lexfive_logo_custom', '1'); }
     }
     localStorage.setItem('lexfive_logo', id);
-    content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b === tile));
+    content().querySelectorAll('.logo-option[data-logo]').forEach(b => b.classList.toggle('is-selected', b.dataset.logo === id));
     const cv = $('#cv_logo'); if (cv) cv.src = logoSrc(id);
     const cvb = $('#cv_logo_back'); if (cvb) cvb.src = logoSrc(id);
     const pv = $('#logoPreviewBig'); if (pv) pv.src = logoSrc(id);
@@ -4358,6 +4364,12 @@ async function renderCredenciales() {
     applyLogo(id);
     pushBranding();
     toast('Logo aplicado. Se usará en todo el sistema y en todos los dispositivos.', 'success');
+  };
+  // Al hacer clic en una miniatura, primero se MUESTRA en grande y ahí se
+  // confirma si usarla (antes se aplicaba de golpe al primer clic).
+  content().querySelectorAll('.logo-option[data-logo]').forEach(tile => tile.onclick = () => {
+    const id = tile.dataset.logo;
+    previewSeleccion(logoSrc(id), 'logo', () => aplicarLogo(id));
   });
   const btnLogoBig = $('#btnLogoBig');
   if (btnLogoBig) btnLogoBig.onclick = () => verImagenGrande(logoSrc(logoSel), 'Logo del bufete', nombreLogo(logoSel));
@@ -4484,16 +4496,19 @@ async function renderCredenciales() {
 
   // Selección de sello: se guarda en este equipo y actualiza vista previa, descarga e impresión
   let selloElegido = selloActual;
-  content().querySelectorAll('.sello-option[data-sello]').forEach(tile => tile.onclick = async () => {
-    const id = tile.dataset.sello;
+  const aplicarSello = async (id) => {
     selloElegido = id;
     if (id.indexOf('custom:') === 0) { const sc = findSello(id.slice(7)); if (sc) { const s = srcDe(sc); IMG.sello = s; try { await ImgDB.set('sello', s); } catch (e) {} localStorage.setItem('lexfive_sello_custom', '1'); } }
     localStorage.setItem('lexfive_sello', id);
-    content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b === tile));
+    content().querySelectorAll('.sello-option[data-sello]').forEach(b => b.classList.toggle('is-selected', b.dataset.sello === id));
     const prev = $('#selloPreview'); if (prev) prev.src = selloSrc(id);
     const dl = $('#selloDownload'); if (dl) { dl.href = selloSrc(id); dl.setAttribute('download', (id && id.indexOf('custom') === 0) ? 'sello-lexfive.png' : id + '.svg'); }
     pushBranding();
     toast('Sello seleccionado. Listo para memoriales y documentos.', 'success');
+  };
+  content().querySelectorAll('.sello-option[data-sello]').forEach(tile => tile.onclick = () => {
+    const id = tile.dataset.sello;
+    previewSeleccion(selloSrc(id), 'sello', () => aplicarSello(id));
   });
   const btnSelloBig = $('#btnSelloBig');
   if (btnSelloBig) btnSelloBig.onclick = () => verImagenGrande(selloSrc(selloElegido), 'Sello del bufete', (selloElegido && selloElegido.indexOf('custom') === 0) ? 'sello-lexfive.png' : selloElegido + '.svg');
@@ -4878,6 +4893,18 @@ function abrirEditorImagen(file, opts, onDone) {
 }
 
 // Vista previa en grande de un logo o sello, con opción de descargar a tamaño completo.
+// Muestra un logo/sello EN GRANDE y permite confirmar si usarlo (en vez de
+// aplicarlo al primer clic). El fondo blanco asegura que el sello se vea.
+function previewSeleccion(src, tipo, onUsar) {
+  if (!src) { toast('No hay imagen para mostrar.', 'error'); return; }
+  const esSello = tipo === 'sello';
+  const body = `<div style="text-align:center"><img src="${src}" alt="" style="max-width:100%;max-height:55vh;background:#fff;border-radius:10px;padding:12px"></div>`;
+  openModal(esSello ? 'Vista del sello' : 'Vista del logo', body, [
+    { label: esSello ? 'Usar este sello' : 'Usar este logo', class: 'btn--primary', onClick: () => { closeModal(); onUsar(); } },
+    { label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }
+  ], true);
+}
+
 function verImagenGrande(src, titulo, nombreArchivo) {
   if (!src) { toast('No hay imagen para mostrar.', 'error'); return; }
   const o = document.createElement('div');

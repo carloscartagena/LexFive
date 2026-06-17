@@ -571,7 +571,8 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 
 /* ---------- Sello del bufete ---------- */
 .sello-box { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
-.sello-img { width: 150px; height: 150px; }
+.sello-img { width: 150px; height: 150px; background: #fff; border-radius: 8px; padding: 8px; }
+.sello-option img { background: #fff; border-radius: 6px; }
 .sello-actions { display: flex; flex-direction: column; gap: 8px; }
 
 
