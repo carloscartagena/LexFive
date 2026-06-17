@@ -4681,19 +4681,49 @@ function leerImagenBufete(file, kind, done) {
     toast('Formato no válido. Use SVG o PNG (de preferencia con fondo transparente).', 'error');
     return;
   }
-  if (file.size > 2 * 1024 * 1024) {
-    toast('La imagen pesa demasiado (máx. 2 MB). Exporte una versión más liviana.', 'error');
+  if (file.size > 5 * 1024 * 1024) {
+    toast('La imagen pesa demasiado (máx. 5 MB). Exporte una versión más liviana.', 'error');
     return;
   }
   const reader = new FileReader();
   reader.onload = async () => {
-    const ok = await guardarImagen(kind, reader.result);
-    if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
-    localStorage.setItem('lexfive_' + kind, 'custom');
-    if (typeof done === 'function') done();
+    const guardar = async (dataUrl) => {
+      const ok = await guardarImagen(kind, dataUrl);
+      if (!ok) { toast('No se pudo guardar la imagen. Intente con una más liviana.', 'error'); return; }
+      localStorage.setItem('lexfive_' + kind, 'custom');
+      if (typeof done === 'function') done();
+    };
+    const esSvg = file.type === 'image/svg+xml' || ext === 'svg';
+    // Los SVG son livianos y escalables: se guardan tal cual. Las imágenes de
+    // mapa de bits (PNG/JPG/WebP) se REDIMENSIONAN a máx. 600 px y se recomprimen,
+    // para que pesen poco (subida y carga rápidas) y no inflen la base de datos.
+    if (esSvg) { guardar(reader.result); }
+    else { redimensionarDataUrl(reader.result, 600, (peq) => guardar(peq)); }
   };
   reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
   reader.readAsDataURL(file);
+}
+
+// Redimensiona una imagen (data URL) para que su lado mayor no supere "maxLado",
+// recomprimiéndola en PNG (conserva transparencia). Si ya es pequeña o algo falla,
+// devuelve la original. Reduce mucho el peso de logos/sellos subidos como foto.
+function redimensionarDataUrl(dataUrl, maxLado, cb) {
+  try {
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      if (!w || !h || (w <= maxLado && h <= maxLado)) { cb(dataUrl); return; }
+      const esc = Math.min(maxLado / w, maxLado / h);
+      const cw = Math.max(1, Math.round(w * esc)), ch = Math.max(1, Math.round(h * esc));
+      try {
+        const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+        c.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        cb(c.toDataURL('image/png'));
+      } catch (e) { cb(dataUrl); }
+    };
+    img.onerror = () => cb(dataUrl);
+    img.src = dataUrl;
+  } catch (e) { cb(dataUrl); }
 }
 
 // Editor de imagen para logos/sellos: recortar (cuadrado), acercar, opcionalmente quitar
