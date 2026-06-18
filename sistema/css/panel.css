@@ -412,11 +412,15 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
    sobre la línea de "Sello del bufete"; el abogado solo agrega su firma).
    Se pinta en dos colores: mitad verde (arriba) y mitad rojo (abajo), usando la
    forma del sello como máscara sobre un degradado. */
+/* Sello del bufete impreso directamente en la credencial. Usa el sello elegido
+   en "Sellos y logos". mix-blend-mode: multiply hace desaparecer el fondo
+   blanco del sello (foto o escaneo) para que quede como estampado real. */
 .cred-sign__sello { position: relative; }
 .cred-sello-img {
   position: absolute; bottom: 100%; left: 50%;
   transform: translate(-50%, 40%) rotate(-7deg);
-  width: 2cm; height: 2cm; opacity: .95; pointer-events: none;
+  width: 2cm; height: 2cm; object-fit: contain; opacity: .95; pointer-events: none;
+  mix-blend-mode: multiply;
 }
 .cred-note { font-size: .4rem; color: var(--muted, #5c6675); padding: 3px 11px 6px; text-align: center; }
 .cred-actions { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
