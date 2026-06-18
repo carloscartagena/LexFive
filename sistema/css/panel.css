@@ -408,23 +408,20 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-card--back .cred-cert.cred-frase { color: var(--gold-dark, #a8853c) !important; font-weight: 700; letter-spacing: .3px; padding-top: 3px; text-align: center; font-size: .46rem; }
 .cred-sign { display: flex; gap: 14px; padding: 12px 11px 4px; margin-top: auto; }
 .cred-sign__line { flex: 1; border-top: 1px solid #b8bdc6; padding-top: 3px; font-size: .42rem; text-align: center; color: var(--muted, #5c6675); }
-/* Sello del bufete impreso directamente en la credencial (queda como estampado
-   sobre la línea de "Sello del bufete"; el abogado solo agrega su firma).
-   Se pinta en dos colores: mitad verde (arriba) y mitad rojo (abajo), usando la
-   forma del sello como máscara sobre un degradado. */
 /* Sello del bufete impreso directamente en la credencial. Usa el sello elegido
-   en "Sellos y logos". mix-blend-mode: multiply hace desaparecer el fondo
-   blanco del sello (foto o escaneo) para que quede como estampado real. */
+   en "Sellos y logos". mix-blend-mode: multiply + filtro hacen desaparecer el
+   fondo claro del sello (foto o escaneo) para que quede como estampado real. */
 .cred-sign__sello { position: relative; }
+.cred-foot__validez { position: relative; }
 .cred-sello-img {
   position: absolute; bottom: 100%; left: 50%;
   transform: translate(-50%, 8%) rotate(-7deg);
   width: 2.4cm; height: 2.4cm; object-fit: contain; opacity: .95; pointer-events: none;
-  /* multiply quita el fondo blanco; el filtro aclara el papel gris y oscurece
-     la tinta del sello para que el fondo desaparezca y deje ver el logo detrás. */
   mix-blend-mode: multiply;
   filter: contrast(1.35) brightness(1.12);
 }
+/* En el frente el sello va arriba de "Válido hasta", anclado a la derecha. */
+.cred-sello-img--front { left: auto; right: -2px; transform: translateY(6%) rotate(-7deg); }
 .cred-note { font-size: .4rem; color: var(--muted, #5c6675); padding: 3px 11px 6px; text-align: center; }
 .cred-actions { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 

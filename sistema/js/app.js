@@ -4883,7 +4883,9 @@ async function renderCredenciales() {
             <div class="cred-foot__qr"><img id="cv_qr" src="${qrURL(qrPersona(datos))}" alt="Verificación del bufete" class="cred-qr-cert"><small class="cred-qr-cap">Verificar</small></div>
             <div class="cred-foot__qr"><img src="${qrURL(RPA_URL)}" alt="SAJ-RPA" class="cred-qr-cert"><small class="cred-qr-cap">SAJ-RPA</small></div>
           </div>
-          <div><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong></div>
+          <div class="cred-foot__validez"><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong>
+            ${selloActual ? `<img class="cred-sello-img cred-sello-img--front" src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
+          </div>
         </div>
       </div>
       </div>
