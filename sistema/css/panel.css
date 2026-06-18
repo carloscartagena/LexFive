@@ -408,6 +408,10 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-card--back .cred-cert.cred-frase { color: var(--gold-dark, #a8853c) !important; font-weight: 700; letter-spacing: .3px; padding-top: 3px; text-align: center; font-size: .46rem; }
 .cred-sign { display: flex; gap: 14px; padding: 12px 11px 4px; margin-top: auto; }
 .cred-sign__line { flex: 1; border-top: 1px solid #b8bdc6; padding-top: 3px; font-size: .42rem; text-align: center; color: var(--muted, #5c6675); }
+/* Sello del bufete impreso directamente en la credencial (queda como estampado
+   sobre la línea de "Sello del bufete"; el abogado solo agrega su firma). */
+.cred-sign__sello { position: relative; }
+.cred-sello-img { position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, 42%) rotate(-7deg); width: 1.5cm; height: 1.5cm; object-fit: contain; opacity: .9; pointer-events: none; }
 .cred-note { font-size: .4rem; color: var(--muted, #5c6675); padding: 3px 11px 6px; text-align: center; }
 .cred-actions { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 

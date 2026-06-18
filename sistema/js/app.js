@@ -4897,7 +4897,10 @@ async function renderCredenciales() {
         <p class="cred-cert cred-frase" id="cv_frase">${esc(datos.frase || '')}</p>
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
-          <div class="cred-sign__line">Sello del bufete</div>
+          <div class="cred-sign__line cred-sign__sello">
+            ${selloActual ? `<img class="cred-sello-img" id="cv_sello" src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
+            Sello del bufete
+          </div>
         </div>
         <p class="cred-note">Documento de uso institucional. Si la encuentra, devuélvala a LexFive.</p>
       </div>
