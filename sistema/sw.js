@@ -5,17 +5,21 @@
    funcione mejor con conexiones lentas.
 
    Estrategia por tipo de recurso:
-   - HTML / navegación: "red primero" (para no quedarse con código viejo),
-     con copia de respaldo en caché si no hay internet.
-   - JavaScript de la app: "red primero" también, para que tras un despliegue
-     el navegador ejecute SIEMPRE la última versión (antes se servía la copia
-     en caché y el sistema podía quedarse con código viejo).
-   - Otros recursos estáticos (CSS, imágenes, logos, fuentes): "stale-while-
-     revalidate": se sirven AL INSTANTE desde la caché y se actualizan en
+   - HTML / navegación: "red primero con tiempo de espera corto". Intenta la
+     red por unos segundos (para no servir HTML viejo) y, si tarda o falla,
+     usa de inmediato la copia en caché. Así en el celular NUNCA se queda
+     colgado mostrando la página de "recargar".
+   - JavaScript y CSS de la app: "stale-while-revalidate": se sirven AL INSTANTE
+     desde la caché (carga rápida en el celular) y se actualizan en segundo
+     plano, de modo que la próxima carga ya trae la última versión. Antes era
+     "red primero", lo que volvía lento el celular y, si la red fallaba,
+     mostraba la página de recarga.
+   - Otros recursos estáticos (imágenes, logos, fuentes): "stale-while-
+     revalidate": se sirven al instante desde la caché y se actualizan en
      segundo plano. Así el panel se siente rápido.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v8';
+const CACHE = 'lexfive-sistema-v10';
 const SHELL = [
   './',
   './index.html',
@@ -56,6 +60,28 @@ function actualizarCache(req, res) {
   return res;
 }
 
+// fetch con tiempo de espera: si la red tarda demasiado (típico en celular con
+// señal débil), se rechaza para poder caer al instante en la copia en caché,
+// en vez de quedarse colgado y terminar mostrando la página de "recargar".
+function fetchConTimeout(req, ms) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('timeout')), ms);
+    fetch(req).then(
+      (res) => { clearTimeout(t); resolve(res); },
+      (err) => { clearTimeout(t); reject(err); }
+    );
+  });
+}
+
+// Stale-while-revalidate: responde al instante con la copia en caché (si la
+// hay) y, en paralelo, actualiza la caché desde la red para la próxima vez.
+function staleWhileRevalidate(req) {
+  return caches.match(req).then((cached) => {
+    const red = fetch(req).then((res) => actualizarCache(req, res)).catch(() => cached);
+    return cached || red;
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
@@ -66,36 +92,32 @@ self.addEventListener('fetch', (event) => {
 
   const aceptaHtml = (req.headers.get('accept') || '').indexOf('text/html') !== -1;
 
-  // HTML / navegación: red primero (para no servir código viejo), con respaldo.
+  // HTML / navegación: red primero con tiempo de espera corto. Si la red
+  // responde rápido, se usa (HTML fresco); si tarda más de 4 s o falla, se
+  // usa de inmediato la copia en caché (la página guardada) y solo como
+  // último recurso la página offline. Así el celular no se queda colgado.
   if (req.mode === 'navigate' || aceptaHtml) {
     event.respondWith(
-      fetch(req).then((res) => actualizarCache(req, res))
-        .catch(() => caches.match(req).then((hit) => hit || caches.match('./offline.html') || caches.match('./index.html')))
+      fetchConTimeout(req, 4000).then((res) => actualizarCache(req, res))
+        .catch(() => caches.match(req)
+          .then((hit) => hit || caches.match('./index.html'))
+          .then((hit) => hit || caches.match('./offline.html')))
     );
     return;
   }
 
-  // JavaScript y CSS de la app: RED PRIMERO. Así, tras un despliegue, el
-  // navegador usa siempre la última versión y no se queda con código o estilos
-  // viejos (esto evitaba que los arreglos visuales no aparecieran hasta recargar
-  // dos veces). Si no hay internet, usa la copia en caché como respaldo.
+  // JavaScript y CSS de la app: stale-while-revalidate. Se sirve AL INSTANTE
+  // desde la caché (carga rápida en el celular) y se actualiza en segundo
+  // plano, así la próxima carga ya trae la última versión tras un despliegue.
   if (/\.(?:m?js|css)$/i.test(url.pathname)) {
-    event.respondWith(
-      fetch(req).then((res) => actualizarCache(req, res))
-        .catch(() => caches.match(req))
-    );
+    event.respondWith(staleWhileRevalidate(req));
     return;
   }
 
   // Recursos estáticos: stale-while-revalidate (caché al instante + refresco
   // en segundo plano). Hace que el panel y los re-render se sientan rápidos.
   if (ASSET_RE.test(url.pathname)) {
-    event.respondWith(
-      caches.match(req).then((cached) => {
-        const red = fetch(req).then((res) => actualizarCache(req, res)).catch(() => cached);
-        return cached || red;
-      })
-    );
+    event.respondWith(staleWhileRevalidate(req));
     return;
   }
 
