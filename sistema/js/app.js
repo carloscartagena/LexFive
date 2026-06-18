@@ -4898,7 +4898,7 @@ async function renderCredenciales() {
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
           <div class="cred-sign__line cred-sign__sello">
-            ${selloActual ? `<img class="cred-sello-img" id="cv_sello" src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
+            ${selloActual ? `<span class="cred-sello-img" id="cv_sello" role="img" aria-label="Sello del bufete" style="-webkit-mask-image:url('${selloSrc(selloActual)}');mask-image:url('${selloSrc(selloActual)}')"></span>` : ''}
             Sello del bufete
           </div>
         </div>

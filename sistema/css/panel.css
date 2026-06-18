@@ -409,9 +409,19 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .cred-sign { display: flex; gap: 14px; padding: 12px 11px 4px; margin-top: auto; }
 .cred-sign__line { flex: 1; border-top: 1px solid #b8bdc6; padding-top: 3px; font-size: .42rem; text-align: center; color: var(--muted, #5c6675); }
 /* Sello del bufete impreso directamente en la credencial (queda como estampado
-   sobre la línea de "Sello del bufete"; el abogado solo agrega su firma). */
+   sobre la línea de "Sello del bufete"; el abogado solo agrega su firma).
+   Se pinta en dos colores: mitad verde (arriba) y mitad rojo (abajo), usando la
+   forma del sello como máscara sobre un degradado. */
 .cred-sign__sello { position: relative; }
-.cred-sello-img { position: absolute; bottom: 100%; left: 50%; transform: translate(-50%, 42%) rotate(-7deg); width: 1.5cm; height: 1.5cm; object-fit: contain; opacity: .9; pointer-events: none; }
+.cred-sello-img {
+  position: absolute; bottom: 100%; left: 50%;
+  transform: translate(-50%, 42%) rotate(-7deg);
+  width: 1.85cm; height: 1.85cm; opacity: .95; pointer-events: none;
+  background: linear-gradient(to bottom, #1f9d6b 0 50%, #c0392b 50% 100%);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain;
+}
 .cred-note { font-size: .4rem; color: var(--muted, #5c6675); padding: 3px 11px 6px; text-align: center; }
 .cred-actions { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
