@@ -42,8 +42,9 @@ const CORS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+const AMP = String.fromCharCode(38); // caracter "&" (evita literales de entidad que al copiar se decodifican y rompen el código)
 const esc = (s: string) =>
-  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string));
+  String(s ?? "").replace(/[&<>"']/g, (c) => (({ "&": AMP + "amp;", "<": AMP + "lt;", ">": AMP + "gt;", '"': AMP + "quot;", "'": AMP + "#39;" })[c] as string));
 
 async function sb(path: string): Promise<any[]> {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
