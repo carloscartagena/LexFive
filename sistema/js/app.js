@@ -5244,8 +5244,15 @@ function abrirEditorImagen(file, opts, onDone) {
     function quitarBlanco(context, size) {
       const d = context.getImageData(0, 0, size, size);
       const p = d.data;
+      // Quita el fondo claro del papel (no solo el blanco puro). Usa el canal
+      // más bajo: el papel claro tiene un mínimo alto; la tinta del sello tiene
+      // un mínimo bajo y se conserva. Entre BAJO y ALTO se aplica una
+      // transición suave para que los bordes no queden duros.
+      const ALTO = 244, BAJO = 200;
       for (let i = 0; i < p.length; i += 4) {
-        if (p[i] > 238 && p[i + 1] > 238 && p[i + 2] > 238) p[i + 3] = 0;
+        const min = Math.min(p[i], p[i + 1], p[i + 2]);
+        if (min >= ALTO) { p[i + 3] = 0; }
+        else if (min > BAJO) { p[i + 3] = Math.round(p[i + 3] * (1 - (min - BAJO) / (ALTO - BAJO))); }
       }
       context.putImageData(d, 0, 0);
     }
