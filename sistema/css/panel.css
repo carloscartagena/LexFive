@@ -129,8 +129,20 @@ ul { list-style: none; }
 
 /* ---------- Paneles / Cajas ---------- */
 .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 22px; }
-.card__head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.card__head h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--navy); font-weight: 600; }
+.card__head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.card__head h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--navy); font-weight: 600; text-align: center; }
+/* Los encabezados que tienen botones o controles de acción a la derecha
+   (Excel, Imprimir, filtros, etc.) mantienen el título a la izquierda y la
+   acción a la derecha. El resto de los títulos van centrados en todo el
+   sistema. El ícono de ayuda (?) va DENTRO del <h3>, por eso no cuenta como
+   acción y esos títulos también se centran. */
+.card__head:has(> button), .card__head:has(> a), .card__head:has(> span),
+.card__head:has(> .btn), .card__head:has(> input), .card__head:has(> select) { justify-content: space-between; }
+.card__head:has(> button) h3, .card__head:has(> a) h3, .card__head:has(> span) h3,
+.card__head:has(> .btn) h3, .card__head:has(> input) h3, .card__head:has(> select) h3 { text-align: left; }
+/* Título de introducción de cada pestaña (se nota y centrado, visible en
+   ambos modos). Antes usaba color navy en línea y desaparecía en modo oscuro. */
+.intro-title { font-family: var(--font-serif, Georgia, serif); font-size: 1.3rem; font-weight: 600; color: var(--navy, #0e1b2c); text-align: center; margin-bottom: 8px; }
 .card__body { padding: 22px; }
 .card__body--flush { padding: 0; }
 
@@ -188,7 +200,7 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 .detail-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 24px; margin-bottom: 8px; }
 .detail-item label { display: block; font-size: .74rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 3px; }
 .detail-item span { font-size: .95rem; color: var(--ink); }
-.section-title { font-family: var(--font-serif); font-size: 1.15rem; color: var(--navy); margin: 22px 0 12px; padding-top: 18px; border-top: 1px solid var(--line); }
+.section-title { font-family: var(--font-serif); font-size: 1.15rem; color: var(--navy); margin: 22px 0 12px; padding-top: 18px; border-top: 1px solid var(--line); text-align: center; }
 .timeline { list-style: none; }
 .timeline li { padding: 12px 0 12px 20px; border-left: 2px solid var(--line); position: relative; }
 .timeline li::before { content: ""; position: absolute; left: -6px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
@@ -788,6 +800,7 @@ html[data-theme="dark"] .topbar h1,
 html[data-theme="dark"] .card__head h3,
 html[data-theme="dark"] .metric__num,
 html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .intro-title,
 html[data-theme="dark"] .modal__head h3,
 html[data-theme="dark"] .md-group__head { color: var(--gold-light); }
 html[data-theme="dark"] .cell-strong { color: #eaf0f7; }
