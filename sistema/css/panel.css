@@ -780,6 +780,27 @@ code { background: #f1f2f4; padding: 1px 5px; border-radius: 4px; font-size: .85
 .topbar__right { display: flex; align-items: center; gap: 10px; }
 .theme-toggle { padding: 7px 10px; }
 .theme-toggle svg { width: 18px; height: 18px; }
+/* Control de tamaño de letra (accesibilidad) */
+.font-ctrl { display: inline-flex; gap: 4px; }
+.font-ctrl__btn { padding: 7px 10px; font-weight: 700; min-width: 36px; }
+
+/* Campanita de notificaciones */
+.notif-bell { position: relative; }
+.notif-bell svg { width: 18px; height: 18px; }
+.notif-bell__count { position: absolute; top: -3px; right: -3px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: #c0392b; color: #fff; font-size: .62rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+.notif-panel { position: fixed; z-index: 9998; width: 330px; max-width: calc(100vw - 16px); max-height: 72vh; overflow-y: auto; background: var(--white); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 14px 44px rgba(0,0,0,.20); display: none; }
+.notif-panel.open { display: block; }
+.notif-panel__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--white); }
+.notif-panel__head strong { color: var(--ink); }
+.notif-list { display: flex; flex-direction: column; }
+.notif-item { text-align: left; background: none; border: none; border-bottom: 1px solid var(--line); padding: 11px 14px; cursor: pointer; width: 100%; }
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--bg); }
+.notif-item.is-unread { background: rgba(194,162,90,.12); }
+.notif-item__title { font-weight: 600; font-size: .86rem; color: var(--ink); }
+.notif-item__body { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+.notif-item__time { font-size: .7rem; color: var(--muted); margin-top: 3px; }
+.notif-empty { padding: 26px 14px; text-align: center; color: var(--muted); font-size: .85rem; }
 
 /* ============================================================
    ACCESIBILIDAD
