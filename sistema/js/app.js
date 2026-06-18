@@ -125,6 +125,12 @@ function fmtDateTime(d) {
   if (isNaN(x)) return '—';
   return x.toLocaleString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
+function fmtHora(d) {
+  if (!d) return '';
+  const x = new Date(d);
+  if (isNaN(x)) return '';
+  return x.toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' });
+}
 function initials(name) {
   return (name || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 }
@@ -1363,6 +1369,27 @@ async function renderDashboard() {
     misTareas = data || [];
   } catch (e) { misTareas = []; }
 
+  // Mi agenda próxima (7 días): audiencias de mis procesos + plazos pendientes.
+  const esMio = (p) => p.abogado_id === state.profile.id || p.procurador_id === state.profile.id
+    || (p.abogados_ids || []).includes(state.profile.id) || (p.procuradores_ids || []).includes(state.profile.id);
+  const en7d = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const misProcesos = list.filter(esMio);
+  let miAgenda = misProcesos
+    .filter(p => p.proxima_audiencia && new Date(p.proxima_audiencia) >= ahora && new Date(p.proxima_audiencia) <= en7d && !['archivado', 'concluido'].includes(p.estado))
+    .map(p => ({ tipo: 'Audiencia', fecha: p.proxima_audiencia, titulo: p.caratula, proceso_id: p.id }));
+  try {
+    const idsMios = misProcesos.map(p => p.id);
+    if (idsMios.length) {
+      const { data: evs } = await supabase.from('eventos').select('*')
+        .eq('estado', 'pendiente')
+        .gte('fecha', ahora.toISOString()).lte('fecha', en7d.toISOString())
+        .in('proceso_id', idsMios);
+      const caratulaDe = {}; misProcesos.forEach(p => { caratulaDe[p.id] = p.caratula; });
+      (evs || []).forEach(e => miAgenda.push({ tipo: e.tipo || 'Plazo', fecha: e.fecha, titulo: e.titulo + (caratulaDe[e.proceso_id] ? ' — ' + caratulaDe[e.proceso_id] : ''), proceso_id: e.proceso_id }));
+    }
+  } catch (e) { /* la tabla eventos puede no existir aún; se ignora */ }
+  miAgenda.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
   // Por cobrar (solo admin y abogado)
   let porCobrar = null;
   if (['admin', 'abogado'].includes(state.profile.rol)) {
@@ -1438,6 +1465,26 @@ async function renderDashboard() {
       </div>
     </div>`;
 
+  // Panel "Mi agenda": audiencias de mis procesos y plazos de los próximos 7 días.
+  const fechaCorta = (iso) => { try { return new Date(iso).toLocaleDateString('es-BO', { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + fmtHora(iso); } catch (e) { return fmtDateTime(iso); } };
+  const miAgendaHtml = miAgenda.length ? `
+    <div class="card">
+      <div class="card__head"><h3>${ICON.audiencia} Mi agenda · próximos 7 días</h3><button class="btn btn--ghost btn--sm" id="btnVerAgenda" type="button">Ver calendario</button></div>
+      <div class="card__body--flush">
+        <div class="pend-list">${miAgenda.slice(0, 8).map(a => {
+          const dia = (a.fecha || '').slice(0, 10);
+          const esHoy = dia === hoyS;
+          return `<div class="pend-row pend-row--agenda js-open-proc" data-id="${a.proceso_id}">
+            <span class="agenda-tag agenda-tag--${a.tipo === 'Audiencia' ? 'aud' : 'plazo'}">${esc(a.tipo)}</span>
+            <div class="pend-row__main">
+              <div class="cell-strong">${esc(a.titulo)}</div>
+              <div class="pend-row__meta"><span class="pend-venc ${esHoy ? 'pend-venc--amber' : ''}">${esHoy ? 'Hoy · ' + fmtHora(a.fecha) : fechaCorta(a.fecha)}</span></div>
+            </div>
+          </div>`;
+        }).join('')}</div>${miAgenda.length > 8 ? `<p class="cell-sub" style="padding:10px 16px">y ${miAgenda.length - 8} más…</p>` : ''}
+      </div>
+    </div>` : '';
+
   content().innerHTML = `
     <div class="stats-grid">
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.procesos}</div></div><div class="metric__num">${list.length}</div><div class="metric__label">Procesos totales</div></div>
@@ -1450,6 +1497,8 @@ async function renderDashboard() {
     </div>
 
     ${misPendientesHtml}
+
+    ${miAgendaHtml}
 
     ${alertasHtml}
 
@@ -1537,6 +1586,12 @@ async function renderDashboard() {
     if (error) { b.disabled = false; toast('No se pudo actualizar: ' + error.message, 'error'); return; }
     toast('Tarea completada. ¡Bien hecho!', 'success');
     renderDashboard();
+  });
+
+  // Panel "Mi agenda": abrir el proceso o ir al calendario.
+  const bva = $('#btnVerAgenda'); if (bva) bva.onclick = () => navigate('agenda');
+  content().querySelectorAll('.js-open-proc').forEach(el => el.onclick = () => {
+    if (el.dataset.id) openProcesoDetail(el.dataset.id);
   });
 }
 
@@ -1872,6 +1927,16 @@ async function renderTareas() {
   content().innerHTML = `
     <div class="toolbar">
       <input type="search" id="qTarea" placeholder="Buscar tarea...">
+      <select id="fVence" ${hint('Filtre las tareas por su fecha de vencimiento.')}>
+        <option value="">Todas las fechas</option>
+        <option value="hoy">Vencen hoy</option>
+        <option value="semana">Esta semana (7 días)</option>
+        <option value="vencidas">Vencidas</option>
+      </select>
+      <select id="fProc" ${hint('Muestre solo las tareas de un proceso.')}>
+        <option value="">Todos los procesos</option>
+        ${(procs || []).map(p => `<option value="${p.id}">${esc(p.caratula)}</option>`).join('')}
+      </select>
       <label class="chk-inline"><input type="checkbox" id="fMias"> Solo mías</label>
       <div class="spacer"></div>
       <button class="btn btn--primary" id="btnNuevaTarea">${ICON.plus} Nueva tarea</button>
@@ -1879,6 +1944,7 @@ async function renderTareas() {
     <div class="tareas-board" id="tareasBoard"></div>`;
 
   const hoyStr = hoyISO();
+  const en7Str = (() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toISOString().slice(0, 10); })();
   const tarjeta = (t) => {
     const vencida = t.vence && t.vence < hoyStr && t.estado !== 'hecha';
     const acciones = [];
@@ -1904,8 +1970,18 @@ async function renderTareas() {
   const paint = () => {
     const q = ($('#qTarea').value || '').toLowerCase();
     const mias = $('#fMias').checked;
+    const fv = $('#fVence').value;
+    const fp = $('#fProc').value;
+    const venceOk = (t) => {
+      if (fv === 'hoy') return t.vence === hoyStr;
+      if (fv === 'semana') return t.vence && t.vence >= hoyStr && t.vence <= en7Str;
+      if (fv === 'vencidas') return t.vence && t.vence < hoyStr && t.estado !== 'hecha';
+      return true;
+    };
     const visibles = T.filter(t =>
       (!mias || t.asignado_a === state.profile.id) &&
+      (!fp || t.proceso_id === fp) &&
+      venceOk(t) &&
       (!q || [t.titulo, t.descripcion, procMap[t.proceso_id]].some(v => (v || '').toLowerCase().includes(q))));
     const board = $('#tareasBoard');
     board.innerHTML = Object.entries(TAREA_ESTADOS).map(([k, label]) => {
@@ -1922,6 +1998,8 @@ async function renderTareas() {
   paint();
   $('#qTarea').oninput = paint;
   $('#fMias').onchange = paint;
+  $('#fVence').onchange = paint;
+  $('#fProc').onchange = paint;
   $('#btnNuevaTarea').onclick = () => tareaForm();
 }
 
@@ -3114,6 +3192,13 @@ async function openProcesoDetail(id, readonly = false) {
     }).select().single();
     if (error) { toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = 'Agregar al historial'; return; }
     await logAccion('actuacion', 'proceso', id, desc.slice(0, 60));
+
+    // Aviso automático al cliente del proceso (correo + push). No bloquea ni
+    // interrumpe el guardado: si la Edge Function no está desplegada o falla,
+    // simplemente no se envía el aviso. Ver supabase/functions/avisar-actuacion.
+    try {
+      supabase.functions.invoke('avisar-actuacion', { body: { proceso_id: id, descripcion: desc } }).catch(() => {});
+    } catch (e) { /* ignorado a propósito */ }
 
     // 2) Subir los archivos adjuntos vinculados a esa actuación
     const archivos = [...($('#actFiles') ? $('#actFiles').files : [])];
@@ -5237,7 +5322,7 @@ function navigate(key) {
   const cont = content();
   let settled = false;
   Promise.resolve().then(() => VIEWS[key].render())
-    .then(() => { settled = true; })
+    .then(() => { settled = true; actualizarBadgesMenu(); })
     .catch((e) => {
       settled = true;
       console.error('Error al cargar la vista «' + key + '»', e);
@@ -5269,6 +5354,38 @@ function buildSidebar() {
   nav.innerHTML = items
     .map(n => `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`).join('');
   nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
+  actualizarBadgesMenu();
+}
+
+// Pone (o quita) un contador junto a una opción del menú lateral.
+function setNavBadge(key, n) {
+  const item = document.querySelector(`.nav-item[data-key="${key}"]`);
+  if (!item) return;
+  let badge = item.querySelector('.nav-badge');
+  if (n > 0) {
+    if (!badge) { badge = document.createElement('span'); badge.className = 'nav-badge'; item.appendChild(badge); }
+    badge.textContent = n > 99 ? '99+' : String(n);
+  } else if (badge) {
+    badge.remove();
+  }
+}
+
+// Actualiza los contadores del menú: tareas pendientes asignadas a quien inició
+// sesión y consultas nuevas sin atender. Se llama al construir el menú y cada
+// vez que se navega, para que los números estén siempre al día. Los clientes no
+// tienen estas secciones, así que no se calcula nada para ellos.
+async function actualizarBadgesMenu() {
+  if (!state.profile || state.profile.rol === 'cliente') return;
+  const rol = state.profile.rol;
+  try {
+    const [tareasRes, consRes] = await Promise.all([
+      supabase.from('tareas').select('id', { count: 'exact', head: true })
+        .neq('estado', 'hecha').eq('asignado_a', state.profile.id),
+      supabase.from('consultas').select('id', { count: 'exact', head: true }).eq('estado', 'nueva')
+    ]);
+    setNavBadge('tareas', tareasRes.count || 0);
+    setNavBadge('consultas', consRes.count || 0);
+  } catch (e) { /* sin conexión: se deja como esté */ }
 }
 
 // ============================================================

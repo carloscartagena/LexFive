@@ -99,6 +99,9 @@ ul { list-style: none; }
 .nav-item svg { width: 19px; height: 19px; flex-shrink: 0; }
 .nav-item:hover { background: rgba(255,255,255,.07); color: #fff; }
 .nav-item.active { background: var(--gold); color: var(--navy); font-weight: 600; }
+/* Contador junto a una opción del menú (tareas pendientes, consultas nuevas) */
+.nav-badge { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 11px; background: var(--gold); color: var(--navy); font-size: .72rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+.nav-item.active .nav-badge { background: var(--navy); color: var(--gold-light, #e7d3a1); }
 .sidebar__foot { padding: 16px; border-top: 1px solid rgba(255,255,255,.08); }
 /* El menú lateral siempre es azul oscuro, así que el botón "Cerrar sesión"
    debe verse claro en AMBOS temas (antes en modo claro quedaba casi invisible). */
@@ -707,6 +710,10 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .pend-venc { font-size: .72rem; color: var(--muted, #5c6675); }
 .pend-venc--red { color: #c0392b; font-weight: 700; }
 .pend-venc--amber { color: var(--gold-dark, #a8853c); font-weight: 700; }
+.pend-row--agenda { gap: 10px; }
+.agenda-tag { flex-shrink: 0; font-size: .6rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; padding: 3px 8px; border-radius: 20px; align-self: flex-start; margin-top: 2px; }
+.agenda-tag--aud { background: #e7eef9; color: #1f4e8c; }
+.agenda-tag--plazo { background: #fbf0db; color: #946018; }
 
 /* ---------- Plazos / audiencias ---------- */
 .plazo-list { display: flex; flex-direction: column; gap: 8px; }
