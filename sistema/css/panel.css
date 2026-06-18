@@ -517,7 +517,22 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .img-editor__zoom { display: flex; align-items: center; gap: 10px; font-size: .82rem; color: var(--navy, #0e1b2c); margin: 6px 0; }
 .img-editor__zoom input { flex: 1; }
 .img-editor__chk { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted, #5c6675); margin-bottom: 14px; }
-.img-editor__actions { display: flex; justify-content: flex-end; gap: 10px; }
+.img-editor__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.img-editor__actions .btn { white-space: nowrap; }
+/* El panel del editor/vista previa es blanco SIEMPRE (también en modo oscuro)
+   para mostrar bien las imágenes. Por eso forzamos los botones secundarios a
+   texto y borde oscuros: en modo oscuro el color de texto se aclaraba y
+   quedaban casi invisibles sobre el panel blanco. */
+.img-editor__panel .btn--ghost { background: #fff; border-color: #d4d7dd; color: #1a2330; }
+.img-editor__panel .btn--ghost:hover { background: #f1f2f4; border-color: var(--gold, #c2a25a); }
+.img-editor__panel .cell-sub { color: #5c6675; }
+/* En celular los botones se apilan a lo ancho (antes se desbordaban del panel
+   y el texto "Usar este sello" se partía en varias líneas). */
+@media (max-width: 520px) {
+    .img-editor__panel { padding: 18px; }
+    .img-editor__actions { flex-direction: column; gap: 8px; }
+    .img-editor__actions .btn { width: 100%; }
+}
 
 /* Flechas para mover / centrar la imagen (estilo Word) */
 .img-editor__nudge { display: grid; grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 36px); justify-content: center; gap: 5px; margin: 4px 0 8px; }
