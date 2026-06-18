@@ -129,8 +129,20 @@ ul { list-style: none; }
 
 /* ---------- Paneles / Cajas ---------- */
 .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 22px; }
-.card__head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.card__head h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--navy); font-weight: 600; }
+.card__head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.card__head h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--navy); font-weight: 600; text-align: center; }
+/* Los encabezados que tienen botones o controles de acción a la derecha
+   (Excel, Imprimir, filtros, etc.) mantienen el título a la izquierda y la
+   acción a la derecha. El resto de los títulos van centrados en todo el
+   sistema. El ícono de ayuda (?) va DENTRO del <h3>, por eso no cuenta como
+   acción y esos títulos también se centran. */
+.card__head:has(> button), .card__head:has(> a), .card__head:has(> span),
+.card__head:has(> .btn), .card__head:has(> input), .card__head:has(> select) { justify-content: space-between; }
+.card__head:has(> button) h3, .card__head:has(> a) h3, .card__head:has(> span) h3,
+.card__head:has(> .btn) h3, .card__head:has(> input) h3, .card__head:has(> select) h3 { text-align: left; }
+/* Título de introducción de cada pestaña (se nota y centrado, visible en
+   ambos modos). Antes usaba color navy en línea y desaparecía en modo oscuro. */
+.intro-title { font-family: var(--font-serif, Georgia, serif); font-size: 1.3rem; font-weight: 600; color: var(--navy, #0e1b2c); text-align: center; margin-bottom: 8px; }
 .card__body { padding: 22px; }
 .card__body--flush { padding: 0; }
 
@@ -188,7 +200,7 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 .detail-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 24px; margin-bottom: 8px; }
 .detail-item label { display: block; font-size: .74rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 3px; }
 .detail-item span { font-size: .95rem; color: var(--ink); }
-.section-title { font-family: var(--font-serif); font-size: 1.15rem; color: var(--navy); margin: 22px 0 12px; padding-top: 18px; border-top: 1px solid var(--line); }
+.section-title { font-family: var(--font-serif); font-size: 1.15rem; color: var(--navy); margin: 22px 0 12px; padding-top: 18px; border-top: 1px solid var(--line); text-align: center; }
 .timeline { list-style: none; }
 .timeline li { padding: 12px 0 12px 20px; border-left: 2px solid var(--line); position: relative; }
 .timeline li::before { content: ""; position: absolute; left: -6px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
@@ -683,6 +695,19 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 .tarea-venc { font-size: .7rem; color: var(--muted, #5c6675); }
 .tarea-venc.is-vencida { color: #c0392b; font-weight: 700; }
 
+/* ---------- Panel "Mis pendientes" del dashboard ---------- */
+.pend-list { display: flex; flex-direction: column; }
+.pend-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.pend-row:last-child { border-bottom: none; }
+.pend-row__check { width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; border: 1.5px solid var(--line); background: transparent; color: var(--muted, #5c6675); cursor: pointer; display: grid; place-items: center; font-size: .85rem; font-weight: 700; transition: .15s; }
+.pend-row__check:hover { background: var(--green, #1f9d6b); border-color: var(--green, #1f9d6b); color: #fff; }
+.pend-row__check:disabled { opacity: .5; cursor: default; }
+.pend-row__main { flex: 1; min-width: 0; cursor: pointer; }
+.pend-row__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 3px; }
+.pend-venc { font-size: .72rem; color: var(--muted, #5c6675); }
+.pend-venc--red { color: #c0392b; font-weight: 700; }
+.pend-venc--amber { color: var(--gold-dark, #a8853c); font-weight: 700; }
+
 /* ---------- Plazos / audiencias ---------- */
 .plazo-list { display: flex; flex-direction: column; gap: 8px; }
 .plazo-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line, #e6e8ec); border-radius: 9px; flex-wrap: wrap; }
@@ -788,6 +813,7 @@ html[data-theme="dark"] .topbar h1,
 html[data-theme="dark"] .card__head h3,
 html[data-theme="dark"] .metric__num,
 html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .intro-title,
 html[data-theme="dark"] .modal__head h3,
 html[data-theme="dark"] .md-group__head { color: var(--gold-light); }
 html[data-theme="dark"] .cell-strong { color: #eaf0f7; }

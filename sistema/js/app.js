@@ -1354,6 +1354,15 @@ async function renderDashboard() {
     tareasPend = count || 0;
   } catch (e) { tareasPend = 0; }
 
+  // Mis tareas pendientes (asignadas a mí) para el panel personal "Mis pendientes".
+  let misTareas = [];
+  try {
+    const { data } = await supabase.from('tareas').select('*')
+      .neq('estado', 'hecha').eq('asignado_a', state.profile.id)
+      .order('vence', { ascending: true, nullsFirst: false });
+    misTareas = data || [];
+  } catch (e) { misTareas = []; }
+
   // Por cobrar (solo admin y abogado)
   let porCobrar = null;
   if (['admin', 'abogado'].includes(state.profile.rol)) {
@@ -1404,6 +1413,31 @@ async function renderDashboard() {
       </div>
     </div>` : '';
 
+  // Panel personal: tareas pendientes asignadas a quien inició sesión, con las
+  // vencidas / que vencen hoy resaltadas y acciones rápidas (completar / abrir).
+  const hoyS = hoyISO();
+  const misPendientesHtml = `
+    <div class="card">
+      <div class="card__head"><h3>${ICON.tareas} Mis pendientes</h3>${misTareas.length ? `<button class="btn btn--ghost btn--sm" id="btnVerTareas" type="button">Ver tablero</button>` : ''}</div>
+      <div class="card__body--flush">
+        ${misTareas.length ? `<div class="pend-list">${misTareas.slice(0, 8).map(t => {
+          const vencida = t.vence && t.vence < hoyS;
+          const venceHoy = t.vence === hoyS;
+          const vencHtml = t.vence
+            ? `<span class="pend-venc ${vencida ? 'pend-venc--red' : (venceHoy ? 'pend-venc--amber' : '')}">${vencida ? 'Venció ' + fmtDate(t.vence) : (venceHoy ? 'Vence hoy' : 'Vence ' + fmtDate(t.vence))}</span>`
+            : '';
+          return `<div class="pend-row">
+            <button class="pend-row__check js-done-tarea" data-id="${t.id}" type="button" title="Marcar como hecha" aria-label="Completar tarea">✓</button>
+            <div class="pend-row__main js-open-tarea" data-id="${t.id}">
+              <div class="cell-strong">${esc(t.titulo)}</div>
+              <div class="pend-row__meta"><span class="badge-prio badge-prio--${t.prioridad}">${TAREA_PRIOR[t.prioridad] || t.prioridad}</span>${vencHtml}</div>
+            </div>
+          </div>`;
+        }).join('')}</div>${misTareas.length > 8 ? `<p class="cell-sub" style="padding:10px 16px">y ${misTareas.length - 8} tarea(s) más…</p>` : ''}`
+        : `<div class="empty" style="padding:26px 16px">${ICON.tareas}<p>No tiene tareas pendientes asignadas. ¡Buen trabajo!</p></div>`}
+      </div>
+    </div>`;
+
   content().innerHTML = `
     <div class="stats-grid">
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.procesos}</div></div><div class="metric__num">${list.length}</div><div class="metric__label">Procesos totales</div></div>
@@ -1414,6 +1448,8 @@ async function renderDashboard() {
       <div class="metric" id="mTareas" style="cursor:pointer" ${hint('Tareas del equipo que aún no se completan. Haga clic para ver el tablero.')}><div class="metric__top"><div class="metric__icon">${ICON.tareas}</div></div><div class="metric__num">${tareasPend}</div><div class="metric__label">Tareas pendientes</div></div>
       ${porCobrar !== null ? `<div class="metric" id="mPorCobrar" style="cursor:pointer" ${hint('Honorarios facturados menos lo cobrado. Haga clic para ver el detalle.')}><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.4rem">${fmtMoneda(porCobrar)}</div><div class="metric__label">Por cobrar</div></div>` : ''}
     </div>
+
+    ${misPendientesHtml}
 
     ${alertasHtml}
 
@@ -1486,6 +1522,22 @@ async function renderDashboard() {
   const brb = $('#btnRevisarBackup'); if (brb) brb.onclick = () => revisarRespaldo();
   const b2fa = $('#btn2FA'); if (b2fa) b2fa.onclick = () => openSeguridad2FA();
   const bpush = $('#btnPush'); if (bpush) bpush.onclick = () => openNotificaciones();
+
+  // Panel "Mis pendientes": completar una tarea con un toque, abrirla para
+  // editarla, o ir al tablero completo.
+  const bvt = $('#btnVerTareas'); if (bvt) bvt.onclick = () => navigate('tareas');
+  content().querySelectorAll('.js-open-tarea').forEach(el => el.onclick = () => {
+    const t = misTareas.find(x => x.id === el.dataset.id);
+    if (t) tareaForm(t);
+  });
+  content().querySelectorAll('.js-done-tarea').forEach(b => b.onclick = async (e) => {
+    e.stopPropagation();
+    b.disabled = true;
+    const { error } = await supabase.from('tareas').update({ estado: 'hecha', updated_at: new Date().toISOString() }).eq('id', b.dataset.id);
+    if (error) { b.disabled = false; toast('No se pudo actualizar: ' + error.message, 'error'); return; }
+    toast('Tarea completada. ¡Bien hecho!', 'success');
+    renderDashboard();
+  });
 }
 
 // ============================================================
@@ -1498,7 +1550,7 @@ async function openSeguridad2FA() {
 
   // Ya está activado -> ofrecer desactivar.
   if (activos.length) {
-    const body = `<p class="cell-sub">La verificación en dos pasos está <strong style="color:var(--navy,#0e1b2c)">ACTIVADA</strong> en su cuenta. Cada vez que inicie sesión se le pedirá el código de su app de autenticación.</p>
+    const body = `<p class="cell-sub">La verificación en dos pasos está <strong style="color:var(--green,#1f9d6b)">ACTIVADA</strong> en su cuenta. Cada vez que inicie sesión se le pedirá el código de su app de autenticación.</p>
       <p class="cell-sub" style="margin-top:8px">Si desactiva la 2FA, su cuenta volverá a protegerse solo con la contraseña.</p>`;
     openModal('Verificación en dos pasos', body, [
       { label: 'Desactivar 2FA', class: 'btn--danger', onClick: async () => {
@@ -1556,7 +1608,7 @@ async function openNotificaciones() {
   const activo = !!sub && Notification.permission === 'granted';
   const estado = Notification.permission === 'denied'
     ? 'El permiso está <strong>bloqueado</strong> en este navegador. Actívelo desde la configuración del sitio (el candado junto a la dirección).'
-    : (activo ? 'Las notificaciones están <strong style="color:var(--navy,#0e1b2c)">ACTIVADAS</strong> en este dispositivo.' : 'Las notificaciones están <strong>desactivadas</strong> en este dispositivo.');
+    : (activo ? 'Las notificaciones están <strong style="color:var(--green,#1f9d6b)">ACTIVADAS</strong> en este dispositivo.' : 'Las notificaciones están <strong>desactivadas</strong> en este dispositivo.');
   const body = `
     <p class="cell-sub" style="margin-bottom:10px">${estado}</p>
     <p class="cell-sub">Cuando estén activas, recibirá avisos de audiencias y plazos próximos aunque el sistema esté cerrado. <em>(El envío automático se completa en una fase posterior; por ahora puede probar una notificación local.)</em></p>`;
@@ -3557,7 +3609,7 @@ async function renderUsuarios() {
         </tr>`).join('')}</tbody></table></div></div>
     </div>
     <div class="card"><div class="card__body">
-      <h3 style="font-family:var(--font-serif);color:var(--navy);margin-bottom:8px;">Sobre los accesos</h3>
+      <h3 class="intro-title" style="margin-bottom:8px;">Sobre los accesos</h3>
       <p class="cell-sub" style="margin-bottom:8px;"><strong>Clientes:</strong> cuando alguien se registra desde la pantalla de acceso, entra como <strong>Cliente</strong> y solo ve sus propios procesos (se vinculan por su correo). No ve nada del bufete ni de otros clientes.</p>
       <p class="cell-sub"><strong>Abogados / Procuradores:</strong> para habilitar a un colega, créele la cuenta en Supabase (<strong>Authentication → Users → Add user</strong>) o pídale que se registre, y aquí cámbiele el rol a Abogado o Procurador.</p>
     </div></div>`;
@@ -4169,7 +4221,7 @@ async function renderSellos() {
   content().innerHTML = `
     <div class="card">
       <div class="card__body">
-        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:6px;">Sellos y logos del bufete</h3>
+        <h3 class="intro-title">Sellos y logos del bufete</h3>
         <p class="cell-sub">Toque cualquier logo o sello para verlo <strong>en grande</strong> y, si le gusta, pulse <strong>Usar este</strong> para dejarlo como predeterminado. Se aplican en la página, el panel, las credenciales y los memoriales.</p>
       </div>
     </div>
@@ -4536,7 +4588,7 @@ async function renderCredenciales() {
   content().innerHTML = `
     <div class="card">
       <div class="card__body">
-        <h3 style="font-family:var(--font-serif,Georgia,serif);color:var(--navy,#0e1b2c);margin-bottom:6px;">Credencial del bufete</h3>
+        <h3 class="intro-title">Credencial del bufete</h3>
         <p class="cell-sub">Complete los datos y se reflejarán en la credencial en tiempo real. Luego use <strong>Imprimir / Guardar PDF</strong>. Lo que escriba queda guardado en este equipo.</p>
       </div>
     </div>
@@ -4642,7 +4694,7 @@ async function renderCredenciales() {
       <button class="btn" id="btnSaveCred">${ICON.llave || ''} ${credEditId ? 'Actualizar credencial' : 'Guardar credencial'}</button>
       ${credEditId ? '<button class="btn btn--ghost" id="btnSaveCredNew" type="button">Guardar como nueva</button><button class="btn btn--ghost" id="btnNewCred" type="button">Nueva credencial (limpiar)</button>' : ''}
     </div>
-    ${credEditId ? `<p class="cell-sub" id="credEditBanner" style="text-align:center;margin-top:4px;color:var(--navy,#0e1b2c)"><strong>Editando una credencial guardada.</strong> Los cambios se aplicarán al actualizar.</p>` : ''}
+    ${credEditId ? `<p class="cell-sub" id="credEditBanner" style="text-align:center;margin-top:4px"><strong>Editando una credencial guardada.</strong> Los cambios se aplicarán al actualizar.</p>` : ''}
 
     <div class="card" id="credSavedCard">
       <div class="card__head"><h3>${ICON.usuarios || ''} Credenciales guardadas (${credList.length})</h3></div>
