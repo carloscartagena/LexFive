@@ -1354,6 +1354,15 @@ async function renderDashboard() {
     tareasPend = count || 0;
   } catch (e) { tareasPend = 0; }
 
+  // Mis tareas pendientes (asignadas a mí) para el panel personal "Mis pendientes".
+  let misTareas = [];
+  try {
+    const { data } = await supabase.from('tareas').select('*')
+      .neq('estado', 'hecha').eq('asignado_a', state.profile.id)
+      .order('vence', { ascending: true, nullsFirst: false });
+    misTareas = data || [];
+  } catch (e) { misTareas = []; }
+
   // Por cobrar (solo admin y abogado)
   let porCobrar = null;
   if (['admin', 'abogado'].includes(state.profile.rol)) {
@@ -1404,6 +1413,31 @@ async function renderDashboard() {
       </div>
     </div>` : '';
 
+  // Panel personal: tareas pendientes asignadas a quien inició sesión, con las
+  // vencidas / que vencen hoy resaltadas y acciones rápidas (completar / abrir).
+  const hoyS = hoyISO();
+  const misPendientesHtml = `
+    <div class="card">
+      <div class="card__head"><h3>${ICON.tareas} Mis pendientes</h3>${misTareas.length ? `<button class="btn btn--ghost btn--sm" id="btnVerTareas" type="button">Ver tablero</button>` : ''}</div>
+      <div class="card__body--flush">
+        ${misTareas.length ? `<div class="pend-list">${misTareas.slice(0, 8).map(t => {
+          const vencida = t.vence && t.vence < hoyS;
+          const venceHoy = t.vence === hoyS;
+          const vencHtml = t.vence
+            ? `<span class="pend-venc ${vencida ? 'pend-venc--red' : (venceHoy ? 'pend-venc--amber' : '')}">${vencida ? 'Venció ' + fmtDate(t.vence) : (venceHoy ? 'Vence hoy' : 'Vence ' + fmtDate(t.vence))}</span>`
+            : '';
+          return `<div class="pend-row">
+            <button class="pend-row__check js-done-tarea" data-id="${t.id}" type="button" title="Marcar como hecha" aria-label="Completar tarea">✓</button>
+            <div class="pend-row__main js-open-tarea" data-id="${t.id}">
+              <div class="cell-strong">${esc(t.titulo)}</div>
+              <div class="pend-row__meta"><span class="badge-prio badge-prio--${t.prioridad}">${TAREA_PRIOR[t.prioridad] || t.prioridad}</span>${vencHtml}</div>
+            </div>
+          </div>`;
+        }).join('')}</div>${misTareas.length > 8 ? `<p class="cell-sub" style="padding:10px 16px">y ${misTareas.length - 8} tarea(s) más…</p>` : ''}`
+        : `<div class="empty" style="padding:26px 16px">${ICON.tareas}<p>No tiene tareas pendientes asignadas. ¡Buen trabajo!</p></div>`}
+      </div>
+    </div>`;
+
   content().innerHTML = `
     <div class="stats-grid">
       <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.procesos}</div></div><div class="metric__num">${list.length}</div><div class="metric__label">Procesos totales</div></div>
@@ -1414,6 +1448,8 @@ async function renderDashboard() {
       <div class="metric" id="mTareas" style="cursor:pointer" ${hint('Tareas del equipo que aún no se completan. Haga clic para ver el tablero.')}><div class="metric__top"><div class="metric__icon">${ICON.tareas}</div></div><div class="metric__num">${tareasPend}</div><div class="metric__label">Tareas pendientes</div></div>
       ${porCobrar !== null ? `<div class="metric" id="mPorCobrar" style="cursor:pointer" ${hint('Honorarios facturados menos lo cobrado. Haga clic para ver el detalle.')}><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num" style="font-size:1.4rem">${fmtMoneda(porCobrar)}</div><div class="metric__label">Por cobrar</div></div>` : ''}
     </div>
+
+    ${misPendientesHtml}
 
     ${alertasHtml}
 
@@ -1486,6 +1522,22 @@ async function renderDashboard() {
   const brb = $('#btnRevisarBackup'); if (brb) brb.onclick = () => revisarRespaldo();
   const b2fa = $('#btn2FA'); if (b2fa) b2fa.onclick = () => openSeguridad2FA();
   const bpush = $('#btnPush'); if (bpush) bpush.onclick = () => openNotificaciones();
+
+  // Panel "Mis pendientes": completar una tarea con un toque, abrirla para
+  // editarla, o ir al tablero completo.
+  const bvt = $('#btnVerTareas'); if (bvt) bvt.onclick = () => navigate('tareas');
+  content().querySelectorAll('.js-open-tarea').forEach(el => el.onclick = () => {
+    const t = misTareas.find(x => x.id === el.dataset.id);
+    if (t) tareaForm(t);
+  });
+  content().querySelectorAll('.js-done-tarea').forEach(b => b.onclick = async (e) => {
+    e.stopPropagation();
+    b.disabled = true;
+    const { error } = await supabase.from('tareas').update({ estado: 'hecha', updated_at: new Date().toISOString() }).eq('id', b.dataset.id);
+    if (error) { b.disabled = false; toast('No se pudo actualizar: ' + error.message, 'error'); return; }
+    toast('Tarea completada. ¡Bien hecho!', 'success');
+    renderDashboard();
+  });
 }
 
 // ============================================================
