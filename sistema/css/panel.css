@@ -421,7 +421,7 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
   filter: contrast(1.35) brightness(1.12);
 }
 /* En el frente el sello va arriba de "Válido hasta", anclado a la derecha. */
-.cred-sello-img--front { left: auto; right: -2px; transform: translateY(6%) rotate(-7deg); }
+.cred-sello-img--front { left: auto; right: -2px; transform: translateY(-45%) rotate(-7deg); }
 .cred-note { font-size: .4rem; color: var(--muted, #5c6675); padding: 3px 11px 6px; text-align: center; }
 .cred-actions { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
