@@ -24,6 +24,9 @@
           t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
         }
         document.documentElement.setAttribute('data-theme', t);
+        // Aplica el tamaño de letra guardado (accesibilidad) antes de pintar.
+        var fs = parseFloat(localStorage.getItem('lexfive_fontscale'));
+        if (fs >= 0.9 && fs <= 1.4) document.documentElement.style.fontSize = (fs * 100) + '%';
       } catch (e) {}
     })();
   </script>
@@ -60,6 +63,10 @@
           <h1 id="pageTitle">Panel</h1>
         </div>
         <div class="topbar__right">
+          <div class="font-ctrl" role="group" aria-label="Tamaño de letra">
+            <button class="btn btn--ghost btn--sm font-ctrl__btn" id="btnFontMinus" type="button" aria-label="Reducir el tamaño de letra" title="Letra más pequeña">A−</button>
+            <button class="btn btn--ghost btn--sm font-ctrl__btn" id="btnFontPlus" type="button" aria-label="Aumentar el tamaño de letra" title="Letra más grande">A+</button>
+          </div>
           <button class="theme-toggle btn btn--ghost btn--sm" id="btnTheme" type="button" aria-label="Cambiar entre modo claro y oscuro" aria-pressed="false" title="Modo claro / oscuro"></button>
           <div class="topbar__actions" id="topbarActions"></div>
         </div>

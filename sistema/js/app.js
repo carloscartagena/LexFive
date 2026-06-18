@@ -1392,15 +1392,24 @@ async function renderDashboard() {
 
   // Por cobrar (solo admin y abogado)
   let porCobrar = null;
+  let ingresos6 = [];
   if (['admin', 'abogado'].includes(state.profile.rol)) {
     try {
       const [{ data: hs }, { data: ps }] = await Promise.all([
         supabase.from('honorarios').select('monto'),
-        supabase.from('pagos').select('monto')
+        supabase.from('pagos').select('monto,fecha')
       ]);
       const th = (hs || []).reduce((a, b) => a + Number(b.monto || 0), 0);
       const tp = (ps || []).reduce((a, b) => a + Number(b.monto || 0), 0);
       porCobrar = th - tp;
+      // Ingresos (pagos recibidos) de los últimos 6 meses, para el gráfico.
+      const porMes = {};
+      (ps || []).forEach(p => { if (p.fecha) { const k = String(p.fecha).slice(0, 7); porMes[k] = (porMes[k] || 0) + Number(p.monto || 0); } });
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
+        const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        ingresos6.push({ label: d.toLocaleDateString('es-BO', { month: 'short', year: '2-digit' }), value: Math.round(porMes[k] || 0) });
+      }
     } catch (e) { porCobrar = null; }
   }
 
@@ -1506,6 +1515,7 @@ async function renderDashboard() {
       <div class="card"><div class="card__head"><h3>${ICON.grafico} Procesos por estado</h3></div><div class="card__body">${barChart(porEstado)}</div></div>
       <div class="card"><div class="card__head"><h3>${ICON.grafico} Procesos por materia</h3></div><div class="card__body">${barChart(porMateria)}</div></div>
       <div class="card"><div class="card__head"><h3>${ICON.grafico} Carga de trabajo por abogado (casos activos)</h3></div><div class="card__body">${barChart(porAbogado)}</div></div>
+      ${ingresos6.length ? `<div class="card"><div class="card__head"><h3>${ICON.grafico} Ingresos por mes (Bs, últimos 6)</h3></div><div class="card__body">${barChart(ingresos6)}</div></div>` : ''}
     </div>
 
     <div class="card">
@@ -3769,7 +3779,10 @@ async function renderMisProcesos() {
     <div class="card">
       <div class="card__head">
         <h3>Mis procesos</h3>
-        <a class="btn btn--primary btn--sm" href="${waUrl}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+        <span style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn--ghost btn--sm" id="btnEstadoCuenta" type="button">${ICON.doc} Mi estado de cuenta</button>
+          <a class="btn btn--primary btn--sm" href="${waUrl}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+        </span>
       </div>
       <div class="card__body--flush">
         ${procesos.length ? `<div class="table-wrap"><table class="data">
@@ -3787,7 +3800,77 @@ async function renderMisProcesos() {
 
     <div class="card" id="opinionDash" style="margin-top:18px"></div>`;
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id, true));
+  const bec = $('#btnEstadoCuenta'); if (bec) bec.onclick = () => descargarEstadoCuenta(procesos);
   mountOpinion($('#opinionDash'));
+}
+
+// Genera el estado de cuenta del cliente (honorarios y pagos de sus procesos)
+// en una ventana lista para imprimir o guardar como PDF. Requiere que el
+// cliente pueda leer sus honorarios/pagos (ver db/24_mejoras_portal_notif.sql);
+// si aún no se aplicó ese permiso, no aparecerán movimientos y se avisa.
+async function descargarEstadoCuenta(procesos) {
+  const procIds = (procesos || []).map(p => p.id);
+  if (!procIds.length) { toast('No hay procesos asociados a su cuenta.', 'error'); return; }
+  const money = (n) => 'Bs ' + Number(n || 0).toFixed(2);
+  let hs = [], ps = [];
+  try {
+    const [h, p] = await Promise.all([
+      supabase.from('honorarios').select('proceso_id,concepto,monto,fecha').in('proceso_id', procIds),
+      supabase.from('pagos').select('proceso_id,monto,metodo,fecha').in('proceso_id', procIds)
+    ]);
+    hs = h.data || []; ps = p.data || [];
+  } catch (e) { hs = []; ps = []; }
+  if (!hs.length && !ps.length) {
+    toast('Aún no hay honorarios ni pagos registrados en sus procesos.', 'error');
+    return;
+  }
+  const car = {}; (procesos || []).forEach(p => { car[p.id] = p.caratula; });
+  let totalH = 0, totalP = 0;
+  const bloques = procIds.map(pid => {
+    const hh = hs.filter(x => x.proceso_id === pid);
+    const pp = ps.filter(x => x.proceso_id === pid);
+    if (!hh.length && !pp.length) return '';
+    const sh = hh.reduce((a, b) => a + Number(b.monto || 0), 0);
+    const sp = pp.reduce((a, b) => a + Number(b.monto || 0), 0);
+    totalH += sh; totalP += sp;
+    const filasH = hh.length ? hh.map(x => `<tr><td>${fmtDate(x.fecha)}</td><td>${esc(x.concepto || 'Honorario')}</td><td class="r">${money(x.monto)}</td></tr>`).join('') : '<tr><td colspan="3" class="muted">Sin cargos.</td></tr>';
+    const filasP = pp.length ? pp.map(x => `<tr><td>${fmtDate(x.fecha)}</td><td>${esc(x.metodo || 'Pago')}</td><td class="r">${money(x.monto)}</td></tr>`).join('') : '<tr><td colspan="3" class="muted">Sin pagos.</td></tr>';
+    return `<h2>${esc(car[pid] || 'Proceso')}</h2>
+      <table><thead><tr><th colspan="3">Honorarios (cargos)</th></tr></thead><tbody>${filasH}</tbody></table>
+      <table><thead><tr><th colspan="3">Pagos recibidos</th></tr></thead><tbody>${filasP}</tbody></table>
+      <p class="saldo">Saldo del proceso: <strong>${money(sh - sp)}</strong></p>`;
+  }).join('');
+  const saldo = totalH - totalP;
+  const win = window.open('', '_blank');
+  if (!win) { toast('Permita las ventanas emergentes para descargar el estado de cuenta.', 'error'); return; }
+  win.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Estado de cuenta · LexFive</title>
+    <style>
+      *{box-sizing:border-box} body{font-family:Arial,Helvetica,sans-serif;color:#1a2330;margin:0;padding:28px;max-width:800px;margin:auto}
+      .hd{background:#0e1b2c;color:#fff;padding:18px 22px;border-radius:10px;margin-bottom:18px}
+      .hd b{font-size:20px} .hd .g{color:#c2a25a} .hd .sub{color:#c2a25a;font-size:12px;letter-spacing:2px;text-transform:uppercase}
+      h2{font-size:15px;margin:18px 0 6px;color:#0e1b2c;border-bottom:2px solid #c2a25a;padding-bottom:4px}
+      table{width:100%;border-collapse:collapse;margin:4px 0 10px}
+      th,td{padding:6px 8px;font-size:12.5px;text-align:left;border-bottom:1px solid #e6e8ec}
+      th{background:#f3eedf;color:#0e1b2c} td.r,th.r{text-align:right} .r{text-align:right}
+      .muted{color:#888} .saldo{text-align:right;margin:2px 0 6px}
+      .tot{background:#f7f8fa;border-radius:10px;padding:14px 18px;margin-top:16px}
+      .tot .big{font-size:18px;color:#0e1b2c}
+      .pie{color:#888;font-size:11px;margin-top:20px;text-align:center}
+      @media print{body{padding:0}}
+    </style></head>
+    <body onload="window.print()">
+      <div class="hd"><b>Lex<span class="g">Five</span></b><div class="sub">Estado de cuenta</div></div>
+      <p><strong>Cliente:</strong> ${esc(state.profile.nombre || '')}<br>
+         <strong>Fecha:</strong> ${fmtDate(hoyISO())}</p>
+      ${bloques || '<p>No hay movimientos para mostrar.</p>'}
+      <div class="tot">
+        <p>Total honorarios: <strong>${money(totalH)}</strong></p>
+        <p>Total pagado: <strong>${money(totalP)}</strong></p>
+        <p class="big">Saldo pendiente: <strong>${money(saldo)}</strong></p>
+      </div>
+      <p class="pie">Documento generado desde el portal del cliente de LexFive. Si tiene dudas sobre algún monto, consúltenos.</p>
+    </body></html>`);
+  win.document.close();
 }
 
 function starsHtml(n) {
@@ -5475,6 +5558,143 @@ function toggleTheme() {
   applyTheme(next);
 }
 
+// ---- Tamaño de letra (accesibilidad) ----
+// Escala la letra de TODO el sistema cambiando el tamaño base (rem). Se guarda
+// en este equipo y se aplica también antes de pintar (ver index.html) para que
+// no haya parpadeo.
+const FONT_KEY = 'lexfive_fontscale';
+const FONT_STEPS = [0.9, 1, 1.1, 1.25, 1.4];
+function currentFontScale() {
+  const v = parseFloat(localStorage.getItem(FONT_KEY));
+  return FONT_STEPS.indexOf(v) !== -1 ? v : 1;
+}
+function applyFontScale(s) {
+  document.documentElement.style.fontSize = (s * 100) + '%';
+}
+function changeFontScale(dir) {
+  let i = FONT_STEPS.indexOf(currentFontScale());
+  if (i === -1) i = 1;
+  i = Math.max(0, Math.min(FONT_STEPS.length - 1, i + dir));
+  const s = FONT_STEPS[i];
+  try { localStorage.setItem(FONT_KEY, String(s)); } catch (e) {}
+  applyFontScale(s);
+  toast('Tamaño de letra: ' + Math.round(s * 100) + '%', 'success');
+}
+
+// ============================================================
+//  Campanita de notificaciones (novedades dentro de la app).
+//  El cliente ve "Novedad en su proceso" al entrar, sin depender del correo.
+//  Si la tabla 'notificaciones' aún no se creó (db/24), la campana se oculta
+//  sola y nada se rompe.
+// ============================================================
+const NOTIF = { items: [], unread: 0, ok: false };
+
+async function cargarNotificaciones() {
+  if (!state.profile) return;
+  try {
+    const { data, error } = await supabase.from('notificaciones').select('*')
+      .eq('user_id', state.profile.id)
+      .order('created_at', { ascending: false }).limit(25);
+    if (error) throw error;
+    NOTIF.items = data || [];
+    NOTIF.unread = NOTIF.items.filter(n => !n.leida).length;
+    NOTIF.ok = true;
+  } catch (e) {
+    NOTIF.ok = false; // la tabla no existe todavía: ocultamos la campana
+  }
+  pintarCampana();
+}
+
+function pintarCampana() {
+  const bell = $('#btnNotif');
+  if (!bell) return;
+  bell.hidden = !NOTIF.ok;
+  const c = bell.querySelector('.notif-bell__count');
+  if (c) {
+    if (NOTIF.ok && NOTIF.unread > 0) { c.hidden = false; c.textContent = NOTIF.unread > 9 ? '9+' : String(NOTIF.unread); }
+    else c.hidden = true;
+  }
+  const panel = $('#notifPanel');
+  if (panel && panel.classList.contains('open')) renderNotifPanel(panel);
+}
+
+function notifListHTML() {
+  if (!NOTIF.items.length) return '<div class="notif-empty">No tiene notificaciones.</div>';
+  return NOTIF.items.map(n => `
+    <button class="notif-item ${n.leida ? '' : 'is-unread'}" data-id="${n.id}" type="button">
+      <div class="notif-item__title">${esc(n.titulo || 'Notificación')}</div>
+      ${n.cuerpo ? `<div class="notif-item__body">${esc(n.cuerpo)}</div>` : ''}
+      <div class="notif-item__time">${fmtDateTime(n.created_at)}</div>
+    </button>`).join('');
+}
+
+function renderNotifPanel(panel) {
+  panel.innerHTML = `
+    <div class="notif-panel__head">
+      <strong>Notificaciones</strong>
+      ${NOTIF.unread ? '<button class="btn btn--ghost btn--sm" id="notifReadAll" type="button">Marcar leídas</button>' : ''}
+    </div>
+    <div class="notif-list">${notifListHTML()}</div>`;
+  panel.querySelectorAll('.notif-item').forEach(it => it.onclick = () => marcarNotifLeida(it.dataset.id));
+  const ra = panel.querySelector('#notifReadAll'); if (ra) ra.onclick = marcarTodasLeidas;
+}
+
+function toggleNotifPanel() {
+  let panel = $('#notifPanel');
+  if (!panel) { panel = document.createElement('div'); panel.id = 'notifPanel'; panel.className = 'notif-panel'; document.body.appendChild(panel); }
+  if (panel.classList.contains('open')) { panel.classList.remove('open'); return; }
+  renderNotifPanel(panel);
+  const bell = $('#btnNotif');
+  const r = bell.getBoundingClientRect();
+  panel.style.top = (r.bottom + 8) + 'px';
+  panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+  panel.classList.add('open');
+}
+
+async function marcarNotifLeida(id) {
+  const n = NOTIF.items.find(x => x.id === id);
+  if (n && !n.leida) {
+    n.leida = true; NOTIF.unread = Math.max(0, NOTIF.unread - 1); pintarCampana();
+    try { await supabase.from('notificaciones').update({ leida: true }).eq('id', id); } catch (e) {}
+  }
+}
+
+async function marcarTodasLeidas() {
+  const ids = NOTIF.items.filter(n => !n.leida).map(n => n.id);
+  NOTIF.items.forEach(n => n.leida = true); NOTIF.unread = 0; pintarCampana();
+  try { if (ids.length) await supabase.from('notificaciones').update({ leida: true }).in('id', ids); } catch (e) {}
+}
+
+function subscribeNotifsRealtime() {
+  try {
+    supabase.channel('notif-' + state.profile.id)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notificaciones', filter: 'user_id=eq.' + state.profile.id }, () => cargarNotificaciones())
+      .subscribe();
+  } catch (e) {}
+}
+
+function initNotifBell() {
+  const actions = $('#topbarActions');
+  if (!actions || $('#btnNotif')) return;
+  const btn = document.createElement('button');
+  btn.className = 'btn btn--ghost btn--sm notif-bell';
+  btn.id = 'btnNotif';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Notificaciones');
+  btn.title = 'Notificaciones';
+  btn.innerHTML = ICON.campana + '<span class="notif-bell__count" hidden></span>';
+  btn.hidden = true;
+  btn.onclick = (e) => { e.stopPropagation(); toggleNotifPanel(); };
+  actions.insertBefore(btn, actions.firstChild);
+  document.addEventListener('click', (e) => {
+    const panel = $('#notifPanel');
+    if (panel && panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) panel.classList.remove('open');
+  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') cargarNotificaciones(); });
+  cargarNotificaciones();
+  subscribeNotifsRealtime();
+}
+
 // ============================================================
 //  Arranque
 // ============================================================
@@ -5562,6 +5782,9 @@ async function arrancarSesion() {
     });
   }
 
+  // Campanita de notificaciones (novedades dentro de la app), para todos los roles.
+  initNotifBell();
+
   // Registrar el service worker para que el sistema se pueda instalar como
   // app en el celular y funcione mejor (PWA).
   if ('serviceWorker' in navigator) {
@@ -5628,6 +5851,11 @@ async function arrancarSesion() {
   applyTheme(currentTheme());
   const btnTheme = $('#btnTheme');
   if (btnTheme) btnTheme.onclick = toggleTheme;
+
+  // Tamaño de letra (accesibilidad): botones A− / A+ en la barra superior.
+  applyFontScale(currentFontScale());
+  const bFontMinus = $('#btnFontMinus'); if (bFontMinus) bFontMinus.onclick = () => changeFontScale(-1);
+  const bFontPlus = $('#btnFontPlus'); if (bFontPlus) bFontPlus.onclick = () => changeFontScale(1);
 
   // Al hacer clic en el logo (ir al sitio público), cerrar la sesión por
   // seguridad. El autoguardado conserva lo que se estaba escribiendo, así que

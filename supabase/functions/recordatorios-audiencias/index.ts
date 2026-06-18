@@ -24,6 +24,7 @@ import webpush from "npm:web-push@3.6.7";
 interface Perfil { id: string; nombre: string; email: string | null; }
 interface Proceso { id: string; caratula: string; numero: string | null; juzgado: string | null; proxima_audiencia: string | null; abogados_ids: string[] | null; abogado_id: string | null; estado: string | null; }
 interface Evento { id: string; proceso_id: string; titulo: string; tipo: string; fecha: string; estado: string; }
+interface Tarea { id: string; titulo: string; asignado_a: string | null; vence: string | null; estado: string; }
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -44,7 +45,7 @@ async function sb(path: string): Promise<any[]> {
   return await res.json();
 }
 
-function rangoManianaUTC(): { startISO: string; endISO: string; etiqueta: string } {
+function rangoManianaUTC(): { startISO: string; endISO: string; etiqueta: string; fechaISO: string } {
   // Bolivia no tiene horario de verano: siempre UTC-4.
   const ahora = new Date();
   const bo = new Date(ahora.getTime() - 4 * 3600 * 1000);
@@ -52,7 +53,8 @@ function rangoManianaUTC(): { startISO: string; endISO: string; etiqueta: string
   const start = new Date(medianocheBoEnUTC.getTime() + 4 * 3600 * 1000); // mañana 00:00 Bolivia, en UTC
   const end = new Date(start.getTime() + 24 * 3600 * 1000);
   const etiqueta = new Date(medianocheBoEnUTC.getTime()).toLocaleDateString("es-BO", { weekday: "long", day: "numeric", month: "long" });
-  return { startISO: start.toISOString(), endISO: end.toISOString(), etiqueta };
+  const fechaISO = medianocheBoEnUTC.toISOString().slice(0, 10); // fecha de mañana (Bolivia), YYYY-MM-DD
+  return { startISO: start.toISOString(), endISO: end.toISOString(), etiqueta, fechaISO };
 }
 
 function horaBolivia(iso: string): string {
@@ -76,12 +78,13 @@ Deno.serve(async (req) => {
       return new Response("No autorizado", { status: 401 });
     }
 
-    const { startISO, endISO, etiqueta } = rangoManianaUTC();
+    const { startISO, endISO, etiqueta, fechaISO } = rangoManianaUTC();
 
-    const [perfiles, procesos, eventos] = await Promise.all([
+    const [perfiles, procesos, eventos, tareas] = await Promise.all([
       sb(`profiles?select=id,nombre,email`) as Promise<Perfil[]>,
       sb(`procesos?select=id,caratula,numero,juzgado,proxima_audiencia,abogados_ids,abogado_id,estado&proxima_audiencia=gte.${startISO}&proxima_audiencia=lt.${endISO}`) as Promise<Proceso[]>,
       sb(`eventos?select=id,proceso_id,titulo,tipo,fecha,estado&estado=eq.pendiente&fecha=gte.${startISO}&fecha=lt.${endISO}`) as Promise<Evento[]>,
+      sb(`tareas?select=id,titulo,asignado_a,vence,estado&estado=neq.hecha&vence=eq.${fechaISO}`).catch(() => []) as Promise<Tarea[]>,
     ]);
 
     const perfilPorId = new Map(perfiles.map((p) => [p.id, p]));
@@ -132,6 +135,19 @@ Deno.serve(async (req) => {
         detalle: e.tipo,
       });
     }
+    // Tareas que vencen mañana (asignadas directamente a un usuario).
+    for (const t of (tareas || [])) {
+      if (!t.asignado_a) continue;
+      const perfil = perfilPorId.get(t.asignado_a);
+      if (!perfil) continue;
+      const item: Item = { hora: "Tarea", titulo: t.titulo, detalle: "Tarea pendiente" };
+      if (perfil.email) {
+        if (!porEmail.has(perfil.email)) porEmail.set(perfil.email, { nombre: perfil.nombre, items: [] });
+        porEmail.get(perfil.email)!.items.push(item);
+      }
+      if (!porUser.has(t.asignado_a)) porUser.set(t.asignado_a, []);
+      porUser.get(t.asignado_a)!.push(item);
+    }
 
     let enviados = 0;
     const errores: string[] = [];
@@ -148,7 +164,7 @@ Deno.serve(async (req) => {
             <div style="color:#c2a25a;font-size:12px;letter-spacing:2px;text-transform:uppercase">Recordatorio de agenda</div>
           </div>
           <div style="border:1px solid #e6e8ec;border-top:none;border-radius:0 0 10px 10px;padding:20px 22px">
-            <p>Hola ${esc(data.nombre)}, le recordamos sus audiencias y plazos para <strong>mañana ${esc(etiqueta)}</strong>:</p>
+            <p>Hola ${esc(data.nombre)}, le recordamos sus audiencias, plazos y tareas para <strong>mañana ${esc(etiqueta)}</strong>:</p>
             <table style="width:100%;border-collapse:collapse;font-size:14px">${filas}</table>
             <p style="color:#666;font-size:12px;margin-top:18px">Mensaje automático del sistema LexFive. No responda a este correo.</p>
           </div>
@@ -201,7 +217,7 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({
       ok: true, fecha: etiqueta, destinatarios: porEmail.size, enviados, errores,
       push: { enviados: pushEnviados, borradas: pushBorradas },
-      audiencias: procesos.length, eventos: eventos.length,
+      audiencias: procesos.length, eventos: eventos.length, tareas: (tareas || []).length,
     }), { headers: { "Content-Type": "application/json" } });
   } catch (e) {
     return new Response(JSON.stringify({ ok: false, error: (e as Error).message }), {

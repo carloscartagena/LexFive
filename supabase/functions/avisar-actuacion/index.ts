@@ -54,6 +54,15 @@ async function sb(path: string): Promise<any[]> {
   return await res.json();
 }
 
+async function sbInsert(path: string, rows: unknown): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method: "POST",
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify(rows),
+  });
+  if (!res.ok) throw new Error(`insert ${path}: ${res.status} ${await res.text()}`);
+}
+
 async function enviarCorreo(to: string, subject: string, html: string) {
   if (!RESEND_API_KEY) return false;
   const res = await fetch("https://api.resend.com/emails", {
@@ -89,7 +98,6 @@ Deno.serve(async (req) => {
     if (!cli) return jsonResp({ ok: true, notified: false, reason: "cliente no encontrado" });
 
     const caratula = proc.caratula || "su proceso";
-    const resumen = (descripcion ? String(descripcion) : "").trim();
 
     // 2) Correo (genérico, sin el detalle, por privacidad)
     let correoEnviado = false;
@@ -118,36 +126,58 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 3) Push (si el cliente activó notificaciones; se vincula por su correo).
-    let pushEnviados = 0, pushBorradas = 0;
-    if (cli.email && VAPID_PUBLIC && VAPID_PRIVATE) {
+    // 3) Buscar el/los usuario(s) del cliente (por su correo), una sola vez.
+    let userIds: string[] = [];
+    if (cli.email) {
       try {
-        // Buscar el usuario (profile) cuyo correo coincide con el del cliente.
         const perfiles = await sb(`profiles?select=id&email=eq.${encodeURIComponent(cli.email)}`);
-        const userIds = perfiles.map((p) => p.id);
-        if (userIds.length) {
-          webpush.setVapidDetails("mailto:notificaciones@lexfive.app", VAPID_PUBLIC, VAPID_PRIVATE);
-          const subs = await sb(`push_subscriptions?select=id,user_id,endpoint,p256dh,auth&user_id=in.(${userIds.join(",")})`);
-          const payload = JSON.stringify({
-            title: "Novedad en su proceso",
-            body: `Se registró una nueva actuación en «${caratula}». Toque para verla.`,
-            url: PORTAL_URL,
-          });
-          for (const s of subs) {
-            try {
-              await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload);
-              pushEnviados++;
-            } catch (err) {
-              const code = (err as any)?.statusCode;
-              if (code === 404 || code === 410) {
-                await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions?id=eq.${s.id}`, {
-                  method: "DELETE",
-                  headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
-                });
-                pushBorradas++;
-              } else {
-                console.error("push error", code, (err as any)?.body ?? (err as Error)?.message);
-              }
+        userIds = perfiles.map((p) => p.id);
+      } catch (e) {
+        errores.push(`perfiles: ${(e as Error).message}`);
+      }
+    }
+
+    // 3a) Notificación DENTRO de la app (campanita), aunque no tenga push.
+    let notifCreadas = 0;
+    if (userIds.length) {
+      try {
+        await sbInsert("notificaciones", userIds.map((uid) => ({
+          user_id: uid,
+          titulo: "Novedad en su proceso",
+          cuerpo: `Se registró una nueva actuación en «${caratula}».`,
+          url: PORTAL_URL,
+        })));
+        notifCreadas = userIds.length;
+      } catch (e) {
+        errores.push(`notif: ${(e as Error).message}`);
+      }
+    }
+
+    // 3b) Push (si el cliente activó notificaciones).
+    let pushEnviados = 0, pushBorradas = 0;
+    if (userIds.length && VAPID_PUBLIC && VAPID_PRIVATE) {
+      try {
+        webpush.setVapidDetails("mailto:notificaciones@lexfive.app", VAPID_PUBLIC, VAPID_PRIVATE);
+        const subs = await sb(`push_subscriptions?select=id,user_id,endpoint,p256dh,auth&user_id=in.(${userIds.join(",")})`);
+        const payload = JSON.stringify({
+          title: "Novedad en su proceso",
+          body: `Se registró una nueva actuación en «${caratula}». Toque para verla.`,
+          url: PORTAL_URL,
+        });
+        for (const s of subs) {
+          try {
+            await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload);
+            pushEnviados++;
+          } catch (err) {
+            const code = (err as any)?.statusCode;
+            if (code === 404 || code === 410) {
+              await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions?id=eq.${s.id}`, {
+                method: "DELETE",
+                headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+              });
+              pushBorradas++;
+            } else {
+              console.error("push error", code, (err as any)?.body ?? (err as Error)?.message);
             }
           }
         }
@@ -158,11 +188,11 @@ Deno.serve(async (req) => {
 
     return jsonResp({
       ok: true,
-      notified: correoEnviado || pushEnviados > 0,
+      notified: correoEnviado || pushEnviados > 0 || notifCreadas > 0,
       correo: correoEnviado,
+      notif: notifCreadas,
       push: { enviados: pushEnviados, borradas: pushBorradas },
       errores,
-      resumen_len: resumen.length,
     });
   } catch (e) {
     return jsonResp({ ok: false, error: (e as Error).message }, 500);
