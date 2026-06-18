@@ -1859,7 +1859,7 @@ async function renderAgenda() {
     </div>
 
     <div class="card">
-      <div class="card__head"><h3>${ICON.audiencia} Audiencias y plazos de ${meses[m]}</h3></div>
+      <div class="card__head"><h3>${ICON.audiencia} Audiencias y plazos de ${meses[m]}</h3>${delMes.length ? `<button class="btn btn--ghost btn--sm" id="calExport" type="button">${ICON.descargar} Exportar mes (.ics)</button>` : ''}</div>
       <div class="card__body--flush">
         ${delMes.length ? `<div class="table-wrap"><table class="data">
           <thead><tr><th>Fecha / hora</th><th>Evento / proceso</th><th>Tipo</th><th>Responsable</th><th></th></tr></thead>
@@ -1900,6 +1900,26 @@ async function renderAgenda() {
     if (it.kind === 'ev') descargarICSEvento(it.ev, it.proc ? it.proc.caratula : '');
     else descargarICS(it.proc);
   });
+  const bexp = $('#calExport');
+  if (bexp) bexp.onclick = () => {
+    if (!delMes.length) { toast('No hay eventos este mes para exportar.', 'error'); return; }
+    const vevents = delMes.map(it => {
+      const inicio = new Date(it.fecha);
+      const fin = new Date(inicio.getTime() + 60 * 60 * 1000);
+      const uid = (it.kind === 'ev' ? 'ev-' + it.ev.id : 'proc-' + it.procId) + '@lexfive';
+      const desc = it.kind === 'ev' ? (it.ev.nota || it.ev.tipo || '') : (it.proc && it.proc.numero ? 'Nº ' + it.proc.numero : '');
+      return [
+        'BEGIN:VEVENT', 'UID:lexfive-' + uid, 'DTSTAMP:' + icsFecha(new Date()),
+        'DTSTART:' + icsFecha(inicio), 'DTEND:' + icsFecha(fin), 'SUMMARY:' + icsEscape(it.titulo),
+        desc ? 'DESCRIPTION:' + icsEscape(desc) : '',
+        'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEscape(it.titulo), 'END:VALARM',
+        'END:VEVENT'
+      ].filter(Boolean).join('\r\n');
+    });
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//LexFive//Sistema//ES', 'CALSCALE:GREGORIAN', ...vevents, 'END:VCALENDAR'].join('\r\n');
+    descargarArchivo('agenda-' + y + '-' + String(m + 1).padStart(2, '0') + '.ics', ics, 'text/calendar;charset=utf-8');
+    toast('Agenda de ' + meses[m] + ' descargada (' + delMes.length + ' eventos). Ábrala para agregarla a su calendario.', 'success');
+  };
 }
 
 // Descarga un evento/plazo como archivo de calendario (.ics).
@@ -2451,6 +2471,16 @@ async function renderReportes() {
   loading();
   const { data } = await supabase.from('procesos').select('*').eq('eliminado', false);
   const todos = data || [];
+  // Honorarios y pagos para la tasa de cobranza (si el rol no tiene acceso, quedan vacíos).
+  let honor = [], pag = [];
+  try {
+    const [h, p] = await Promise.all([
+      supabase.from('honorarios').select('proceso_id,monto'),
+      supabase.from('pagos').select('proceso_id,monto')
+    ]);
+    honor = h.data || []; pag = p.data || [];
+  } catch (e) { honor = []; pag = []; }
+  const bs = (n) => 'Bs ' + Number(n || 0).toFixed(2);
   const fechaProc = p => (p.fecha_inicio || (p.created_at ? p.created_at.slice(0, 10) : ''));
   const hoy = hoyISO();
   const iniAnio = hoy.slice(0, 4) + '-01-01';
@@ -2485,7 +2515,16 @@ async function renderReportes() {
     const porMateria = Object.entries(matCount).map(([k, v]) => ({ label: k, value: v })).sort((a, b) => b.value - a.value);
     const aboCount = {}; filt.forEach(p => { const ids = (p.abogados_ids && p.abogados_ids.length) ? p.abogados_ids : (p.abogado_id ? [p.abogado_id] : []); ids.forEach(id => { aboCount[id] = (aboCount[id] || 0) + 1; }); });
     const porAbogado = Object.entries(aboCount).map(([id, v]) => ({ label: profName(id), value: v })).sort((a, b) => b.value - a.value);
-    datos = { filt, activos, judiciales, administrativos, porEstado, porMateria, porAbogado };
+    // Tasa de cobranza (pagado / facturado) de los procesos del período.
+    const idsFilt = new Set(filt.map(p => p.id));
+    const totHon = honor.filter(h => idsFilt.has(h.proceso_id)).reduce((a, b) => a + Number(b.monto || 0), 0);
+    const totPag = pag.filter(p => idsFilt.has(p.proceso_id)).reduce((a, b) => a + Number(b.monto || 0), 0);
+    const cobranza = totHon > 0 ? Math.round((totPag / totHon) * 100) : null;
+    // Casos nuevos por mes (según fecha de inicio / alta).
+    const mesCount = {};
+    filt.forEach(p => { const f = fechaProc(p); if (f) { const k = f.slice(0, 7); mesCount[k] = (mesCount[k] || 0) + 1; } });
+    const porMes = Object.keys(mesCount).sort().map(k => { const a = k.split('-'); return { label: a[1] + '/' + a[0].slice(2), value: mesCount[k] }; });
+    datos = { filt, activos, judiciales, administrativos, porEstado, porMateria, porAbogado, cobranza, totHon, totPag, porMes };
 
     $('#repBody').innerHTML = `
       <div class="stats-grid">
@@ -2493,11 +2532,18 @@ async function renderReportes() {
         <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dashboard}</div></div><div class="metric__num">${activos}</div><div class="metric__label">Activos</div></div>
         <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.doc}</div></div><div class="metric__num">${judiciales}</div><div class="metric__label">Judiciales</div></div>
         <div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.doc}</div></div><div class="metric__num">${administrativos}</div><div class="metric__label">Administrativos</div></div>
+        ${cobranza !== null ? `<div class="metric"><div class="metric__top"><div class="metric__icon">${ICON.dinero}</div></div><div class="metric__num">${cobranza}%</div><div class="metric__label">Tasa de cobranza</div></div>` : ''}
       </div>
+      ${cobranza !== null ? `<div class="card"><div class="card__head"><h3>${ICON.dinero} Cobranza del período</h3></div><div class="card__body" style="display:flex;flex-wrap:wrap;gap:24px">
+        <div><div class="cell-sub">Facturado (honorarios)</div><div class="cell-strong" style="font-size:1.2rem">${bs(totHon)}</div></div>
+        <div><div class="cell-sub">Cobrado (pagos)</div><div class="cell-strong" style="font-size:1.2rem">${bs(totPag)}</div></div>
+        <div><div class="cell-sub">Saldo por cobrar</div><div class="cell-strong" style="font-size:1.2rem">${bs(totHon - totPag)}</div></div>
+      </div></div>` : ''}
       <div class="charts-grid">
         <div class="card"><div class="card__head"><h3>${ICON.grafico} Por estado</h3></div><div class="card__body">${barChart(porEstado)}</div></div>
         <div class="card"><div class="card__head"><h3>${ICON.grafico} Por materia</h3></div><div class="card__body">${barChart(porMateria)}</div></div>
         <div class="card"><div class="card__head"><h3>${ICON.grafico} Por abogado</h3></div><div class="card__body">${barChart(porAbogado)}</div></div>
+        ${porMes.length ? `<div class="card"><div class="card__head"><h3>${ICON.grafico} Casos nuevos por mes</h3></div><div class="card__body">${barChart(porMes)}</div></div>` : ''}
       </div>`;
   }
   calc();
@@ -2515,10 +2561,12 @@ async function renderReportes() {
       ? `Período: ${rango.desde ? fmtDate(rango.desde) : 'inicio'} — ${rango.hasta ? fmtDate(rango.hasta) : 'hoy'}`
       : 'Todo el historial';
     const body = `<h1>Reporte de procesos</h1>
-      <p style="color:#5c6675;font-size:12px;margin:0 0 4px">${esc(periodo)} · ${d.filt.length} proceso(s) · ${d.activos} activo(s)</p>
+      <p style="color:#5c6675;font-size:12px;margin:0 0 4px">${esc(periodo)} · ${d.filt.length} proceso(s) · ${d.activos} activo(s)${d.cobranza !== null ? ' · Cobranza: ' + d.cobranza + '%' : ''}</p>
+      ${d.cobranza !== null ? `<p style="font-size:12px;margin:0 0 4px">Facturado: ${bs(d.totHon)} · Cobrado: ${bs(d.totPag)} · Saldo: ${bs(d.totHon - d.totPag)}</p>` : ''}
       ${tabla('Por estado', 'Estado', d.porEstado)}
       ${tabla('Por materia', 'Materia', d.porMateria)}
-      ${tabla('Por abogado', 'Abogado', d.porAbogado)}`;
+      ${tabla('Por abogado', 'Abogado', d.porAbogado)}
+      ${d.porMes && d.porMes.length ? tabla('Casos nuevos por mes', 'Mes', d.porMes) : ''}`;
     abrirImpresion('Reporte de procesos', body);
   };
 }
@@ -5477,9 +5525,9 @@ async function actualizarBadgesMenu() {
 async function openBuscadorGlobal() {
   openModal('Buscar en el sistema', `
     <div class="field" style="margin-bottom:6px">
-      <input id="gqInput" type="search" placeholder="Escriba carátula, número, NUREJ, cliente, correo..." autocomplete="off">
+      <input id="gqInput" type="search" placeholder="Escriba carátula, número, NUREJ, cliente, correo, actuación..." autocomplete="off">
     </div>
-    <p class="cell-sub" id="gqHint">Busca a la vez en procesos, clientes y consultas.</p>
+    <p class="cell-sub" id="gqHint">Busca a la vez en procesos, clientes, consultas y actuaciones.</p>
     <div id="gqResults"></div>`, [{ label: 'Cerrar', class: 'btn--ghost', onClick: closeModal }], true);
 
   const input = $('#gqInput');
@@ -5487,12 +5535,15 @@ async function openBuscadorGlobal() {
   if (input) input.focus();
 
   // Cargar datos una sola vez al abrir
-  const [{ data: procesos }, { data: clientes }, { data: consultas }] = await Promise.all([
+  const [{ data: procesos }, { data: clientes }, { data: consultas }, actuRes] = await Promise.all([
     supabase.from('procesos').select('*').eq('eliminado', false),
     supabase.from('clientes').select('*'),
-    supabase.from('consultas').select('*').order('created_at', { ascending: false })
+    supabase.from('consultas').select('*').order('created_at', { ascending: false }),
+    supabase.from('actuaciones').select('id,proceso_id,descripcion,fecha').order('fecha', { ascending: false }).limit(500).then(r => r, () => ({ data: [] }))
   ]);
   const P = procesos || [], C = (clientes || []).filter(c => !c.eliminado), Q = consultas || [];
+  const A = (actuRes && actuRes.data) || [];
+  const procById = {}; P.forEach(p => { procById[p.id] = p; });
 
   const pinta = () => {
     const q = (input.value || '').trim().toLowerCase();
@@ -5503,6 +5554,7 @@ async function openBuscadorGlobal() {
     const pr = P.filter(p => match(p.caratula, p.numero, p.nurej, p.juzgado, p.parte_contraria, clienteName(p.cliente_id))).slice(0, 8);
     const cl = C.filter(c => match(c.nombre, c.documento, c.email, c.telefono)).slice(0, 6);
     const cs = Q.filter(c => match(consultaNombre(c), c.email, c.mensaje, c.area)).slice(0, 6);
+    const ac = A.filter(a => match(a.descripcion, procById[a.proceso_id] && procById[a.proceso_id].caratula)).slice(0, 6);
 
     let html = '';
     if (pr.length) html += `<div class="gq-group"><div class="gq-group__title">${ICON.procesos} Procesos (${pr.length})</div>${pr.map(p => `
@@ -5520,12 +5572,18 @@ async function openBuscadorGlobal() {
         <strong>${esc(consultaNombre(c))}</strong>
         <span class="cell-sub">${esc((c.mensaje || '').slice(0, 70))}</span>
       </button>`).join('')}</div>`;
+    if (ac.length) html += `<div class="gq-group"><div class="gq-group__title">${ICON.doc} Actuaciones (${ac.length})</div>${ac.map(a => `
+      <button class="gq-item" data-tipo="actuacion" data-id="${a.proceso_id}">
+        <strong>${esc((a.descripcion || 'Actuación').slice(0, 70))}</strong>
+        <span class="cell-sub">${esc(fmtDate(a.fecha))}${procById[a.proceso_id] ? ' · ' + esc(procById[a.proceso_id].caratula) : ''}</span>
+      </button>`).join('')}</div>`;
     if (!html) html = `<p class="empty" style="padding:20px">Sin resultados para “${esc(q)}”.</p>`;
     cont.innerHTML = html;
 
     cont.querySelectorAll('.gq-item').forEach(b => b.onclick = () => {
       const id = b.dataset.id;
       if (b.dataset.tipo === 'proceso') openProcesoDetail(id);
+      else if (b.dataset.tipo === 'actuacion') openProcesoDetail(id);
       else if (b.dataset.tipo === 'cliente') { const c = C.find(x => x.id === id); if (c) clienteForm(c); }
       else { const c = Q.find(x => x.id === id); if (c) openConsultaDetail(c); }
     });
