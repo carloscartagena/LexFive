@@ -235,7 +235,7 @@ ET
 BT
 /F1 10.50 Tf
 533.44 613.89 Td
-(4) Tj
+(5) Tj
 ET
 0.800 0.820 0.850 rg
 BT
@@ -619,7 +619,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Length 6646 >>
+<< /Length 6807 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -942,116 +942,116 @@ BT
 74.00 328.39 Td
 (09_actuaciones_archivos.sql — adjuntar archivos a cada actuación.) Tj
 ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 311.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 311.89 Td
+(10 a 24 — etapas siguientes: branding compartido y en tiempo real, gestión avanzada \(tareas,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 297.39 Td
+(plazos, honorarios y pagos\), plantillas, privacidad del personal, papeleras, recibos correlativos,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 282.89 Td
+(credenciales en la nube, registro de horas, suscripciones push y notificaciones in-app + estado de) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 268.39 Td
+(cuenta del cliente \(24_notificaciones_estado_cuenta.sql\).) Tj
+ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 291.39 Td
+56.00 231.39 Td
 (4. Funcionalidades construidas) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 283.39 m 539.28 283.39 l S
+56.00 223.39 m 539.28 223.39 l S
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 249.39 Td
+56.00 189.39 Td
 (Sitio web público) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 228.89 Td
+60.00 168.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 228.89 Td
+74.00 168.89 Td
 (Página de inicio con áreas de práctica, equipo, testimonios e indicadores.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 212.39 Td
+60.00 152.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 212.39 Td
+74.00 152.39 Td
 (Casos de éxito, blog jurídico y preguntas frecuentes.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 195.89 Td
+60.00 135.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 195.89 Td
+74.00 135.89 Td
 (Formulario de contacto que guarda cada mensaje en la base de datos \(bandeja de Consultas\) y,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 181.39 Td
+74.00 121.39 Td
 (opcionalmente, envía copia por correo \(Web3Forms\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 164.89 Td
+60.00 104.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 164.89 Td
+74.00 104.89 Td
 (Botón flotante de WhatsApp con menú de los cinco abogados.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 148.39 Td
+60.00 88.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 148.39 Td
+74.00 88.39 Td
 (Páginas legales y página de verificación de credenciales.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 131.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 131.89 Td
-(Cuatro temas de color con acento dorado y diseño accesible y responsive.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 12.00 Tf
-56.00 102.89 Td
-(Panel de gestión privado) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 82.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 82.39 Td
-(Dashboard con métricas \(procesos totales/activos, audiencias próximas, consultas nuevas\).) Tj
 ET
 
 endstream
@@ -1060,7 +1060,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Length 6852 >>
+<< /Length 7151 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1105,61 +1105,43 @@ ET
 BT
 /F1 10.50 Tf
 74.00 757.39 Td
+(Cuatro temas de color con acento dorado y diseño accesible y responsive.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 728.39 Td
+(Panel de gestión privado) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 707.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 707.89 Td
+(Dashboard con métricas \(procesos totales/activos, audiencias próximas, consultas nuevas\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 691.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 691.39 Td
 (Procesos/casos: crear, editar, asignar varios abogados y procuradores, vincular cliente, estados,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 742.89 Td
-(NUREJ, próxima audiencia e historial de actuaciones con archivos.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 726.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 726.39 Td
-(Clientes: cartera con documento, contacto y vinculación por correo.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 709.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 709.89 Td
-(Bandeja de consultas con estados \(Nueva/Atendida/Archivada\) y respuesta por WhatsApp o correo.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 693.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 693.39 Td
-(Modelos de memoriales: biblioteca de plantillas por área del derecho.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 676.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
 74.00 676.89 Td
-(Blog: redacción de artículos \(borrador/publicado\) que aparecen en la web pública.) Tj
+(NUREJ, próxima audiencia e historial de actuaciones con archivos.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -1171,7 +1153,7 @@ ET
 BT
 /F1 10.50 Tf
 74.00 660.39 Td
-(Testimonios: moderación \(aprobar/rechazar\) antes de publicarse.) Tj
+(Clientes: cartera con documento, contacto y vinculación por correo.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -1183,7 +1165,7 @@ ET
 BT
 /F1 10.50 Tf
 74.00 643.89 Td
-(Usuarios \(solo admin\): cambiar roles, activar/desactivar cuentas.) Tj
+(Bandeja de consultas con estados \(Nueva/Atendida/Archivada\) y respuesta por WhatsApp o correo.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -1195,7 +1177,7 @@ ET
 BT
 /F1 10.50 Tf
 74.00 627.39 Td
-(Categorías/áreas del derecho \(solo admin\): crear, renombrar y eliminar.) Tj
+(Modelos de memoriales: biblioteca de plantillas por área del derecho.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -1207,7 +1189,7 @@ ET
 BT
 /F1 10.50 Tf
 74.00 610.89 Td
-(Auditoría \(solo admin\): bitácora de acciones importantes.) Tj
+(Blog: redacción de artículos \(borrador/publicado\) que aparecen en la web pública.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -1219,7 +1201,7 @@ ET
 BT
 /F1 10.50 Tf
 74.00 594.39 Td
-(Credenciales: generador de carnet imprimible del bufete.) Tj
+(Testimonios: moderación \(aprobar/rechazar\) antes de publicarse.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -1231,7 +1213,7 @@ ET
 BT
 /F1 10.50 Tf
 74.00 577.89 Td
-(Portal del cliente: vista reducida donde el cliente ve solo sus procesos y deja su opinión.) Tj
+(Usuarios \(solo admin\): cambiar roles, activar/desactivar cuentas.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
@@ -1243,235 +1225,268 @@ ET
 BT
 /F1 10.50 Tf
 74.00 561.39 Td
+(Categorías/áreas del derecho \(solo admin\): crear, renombrar y eliminar.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 544.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 544.89 Td
+(Auditoría \(solo admin\): bitácora de acciones importantes.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 528.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 528.39 Td
+(Credenciales: generador de carnet imprimible del bufete.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 511.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 511.89 Td
+(Portal del cliente: vista reducida donde el cliente ve solo sus procesos y deja su opinión.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 495.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 495.39 Td
 (Autoguardado de borradores y cierre de sesión por inactividad.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
+/F2 12.00 Tf
+56.00 466.39 Td
+(Funciones de etapas posteriores) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 445.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 445.89 Td
+(Agenda/calendario con exportación de un evento o de todo el mes a calendario \(.ics\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 429.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 429.39 Td
+(Tareas/pendientes \(tablero\) con prioridad, vencimiento, responsable y filtros.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 412.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 412.89 Td
+(Honorarios y pagos con saldo, cartera, reportes \(tasa de cobranza, casos por mes\) y recibos) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 398.39 Td
+(numerados imprimibles.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 381.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 381.89 Td
+(Plantillas de memoriales con campos automáticos; papeleras de procesos y clientes.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 365.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 365.39 Td
+(Branding \(logo y sello\) compartido y en tiempo real, con pestaña «Sellos y logos» y vista previa en) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 350.89 Td
+(grande; sello impreso directamente en la credencial \(frente y reverso\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 334.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 334.39 Td
+(Dashboard con «Mis pendientes», «Mi agenda», contadores en el menú y gráficos \(incl. ingresos) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 319.89 Td
+(por mes\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 303.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 303.39 Td
+(Accesibilidad: tamaño de letra ajustable; modo oscuro; títulos legibles y centrados.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 286.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 286.89 Td
+(Notificaciones: recordatorios diarios \(audiencias, plazos y tareas\) por correo y push; aviso al cliente) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 272.39 Td
+(por nueva actuación \(correo, push y campanita\); centro de notificaciones \(campanita\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 255.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 255.89 Td
+(Portal del cliente: estado de cuenta descargable en PDF.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
 /F2 16.00 Tf
-56.00 524.39 Td
+56.00 218.89 Td
 (5. Modelo de datos \(resumen\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 516.39 m 539.28 516.39 l S
+56.00 210.89 m 539.28 210.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 489.89 Td
+56.00 184.39 Td
 (Tablas principales en PostgreSQL \(Supabase\):) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 468.39 Td
+60.00 162.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 468.39 Td
+74.00 162.89 Td
 (profiles — usuarios del sistema, vinculados a auth.users, con rol) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 453.89 Td
+74.00 148.39 Td
 (\(admin/procurador/abogado/cliente\) y estado activo.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 437.39 Td
+60.00 131.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 437.39 Td
+74.00 131.89 Td
 (clientes — cartera de clientes \(vinculados por correo\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 420.89 Td
+60.00 115.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 420.89 Td
+74.00 115.39 Td
 (procesos — casos judiciales/administrativos \(carátula, número/NUREJ, materia, estado, audiencia,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 406.39 Td
+74.00 100.89 Td
 (etc.\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 389.89 Td
+60.00 84.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 389.89 Td
+74.00 84.39 Td
 (actuaciones — historial de pasos de cada proceso \(con archivos adjuntos\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 373.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 373.39 Td
-(documentos — metadatos de memoriales/archivos \(el archivo físico va en Storage\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 356.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 356.89 Td
-(articulos — artículos del blog \(borrador/publicado\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 340.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 340.39 Td
-(auditoria — bitácora de acciones.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 323.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 323.89 Td
-(Más tablas para consultas, testimonios y categorías, añadidas por los scripts 02 a 09.) Tj
-ET
-0.965 0.957 0.937 rg
-56.00 244.89 483.28 72.00 re
-f
-0.760 0.635 0.353 rg
-56.00 244.89 4.00 72.00 re
-f
-0.659 0.522 0.235 rg
-BT
-/F2 10.00 Tf
-71.00 297.39 Td
-(Seguridad) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 283.89 Td
-(Seguridad \(RLS\): cada tabla tiene políticas que definen quién puede ver, crear, editar o borrar. Por) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 270.39 Td
-(ejemplo, todos ven los procesos pero solo el admin elimina; un cliente solo ve sus propios procesos; la) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 256.89 Td
-(auditoría solo la ve el admin. Funciones auxiliares: is_admin\(\) y current_rol\(\).) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 204.89 Td
-(6. Cómo se pone en marcha \(una sola vez\)) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 196.89 m 539.28 196.89 l S
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 170.39 Td
-(1.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 170.39 Td
-(Crear un proyecto en Supabase.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 152.89 Td
-(2.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 152.89 Td
-(En el SQL Editor, ejecutar en orden los scripts de db/: primero schema.sql, luego del 02 al 09.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 135.39 Td
-(3.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 135.39 Td
-(En Authentication ? Providers ? Email, configurar el login por correo.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 117.89 Td
-(4.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 117.89 Td
-(Crear el primer usuario y convertirlo en admin con: update public.profiles set rol = 'admin' where) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 103.39 Td
-(email = 'tu-correo';) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 10.50 Tf
-58.00 85.89 Td
-(5.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-78.00 85.89 Td
-(Poner la URL y la clave pública de Supabase en sistema/js/config.js.) Tj
 ET
 
 endstream
@@ -1480,7 +1495,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 6468 >>
+<< /Length 6209 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1515,362 +1530,329 @@ BT
 281.85 52.00 Td
 (Página 5) Tj
 ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 757.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 757.39 Td
+(documentos — metadatos de memoriales/archivos \(el archivo físico va en Storage\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 740.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 740.89 Td
+(articulos — artículos del blog \(borrador/publicado\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 724.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 724.39 Td
+(auditoria — bitácora de acciones.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 707.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 707.89 Td
+(Más tablas para consultas, testimonios y categorías, añadidas por los scripts 02 a 09.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 628.89 483.28 72.00 re
+f
+0.760 0.635 0.353 rg
+56.00 628.89 4.00 72.00 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 681.39 Td
+(Seguridad) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 667.89 Td
+(Seguridad \(RLS\): cada tabla tiene políticas que definen quién puede ver, crear, editar o borrar. Por) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 654.39 Td
+(ejemplo, todos ven los procesos pero solo el admin elimina; un cliente solo ve sus propios procesos; la) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 640.89 Td
+(auditoría solo la ve el admin. Funciones auxiliares: is_admin\(\) y current_rol\(\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 588.89 Td
+(6. Cómo se pone en marcha \(una sola vez\)) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 580.89 m 539.28 580.89 l S
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 757.39 Td
+58.00 554.39 Td
+(1.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 554.39 Td
+(Crear un proyecto en Supabase.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 536.89 Td
+(2.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 536.89 Td
+(En el SQL Editor, ejecutar en orden los scripts de db/: primero schema.sql, luego del 02 al 09.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 519.39 Td
+(3.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 519.39 Td
+(En Authentication ? Providers ? Email, configurar el login por correo.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 501.89 Td
+(4.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 501.89 Td
+(Crear el primer usuario y convertirlo en admin con: update public.profiles set rol = 'admin' where) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 487.39 Td
+(email = 'tu-correo';) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 469.89 Td
+(5.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+78.00 469.89 Td
+(Poner la URL y la clave pública de Supabase en sistema/js/config.js.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 10.50 Tf
+58.00 452.39 Td
 (6.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 757.39 Td
+78.00 452.39 Td
 (\(Opcional\) Poner la clave de Web3Forms en el formulario de index.html.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 10.50 Tf
-58.00 739.89 Td
+58.00 434.89 Td
 (7.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-78.00 739.89 Td
+78.00 434.89 Td
 (Desplegar en Netlify conectando el repositorio de GitHub \(push a main = publica solo\).) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 686.89 483.28 45.00 re
+56.00 381.89 483.28 45.00 re
 f
 0.760 0.635 0.353 rg
-56.00 686.89 4.00 45.00 re
+56.00 381.89 4.00 45.00 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 712.39 Td
+71.00 407.39 Td
 (Más detalle) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 698.89 Td
+71.00 393.89 Td
 (El detalle completo está en sistema/CONFIGURACION.md y en el Manual del Sistema.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 646.89 Td
+56.00 341.89 Td
 (7. Guía para replicar el sistema en otra plataforma) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 638.89 m 539.28 638.89 l S
+56.00 333.89 m 539.28 333.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 612.39 Td
+56.00 307.39 Td
 (Si en el futuro se reconstruye con otro stack \(por ejemplo React + Node, Django, Laravel, Firebase,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 597.89 Td
+56.00 292.89 Td
 (etc.\), estos son los componentes que hay que cubrir, independientemente del lenguaje.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 12.00 Tf
-56.00 568.89 Td
+56.00 263.89 Td
 (Equivalencias por capa \(lo usado aquí y sus alternativas\)) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 548.39 Td
+60.00 243.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 548.39 Td
+74.00 243.39 Td
 (Base de datos relacional — aquí: Supabase \(PostgreSQL\). Alternativas: Firebase/Firestore,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 533.89 Td
+74.00 228.89 Td
 (MySQL, MongoDB, PlanetScale, Neon.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 517.39 Td
+60.00 212.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 517.39 Td
+74.00 212.39 Td
 (Autenticación — aquí: Supabase Auth. Alternativas: Firebase Auth, Auth0, Clerk, NextAuth, Devise) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 502.89 Td
+74.00 197.89 Td
 (\(Rails\), auth de Django.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 486.39 Td
+60.00 181.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 486.39 Td
+74.00 181.39 Td
 (Seguridad por rol — aquí: RLS de PostgreSQL. Alternativas: middleware/guards en el backend) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 471.89 Td
+74.00 166.89 Td
 (\(guards de NestJS, permissions de Django, policies de Laravel\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 455.39 Td
+60.00 150.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 455.39 Td
+74.00 150.39 Td
 (Almacenamiento de archivos — aquí: Supabase Storage. Alternativas: AWS S3, Firebase Storage,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 440.89 Td
+74.00 135.89 Td
 (Cloudinary.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 424.39 Td
+60.00 119.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 424.39 Td
+74.00 119.39 Td
 (Frontend — aquí: HTML/CSS/JS puro. Alternativas: React, Vue, Angular, Svelte, Next.js.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 407.89 Td
+60.00 102.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 407.89 Td
+74.00 102.89 Td
 (Recepción de formularios — aquí: Web3Forms. Alternativas: Formspree, EmailJS, o un endpoint) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 393.39 Td
+74.00 88.39 Td
 (propio con Nodemailer/SendGrid.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 376.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 376.89 Td
-(Hosting — aquí: Netlify. Alternativas: Vercel, GitHub Pages, Render, Cloudflare Pages o un VPS.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 12.00 Tf
-56.00 347.89 Td
-(Checklist funcional para no olvidar nada) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 327.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 327.39 Td
-(Roles y permisos: admin, abogado, procurador, cliente — con quién puede borrar.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 310.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 310.89 Td
-(Gestión de procesos con asignación múltiple de abogados/procuradores.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 294.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 294.39 Td
-(Historial de actuaciones con archivos adjuntos por paso.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 277.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 277.89 Td
-(Clientes vinculados por correo y portal del cliente \(ve solo lo suyo\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 261.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 261.39 Td
-(Bandeja de consultas alimentada por el formulario web.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 244.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 244.89 Td
-(Biblioteca de modelos por área del derecho.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 228.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 228.39 Td
-(Blog editable desde el panel que se publica en la web.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 211.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 211.89 Td
-(Testimonios con moderación.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 195.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 195.39 Td
-(Categorías dinámicas \(áreas del derecho\).) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 178.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 178.89 Td
-(Auditoría de acciones.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 162.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 162.39 Td
-(Generador de credenciales imprimibles.) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 145.89 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 145.89 Td
-(Autoguardado de borradores y cierre de sesión por inactividad.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 12.00 Tf
-56.00 116.89 Td
-(Lecciones aprendidas y recomendaciones) Tj
-ET
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 96.39 Td
-(•) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 96.39 Td
-(Empezar por el modelo de datos y los roles: todo lo demás \(pantallas, permisos\) se deriva de ahí.) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 81.89 Td
-(Tener clara la matriz de permisos antes de programar evita rehacer trabajo.) Tj
 ET
 
 endstream
@@ -1879,7 +1861,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 15 0 R >>
 endobj
 17 0 obj
-<< /Length 3425 >>
+<< /Length 6450 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1924,165 +1906,357 @@ ET
 BT
 /F1 10.50 Tf
 74.00 757.39 Td
+(Hosting — aquí: Netlify. Alternativas: Vercel, GitHub Pages, Render, Cloudflare Pages o un VPS.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 728.39 Td
+(Checklist funcional para no olvidar nada) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 707.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 707.89 Td
+(Roles y permisos: admin, abogado, procurador, cliente — con quién puede borrar.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 691.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 691.39 Td
+(Gestión de procesos con asignación múltiple de abogados/procuradores.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 674.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 674.89 Td
+(Historial de actuaciones con archivos adjuntos por paso.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 658.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 658.39 Td
+(Clientes vinculados por correo y portal del cliente \(ve solo lo suyo\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 641.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 641.89 Td
+(Bandeja de consultas alimentada por el formulario web.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 625.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 625.39 Td
+(Biblioteca de modelos por área del derecho.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 608.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 608.89 Td
+(Blog editable desde el panel que se publica en la web.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 592.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 592.39 Td
+(Testimonios con moderación.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 575.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 575.89 Td
+(Categorías dinámicas \(áreas del derecho\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 559.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 559.39 Td
+(Auditoría de acciones.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 542.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 542.89 Td
+(Generador de credenciales imprimibles.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 526.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 526.39 Td
+(Autoguardado de borradores y cierre de sesión por inactividad.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 12.00 Tf
+56.00 497.39 Td
+(Lecciones aprendidas y recomendaciones) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 476.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 476.89 Td
+(Empezar por el modelo de datos y los roles: todo lo demás \(pantallas, permisos\) se deriva de ahí.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 462.39 Td
+(Tener clara la matriz de permisos antes de programar evita rehacer trabajo.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 445.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 445.89 Td
 (Mantener la seguridad en el backend o la base de datos, nunca solo en el navegador. Aquí se logró) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 742.89 Td
+74.00 431.39 Td
 (con RLS; en otro stack, con guards/policies del lado del servidor.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 726.39 Td
+60.00 414.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 726.39 Td
+74.00 414.89 Td
 (Separar claves públicas de claves secretas. En config.js solo va la clave pública; la service_role y) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 711.89 Td
+74.00 400.39 Td
 (las contraseñas jamás se exponen en el frontend.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 695.39 Td
+60.00 383.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 695.39 Td
+74.00 383.89 Td
 (Un frontend estático más un backend gestionado \(BaaS\) abarata y simplifica el mantenimiento de) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 680.89 Td
+74.00 369.39 Td
 (proyectos pequeños y medianos: no hay servidor que administrar.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 664.39 Td
+60.00 352.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 664.39 Td
+74.00 352.89 Td
 (El despliegue continuo \(push a main que publica solo\) ahorra mucho tiempo.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 647.89 Td
+60.00 336.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 647.89 Td
+74.00 336.39 Td
 (Documentar desde el inicio \(manual y guía de configuración\) facilita el traspaso y el soporte.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 610.89 Td
+56.00 299.39 Td
 (8. Datos clave del proyecto actual) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 602.89 m 539.28 602.89 l S
+56.00 291.39 m 539.28 291.39 l S
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 576.39 Td
+60.00 264.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 576.39 Td
+74.00 264.89 Td
 (Sitio: lexfive.netlify.app.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 559.89 Td
+60.00 248.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 559.89 Td
+74.00 248.39 Td
 (Frontend: HTML/CSS/JS puro \(alrededor de 3.700 líneas entre app.js, main.js y styles.css\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 543.39 Td
+60.00 231.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 543.39 Td
-(Base de datos: Supabase \(PostgreSQL\), 9 scripts SQL versionados en db/.) Tj
+74.00 231.89 Td
+(Base de datos: Supabase \(PostgreSQL\), 24 scripts SQL versionados en db/, más 2 Edge Functions) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 217.39 Td
+(\(recordatorios y aviso de actuación\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 526.89 Td
+60.00 200.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 526.89 Td
+74.00 200.89 Td
 (Despliegue: Netlify conectado a GitHub \(rama main\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 510.39 Td
+60.00 184.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 510.39 Td
+74.00 184.39 Td
 (Repositorio: carloscartagena/LexFive.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 436.89 483.28 58.50 re
+56.00 110.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 436.89 4.00 58.50 re
+56.00 110.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 475.89 Td
+71.00 149.89 Td
 (Versión) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 462.39 Td
+71.00 136.39 Td
 (Este resumen describe el proyecto a la fecha indicada en la portada. Si el sistema cambia, vuelva a) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 448.89 Td
+71.00 122.89 Td
 (generar el documento con scripts/generar_resumen.py.) Tj
 ET
 
@@ -2105,15 +2279,15 @@ xref
 0000005067 00000 n 
 0000010950 00000 n 
 0000011115 00000 n 
-0000017814 00000 n 
-0000017980 00000 n 
-0000024885 00000 n 
-0000025051 00000 n 
-0000031572 00000 n 
-0000031738 00000 n 
-0000035216 00000 n 
+0000017975 00000 n 
+0000018141 00000 n 
+0000025345 00000 n 
+0000025511 00000 n 
+0000031773 00000 n 
+0000031939 00000 n 
+0000038442 00000 n 
 trailer
 << /Size 19 /Root 1 0 R >>
 startxref
-35382
+38608
 %%EOF

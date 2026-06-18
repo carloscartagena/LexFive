@@ -118,7 +118,19 @@ def build_blocks():
         "Mis procesos: los casos en los que usted está asignado.",
         "Consultas nuevas: mensajes del formulario web aún sin atender. Al hacer clic en esta "
         "tarjeta se abre directamente la bandeja de Consultas.",
+        "«Mis pendientes»: sus tareas asignadas sin terminar, con las vencidas en rojo y las de "
+        "hoy en ámbar; puede completarlas con un toque (✓) o abrirlas.",
+        "«Mi agenda» (próximos 7 días): sus audiencias y los plazos de sus procesos, con acceso "
+        "directo al proceso o al calendario.",
+        "Gráficos: procesos por estado, materia, carga por abogado e ingresos por mes.",
     ])
+    p("En la barra superior y el menú lateral, todos los roles disponen de: una campanita de "
+      "notificaciones (novedades, con contador de no leídas); contadores en el menú (tareas "
+      "pendientes asignadas y consultas nuevas); botones de tamaño de letra (A− / A+) y modo "
+      "claro/oscuro; y un buscador global (procesos, clientes, consultas y actuaciones) con "
+      "el botón «Buscar» o Ctrl/Cmd + K.")
+    note("Cada mañana el sistema envía a cada abogado, por correo y notificación push, un "
+         "resumen con sus audiencias, plazos y tareas del día siguiente.", "Recordatorios")
 
     h1("5. Procesos (casos)")
     p("La pestaña «Procesos» es el corazón del sistema. Allí se registra y da seguimiento a "
@@ -260,6 +272,11 @@ def build_blocks():
         "botón para consultar por WhatsApp.",
         "Dentro de cada caso ve su historial de actuaciones y puede descargar los archivos de "
         "cada paso: la respuesta del juzgado y el nuevo memorial presentado, entre otros.",
+        "Avisos de novedades: cuando su abogado registra una nueva actuación, el cliente recibe "
+        "un aviso por la campanita de su portal, por notificación push y por correo (genérico, "
+        "sin el detalle, por privacidad).",
+        "Mi estado de cuenta: el cliente puede descargar en PDF el detalle de honorarios y "
+        "pagos de sus procesos, con el saldo pendiente.",
         "Mi opinión: un formulario para calificar el servicio y dejar un comentario, que el "
         "bufete revisa antes de publicarlo.",
     ])
@@ -294,7 +311,18 @@ def build_blocks():
         "07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.",
         "08_categorias.sql — áreas del derecho dinámicas (crear categorías desde el panel).",
         "09_actuaciones_archivos.sql — adjuntar archivos a cada actuación del historial.",
+        "10 a 24 — etapas siguientes: branding compartido y en tiempo real (logo/sello), "
+        "gestión avanzada (tareas, plazos, honorarios y pagos), plantillas, privacidad del "
+        "personal, papeleras de procesos y clientes, recibos correlativos, credenciales en la "
+        "nube, registro de horas, suscripciones push y, el más reciente, "
+        "24_notificaciones_estado_cuenta.sql (campanita de notificaciones y estado de cuenta "
+        "del cliente).",
     ])
+    p("Además, en supabase/functions/ hay dos funciones programadas que se despliegan en "
+      "Supabase: «recordatorios-audiencias» (envía cada mañana audiencias, plazos y tareas del "
+      "día siguiente por correo y push) y «avisar-actuacion» (avisa al cliente por correo, push "
+      "y campanita al registrarse una nueva actuación). Su configuración está en los archivos "
+      "RECORDATORIOS-SETUP.md, AVISO-ACTUACION-SETUP.md y MEJORAS-BLOQUE2-SETUP.md.")
     h2("Conexión y correo")
     bul([
         "La conexión a Supabase está en sistema/js/config.js (URL y clave pública).",
@@ -366,7 +394,14 @@ def build_blocks():
         "imprimir o guardar el PDF.",
         "En el reverso puede escribir una frase del bufete y la base legal que faculta la "
         "representación del procurador (texto que redacta usted como abogado).",
-        "Hay líneas para la firma autorizada y el sello del bufete, sobre fondo blanco.",
+        "Hay líneas para la firma autorizada y el sello del bufete. El sello del bufete ya se "
+        "imprime en la credencial (en el frente y el reverso), usando el sello elegido en "
+        "«Sellos y logos» y sin el cuadro blanco de fondo; así solo hace falta agregar a mano "
+        "la firma o el sello personal.",
+        "El logo y el sello se administran en la pestaña «Sellos y logos»: toque uno para verlo "
+        "en grande y pulse «Usar este» para dejarlo como predeterminado, o suba el suyo (con "
+        "opción de «Quitar fondo blanco» para fotos). Lo elegido se aplica en la web, el panel, "
+        "las credenciales y los memoriales.",
     ])
     p("El administrador y los abogados entregan las credenciales a sus procuradores: el "
       "procurador se registra, el administrador le asigna el rol «Procurador» en Usuarios, y "
@@ -444,10 +479,18 @@ def build_blocks_abogados():
       "administrador, cuánto hay por cobrar.")
     bul([
         "Las «Alertas de audiencias y plazos» muestran lo vencido y lo que vence en 7 días.",
+        "«Mis pendientes»: sus tareas asignadas sin terminar (vencidas en rojo, las de hoy en "
+        "ámbar); puede completarlas con un toque o abrirlas.",
+        "«Mi agenda» (próximos 7 días): sus audiencias y plazos próximos, con acceso al proceso "
+        "o al calendario.",
+        "En el menú lateral aparecen contadores: tareas pendientes asignadas y consultas nuevas; "
+        "y arriba, una campanita con las novedades.",
         "Con «Recordar a los 5» envía por WhatsApp un recordatorio de la audiencia.",
-        "Puede buscar en todo el sistema (procesos, clientes y consultas) con el botón "
-        "«Buscar» o el atajo Ctrl/Cmd + K.",
-        "Puede cambiar entre modo claro y oscuro con el botón de la luna/sol.",
+        "Puede buscar en todo el sistema (procesos, clientes, consultas y actuaciones) con el "
+        "botón «Buscar» o el atajo Ctrl/Cmd + K.",
+        "Puede cambiar entre modo claro y oscuro, y ajustar el tamaño de letra (A− / A+).",
+        "Cada mañana recibe por correo y notificación un recordatorio con sus audiencias, "
+        "plazos y tareas del día siguiente.",
     ])
 
     h1("4. Procesos judiciales")
@@ -482,7 +525,12 @@ def build_blocks_abogados():
 
     h1("7. Agenda y audiencias")
     p("En «Agenda» ve el calendario con las audiencias y plazos del bufete. Puede exportar un "
-      "evento a su calendario personal (celular o computadora) para que le avise.")
+      "evento a su calendario personal (celular o computadora), o usar «Exportar mes (.ics)» "
+      "para descargar todas las audiencias y plazos del mes en un solo archivo y abrirlo en "
+      "Google Calendar, Outlook o el calendario del celular.")
+    note("Cada vez que registra una nueva actuación en un proceso, su cliente recibe un aviso "
+         "automático (campanita de su portal, notificación y correo) invitándolo a ver la "
+         "novedad. El detalle no se envía por correo, por privacidad.", "Aviso al cliente")
 
     h1("8. Honorarios y pagos")
     p("Los abogados y el administrador registran honorarios y los pagos recibidos de cada "
@@ -496,8 +544,14 @@ def build_blocks_abogados():
     p("Los abogados y el administrador pueden generar carnets (credenciales) para sus "
       "procuradores desde la pestaña «Credenciales»: llenan los datos, eligen el logo, ajustan "
       "el fondo, usan «Vista previa» y luego «Imprimir / Guardar PDF». Las credenciales quedan "
-      "guardadas en la nube para editarlas o reimprimirlas. (Vea el detalle en el Manual "
-      "completo del Sistema.)")
+      "guardadas en la nube para editarlas o reimprimirlas. El sello del bufete (el que elija "
+      "en «Sellos y logos») se imprime ya en la credencial —en el frente y el reverso—, así "
+      "solo agrega su firma o sello personal a mano. (Vea el detalle en el Manual completo del "
+      "Sistema.)")
+    p("En la pestaña «Sellos y logos» administra el logo y el sello del bufete: toque uno para "
+      "verlo en grande y pulse «Usar este» para dejarlo como predeterminado, o suba el suyo "
+      "(marque «Quitar fondo blanco» si es una foto, para que quede transparente). Lo elegido "
+      "se aplica en la web, el panel, las credenciales y los memoriales.")
 
     h1("11. Consejos y seguridad")
     bul([
@@ -567,6 +621,12 @@ def build_blocks_clientes():
         "Toque o haga clic en un proceso para ver más detalles.",
         "La información se actualiza cuando su abogado registra novedades.",
     ])
+    note("Cuando su abogado registra una nueva actuación en su proceso, usted recibe un aviso "
+         "por la campanita (arriba en su portal, con un número de novedades sin leer), por "
+         "notificación en su celular o computadora y por correo. Así no tiene que estar "
+         "revisando: el sistema le avisa.", "Avisos de novedades")
+    p("También puede descargar su «Estado de cuenta» en PDF (honorarios, pagos y saldo de sus "
+      "procesos) desde el botón «Mi estado de cuenta» en «Mis procesos».")
 
     h1("5. Dejar su opinión")
     p("Si lo desea, puede dejar su opinión sobre la atención recibida. El bufete la revisa y, "
@@ -577,6 +637,9 @@ def build_blocks_clientes():
     p("Su información está protegida. Usted solo ve sus propios procesos y nadie más que el "
       "bufete tiene acceso a ellos. La sesión se cierra sola tras un tiempo sin uso, por "
       "seguridad.")
+    note("Si le cuesta leer, use los botones A− y A+ de la barra superior para achicar o "
+         "agrandar la letra de todo el portal. El tamaño se recuerda en su dispositivo.",
+         "Tamaño de letra")
 
     h1("7. Si olvida su contraseña o tiene dudas")
     bul([

@@ -80,6 +80,13 @@ Es la primera pantalla del personal. Muestra un resumen con tarjetas (métricas)
 - Audiencias próximas.
 - Mis procesos: los casos en los que usted está asignado.
 - Consultas nuevas: mensajes del formulario web aún sin atender. Al hacer clic en esta tarjeta se abre directamente la bandeja de Consultas.
+- «Mis pendientes»: sus tareas asignadas sin terminar, con las vencidas en rojo y las de hoy en ámbar; puede completarlas con un toque (✓) o abrirlas.
+- «Mi agenda» (próximos 7 días): sus audiencias y los plazos de sus procesos, con acceso directo al proceso o al calendario.
+- Gráficos: procesos por estado, materia, carga por abogado e ingresos por mes.
+
+En la barra superior y el menú lateral, todos los roles disponen de: una campanita de notificaciones (novedades, con contador de no leídas); contadores en el menú (tareas pendientes asignadas y consultas nuevas); botones de tamaño de letra (A− / A+) y modo claro/oscuro; y un buscador global (procesos, clientes, consultas y actuaciones) con el botón «Buscar» o Ctrl/Cmd + K.
+
+> **Recordatorios:** Cada mañana el sistema envía a cada abogado, por correo y notificación push, un resumen con sus audiencias, plazos y tareas del día siguiente.
 
 ## 5. Procesos (casos)
 
@@ -193,6 +200,8 @@ Cuando un cliente inicia sesión, ve una versión reducida y privada:
 
 - Mis procesos: el listado de sus casos, su estado y la próxima audiencia, además de un botón para consultar por WhatsApp.
 - Dentro de cada caso ve su historial de actuaciones y puede descargar los archivos de cada paso: la respuesta del juzgado y el nuevo memorial presentado, entre otros.
+- Avisos de novedades: cuando su abogado registra una nueva actuación, el cliente recibe un aviso por la campanita de su portal, por notificación push y por correo (genérico, sin el detalle, por privacidad).
+- Mi estado de cuenta: el cliente puede descargar en PDF el detalle de honorarios y pagos de sus procesos, con el saldo pendiente.
 - Mi opinión: un formulario para calificar el servicio y dejar un comentario, que el bufete revisa antes de publicarlo.
 
 ## 15. La página web pública
@@ -223,6 +232,9 @@ En la carpeta db/ del repositorio están los scripts SQL. Se ejecutan UNA sola v
 - 07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.
 - 08_categorias.sql — áreas del derecho dinámicas (crear categorías desde el panel).
 - 09_actuaciones_archivos.sql — adjuntar archivos a cada actuación del historial.
+- 10 a 24 — etapas siguientes: branding compartido y en tiempo real (logo/sello), gestión avanzada (tareas, plazos, honorarios y pagos), plantillas, privacidad del personal, papeleras de procesos y clientes, recibos correlativos, credenciales en la nube, registro de horas, suscripciones push y, el más reciente, 24_notificaciones_estado_cuenta.sql (campanita de notificaciones y estado de cuenta del cliente).
+
+Además, en supabase/functions/ hay dos funciones programadas que se despliegan en Supabase: «recordatorios-audiencias» (envía cada mañana audiencias, plazos y tareas del día siguiente por correo y push) y «avisar-actuacion» (avisa al cliente por correo, push y campanita al registrarse una nueva actuación). Su configuración está en los archivos RECORDATORIOS-SETUP.md, AVISO-ACTUACION-SETUP.md y MEJORAS-BLOQUE2-SETUP.md.
 
 ### Conexión y correo
 
@@ -280,7 +292,8 @@ El panel incluye una pestaña «Credenciales», visible solo para el administrad
 - Las credenciales que crea quedan GUARDADAS en la nube: en «Credenciales guardadas» puede verlas, editarlas, volver a imprimirlas o eliminarlas desde cualquier dispositivo. Si tiene muchas, use el buscador por nombre, carnet o cargo.
 - Con el botón «Vista previa» revisa cómo saldrá la credencial (ambas caras) antes de imprimir o guardar el PDF.
 - En el reverso puede escribir una frase del bufete y la base legal que faculta la representación del procurador (texto que redacta usted como abogado).
-- Hay líneas para la firma autorizada y el sello del bufete, sobre fondo blanco.
+- Hay líneas para la firma autorizada y el sello del bufete. El sello del bufete ya se imprime en la credencial (en el frente y el reverso), usando el sello elegido en «Sellos y logos» y sin el cuadro blanco de fondo; así solo hace falta agregar a mano la firma o el sello personal.
+- El logo y el sello se administran en la pestaña «Sellos y logos»: toque uno para verlo en grande y pulse «Usar este» para dejarlo como predeterminado, o suba el suyo (con opción de «Quitar fondo blanco» para fotos). Lo elegido se aplica en la web, el panel, las credenciales y los memoriales.
 
 El administrador y los abogados entregan las credenciales a sus procuradores: el procurador se registra, el administrador le asigna el rol «Procurador» en Usuarios, y luego se llena e imprime su credencial.
 
