@@ -420,7 +420,10 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
   position: absolute; bottom: 100%; left: 50%;
   transform: translate(-50%, 8%) rotate(-7deg);
   width: 2.4cm; height: 2.4cm; object-fit: contain; opacity: .95; pointer-events: none;
+  /* multiply quita el fondo blanco; el filtro aclara el papel gris y oscurece
+     la tinta del sello para que el fondo desaparezca y deje ver el logo detrás. */
   mix-blend-mode: multiply;
+  filter: contrast(1.35) brightness(1.12);
 }
 .cred-note { font-size: .4rem; color: var(--muted, #5c6675); padding: 3px 11px 6px; text-align: center; }
 .cred-actions { margin-bottom: 22px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
