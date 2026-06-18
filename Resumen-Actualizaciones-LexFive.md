@@ -2,7 +2,7 @@
 
 Documento de referencia para futuras actualizaciones o mejoras del sistema.
 Resume el trabajo realizado, los scripts de base de datos a ejecutar y las
-ideas pendientes. Última actualización: junio de 2026.
+ideas pendientes. Última actualización: junio de 2026 (segunda etapa).
 
 ---
 
@@ -17,6 +17,10 @@ en Supabase → **SQL Editor**. Los más recientes (de estas actualizaciones):
 | `18_realtime_branding.sql` | Logo y sello en tiempo real (en vivo) | Sí (para actualización instantánea) |
 | `19_branding_galerias.sql` | Galerías de logos/sellos en fila aparte (más liviano) | Sí (para que carguen las galerías) |
 | `20_seguridad_eventos.sql` | Corrige la lectura de "eventos" (privacidad del cliente) | **Sí (seguridad)** |
+| `21_registro_horas.sql` | Registro de horas trabajadas por proceso | Opcional |
+| `22_push_subscriptions.sql` | Suscripciones para notificaciones push | Sí (para push) |
+| `23_branding_storage.sql` | Bucket público para logos/sellos (más liviano que base64) | Sí (branding) |
+| `24_notificaciones_estado_cuenta.sql` | Campanita de notificaciones + permiso para el estado de cuenta del cliente | Sí (campanita y estado de cuenta) |
 
 > Regla práctica: cada vez que se agregue una función que necesite base de
 > datos, habrá un nuevo `db/NN_*.sql` que se ejecuta una sola vez.
@@ -97,10 +101,62 @@ en Supabase → **SQL Editor**. Los más recientes (de estas actualizaciones):
 
 ---
 
+### Segunda etapa: rendimiento, productividad, notificaciones y credencial
+
+**Rendimiento y experiencia**
+- Pestaña **Credenciales** mucho más ágil: el branding y las galerías se cargan
+  una sola vez por sesión y la lista de credenciales usa caché (antes se
+  descargaba todo de la nube en cada acción). Subir y eliminar responden al
+  instante; la sincronización ocurre en segundo plano.
+- **Service Worker** mejorado: JS/CSS con «stale-while-revalidate» (carga
+  instantánea en el celular) y navegación con tiempo de espera, para que el
+  celular no se quede colgado mostrando la página de «recargar».
+- **Modo oscuro**: títulos de pestaña/sección visibles (antes algunos quedaban
+  oscuros sobre fondo oscuro) y **centrados** en todo el sistema; botones de
+  modales y sello del catálogo legibles.
+- **Tamaño de letra ajustable** (botones A− / A+ en la barra superior), se
+  guarda por equipo. Mejora de accesibilidad para todos los roles.
+
+**Sellos y logos**
+- Pestaña **«Sellos y logos»** separada de Credenciales (más liviana y clara).
+- Al tocar un logo o sello se **ve en grande** y se confirma con «Usar este»
+  (antes se aplicaba con un solo clic, por accidente).
+
+**Productividad**
+- **«Mis pendientes»** y **«Mi agenda» (próximos 7 días)** en el inicio.
+- **Contadores en el menú** (tareas pendientes asignadas, consultas nuevas).
+- **Filtros en Tareas** (vencen hoy / esta semana / vencidas / por proceso).
+- **Gráfico de ingresos por mes** en el dashboard.
+- **Reportes**: tasa de cobranza (cobrado/facturado) y casos nuevos por mes.
+- **Buscador global**: ahora también encuentra **actuaciones**.
+- **Agenda**: exportar **todo el mes** a calendario (.ics).
+
+**Notificaciones**
+- **Recordatorios diarios** ahora incluyen también las **tareas que vencen
+  mañana** (además de audiencias y plazos), por correo y push.
+- **Aviso automático al cliente** cuando se registra una actuación: por correo,
+  por **push** y por la **campanita** dentro de la app (Edge Function
+  `avisar-actuacion`). Requiere `db/24` y desplegar la función.
+- **Campanita de notificaciones** en la barra superior (centro de novedades).
+
+**Credencial**
+- El **sello del bufete** ahora se imprime directamente en la credencial
+  (frente y reverso), con el sello elegido en «Sellos y logos» y sin el cuadro
+  blanco de fondo (se limpia con un filtro / `mix-blend-mode`).
+- **Estado de cuenta del cliente en PDF** desde su portal.
+
+> Detalle de despliegue de las funciones y SQL de esta etapa en
+> `MEJORAS-BLOQUE2-SETUP.md` y `AVISO-ACTUACION-SETUP.md`.
+
+---
+
 ## 3. Ideas pendientes / futuras mejoras
 
-- **Notificaciones por correo/WhatsApp automáticas** de audiencias (hoy el aviso
-  es dentro del panel y el recordatorio por WhatsApp es manual).
+- **Notificaciones**: ✅ ya se envían recordatorios automáticos diarios (correo
+  y push) de audiencias, plazos y tareas, y avisos al cliente por nueva
+  actuación (correo, push y campanita). Pendiente: **WhatsApp automático**
+  (requiere la API de WhatsApp Business, de pago) y **correo a clientes reales**
+  (requiere verificar un dominio en Resend).
 - **Restaurar** datos desde un respaldo (hoy el respaldo se puede *revisar*, no
   reimportar automáticamente).
 - **Comprimir también** logos/sellos raster (hoy se comprime la foto a JPEG;

@@ -44,6 +44,10 @@ Al ingresar verá «Mis procesos». Por cada caso podrá ver, según lo que regi
 - Toque o haga clic en un proceso para ver más detalles.
 - La información se actualiza cuando su abogado registra novedades.
 
+> **Avisos de novedades:** Cuando su abogado registra una nueva actuación en su proceso, usted recibe un aviso por la campanita (arriba en su portal, con un número de novedades sin leer), por notificación en su celular o computadora y por correo. Así no tiene que estar revisando: el sistema le avisa.
+
+También puede descargar su «Estado de cuenta» en PDF (honorarios, pagos y saldo de sus procesos) desde el botón «Mi estado de cuenta» en «Mis procesos».
+
 ## 5. Dejar su opinión
 
 Si lo desea, puede dejar su opinión sobre la atención recibida. El bufete la revisa y, una vez aprobada, puede mostrarse como testimonio en el sitio web. Su opinión nos ayuda a mejorar.
@@ -51,6 +55,8 @@ Si lo desea, puede dejar su opinión sobre la atención recibida. El bufete la r
 ## 6. Su privacidad
 
 Su información está protegida. Usted solo ve sus propios procesos y nadie más que el bufete tiene acceso a ellos. La sesión se cierra sola tras un tiempo sin uso, por seguridad.
+
+> **Tamaño de letra:** Si le cuesta leer, use los botones A− y A+ de la barra superior para achicar o agrandar la letra de todo el portal. El tamaño se recuerda en su dispositivo.
 
 ## 7. Si olvida su contraseña o tiene dudas
 

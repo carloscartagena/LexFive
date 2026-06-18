@@ -47,6 +47,15 @@ Organizadas por bloque. Cada una está fusionada en el repositorio.
 - **Papelera de procesos**: borrado seguro con opción de **restaurar** o eliminar definitivamente (solo admin).
 - **Reportes de procesos** por estado, materia y abogado, con filtro por período e impresión/PDF.
 
+### Bloque "Etapa reciente" (rendimiento, productividad, notificaciones, credencial)
+- **Rendimiento**: pestaña Credenciales con caché (carga/sube/elimina al instante); Service Worker con carga instantánea en el celular y sin la página de "recargar".
+- **Sellos y logos** en pestaña propia; vista previa en grande antes de elegir; sello visible en modo oscuro.
+- **Accesibilidad**: tamaño de letra ajustable (A− / A+); títulos visibles en modo oscuro y centrados.
+- **Productividad**: paneles "Mis pendientes" y "Mi agenda" en el inicio; contadores en el menú; filtros de tareas; gráfico de ingresos por mes; buscador que incluye actuaciones; exportar la agenda del mes (.ics).
+- **Reportes**: tasa de cobranza (cobrado/facturado) y casos nuevos por mes.
+- **Notificaciones**: recordatorios diarios que incluyen también tareas; aviso automático al cliente por nueva actuación (correo + push + campanita); centro de notificaciones (campanita) en la app.
+- **Credencial**: sello del bufete impreso directo (frente y reverso), elegible y sin fondo blanco. **Estado de cuenta del cliente en PDF** desde su portal.
+
 ---
 
 ## 3. Scripts de base de datos ejecutados
@@ -66,6 +75,10 @@ Para que el sistema funcione, en Supabase (SQL Editor) se ejecutaron los scripts
 | `18_realtime_branding.sql` | Logo y sello en tiempo real (se actualizan en vivo) |
 | `19_branding_galerias.sql` | Galerías de logos/sellos en fila aparte (carga más liviana) |
 | `20_seguridad_eventos.sql` | Privacidad de plazos/audiencias (el cliente solo ve los suyos) |
+| `21_registro_horas.sql` | Registro de horas trabajadas por proceso |
+| `22_push_subscriptions.sql` | Suscripciones para notificaciones push |
+| `23_branding_storage.sql` | Bucket público para logos/sellos (más liviano) |
+| `24_notificaciones_estado_cuenta.sql` | Campanita de notificaciones + estado de cuenta del cliente |
 
 > Regla práctica: cada vez que se agregue una función que necesite base de datos, habrá un nuevo script `db/NN_*.sql` que se ejecuta **una sola vez** en Supabase.
 
@@ -105,12 +118,12 @@ Hoy todo entra cómodamente en lo gratuito. Estos son los topes aproximados a vi
 ## 7. Ideas para continuar (hoja de ruta)
 
 ### A. Se pueden hacer GRATIS (solo programación)
-- **Avisos por correo al cliente** cuando cambia su proceso (reutilizando "Novedades"). *Nota: para enviar a los clientes hace falta el dominio verificado en Resend.*
+- ✅ **Avisos al cliente** cuando cambia su proceso: **hecho** por campanita, push y correo. *Pendiente solo el correo a clientes externos, que necesita el dominio verificado en Resend.*
 - **Papelera también para clientes** (borrado seguro de fichas de cliente).
-- **Recibos con el monto en letras** y numeración correlativa.
-- **Reportes adicionales**: honorarios por abogado/período, productividad, casos ganados/perdidos.
-- **Suscripción de calendario (.ics)**: que cada abogado vea TODAS sus audiencias en Google Calendar, actualizadas solas.
-- **Mejoras de uso**: modo oscuro, resaltado de resultados de búsqueda, más accesibilidad, atajos de teclado.
+- ✅ **Recibos con el monto en letras** y numeración correlativa: **hecho**.
+- ✅ **Reportes adicionales**: **hecho** en parte (tasa de cobranza y casos por mes). Pendiente: productividad por abogado, casos ganados/perdidos.
+- ✅ **Exportar la agenda del mes a calendario (.ics)**: **hecho**. Pendiente: suscripción que se actualice sola en Google Calendar.
+- ✅ **Mejoras de uso**: modo oscuro, **tamaño de letra ajustable** y más accesibilidad: **hecho**. Pendiente: resaltado de resultados de búsqueda.
 - **Plantillas**: más campos automáticos y guardar el memorial generado en el expediente del proceso.
 - **Auditoría con filtros** (por usuario, fecha o acción).
 

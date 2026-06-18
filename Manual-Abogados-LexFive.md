@@ -41,9 +41,13 @@ Este manual es para los abogados del bufete. Explica, en lenguaje sencillo, cóm
 Al entrar verá tarjetas con el resumen: procesos totales y activos, audiencias próximas, sus procesos, consultas nuevas, tareas pendientes y, si es abogado o administrador, cuánto hay por cobrar.
 
 - Las «Alertas de audiencias y plazos» muestran lo vencido y lo que vence en 7 días.
+- «Mis pendientes»: sus tareas asignadas sin terminar (vencidas en rojo, las de hoy en ámbar); puede completarlas con un toque o abrirlas.
+- «Mi agenda» (próximos 7 días): sus audiencias y plazos próximos, con acceso al proceso o al calendario.
+- En el menú lateral aparecen contadores: tareas pendientes asignadas y consultas nuevas; y arriba, una campanita con las novedades.
 - Con «Recordar a los 5» envía por WhatsApp un recordatorio de la audiencia.
-- Puede buscar en todo el sistema (procesos, clientes y consultas) con el botón «Buscar» o el atajo Ctrl/Cmd + K.
-- Puede cambiar entre modo claro y oscuro con el botón de la luna/sol.
+- Puede buscar en todo el sistema (procesos, clientes, consultas y actuaciones) con el botón «Buscar» o el atajo Ctrl/Cmd + K.
+- Puede cambiar entre modo claro y oscuro, y ajustar el tamaño de letra (A− / A+).
+- Cada mañana recibe por correo y notificación un recordatorio con sus audiencias, plazos y tareas del día siguiente.
 
 ## 4. Procesos judiciales
 
@@ -70,7 +74,9 @@ Cada mensaje enviado desde el formulario de contacto del sitio web llega a la ba
 
 ## 7. Agenda y audiencias
 
-En «Agenda» ve el calendario con las audiencias y plazos del bufete. Puede exportar un evento a su calendario personal (celular o computadora) para que le avise.
+En «Agenda» ve el calendario con las audiencias y plazos del bufete. Puede exportar un evento a su calendario personal (celular o computadora), o usar «Exportar mes (.ics)» para descargar todas las audiencias y plazos del mes en un solo archivo y abrirlo en Google Calendar, Outlook o el calendario del celular.
+
+> **Aviso al cliente:** Cada vez que registra una nueva actuación en un proceso, su cliente recibe un aviso automático (campanita de su portal, notificación y correo) invitándolo a ver la novedad. El detalle no se envía por correo, por privacidad.
 
 ## 8. Honorarios y pagos
 
@@ -82,7 +88,9 @@ En «Blog» puede redactar artículos jurídicos. Mientras escribe, se guarda so
 
 ## 10. Credenciales de procuradores
 
-Los abogados y el administrador pueden generar carnets (credenciales) para sus procuradores desde la pestaña «Credenciales»: llenan los datos, eligen el logo, ajustan el fondo, usan «Vista previa» y luego «Imprimir / Guardar PDF». Las credenciales quedan guardadas en la nube para editarlas o reimprimirlas. (Vea el detalle en el Manual completo del Sistema.)
+Los abogados y el administrador pueden generar carnets (credenciales) para sus procuradores desde la pestaña «Credenciales»: llenan los datos, eligen el logo, ajustan el fondo, usan «Vista previa» y luego «Imprimir / Guardar PDF». Las credenciales quedan guardadas en la nube para editarlas o reimprimirlas. El sello del bufete (el que elija en «Sellos y logos») se imprime ya en la credencial —en el frente y el reverso—, así solo agrega su firma o sello personal a mano. (Vea el detalle en el Manual completo del Sistema.)
+
+En la pestaña «Sellos y logos» administra el logo y el sello del bufete: toque uno para verlo en grande y pulse «Usar este» para dejarlo como predeterminado, o suba el suyo (marque «Quitar fondo blanco» si es una foto, para que quede transparente). Lo elegido se aplica en la web, el panel, las credenciales y los memoriales.
 
 ## 11. Consejos y seguridad
 

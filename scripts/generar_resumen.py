@@ -114,6 +114,10 @@ def build_blocks():
         "07_sync_clientes.sql — crea la ficha de cliente al registrarse.",
         "08_categorias.sql — áreas del derecho dinámicas.",
         "09_actuaciones_archivos.sql — adjuntar archivos a cada actuación.",
+        "10 a 24 — etapas siguientes: branding compartido y en tiempo real, gestión avanzada "
+        "(tareas, plazos, honorarios y pagos), plantillas, privacidad del personal, papeleras, "
+        "recibos correlativos, credenciales en la nube, registro de horas, suscripciones push y "
+        "notificaciones in-app + estado de cuenta del cliente (24_notificaciones_estado_cuenta.sql).",
     ])
 
     # 4
@@ -145,7 +149,23 @@ def build_blocks():
         "Portal del cliente: vista reducida donde el cliente ve solo sus procesos y deja su opinión.",
         "Autoguardado de borradores y cierre de sesión por inactividad.",
     ])
-
+    h2("Funciones de etapas posteriores")
+    bul([
+        "Agenda/calendario con exportación de un evento o de todo el mes a calendario (.ics).",
+        "Tareas/pendientes (tablero) con prioridad, vencimiento, responsable y filtros.",
+        "Honorarios y pagos con saldo, cartera, reportes (tasa de cobranza, casos por mes) y "
+        "recibos numerados imprimibles.",
+        "Plantillas de memoriales con campos automáticos; papeleras de procesos y clientes.",
+        "Branding (logo y sello) compartido y en tiempo real, con pestaña «Sellos y logos» y "
+        "vista previa en grande; sello impreso directamente en la credencial (frente y reverso).",
+        "Dashboard con «Mis pendientes», «Mi agenda», contadores en el menú y gráficos (incl. "
+        "ingresos por mes).",
+        "Accesibilidad: tamaño de letra ajustable; modo oscuro; títulos legibles y centrados.",
+        "Notificaciones: recordatorios diarios (audiencias, plazos y tareas) por correo y push; "
+        "aviso al cliente por nueva actuación (correo, push y campanita); centro de "
+        "notificaciones (campanita).",
+        "Portal del cliente: estado de cuenta descargable en PDF.",
+    ])
     # 5
     h1("5. Modelo de datos (resumen)")
     p("Tablas principales en PostgreSQL (Supabase):")
@@ -237,7 +257,8 @@ def build_blocks():
     bul([
         "Sitio: %s." % SITIO,
         "Frontend: HTML/CSS/JS puro (alrededor de 3.700 líneas entre app.js, main.js y styles.css).",
-        "Base de datos: Supabase (PostgreSQL), 9 scripts SQL versionados en db/.",
+        "Base de datos: Supabase (PostgreSQL), 24 scripts SQL versionados en db/, más 2 Edge "
+        "Functions (recordatorios y aviso de actuación).",
         "Despliegue: Netlify conectado a GitHub (rama main).",
         "Repositorio: carloscartagena/LexFive.",
     ])
