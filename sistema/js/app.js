@@ -4898,18 +4898,7 @@ async function renderCredenciales() {
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
           <div class="cred-sign__line cred-sign__sello">
-            <svg class="cred-sello-img" id="cv_sello" viewBox="0 0 120 120" role="img" aria-label="Sello del bufete" xmlns="http://www.w3.org/2000/svg">
-              <defs><linearGradient id="lfSelloGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="50%" stop-color="#1f9d6b"/><stop offset="50%" stop-color="#c0392b"/></linearGradient></defs>
-              <g fill="url(#lfSelloGrad)">
-                <g fill="none" stroke="url(#lfSelloGrad)"><circle cx="60" cy="60" r="56" stroke-width="2.5"/><circle cx="60" cy="60" r="49" stroke-width="1.2"/></g>
-                <text x="60" y="27" text-anchor="middle" font-size="8" font-family="Arial,Helvetica,sans-serif" font-weight="700" letter-spacing="1.5">★ ABOGADOS ★</text>
-                <text x="60" y="61" text-anchor="middle" font-size="22" font-family="Georgia,'Times New Roman',serif" font-weight="700">LexFive</text>
-                <text x="60" y="73" text-anchor="middle" font-size="6.5" font-family="Arial,Helvetica,sans-serif" font-weight="700" letter-spacing="2">BUFETE DE ABOGADOS</text>
-                <line x1="30" y1="83" x2="90" y2="83" stroke="url(#lfSelloGrad)" stroke-width="1"/>
-                <text x="60" y="96" text-anchor="middle" font-size="6.5" font-family="Arial,Helvetica,sans-serif" letter-spacing="1.2">EL ALTO · BOLIVIA</text>
-                <text x="60" y="106" text-anchor="middle" font-size="6" font-family="Arial,Helvetica,sans-serif">EST. 2023</text>
-              </g>
-            </svg>
+            ${selloActual ? `<img class="cred-sello-img" id="cv_sello" src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
             Sello del bufete
           </div>
         </div>
