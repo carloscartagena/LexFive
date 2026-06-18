@@ -3193,6 +3193,13 @@ async function openProcesoDetail(id, readonly = false) {
     if (error) { toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = 'Agregar al historial'; return; }
     await logAccion('actuacion', 'proceso', id, desc.slice(0, 60));
 
+    // Aviso automático al cliente del proceso (correo + push). No bloquea ni
+    // interrumpe el guardado: si la Edge Function no está desplegada o falla,
+    // simplemente no se envía el aviso. Ver supabase/functions/avisar-actuacion.
+    try {
+      supabase.functions.invoke('avisar-actuacion', { body: { proceso_id: id, descripcion: desc } }).catch(() => {});
+    } catch (e) { /* ignorado a propósito */ }
+
     // 2) Subir los archivos adjuntos vinculados a esa actuación
     const archivos = [...($('#actFiles') ? $('#actFiles').files : [])];
     let ok = 0, fallos = 0;
