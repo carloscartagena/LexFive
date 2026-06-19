@@ -85,7 +85,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 5 0 R >>
 endobj
 7 0 obj
-<< /Length 7804 >>
+<< /Length 8131 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -493,7 +493,7 @@ ET
 BT
 /F1 10.50 Tf
 60.00 343.89 Td
-(21. Respaldos, instalación y conexión a internet) Tj
+(21. Certificados y constancias) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -504,14 +504,14 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-290.36 343.89 Td
-(...............................................................................) Tj
+207.47 343.89 Td
+(...........................................................................................................) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 60.00 325.89 Td
-(22. Soporte) Tj
+(22. Respaldos, instalación y conexión a internet) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -522,7 +522,25 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-122.28 325.89 Td
+290.36 325.89 Td
+(...............................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 307.89 Td
+(23. Soporte) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+527.60 307.89 Td
+(11) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+122.28 307.89 Td
 (........................................................................................................................................) Tj
 ET
 
@@ -2470,7 +2488,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 19 0 R >>
 endobj
 21 0 obj
-<< /Length 6380 >>
+<< /Length 6454 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -2629,7 +2647,7 @@ ET
 BT
 /F1 10.50 Tf
 74.00 587.39 Td
-(10 a 24 — etapas siguientes: branding compartido y en tiempo real \(logo/sello\), gestión avanzada) Tj
+(10 a 26 — etapas siguientes: branding compartido y en tiempo real \(logo/sello\), gestión avanzada) Tj
 ET
 0.102 0.137 0.188 rg
 BT
@@ -2641,19 +2659,19 @@ ET
 BT
 /F1 10.50 Tf
 74.00 558.39 Td
-(clientes, recibos correlativos, credenciales en la nube, registro de horas, suscripciones push y, el) Tj
+(clientes, recibos correlativos, credenciales en la nube, registro de horas, suscripciones push,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 74.00 543.89 Td
-(más reciente, 24_notificaciones_estado_cuenta.sql \(campanita de notificaciones y estado de) Tj
+(notificaciones in-app y estado de cuenta del cliente \(24_notificaciones_estado_cuenta.sql\), y el) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 74.00 529.39 Td
-(cuenta del cliente\).) Tj
+(registro y verificación de certificados \(25_certificados.sql y 26_certificados_cuerpo.sql\).) Tj
 ET
 0.102 0.137 0.188 rg
 BT
@@ -3178,7 +3196,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 23 0 R >>
 endobj
 25 0 obj
-<< /Length 5755 >>
+<< /Length 6228 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -3343,7 +3361,7 @@ ET
 BT
 /F2 16.00 Tf
 56.00 464.89 Td
-(21. Respaldos, instalación y conexión a internet) Tj
+(21. Certificados y constancias) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
@@ -3352,136 +3370,154 @@ ET
 BT
 /F1 10.50 Tf
 56.00 430.39 Td
-(El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:) Tj
+(La pestaña «Certificados» \(administrador y abogados\) genera certificados y constancias en hoja) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 415.89 Td
+(membretada del bufete, en tamaño carta, con el logo, la dirección de la oficina, el sello y un código QR) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 401.39 Td
+(de verificación.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 408.89 Td
+60.00 379.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 408.89 Td
-(Respaldo automático: la base de datos se respalda sola cada día \(mediante GitHub Actions\). No) Tj
+74.00 379.89 Td
+(Formatos: certificado de trabajo \(procurador y general\), constancia de pasantía universitaria,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 394.39 Td
-(tiene que hacer nada.) Tj
+74.00 365.39 Td
+(certificado de horas de práctica, carta de recomendación, constancia de desempeño/conducta y) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 350.89 Td
+(constancia de servicios prestados.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 377.89 Td
+60.00 334.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 377.89 Td
-(Respaldo manual: en el «Panel general», el administrador puede pulsar «Exportar respaldo) Tj
+74.00 334.39 Td
+(Se completan los datos \(nombre, C.I., cargo, período, universidad, etc.\); el texto se redacta solo y) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 363.39 Td
-(\(JSON\)» para descargar una copia de los datos principales en su equipo. Se muestra la fecha del) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-74.00 348.89 Td
-(último respaldo manual.) Tj
+74.00 319.89 Td
+(puede editarse antes de imprimir. El nombre y el C.I. salen en negrilla.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 332.39 Td
+60.00 303.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 332.39 Td
-(Instalar como app: en el celular puede «Agregar a la pantalla de inicio» desde el navegador y usar) Tj
+74.00 303.39 Td
+(Botones «Imprimir / Guardar PDF» y «Descargar Word». El sello del bufete \(el elegido en «Sellos y) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 317.89 Td
-(el sistema como una aplicación \(abre más rápido y a pantalla completa\).) Tj
+74.00 288.89 Td
+(logos»\) va impreso a la derecha de la firma.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 301.39 Td
+60.00 272.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 301.39 Td
-(Aviso de «sin conexión»: si se queda sin internet, aparece un aviso. Lo que guarde queda en el) Tj
+74.00 272.39 Td
+(Verificación: cada certificado se registra con un N.º de referencia y su QR abre la página pública de) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 286.89 Td
-(equipo y se sincroniza al volver la conexión.) Tj
+74.00 257.89 Td
+(verificación, que confirma contra la base de datos que el documento fue emitido por el bufete.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 241.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 241.39 Td
+(Sección «Certificados emitidos»: lista los generados, con búsqueda, filtro por fecha, quién lo emitió,) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 226.89 Td
+(y opciones para reimprimir o eliminar el registro.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 221.39 483.28 58.50 re
+56.00 161.39 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 221.39 4.00 58.50 re
+56.00 161.39 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 260.39 Td
-(Recomendación) Tj
+71.00 200.39 Td
+(Configuración) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 246.89 Td
-(Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o restaurar datos) Tj
+71.00 186.89 Td
+(Requiere ejecutar una sola vez los scripts db/25 y db/26 en Supabase para activar el registro y la) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 233.39 Td
-(antiguos.) Tj
+71.00 173.39 Td
+(verificación de certificados.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 181.39 Td
-(22. Soporte) Tj
+56.00 121.39 Td
+(22. Respaldos, instalación y conexión a internet) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 173.39 m 539.28 173.39 l S
+56.00 113.39 m 539.28 113.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 146.89 Td
-(Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 132.39 Td
-(mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 117.89 Td
-(posible lo que necesita.) Tj
+56.00 86.89 Td
+(El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:) Tj
 ET
 
 endstream
@@ -3490,7 +3526,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 25 0 R >>
 endobj
 27 0 obj
-<< /Length 907 >>
+<< /Length 3299 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -3525,28 +3561,157 @@ BT
 279.63 52.00 Td
 (Página 11) Tj
 ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 757.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 757.39 Td
+(Respaldo automático: la base de datos se respalda sola cada día \(mediante GitHub Actions\). No) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 742.89 Td
+(tiene que hacer nada.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 726.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 726.39 Td
+(Respaldo manual: en el «Panel general», el administrador puede pulsar «Exportar respaldo) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 711.89 Td
+(\(JSON\)» para descargar una copia de los datos principales en su equipo. Se muestra la fecha del) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 697.39 Td
+(último respaldo manual.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 680.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 680.89 Td
+(Instalar como app: en el celular puede «Agregar a la pantalla de inicio» desde el navegador y usar) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 666.39 Td
+(el sistema como una aplicación \(abre más rápido y a pantalla completa\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 649.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 649.89 Td
+(Aviso de «sin conexión»: si se queda sin internet, aparece un aviso. Lo que guarde queda en el) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 635.39 Td
+(equipo y se sincroniza al volver la conexión.) Tj
+ET
 0.965 0.957 0.937 rg
-56.00 713.39 483.28 58.50 re
+56.00 569.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 713.39 4.00 58.50 re
+56.00 569.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 752.39 Td
+71.00 608.89 Td
+(Recomendación) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 595.39 Td
+(Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o restaurar datos) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 581.89 Td
+(antiguos.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 529.89 Td
+(23. Soporte) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 521.89 m 539.28 521.89 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 495.39 Td
+(Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 480.89 Td
+(mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 466.39 Td
+(posible lo que necesita.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 392.89 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 392.89 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 431.89 Td
 (Versión) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 738.89 Td
+71.00 418.39 Td
 (Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 725.39 Td
+71.00 404.89 Td
 (actualiza, solicite una versión nueva del manual.) Tj
 ET
 
@@ -3565,29 +3730,29 @@ xref
 0000000397 00000 n 
 0000001377 00000 n 
 0000001541 00000 n 
-0000009397 00000 n 
-0000009561 00000 n 
-0000014671 00000 n 
-0000014836 00000 n 
-0000021319 00000 n 
-0000021485 00000 n 
-0000027264 00000 n 
-0000027430 00000 n 
-0000033174 00000 n 
-0000033340 00000 n 
-0000038521 00000 n 
-0000038687 00000 n 
-0000043985 00000 n 
-0000044151 00000 n 
-0000050584 00000 n 
-0000050750 00000 n 
-0000056713 00000 n 
-0000056879 00000 n 
-0000062687 00000 n 
-0000062853 00000 n 
-0000063812 00000 n 
+0000009724 00000 n 
+0000009888 00000 n 
+0000014998 00000 n 
+0000015163 00000 n 
+0000021646 00000 n 
+0000021812 00000 n 
+0000027591 00000 n 
+0000027757 00000 n 
+0000033501 00000 n 
+0000033667 00000 n 
+0000038848 00000 n 
+0000039014 00000 n 
+0000044312 00000 n 
+0000044478 00000 n 
+0000050985 00000 n 
+0000051151 00000 n 
+0000057114 00000 n 
+0000057280 00000 n 
+0000063561 00000 n 
+0000063727 00000 n 
+0000067079 00000 n 
 trailer
 << /Size 29 /Root 1 0 R >>
 startxref
-63978
+67245
 %%EOF
