@@ -888,3 +888,10 @@ html[data-theme="dark"] .cred-saved-item__info strong { color: #eaf0f7; }
   --line: #e6e8ec;
 }
 .cred-card, #printRoot .cred-card { color: #1a2330; }
+
+
+/* ---------- Certificados (hoja membretada) ---------- */
+.cert-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .cert-form { grid-template-columns: 1fr; } }
+.cert-preview { background: #e9ecf1; padding: 16px; border-radius: 8px; overflow-x: auto; }
+.cert-preview > div { box-shadow: 0 6px 24px rgba(0,0,0,.15); }
