@@ -27,3 +27,13 @@ Esto crea:
 
 > Mientras no se ejecute `db/25`, los certificados se generan igual y el QR
 > muestra los datos; solo no quedan registrados para la verificación oficial.
+
+
+## Actualización — Certificados emitidos (reimprimir)
+
+Para poder **reimprimir** un certificado tal cual se emitió, se agregó una
+columna `cuerpo`. Si ya habías corrido `db/25` antes de esta mejora, ejecuta
+también **`db/26_certificados_cuerpo.sql`** (una sola vez) en el SQL Editor.
+
+En la pestaña **Certificados** ahora hay una sección **«Certificados emitidos»**
+donde puedes **buscar**, **reimprimir** y **eliminar** los certificados generados.
