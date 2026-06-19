@@ -2701,6 +2701,17 @@ function fechaLarga(d) {
   return x.getDate() + ' de ' + m[x.getMonth()] + ' de ' + x.getFullYear();
 }
 
+// Enlace que codifica el QR del certificado: abre la página de verificación de
+// CERTIFICADOS del bufete con los datos del documento emitido.
+function qrCertificado(d) {
+  return SITIO_URL + 'verificar-certificado.html?n=' + encodeURIComponent(d.nombre || '') +
+    '&ci=' + encodeURIComponent(d.ci || '') +
+    '&cargo=' + encodeURIComponent(d.cargo || '') +
+    '&tipo=' + encodeURIComponent(d.tipo || '') +
+    '&ref=' + encodeURIComponent(d.ref || '') +
+    '&fecha=' + encodeURIComponent(d.fecha || '');
+}
+
 const CERT_PLANTILLAS = [
   { id: 'trabajo_proc', nombre: 'Certificado de trabajo (Procurador)', titulo: 'CERTIFICADO DE TRABAJO',
     cuerpo: d => `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con Cédula de Identidad N.º ${d.ci}` : ''}, prestó sus servicios en el Bufete de Abogados LexFive en calidad de PROCURADOR(A), durante el período ${d.periodo}, desempeñando con responsabilidad funciones de gestión, seguimiento y diligenciamiento de procesos judiciales y trámites administrativos ante estrados judiciales, oficinas públicas y privadas.\n\nDurante su permanencia demostró ética profesional, puntualidad, compromiso y un adecuado desempeño en las tareas encomendadas.\n\nSe extiende el presente certificado a solicitud del(la) interesado(a), para los fines que estime convenientes.` },
@@ -2721,8 +2732,15 @@ const CERT_PLANTILLAS = [
 // Documento del certificado con estilos EN LÍNEA (autocontenido): sirve para la
 // vista previa, la impresión/PDF (tamaño carta) y la descarga en Word.
 function buildCertDoc(d) {
+  const nombreEsc = (d.nombre && d.nombre.length >= 3 && d.nombre.indexOf('___') === -1) ? esc(d.nombre) : '';
+  const ciEsc = (d.ci && d.ci.length >= 2) ? esc(d.ci) : '';
+  const resaltar = (h) => {
+    if (nombreEsc) h = h.split(nombreEsc).join('<strong>' + nombreEsc + '</strong>');
+    if (ciEsc) h = h.split(ciEsc).join('<strong>' + ciEsc + '</strong>');
+    return h;
+  };
   const parrafos = (d.cuerpoTexto || '').split(/\n\s*\n/).map(p =>
-    `<p style="margin:0 0 13px;text-align:justify;">${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
+    `<p style="margin:0 0 13px;text-align:justify;">${resaltar(esc(p).replace(/\n/g, '<br>'))}</p>`).join('');
   const wm = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="position:absolute;top:52%;left:50%;width:12cm;height:12cm;object-fit:contain;transform:translate(-50%,-50%);opacity:.05;pointer-events:none;">` : '';
   return `
   <div style="position:relative;font-family:Georgia,'Times New Roman',serif;color:#1a2330;background:#fff;width:21.6cm;min-height:27.9cm;margin:0 auto;padding:1.6cm 2cm 1.3cm;box-sizing:border-box;overflow:hidden;">
@@ -2732,7 +2750,7 @@ function buildCertDoc(d) {
       ${d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:92px;height:92px;object-fit:contain;display:block;margin:0 auto 6px;">` : ''}
       <div style="font-size:30px;font-weight:700;color:#0e1b2c;letter-spacing:1px;">Lex<span style="color:#c2a25a;">Five</span></div>
       <div style="font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div>
-      <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;">El Alto &middot; La Paz &mdash; Bolivia &nbsp;&middot;&nbsp; Tel/WhatsApp: +591 78360469 &nbsp;&middot;&nbsp; lexfive.netlify.app</div>
+      <div style="font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;line-height:1.55;">Calle 12 Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.&deg; 85, P.B., of. 1-A &mdash; El Alto, Bolivia<br>Tel/WhatsApp: +591 78360469 &nbsp;&middot;&nbsp; lexfive.netlify.app</div>
     </div>
     <div style="position:relative;text-align:right;font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:6px;">Ref. N.º ${esc(d.ref || '')}</div>
     <h1 style="position:relative;text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:18px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>
@@ -2750,7 +2768,7 @@ function buildCertDoc(d) {
       ${d.qrSrc ? `<img src="${d.qrSrc}" alt="QR de verificación" style="width:2.1cm;height:2.1cm;flex-shrink:0;">` : ''}
       <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.55;">
         <strong style="color:#0e1b2c;">Verificación:</strong> escanee el código QR para confirmar la autenticidad de este documento y la vinculación de la persona con el Bufete LexFive.<br>
-        LexFive &middot; Bufete de Abogados &mdash; El Alto &middot; La Paz, Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
+        LexFive &middot; Bufete de Abogados &middot; Calle 12 Uruguay esq. Raúl Salmón, Ed. Señor de Mayo N.&deg; 85, of. 1-A, El Alto - Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
       </div>
     </div>
   </div>`;
@@ -2817,14 +2835,21 @@ async function renderCertificados() {
   });
   const regenerar = () => { $('#ce_cuerpo').value = tplActual().cuerpo(datos()); cuerpoEditado = false; };
   const ref = 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
-  const docActual = () => buildCertDoc({
-    titulo: tplActual().titulo,
-    cuerpoTexto: $('#ce_cuerpo').value,
-    fechaTxt: fechaLarga($('#ce_fecha').value),
-    ref,
-    qrSrc: qrURL(qrPersona({ nombre: ($('#ce_nombre').value || '').trim(), ci: ($('#ce_ci').value || '').trim(), cargo: ($('#ce_calidad').value || '').trim() || 'Colaborador' })),
-    logoSrc, selloSrc
-  });
+  const docActual = () => {
+    const nombre = ($('#ce_nombre').value || '').trim();
+    const ci = ($('#ce_ci').value || '').trim();
+    const cargo = ($('#ce_calidad').value || '').trim();
+    const fecha = $('#ce_fecha').value;
+    return buildCertDoc({
+      titulo: tplActual().titulo,
+      cuerpoTexto: $('#ce_cuerpo').value,
+      nombre, ci,
+      fechaTxt: fechaLarga(fecha),
+      ref,
+      qrSrc: qrURL(qrCertificado({ nombre, ci, cargo: cargo || 'Colaborador', tipo: tplActual().titulo, ref, fecha })),
+      logoSrc, selloSrc
+    });
+  };
   const pintar = () => { $('#certPreview').innerHTML = docActual(); };
 
   // Campos que, si el texto no fue editado a mano, regeneran el borrador.
