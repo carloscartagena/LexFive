@@ -58,6 +58,7 @@ const NAV = [
   { key: 'blog', label: 'Blog', icon: ICON.blog },
   { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
   { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true },
+  { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
   { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
@@ -2679,6 +2680,179 @@ async function imprimirReciboPago(pago, proc) {
       </div>
     </div>`;
   abrirImpresion('Recibo ' + nro, body);
+}
+
+// ============================================================
+//  Certificados y constancias con hoja membretada del bufete.
+//  Genera, en hoja membretada de LexFive, certificados de trabajo,
+//  pasantías, horas de práctica, recomendaciones, etc.
+// ============================================================
+function urlAbs(src) {
+  if (!src) return '';
+  return src.indexOf('data:') === 0 ? src : new URL(src, location.href).href;
+}
+function fechaLarga(d) {
+  let x;
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}/.test(d)) {
+    const p = d.slice(0, 10).split('-'); x = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  } else { x = d ? new Date(d) : new Date(); }
+  if (isNaN(x)) return fmtDate(d);
+  const m = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  return x.getDate() + ' de ' + m[x.getMonth()] + ' de ' + x.getFullYear();
+}
+
+const CERT_PLANTILLAS = [
+  { id: 'trabajo_proc', nombre: 'Certificado de trabajo (Procurador)', titulo: 'CERTIFICADO DE TRABAJO',
+    cuerpo: d => `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con Cédula de Identidad N.º ${d.ci}` : ''}, prestó sus servicios en el Bufete de Abogados LexFive en calidad de PROCURADOR(A), durante el período ${d.periodo}, desempeñando con responsabilidad funciones de gestión, seguimiento y diligenciamiento de procesos judiciales y trámites administrativos ante estrados judiciales, oficinas públicas y privadas.\n\nDurante su permanencia demostró ética profesional, puntualidad, compromiso y un adecuado desempeño en las tareas encomendadas.\n\nSe extiende el presente certificado a solicitud del(la) interesado(a), para los fines que estime convenientes.` },
+  { id: 'trabajo_gen', nombre: 'Certificado de trabajo (general)', titulo: 'CERTIFICADO DE TRABAJO',
+    cuerpo: d => `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, trabajó en el Bufete de Abogados LexFive en el cargo de ${d.calidad || '—'}, durante el período ${d.periodo}, cumpliendo satisfactoriamente las funciones propias de su cargo.\n\nSe extiende el presente a solicitud del(la) interesado(a), para los fines que vea por conveniente.` },
+  { id: 'pasantia', nombre: 'Constancia de pasantía universitaria', titulo: 'CONSTANCIA DE PASANTÍA',
+    cuerpo: d => `Se hace constar que el(la) universitario(a) ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, estudiante de la carrera de ${d.carrera || '—'} de la ${d.universidad || '—'}, realizó su PASANTÍA / PRÁCTICA PRE-PROFESIONAL en el Bufete de Abogados LexFive durante el período ${d.periodo}${d.horas ? `, completando un total de ${d.horas} horas` : ''}.\n\nDurante la pasantía participó en labores de apoyo jurídico, revisión de expedientes, elaboración de memoriales y acompañamiento en diligencias, demostrando dedicación y responsabilidad.\n\nSe extiende la presente constancia a solicitud del(la) interesado(a), para fines académicos y los que estime convenientes.` },
+  { id: 'horas', nombre: 'Certificado de horas de práctica', titulo: 'CERTIFICADO DE HORAS DE PRÁCTICA',
+    cuerpo: d => `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}${d.universidad ? `, de la ${d.universidad}` : ''}, cumplió un total de ${d.horas || '___'} horas de práctica en el Bufete de Abogados LexFive, durante el período ${d.periodo}, en tareas de apoyo legal y administrativo.\n\nSe extiende el presente para los fines académicos correspondientes.` },
+  { id: 'recomendacion', nombre: 'Carta de recomendación', titulo: 'CARTA DE RECOMENDACIÓN',
+    cuerpo: d => `Por medio de la presente, el Bufete de Abogados LexFive tiene a bien RECOMENDAR al(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, quien se desempeñó como ${d.calidad || 'colaborador(a)'} en nuestra institución durante el período ${d.periodo}.\n\nDurante este tiempo demostró ser una persona responsable, proactiva, honesta y con sólidos conocimientos en el área legal, cualidades que la hacen idónea para las funciones que requiera desempeñar.\n\nSe extiende la presente a solicitud del(la) interesado(a)${d.destinatario ? `, dirigida a ${d.destinatario}` : ''}.` },
+  { id: 'desempeno', nombre: 'Constancia de desempeño / conducta', titulo: 'CONSTANCIA DE DESEMPEÑO',
+    cuerpo: d => `Se hace constar que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, durante su permanencia en el Bufete de Abogados LexFive como ${d.calidad || '—'} (período ${d.periodo}), observó una conducta intachable y un desempeño sobresaliente, demostrando ética, disciplina y compromiso con la institución.\n\nSe extiende la presente a solicitud del(la) interesado(a).` },
+  { id: 'servicios', nombre: 'Constancia de servicios prestados', titulo: 'CONSTANCIA DE SERVICIOS PRESTADOS',
+    cuerpo: d => `Se hace constar que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, prestó servicios profesionales en el Bufete de Abogados LexFive en calidad de ${d.calidad || '—'}, durante el período ${d.periodo}.\n\nSe extiende la presente a solicitud del(la) interesado(a), para los fines que estime convenientes.` }
+];
+
+// Documento del certificado con estilos EN LÍNEA (autocontenido): sirve para la
+// vista previa, la impresión/PDF y la descarga en Word.
+function buildCertDoc(d) {
+  const parrafos = (d.cuerpoTexto || '').split(/\n\s*\n/).map(p =>
+    `<p style="margin:0 0 12px;text-align:justify;">${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
+  return `
+  <div style="font-family:Georgia,'Times New Roman',serif;color:#1a2330;background:#fff;width:100%;max-width:21cm;margin:0 auto;padding:2cm 2.2cm;">
+    <div style="display:flex;align-items:center;gap:16px;border-bottom:3px solid #0e1b2c;padding-bottom:12px;">
+      ${d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:82px;height:82px;object-fit:contain;flex-shrink:0;">` : ''}
+      <div style="flex:1;">
+        <div style="font-size:26px;font-weight:700;color:#0e1b2c;letter-spacing:.5px;">Lex<span style="color:#c2a25a;">Five</span></div>
+        <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div>
+        <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;margin-top:3px;">El Alto &middot; La Paz &mdash; Bolivia &nbsp;&middot;&nbsp; Tel/WhatsApp: +591 78360469 &nbsp;&middot;&nbsp; lexfive.netlify.app</div>
+      </div>
+    </div>
+    <h1 style="text-align:center;font-size:19px;letter-spacing:1px;color:#0e1b2c;margin:34px 0 22px;text-transform:uppercase;">${esc(d.titulo)}</h1>
+    <div style="font-size:13.5px;line-height:1.85;">${parrafos}</div>
+    <p style="margin:26px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>
+    <div style="margin:64px auto 0;text-align:center;position:relative;width:62%;">
+      ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%) rotate(-6deg);width:2.6cm;height:2.6cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;">` : ''}
+      <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:13px;font-weight:700;color:#0e1b2c;">${esc(d.firmante)}</div>
+      <div style="font-size:11px;color:#5c6675;font-family:Arial,sans-serif;">${esc(d.cargoFirmante)} &middot; LexFive</div>
+    </div>
+    <div style="margin-top:52px;border-top:1px solid #d9dce1;padding-top:8px;text-align:center;font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;">
+      LexFive &middot; Bufete de Abogados &mdash; El Alto &middot; La Paz, Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
+    </div>
+  </div>`;
+}
+
+async function renderCertificados() {
+  loading();
+  try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) {}
+  try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) {}
+  const logoSrc = urlAbs(brandLogoSrc(pickActiveLogo(localStorage.getItem('lexfive_logo'))));
+  const selloSrc = urlAbs(brandSelloSrc(pickActiveSello(localStorage.getItem('lexfive_sello'))));
+  // Lista de firmantes: el usuario actual + los abogados del bufete (sin repetir).
+  const firmantes = [];
+  if (state.profile && state.profile.nombre) firmantes.push(state.profile.nombre);
+  ABOGADOS.forEach(a => { if (firmantes.indexOf(a.nombre) === -1) firmantes.push(a.nombre); });
+
+  content().innerHTML = `
+    <div class="card">
+      <div class="card__body">
+        <h3 class="intro-title">Certificados y constancias</h3>
+        <p class="cell-sub">Elija el tipo, complete los datos y use «Imprimir / Guardar PDF». El texto se genera solo y puede editarlo. Sale en la hoja membretada del bufete, con el sello.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Datos</h3></div>
+      <div class="card__body">
+        <div class="field"><label>Tipo de certificado</label>
+          <select id="ce_tipo">${CERT_PLANTILLAS.map(t => `<option value="${t.id}">${esc(t.nombre)}</option>`).join('')}</select></div>
+        <div class="cert-form">
+          <div class="field"><label>Nombre completo *</label><input id="ce_nombre" placeholder="Nombre y apellidos"></div>
+          <div class="field"><label>Cédula de identidad</label><input id="ce_ci" placeholder="Ej: 12345678 LP"></div>
+          <div class="field"><label>Cargo / calidad</label><input id="ce_calidad" placeholder="Procurador, Pasante, Asistente legal..."></div>
+          <div class="field"><label>Período</label><input id="ce_periodo" placeholder="marzo a diciembre de 2024"></div>
+          <div class="field"><label>Universidad (pasantías)</label><input id="ce_uni" placeholder="Ej: U.M.S.A."></div>
+          <div class="field"><label>Carrera</label><input id="ce_carrera" placeholder="Ej: Derecho"></div>
+          <div class="field"><label>Horas (opcional)</label><input id="ce_horas" type="number" min="0" placeholder="Ej: 240"></div>
+          <div class="field"><label>Dirigido a (opcional)</label><input id="ce_dest" placeholder="A quien corresponda"></div>
+          <div class="field"><label>Firma de</label><select id="ce_firmante">${firmantes.map(n => `<option>${esc(n)}</option>`).join('')}</select></div>
+          <div class="field"><label>Cargo del firmante</label><input id="ce_cargofirma" value="Abogado"></div>
+          <div class="field"><label>Fecha de emisión</label><input id="ce_fecha" type="date" value="${hoyISO()}"></div>
+        </div>
+        <div class="field" style="margin-top:8px">
+          <label>Texto del certificado <button class="btn btn--ghost btn--sm" id="ce_restaurar" type="button" style="margin-left:8px">Restaurar texto automático</button></label>
+          <textarea id="ce_cuerpo" rows="8" style="font-family:inherit"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+          <button class="btn btn--primary" id="ce_print">${ICON.doc} Imprimir / Guardar PDF</button>
+          <button class="btn btn--ghost" id="ce_word">Descargar Word</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Vista previa</h3></div>
+      <div class="card__body"><div class="cert-preview" id="certPreview"></div></div>
+    </div>`;
+
+  let cuerpoEditado = false;
+  const tplActual = () => CERT_PLANTILLAS.find(t => t.id === $('#ce_tipo').value) || CERT_PLANTILLAS[0];
+  const datos = () => ({
+    nombre: ($('#ce_nombre').value || '').trim() || '___________________',
+    ci: ($('#ce_ci').value || '').trim(),
+    calidad: ($('#ce_calidad').value || '').trim(),
+    periodo: ($('#ce_periodo').value || '').trim() || 'el período indicado',
+    universidad: ($('#ce_uni').value || '').trim(),
+    carrera: ($('#ce_carrera').value || '').trim(),
+    horas: ($('#ce_horas').value || '').trim(),
+    destinatario: ($('#ce_dest').value || '').trim()
+  });
+  const regenerar = () => { $('#ce_cuerpo').value = tplActual().cuerpo(datos()); cuerpoEditado = false; };
+  const docActual = () => buildCertDoc({
+    titulo: tplActual().titulo,
+    cuerpoTexto: $('#ce_cuerpo').value,
+    firmante: $('#ce_firmante').value,
+    cargoFirmante: ($('#ce_cargofirma').value || 'Abogado').trim(),
+    fechaTxt: fechaLarga($('#ce_fecha').value),
+    logoSrc, selloSrc
+  });
+  const pintar = () => { $('#certPreview').innerHTML = docActual(); };
+
+  // Campos que, si el texto no fue editado a mano, regeneran el borrador.
+  ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => {
+    $('#' + id).oninput = () => { if (!cuerpoEditado) regenerar(); pintar(); };
+  });
+  $('#ce_tipo').onchange = () => { regenerar(); pintar(); };
+  $('#ce_firmante').onchange = pintar;
+  $('#ce_cargofirma').oninput = pintar;
+  $('#ce_fecha').onchange = pintar;
+  $('#ce_cuerpo').oninput = () => { cuerpoEditado = true; pintar(); };
+  $('#ce_restaurar').onclick = () => { regenerar(); pintar(); toast('Texto regenerado a partir de los datos.', 'success'); };
+
+  $('#ce_print').onclick = () => {
+    if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+    const w = window.open('', '_blank');
+    if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
+    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(tplActual().titulo)}</title>
+      <style>@page{margin:12mm;} body{margin:0;}</style></head><body>${docActual()}
+      <script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script></body></html>`);
+    w.document.close();
+  };
+  $('#ce_word').onclick = () => {
+    if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>' + docActual() + '</body></html>';
+    const nombre = 'certificado-' + (($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40)) + '.doc';
+    descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
+    toast('Certificado descargado en Word.', 'success');
+  };
+
+  regenerar();
+  pintar();
 }
 
 function memorialHTML(titulo, texto) {
@@ -5429,6 +5603,7 @@ const VIEWS = {
   blog: { title: 'Blog', render: renderBlog },
   credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
   sellos: { title: 'Sellos y logos del bufete', render: renderSellos },
+  certificados: { title: 'Certificados y constancias', render: renderCertificados },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
   categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
@@ -5454,6 +5629,7 @@ function navigate(key) {
     if (['usuarios', 'auditoria', 'testimonios', 'categorias', 'papelera'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
     if (key === 'credenciales' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'sellos' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
+    if (key === 'certificados' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
   }
   state.view = key;
