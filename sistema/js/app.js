@@ -2774,6 +2774,16 @@ function buildCertDoc(d) {
   </div>`;
 }
 
+// Abre una ventana de impresión (tamaño carta) con un documento de certificado.
+function abrirImpresionCert(titulo, docHTML) {
+  const w = window.open('', '_blank');
+  if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title>
+    <style>@page{size:letter;margin:0;} html,body{margin:0;background:#fff;}</style></head><body>${docHTML}
+    <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},400);});<\/script></body></html>`);
+  w.document.close();
+}
+
 async function renderCertificados() {
   loading();
   try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) {}
@@ -2819,6 +2829,11 @@ async function renderCertificados() {
     <div class="card">
       <div class="card__head"><h3>Vista previa</h3></div>
       <div class="card__body"><div class="cert-preview" id="certPreview"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Certificados emitidos</h3><input type="search" id="ce_buscar" placeholder="Buscar por nombre, C.I. o referencia..." style="max-width:280px"></div>
+      <div class="card__body--flush"><div id="certList"><div class="loading"><div class="spinner"></div>Cargando...</div></div></div>
     </div>`;
 
   let cuerpoEditado = false;
@@ -2863,11 +2878,59 @@ async function renderCertificados() {
         ci: ($('#ce_ci').value || '').trim() || null,
         cargo: ($('#ce_calidad').value || '').trim() || null,
         periodo: ($('#ce_periodo').value || '').trim() || null,
+        cuerpo: $('#ce_cuerpo').value || null,
         fecha_emision: $('#ce_fecha').value || null,
         created_by: state.profile.id
-      }, { onConflict: 'ref' }).then(() => {}, () => {});
+      }, { onConflict: 'ref' }).then(() => { cargarEmitidos(); }, () => {});
     } catch (e) { /* ignorado */ }
   };
+
+  // ---- Certificados emitidos (lista, búsqueda, reimprimir, eliminar) ----
+  let EMITIDOS = [];
+  async function cargarEmitidos() {
+    try {
+      const { data } = await supabase.from('certificados').select('*').order('created_at', { ascending: false }).limit(500);
+      EMITIDOS = data || [];
+    } catch (e) { EMITIDOS = []; }
+    pintarEmitidos();
+  }
+  function pintarEmitidos() {
+    const cont = $('#certList'); if (!cont) return;
+    if (!EMITIDOS.length) { cont.innerHTML = `<div class="empty" style="padding:24px">${ICON.doc}<p>Aún no hay certificados registrados. Genere uno e imprímalo o descárguelo para que aparezca aquí.</p></div>`; return; }
+    const q = ($('#ce_buscar') ? $('#ce_buscar').value : '').toLowerCase();
+    const list = EMITIDOS.filter(c => !q || [c.nombre, c.ci, c.ref, c.tipo].some(v => (v || '').toLowerCase().includes(q)));
+    if (!list.length) { cont.innerHTML = '<p class="cell-sub" style="padding:16px">Sin resultados para esa búsqueda.</p>'; return; }
+    cont.innerHTML = `<div class="table-wrap"><table class="data">
+      <thead><tr><th>Persona</th><th>Tipo</th><th>Referencia</th><th>Emitido</th><th></th></tr></thead>
+      <tbody>${list.map(c => `<tr>
+        <td class="cell-strong">${esc(c.nombre)}${c.ci ? `<div class="cell-sub">C.I. ${esc(c.ci)}</div>` : ''}</td>
+        <td>${esc(c.tipo || '')}</td>
+        <td class="cell-sub">${esc(c.ref)}</td>
+        <td class="cell-sub">${fmtDate(c.created_at)}</td>
+        <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-reimp" data-id="${c.id}">Reimprimir</button> <button class="btn btn--danger btn--sm js-delcert" data-id="${c.id}" title="Eliminar registro">&times;</button></td>
+      </tr>`).join('')}</tbody></table></div>`;
+    cont.querySelectorAll('.js-reimp').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) reimprimirCert(c); });
+    cont.querySelectorAll('.js-delcert').forEach(b => b.onclick = async () => {
+      const c = EMITIDOS.find(x => x.id === b.dataset.id); if (!c) return;
+      if (!confirm('¿Eliminar el registro del certificado ' + c.ref + '? Ya no se podrá verificar por su QR.')) return;
+      try { await supabase.from('certificados').delete().eq('id', c.id); toast('Registro eliminado.', 'success'); cargarEmitidos(); }
+      catch (e) { toast('No se pudo eliminar.', 'error'); }
+    });
+  }
+  function reimprimirCert(c) {
+    let cuerpo = c.cuerpo;
+    if (!cuerpo) {
+      const tpl = CERT_PLANTILLAS.find(t => t.titulo === c.tipo) || CERT_PLANTILLAS[0];
+      cuerpo = tpl.cuerpo({ nombre: c.nombre, ci: c.ci, calidad: c.cargo, periodo: c.periodo || 'el período indicado', universidad: '', carrera: '', horas: '', destinatario: '' });
+    }
+    const doc = buildCertDoc({
+      titulo: c.tipo || 'CERTIFICADO', cuerpoTexto: cuerpo, nombre: c.nombre, ci: c.ci || '',
+      fechaTxt: fechaLarga(c.fecha_emision), ref: c.ref,
+      qrSrc: qrURL(qrCertificado({ nombre: c.nombre, ci: c.ci, cargo: c.cargo, tipo: c.tipo, ref: c.ref, fecha: c.fecha_emision })),
+      logoSrc, selloSrc
+    });
+    abrirImpresionCert(c.tipo || 'Certificado', doc);
+  }
 
   // Campos que, si el texto no fue editado a mano, regeneran el borrador.
   ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => {
@@ -2881,12 +2944,7 @@ async function renderCertificados() {
   $('#ce_print').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
     registrarCert();
-    const w = window.open('', '_blank');
-    if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
-    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(tplActual().titulo)}</title>
-      <style>@page{size:letter;margin:0;} html,body{margin:0;background:#fff;}</style></head><body>${docActual()}
-      <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},400);});<\/script></body></html>`);
-    w.document.close();
+    abrirImpresionCert(tplActual().titulo, docActual());
   };
   $('#ce_word').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
@@ -2897,8 +2955,11 @@ async function renderCertificados() {
     toast('Certificado descargado en Word.', 'success');
   };
 
+  const bce = $('#ce_buscar'); if (bce) bce.oninput = pintarEmitidos;
+
   regenerar();
   pintar();
+  cargarEmitidos();
 }
 
 function memorialHTML(titulo, texto) {

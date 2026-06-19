@@ -14,6 +14,7 @@ create table if not exists public.certificados (
   ci            text,
   cargo         text,
   periodo       text,
+  cuerpo        text,
   fecha_emision date,
   created_by    uuid references auth.users(id),
   created_at    timestamptz not null default now()
