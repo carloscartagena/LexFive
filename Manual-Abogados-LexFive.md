@@ -14,8 +14,9 @@ _Guía de uso del panel para el equipo legal · Versión: junio de 2026 · lexfi
 - 8. Honorarios y pagos
 - 9. Blog del bufete
 - 10. Credenciales de procuradores
-- 11. Consejos y seguridad
-- 12. Soporte
+- 11. Certificados y constancias
+- 12. Consejos y seguridad
+- 13. Soporte
 
 
 ## 1. Bienvenido al panel de LexFive
@@ -92,14 +93,22 @@ Los abogados y el administrador pueden generar carnets (credenciales) para sus p
 
 En la pestaña «Sellos y logos» administra el logo y el sello del bufete: toque uno para verlo en grande y pulse «Usar este» para dejarlo como predeterminado, o suba el suyo (marque «Quitar fondo blanco» si es una foto, para que quede transparente). Lo elegido se aplica en la web, el panel, las credenciales y los memoriales.
 
-## 11. Consejos y seguridad
+## 11. Certificados y constancias
+
+En «Certificados» puede emitir, en hoja membretada del bufete (tamaño carta) y con QR de verificación, distintos documentos para procuradores y pasantes: certificado de trabajo, constancia de pasantía, horas de práctica, carta de recomendación, entre otros.
+
+- Elija el tipo y complete los datos; el texto se redacta solo y puede editarlo.
+- Imprima/guarde en PDF o descargue en Word. El sello del bufete va impreso.
+- Cada certificado queda registrado y se verifica por su QR. En «Certificados emitidos» puede buscar, filtrar por fecha, ver quién lo emitió, reimprimir o eliminar.
+
+## 12. Consejos y seguridad
 
 - Cierre sesión al terminar, sobre todo en computadoras compartidas.
 - Si pierde el internet, aparece un aviso de «sin conexión»: lo que guarde queda en el equipo y se sincroniza al volver la conexión.
 - No comparta su contraseña. Si la olvida, pídale al administrador que la reinicie.
 - Revise el panel general al iniciar el día para no perder audiencias ni plazos.
 
-## 12. Soporte
+## 13. Soporte
 
 Ante cualquier duda, contacte al administrador del bufete. Para el detalle completo de cada función, consulte el «Manual del Sistema».
 

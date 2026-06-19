@@ -24,8 +24,9 @@ _Guía completa de uso y gestión · Versión: junio de 2026 · lexfive.netlify.
 - 18. Mantenimiento y buenas prácticas
 - 19. Solución de problemas frecuentes
 - 20. Credenciales del bufete (administrador y abogados)
-- 21. Respaldos, instalación y conexión a internet
-- 22. Soporte
+- 21. Certificados y constancias
+- 22. Respaldos, instalación y conexión a internet
+- 23. Soporte
 
 
 ## 1. Introducción: qué es el sistema
@@ -232,7 +233,7 @@ En la carpeta db/ del repositorio están los scripts SQL. Se ejecutan UNA sola v
 - 07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.
 - 08_categorias.sql — áreas del derecho dinámicas (crear categorías desde el panel).
 - 09_actuaciones_archivos.sql — adjuntar archivos a cada actuación del historial.
-- 10 a 24 — etapas siguientes: branding compartido y en tiempo real (logo/sello), gestión avanzada (tareas, plazos, honorarios y pagos), plantillas, privacidad del personal, papeleras de procesos y clientes, recibos correlativos, credenciales en la nube, registro de horas, suscripciones push y, el más reciente, 24_notificaciones_estado_cuenta.sql (campanita de notificaciones y estado de cuenta del cliente).
+- 10 a 26 — etapas siguientes: branding compartido y en tiempo real (logo/sello), gestión avanzada (tareas, plazos, honorarios y pagos), plantillas, privacidad del personal, papeleras de procesos y clientes, recibos correlativos, credenciales en la nube, registro de horas, suscripciones push, notificaciones in-app y estado de cuenta del cliente (24_notificaciones_estado_cuenta.sql), y el registro y verificación de certificados (25_certificados.sql y 26_certificados_cuerpo.sql).
 
 Además, en supabase/functions/ hay dos funciones programadas que se despliegan en Supabase: «recordatorios-audiencias» (envía cada mañana audiencias, plazos y tareas del día siguiente por correo y push) y «avisar-actuacion» (avisa al cliente por correo, push y campanita al registrarse una nueva actuación). Su configuración está en los archivos RECORDATORIOS-SETUP.md, AVISO-ACTUACION-SETUP.md y MEJORAS-BLOQUE2-SETUP.md.
 
@@ -299,7 +300,19 @@ El administrador y los abogados entregan las credenciales a sus procuradores: el
 
 > **Importante:** La base legal de la representación la redacta usted con su criterio profesional; el sistema no inventa números de artículo. Cada persona tiene su propia cuenta y no se comparten contraseñas.
 
-## 21. Respaldos, instalación y conexión a internet
+## 21. Certificados y constancias
+
+La pestaña «Certificados» (administrador y abogados) genera certificados y constancias en hoja membretada del bufete, en tamaño carta, con el logo, la dirección de la oficina, el sello y un código QR de verificación.
+
+- Formatos: certificado de trabajo (procurador y general), constancia de pasantía universitaria, certificado de horas de práctica, carta de recomendación, constancia de desempeño/conducta y constancia de servicios prestados.
+- Se completan los datos (nombre, C.I., cargo, período, universidad, etc.); el texto se redacta solo y puede editarse antes de imprimir. El nombre y el C.I. salen en negrilla.
+- Botones «Imprimir / Guardar PDF» y «Descargar Word». El sello del bufete (el elegido en «Sellos y logos») va impreso a la derecha de la firma.
+- Verificación: cada certificado se registra con un N.º de referencia y su QR abre la página pública de verificación, que confirma contra la base de datos que el documento fue emitido por el bufete.
+- Sección «Certificados emitidos»: lista los generados, con búsqueda, filtro por fecha, quién lo emitió, y opciones para reimprimir o eliminar el registro.
+
+> **Configuración:** Requiere ejecutar una sola vez los scripts db/25 y db/26 en Supabase para activar el registro y la verificación de certificados.
+
+## 22. Respaldos, instalación y conexión a internet
 
 El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:
 
@@ -310,7 +323,7 @@ El sistema incluye varias ayudas para la seguridad de los datos y la comodidad d
 
 > **Recomendación:** Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o restaurar datos antiguos.
 
-## 22. Soporte
+## 23. Soporte
 
 Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle posible lo que necesita.
 

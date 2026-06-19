@@ -21,6 +21,8 @@ en Supabase → **SQL Editor**. Los más recientes (de estas actualizaciones):
 | `22_push_subscriptions.sql` | Suscripciones para notificaciones push | Sí (para push) |
 | `23_branding_storage.sql` | Bucket público para logos/sellos (más liviano que base64) | Sí (branding) |
 | `24_notificaciones_estado_cuenta.sql` | Campanita de notificaciones + permiso para el estado de cuenta del cliente | Sí (campanita y estado de cuenta) |
+| `25_certificados.sql` | Registro de certificados emitidos + verificación pública | Sí (certificados) |
+| `26_certificados_cuerpo.sql` | Guarda el texto del certificado (para reimprimir) | Sí (certificados) |
 
 > Regla práctica: cada vez que se agregue una función que necesite base de
 > datos, habrá un nuevo `db/NN_*.sql` que se ejecuta una sola vez.
@@ -144,6 +146,18 @@ en Supabase → **SQL Editor**. Los más recientes (de estas actualizaciones):
   (frente y reverso), con el sello elegido en «Sellos y logos» y sin el cuadro
   blanco de fondo (se limpia con un filtro / `mix-blend-mode`).
 - **Estado de cuenta del cliente en PDF** desde su portal.
+
+**Certificados y constancias**
+- Nueva pestaña **«Certificados»** que emite, en **hoja membretada** (tamaño
+  carta) con logo, dirección de la oficina, sello y **QR de verificación**:
+  certificado de trabajo (procurador y general), constancia de pasantía
+  universitaria, horas de práctica, carta de recomendación, desempeño y
+  servicios prestados.
+- El texto se redacta solo y es editable; nombre y C.I. en negrilla.
+- **Verificación contra base de datos**: cada certificado se registra con un
+  N.º de referencia y el QR abre una **página pública de verificación**.
+- Sección **«Certificados emitidos»**: lista, búsqueda, filtro por fecha, quién
+  lo emitió, reimprimir y eliminar. Requiere `db/25` y `db/26`.
 
 > Detalle de despliegue de las funciones y SQL de esta etapa en
 > `MEJORAS-BLOQUE2-SETUP.md` y `AVISO-ACTUACION-SETUP.md`.

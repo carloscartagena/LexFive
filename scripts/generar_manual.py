@@ -311,12 +311,12 @@ def build_blocks():
         "07_sync_clientes.sql — crea la ficha de cliente al registrarse en el portal.",
         "08_categorias.sql — áreas del derecho dinámicas (crear categorías desde el panel).",
         "09_actuaciones_archivos.sql — adjuntar archivos a cada actuación del historial.",
-        "10 a 24 — etapas siguientes: branding compartido y en tiempo real (logo/sello), "
+        "10 a 26 — etapas siguientes: branding compartido y en tiempo real (logo/sello), "
         "gestión avanzada (tareas, plazos, honorarios y pagos), plantillas, privacidad del "
         "personal, papeleras de procesos y clientes, recibos correlativos, credenciales en la "
-        "nube, registro de horas, suscripciones push y, el más reciente, "
-        "24_notificaciones_estado_cuenta.sql (campanita de notificaciones y estado de cuenta "
-        "del cliente).",
+        "nube, registro de horas, suscripciones push, notificaciones in-app y estado de cuenta "
+        "del cliente (24_notificaciones_estado_cuenta.sql), y el registro y verificación de "
+        "certificados (25_certificados.sql y 26_certificados_cuerpo.sql).",
     ])
     p("Además, en supabase/functions/ hay dos funciones programadas que se despliegan en "
       "Supabase: «recordatorios-audiencias» (envía cada mañana audiencias, plazos y tareas del "
@@ -410,7 +410,28 @@ def build_blocks():
          "sistema no inventa números de artículo. Cada persona tiene su propia cuenta y no se "
          "comparten contraseñas.", "Importante")
 
-    h1("21. Respaldos, instalación y conexión a internet")
+    h1("21. Certificados y constancias")
+    p("La pestaña «Certificados» (administrador y abogados) genera certificados y constancias "
+      "en hoja membretada del bufete, en tamaño carta, con el logo, la dirección de la oficina, "
+      "el sello y un código QR de verificación.")
+    bul([
+        "Formatos: certificado de trabajo (procurador y general), constancia de pasantía "
+        "universitaria, certificado de horas de práctica, carta de recomendación, constancia de "
+        "desempeño/conducta y constancia de servicios prestados.",
+        "Se completan los datos (nombre, C.I., cargo, período, universidad, etc.); el texto se "
+        "redacta solo y puede editarse antes de imprimir. El nombre y el C.I. salen en negrilla.",
+        "Botones «Imprimir / Guardar PDF» y «Descargar Word». El sello del bufete (el elegido en "
+        "«Sellos y logos») va impreso a la derecha de la firma.",
+        "Verificación: cada certificado se registra con un N.º de referencia y su QR abre la "
+        "página pública de verificación, que confirma contra la base de datos que el documento "
+        "fue emitido por el bufete.",
+        "Sección «Certificados emitidos»: lista los generados, con búsqueda, filtro por fecha, "
+        "quién lo emitió, y opciones para reimprimir o eliminar el registro.",
+    ])
+    note("Requiere ejecutar una sola vez los scripts db/25 y db/26 en Supabase para activar el "
+         "registro y la verificación de certificados.", "Configuración")
+
+    h1("22. Respaldos, instalación y conexión a internet")
     p("El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:")
     bul([
         "Respaldo automático: la base de datos se respalda sola cada día (mediante GitHub "
@@ -427,7 +448,7 @@ def build_blocks():
     note("Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o "
          "restaurar datos antiguos.", "Recomendación")
 
-    h1("22. Soporte")
+    h1("23. Soporte")
     p("Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. "
       "Para cambios o mejoras en la web o el panel, conserve este manual como referencia y "
       "describa con el mayor detalle posible lo que necesita.")
@@ -553,7 +574,18 @@ def build_blocks_abogados():
       "(marque «Quitar fondo blanco» si es una foto, para que quede transparente). Lo elegido "
       "se aplica en la web, el panel, las credenciales y los memoriales.")
 
-    h1("11. Consejos y seguridad")
+    h1("11. Certificados y constancias")
+    p("En «Certificados» puede emitir, en hoja membretada del bufete (tamaño carta) y con QR de "
+      "verificación, distintos documentos para procuradores y pasantes: certificado de trabajo, "
+      "constancia de pasantía, horas de práctica, carta de recomendación, entre otros.")
+    bul([
+        "Elija el tipo y complete los datos; el texto se redacta solo y puede editarlo.",
+        "Imprima/guarde en PDF o descargue en Word. El sello del bufete va impreso.",
+        "Cada certificado queda registrado y se verifica por su QR. En «Certificados emitidos» "
+        "puede buscar, filtrar por fecha, ver quién lo emitió, reimprimir o eliminar.",
+    ])
+
+    h1("12. Consejos y seguridad")
     bul([
         "Cierre sesión al terminar, sobre todo en computadoras compartidas.",
         "Si pierde el internet, aparece un aviso de «sin conexión»: lo que guarde queda en el "
@@ -562,7 +594,7 @@ def build_blocks_abogados():
         "Revise el panel general al iniciar el día para no perder audiencias ni plazos.",
     ])
 
-    h1("12. Soporte")
+    h1("13. Soporte")
     p("Ante cualquier duda, contacte al administrador del bufete. Para el detalle completo de "
       "cada función, consulte el «Manual del Sistema».")
     sp(8)

@@ -55,6 +55,7 @@ Organizadas por bloque. Cada una está fusionada en el repositorio.
 - **Reportes**: tasa de cobranza (cobrado/facturado) y casos nuevos por mes.
 - **Notificaciones**: recordatorios diarios que incluyen también tareas; aviso automático al cliente por nueva actuación (correo + push + campanita); centro de notificaciones (campanita) en la app.
 - **Credencial**: sello del bufete impreso directo (frente y reverso), elegible y sin fondo blanco. **Estado de cuenta del cliente en PDF** desde su portal.
+- **Certificados y constancias**: pestaña que emite documentos en hoja membretada (tamaño carta) con QR de verificación contra base de datos, registro de emitidos (búsqueda, filtro por fecha, reimprimir/eliminar) y página pública de verificación de certificados.
 
 ---
 
@@ -79,6 +80,8 @@ Para que el sistema funcione, en Supabase (SQL Editor) se ejecutaron los scripts
 | `22_push_subscriptions.sql` | Suscripciones para notificaciones push |
 | `23_branding_storage.sql` | Bucket público para logos/sellos (más liviano) |
 | `24_notificaciones_estado_cuenta.sql` | Campanita de notificaciones + estado de cuenta del cliente |
+| `25_certificados.sql` | Registro y verificación de certificados emitidos |
+| `26_certificados_cuerpo.sql` | Guarda el texto del certificado (reimpresión) |
 
 > Regla práctica: cada vez que se agregue una función que necesite base de datos, habrá un nuevo script `db/NN_*.sql` que se ejecuta **una sola vez** en Supabase.
 

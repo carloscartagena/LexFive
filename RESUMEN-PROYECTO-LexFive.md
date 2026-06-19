@@ -73,7 +73,7 @@ Las páginas públicas están en la raíz; el panel privado, en la carpeta /sist
 - 07_sync_clientes.sql — crea la ficha de cliente al registrarse.
 - 08_categorias.sql — áreas del derecho dinámicas.
 - 09_actuaciones_archivos.sql — adjuntar archivos a cada actuación.
-- 10 a 24 — etapas siguientes: branding compartido y en tiempo real, gestión avanzada (tareas, plazos, honorarios y pagos), plantillas, privacidad del personal, papeleras, recibos correlativos, credenciales en la nube, registro de horas, suscripciones push y notificaciones in-app + estado de cuenta del cliente (24_notificaciones_estado_cuenta.sql).
+- 10 a 26 — etapas siguientes: branding compartido y en tiempo real, gestión avanzada (tareas, plazos, honorarios y pagos), plantillas, privacidad del personal, papeleras, recibos correlativos, credenciales en la nube, registro de horas, suscripciones push, notificaciones in-app + estado de cuenta del cliente (24_notificaciones_estado_cuenta.sql) y registro/verificación de certificados (25_certificados.sql, 26_certificados_cuerpo.sql).
 
 ## 4. Funcionalidades construidas
 
@@ -113,6 +113,7 @@ Las páginas públicas están en la raíz; el panel privado, en la carpeta /sist
 - Accesibilidad: tamaño de letra ajustable; modo oscuro; títulos legibles y centrados.
 - Notificaciones: recordatorios diarios (audiencias, plazos y tareas) por correo y push; aviso al cliente por nueva actuación (correo, push y campanita); centro de notificaciones (campanita).
 - Portal del cliente: estado de cuenta descargable en PDF.
+- Certificados y constancias en hoja membretada (tamaño carta) con QR de verificación contra la base de datos, registro de emitidos (búsqueda, reimprimir) y página pública de verificación de certificados.
 
 ## 5. Modelo de datos (resumen)
 
@@ -183,7 +184,7 @@ Si en el futuro se reconstruye con otro stack (por ejemplo React + Node, Django,
 
 - Sitio: lexfive.netlify.app.
 - Frontend: HTML/CSS/JS puro (alrededor de 3.700 líneas entre app.js, main.js y styles.css).
-- Base de datos: Supabase (PostgreSQL), 24 scripts SQL versionados en db/, más 2 Edge Functions (recordatorios y aviso de actuación).
+- Base de datos: Supabase (PostgreSQL), 26 scripts SQL versionados en db/, más 2 Edge Functions (recordatorios y aviso de actuación).
 - Despliegue: Netlify conectado a GitHub (rama main).
 - Repositorio: carloscartagena/LexFive.
 
