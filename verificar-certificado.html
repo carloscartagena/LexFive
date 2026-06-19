@@ -91,40 +91,61 @@
                 });
                 return p;
             }
-            var p = getParams();
-            var nombre = (p.n || '').trim();
-            var ci = (p.ci || '').trim();
-            var cargo = (p.cargo || '').trim();
-            var tipo = (p.tipo || '').trim();
-            var ref = (p.ref || '').trim();
-            var fecha = (p.fecha || '').trim();
-
-            var lead = document.getElementById('vfLead');
-            var data = document.getElementById('vfData');
-
-            if (nombre) {
-                lead.innerHTML = 'El bufete <strong>LexFive</strong> certifica la vinculación de la persona indicada, según el documento emitido.';
-                var rows = '';
-                rows += row('Nombre', nombre);
-                if (ci) rows += row('Carnet de identidad', ci);
-                if (cargo) rows += row('Calidad / cargo', cargo);
-                if (tipo) rows += row('Tipo de documento', tipo);
-                if (ref) rows += row('N.º de referencia', ref);
-                if (fecha) rows += row('Fecha de emisión', fecha);
-                rows += row('Emisor', 'LexFive Abogados · El Alto — La Paz, Bolivia');
-                data.innerHTML = rows;
-            } else {
-                lead.innerHTML = 'Página oficial de verificación de <strong>certificados</strong> del bufete <strong>LexFive</strong>. Escanee el código QR de un certificado para ver sus datos.';
-            }
-
-            function row(k, v) {
-                return '<div class="vf-row"><span>' + escapeHtml(k) + '</span><strong>' + escapeHtml(v) + '</strong></div>';
-            }
             function escapeHtml(s) {
                 return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
                     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
                 });
             }
+            function row(k, v) {
+                return '<div class="vf-row"><span>' + escapeHtml(k) + '</span><strong>' + escapeHtml(v) + '</strong></div>';
+            }
+
+            var p = getParams();
+            var lead = document.getElementById('vfLead');
+            var data = document.getElementById('vfData');
+            var titleEl = document.querySelector('.vf-title');
+            var checkEl = document.querySelector('.vf-check');
+
+            function pintar(cert, verificadoDB) {
+                lead.innerHTML = verificadoDB
+                    ? 'Documento <strong>verificado</strong> en los registros oficiales del bufete <strong>LexFive</strong>.'
+                    : 'Datos del documento emitido por el bufete <strong>LexFive</strong>.';
+                var rows = '';
+                rows += row('Nombre', cert.nombre);
+                if (cert.ci) rows += row('Carnet de identidad', cert.ci);
+                if (cert.cargo) rows += row('Calidad / cargo', cert.cargo);
+                if (cert.tipo) rows += row('Tipo de documento', cert.tipo);
+                if (cert.ref) rows += row('N.º de referencia', cert.ref);
+                var f = cert.fecha_emision || cert.fecha;
+                if (f) rows += row('Fecha de emisión', f);
+                rows += row('Emisor', 'LexFive Abogados · El Alto — La Paz, Bolivia');
+                data.innerHTML = rows;
+            }
+
+            function noEncontrado() {
+                checkEl.style.background = '#c0392b';
+                checkEl.innerHTML = '<svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"></line><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"></line></svg>';
+                titleEl.textContent = 'Certificado no encontrado';
+                lead.innerHTML = 'No se encontró un certificado con esa referencia en los registros de <strong>LexFive</strong>. Verifique el código o contáctenos por los medios oficiales.';
+            }
+
+            (async function () {
+                var ref = (p.ref || '').trim();
+                var cert = null;
+                if (ref) {
+                    try {
+                        var mod = await import('https://esm.sh/@supabase/supabase-js@2');
+                        var cfg = await import('./sistema/js/config.js');
+                        var sb = mod.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_KEY);
+                        var res = await sb.rpc('verificar_certificado', { p_ref: ref });
+                        if (res && res.data && res.data.length) cert = res.data[0];
+                    } catch (e) { /* sin conexión o BD no configurada: usamos el respaldo */ }
+                }
+                if (cert) { pintar(cert, true); return; }
+                if ((p.n || '').trim()) { pintar({ nombre: p.n, ci: p.ci, cargo: p.cargo, tipo: p.tipo, ref: p.ref, fecha: p.fecha }, false); return; }
+                if (ref) { noEncontrado(); return; }
+                lead.innerHTML = 'Página oficial de verificación de <strong>certificados</strong> del bufete <strong>LexFive</strong>. Escanee el código QR de un certificado para ver sus datos.';
+            })();
         })();
     </script>
     <script src="js/branding.js"></script>

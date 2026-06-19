@@ -2852,6 +2852,23 @@ async function renderCertificados() {
   };
   const pintar = () => { $('#certPreview').innerHTML = docActual(); };
 
+  // Registra el certificado en la nube (best-effort) para que sea verificable
+  // por su N.º de referencia. Si la tabla aún no existe (db/25), no pasa nada.
+  const registrarCert = () => {
+    try {
+      supabase.from('certificados').upsert({
+        ref,
+        tipo: tplActual().titulo,
+        nombre: ($('#ce_nombre').value || '').trim(),
+        ci: ($('#ce_ci').value || '').trim() || null,
+        cargo: ($('#ce_calidad').value || '').trim() || null,
+        periodo: ($('#ce_periodo').value || '').trim() || null,
+        fecha_emision: $('#ce_fecha').value || null,
+        created_by: state.profile.id
+      }, { onConflict: 'ref' }).then(() => {}, () => {});
+    } catch (e) { /* ignorado */ }
+  };
+
   // Campos que, si el texto no fue editado a mano, regeneran el borrador.
   ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => {
     $('#' + id).oninput = () => { if (!cuerpoEditado) regenerar(); pintar(); };
@@ -2863,6 +2880,7 @@ async function renderCertificados() {
 
   $('#ce_print').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+    registrarCert();
     const w = window.open('', '_blank');
     if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
     w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(tplActual().titulo)}</title>
@@ -2872,6 +2890,7 @@ async function renderCertificados() {
   };
   $('#ce_word').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+    registrarCert();
     const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>' + docActual() + '</body></html>';
     const nombre = 'certificado-' + (($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40)) + '.doc';
     descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
