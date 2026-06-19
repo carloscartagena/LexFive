@@ -2832,7 +2832,13 @@ async function renderCertificados() {
     </div>
 
     <div class="card">
-      <div class="card__head"><h3>Certificados emitidos</h3><input type="search" id="ce_buscar" placeholder="Buscar por nombre, C.I. o referencia..." style="max-width:280px"></div>
+      <div class="card__head"><h3>Certificados emitidos</h3>
+        <span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="search" id="ce_buscar" placeholder="Buscar nombre, C.I., referencia..." style="max-width:220px">
+          <label class="cell-sub" style="display:flex;align-items:center;gap:4px">Desde <input type="date" id="ce_fdesde"></label>
+          <label class="cell-sub" style="display:flex;align-items:center;gap:4px">Hasta <input type="date" id="ce_fhasta"></label>
+        </span>
+      </div>
       <div class="card__body--flush"><div id="certList"><div class="loading"><div class="spinner"></div>Cargando...</div></div></div>
     </div>`;
 
@@ -2898,13 +2904,22 @@ async function renderCertificados() {
     const cont = $('#certList'); if (!cont) return;
     if (!EMITIDOS.length) { cont.innerHTML = `<div class="empty" style="padding:24px">${ICON.doc}<p>Aún no hay certificados registrados. Genere uno e imprímalo o descárguelo para que aparezca aquí.</p></div>`; return; }
     const q = ($('#ce_buscar') ? $('#ce_buscar').value : '').toLowerCase();
-    const list = EMITIDOS.filter(c => !q || [c.nombre, c.ci, c.ref, c.tipo].some(v => (v || '').toLowerCase().includes(q)));
-    if (!list.length) { cont.innerHTML = '<p class="cell-sub" style="padding:16px">Sin resultados para esa búsqueda.</p>'; return; }
+    const desde = $('#ce_fdesde') ? $('#ce_fdesde').value : '';
+    const hasta = $('#ce_fhasta') ? $('#ce_fhasta').value : '';
+    const list = EMITIDOS.filter(c => {
+      if (q && ![c.nombre, c.ci, c.ref, c.tipo].some(v => (v || '').toLowerCase().includes(q))) return false;
+      const dia = (c.created_at || '').slice(0, 10);
+      if (desde && dia < desde) return false;
+      if (hasta && dia > hasta) return false;
+      return true;
+    });
+    if (!list.length) { cont.innerHTML = '<p class="cell-sub" style="padding:16px">Sin resultados para esos filtros.</p>'; return; }
     cont.innerHTML = `<div class="table-wrap"><table class="data">
-      <thead><tr><th>Persona</th><th>Tipo</th><th>Referencia</th><th>Emitido</th><th></th></tr></thead>
+      <thead><tr><th>Persona</th><th>Tipo</th><th>Emitido por</th><th>Referencia</th><th>Emitido</th><th></th></tr></thead>
       <tbody>${list.map(c => `<tr>
         <td class="cell-strong">${esc(c.nombre)}${c.ci ? `<div class="cell-sub">C.I. ${esc(c.ci)}</div>` : ''}</td>
         <td>${esc(c.tipo || '')}</td>
+        <td class="cell-sub">${esc(c.created_by ? profName(c.created_by) : '—')}</td>
         <td class="cell-sub">${esc(c.ref)}</td>
         <td class="cell-sub">${fmtDate(c.created_at)}</td>
         <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-reimp" data-id="${c.id}">Reimprimir</button> <button class="btn btn--danger btn--sm js-delcert" data-id="${c.id}" title="Eliminar registro">&times;</button></td>
@@ -2956,6 +2971,8 @@ async function renderCertificados() {
   };
 
   const bce = $('#ce_buscar'); if (bce) bce.oninput = pintarEmitidos;
+  const bfd = $('#ce_fdesde'); if (bfd) bfd.onchange = pintarEmitidos;
+  const bfh = $('#ce_fhasta'); if (bfh) bfh.onchange = pintarEmitidos;
 
   regenerar();
   pintar();
