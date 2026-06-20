@@ -151,7 +151,7 @@
 
         /* ---------- Animaciones de aparición al hacer scroll ---------- */
         var revealTargets = document.querySelectorAll(
-            '.area-card, .member, .testimonial, .stat, .about__content, .about__media, .contact__info, .contact__form, .section__head'
+            '.area-card, .member, .testimonial, .stat, .about__content, .about__media, .contact__info, .contact__form, .section__head, .why-card, .step'
         );
         revealTargets.forEach(function (el) { el.classList.add('reveal'); });
 

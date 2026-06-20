@@ -24,6 +24,10 @@
     --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
     --sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     --container: 1200px;
+    /* Trama de "circuito" (ingeniería de sistemas) en la paleta del bufete.
+       Se usa muy tenue de fondo para unir tecnología + derecho sin recargar. */
+    --circuit-navy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%230e1b2c' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%23b8923f'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    --circuit-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%23c8a558' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%23c8a558'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -110,8 +114,8 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 /* ---------- Hero ---------- */
 .hero { position: relative; background: radial-gradient(1200px 600px at 82% -10%, var(--gold-tint) 0%, transparent 55%), linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%); overflow: hidden; }
 .hero__overlay { position: absolute; inset: 0; pointer-events: none;
-    background-image: radial-gradient(circle, rgba(14,27,44,.05) 1px, transparent 1.4px);
-    background-size: 26px 26px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%); mask-image: linear-gradient(180deg, #000, transparent 70%); opacity: .5; }
+    background-image: var(--circuit-navy), radial-gradient(circle, rgba(14,27,44,.05) 1px, transparent 1.4px);
+    background-size: 84px 84px, 26px 26px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 72%); mask-image: linear-gradient(180deg, #000, transparent 72%); opacity: .42; }
 .hero__content { position: relative; padding: 92px 24px 84px; }
 .hero__eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .76rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; color: var(--gold); background: var(--gold-tint); padding: 7px 14px; border-radius: 999px; margin-bottom: 22px; }
 .hero__title { font-size: clamp(2.4rem, 5.4vw, 4.1rem); color: var(--navy); margin-bottom: 20px; max-width: 780px; }
@@ -153,7 +157,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 .about__grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; }
 .about__media { position: relative; }
 .about__image { aspect-ratio: 4 / 4.4; border-radius: var(--radius); background: linear-gradient(150deg, var(--navy), var(--navy-700) 70%); box-shadow: var(--shadow-lg); position: relative; overflow: hidden; }
-.about__image::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle at 30% 20%, rgba(184,146,63,.22), transparent 45%); }
+.about__image::after { content: ""; position: absolute; inset: 0; background-image: var(--circuit-gold), radial-gradient(circle at 30% 20%, rgba(184,146,63,.22), transparent 45%); background-size: 84px 84px, cover; opacity: .5; }
 .about__badge { position: absolute; right: -18px; bottom: 28px; background: var(--gold); color: #fff; border-radius: var(--radius-sm); padding: 18px 22px; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 12px; }
 .about__badge strong { font-family: var(--serif); font-size: 2.4rem; line-height: 1; }
 .about__badge span { font-size: .78rem; line-height: 1.25; opacity: .95; }
@@ -172,7 +176,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 .member__photo { position: relative; aspect-ratio: 1 / 1.04; background: linear-gradient(150deg, var(--navy), var(--navy-700)); display: grid; place-items: center; }
 .member__photo::after { content: attr(data-initials); font-family: var(--serif); font-size: 2.6rem; font-weight: 700; color: var(--gold-soft); opacity: .85; }
 .member__photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.member__info { padding: 18px 18px 22px; }
+.member__info { padding: 18px 18px 22px; text-align: center; }
 .member__name { font-size: 1.04rem; line-height: 1.25; margin-bottom: 4px; }
 .member__role { font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 10px; }
 .member__areas { font-size: .82rem; color: var(--navy); font-weight: 600; margin-bottom: 8px; }
@@ -272,6 +276,33 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 .reveal.is-visible { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
 
+/* ---------- ¿Por qué elegirnos? ---------- */
+.why { background: var(--gold-tint); }
+.why__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.why-card { text-align: center; padding: 14px 12px; }
+.why-card__icon { width: 58px; height: 58px; border-radius: 15px; background: #fff; color: var(--gold); display: grid; place-items: center; margin: 0 auto 16px; box-shadow: var(--shadow-sm); }
+.why-card__icon svg { width: 27px; height: 27px; }
+.why-card h3 { font-size: 1.14rem; margin-bottom: 8px; }
+.why-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+
+/* ---------- Proceso / Cómo trabajamos ---------- */
+.process { background: var(--bg); }
+.process__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; position: relative; }
+.process__grid::before { content: ""; position: absolute; top: 30px; left: 13%; right: 13%; height: 2px; background: linear-gradient(90deg, var(--line), var(--gold-soft) 50%, var(--line)); z-index: 1; }
+.step { text-align: center; position: relative; z-index: 2; }
+.step__num { width: 62px; height: 62px; border-radius: 50%; background: var(--navy); color: var(--gold-soft); font-family: var(--serif); font-size: 1.7rem; font-weight: 700; display: grid; place-items: center; margin: 0 auto 18px; box-shadow: 0 6px 18px rgba(14,27,44,.18); }
+.step__title { font-size: 1.12rem; margin-bottom: 8px; }
+.step__text { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+
+@media (max-width: 860px) {
+    .why__grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .process__grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
+    .process__grid::before { display: none; }
+}
+@media (max-width: 480px) {
+    .why__grid, .process__grid { grid-template-columns: 1fr; }
+}
+
 /* =========================================================
    Páginas internas (blog, casos, faq)
    ========================================================= */
@@ -306,7 +337,9 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 .case-card__title { font-size: 1.32rem; }
 .case-card__text { color: var(--muted); font-size: .94rem; margin-bottom: 18px; }
 .case-card__result { display: inline-flex; align-items: center; gap: 8px; background: var(--gold-tint); color: var(--gold); font-weight: 700; font-size: .84rem; padding: 9px 16px; border-radius: 999px; }
-.cta-band { background: linear-gradient(135deg, var(--navy), var(--navy-700)); border-radius: var(--radius); padding: 48px; text-align: center; color: #fff; margin-top: 56px; }
+.cta-band { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--navy), var(--navy-700)); border-radius: var(--radius); padding: 48px; text-align: center; color: #fff; margin-top: 56px; }
+.cta-band::before { content: ""; position: absolute; inset: 0; background-image: var(--circuit-gold); background-size: 84px 84px; opacity: .12; pointer-events: none; }
+.cta-band > * { position: relative; z-index: 1; }
 .cta-band h2 { color: #fff; font-size: clamp(1.7rem, 3vw, 2.3rem); margin-bottom: 12px; }
 .cta-band p { color: rgba(255,255,255,.8); margin-bottom: 26px; max-width: 560px; margin-left: auto; margin-right: auto; }
 

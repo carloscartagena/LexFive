@@ -26,7 +26,7 @@ y fácil de mantener o desplegar en cualquier servicio.
 - **Nombre:** LexFive
 - **Teléfono / WhatsApp:** +591 78360469
 - **Correo:** alba23meira@gmail.com
-- **Dirección:** Calle 12 Uruguay esq. Raúl Salmón, zona 12 de Octubre, Edificio Señor de Mayo N.º 85, planta baja, oficina 1-A. El Alto, Bolivia.
+- **Dirección:** Calle Uruguay esq. Raúl Salmón, zona 12 de Octubre, Edificio Señor de Mayo N.º 85, planta baja, oficina 1-A. El Alto, Bolivia.
 - **Áreas de práctica:** Laboral, Civil, Penal y Familiar.
 
 ---
