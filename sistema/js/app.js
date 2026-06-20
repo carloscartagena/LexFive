@@ -924,8 +924,16 @@ function snapshotBranding() {
   };
 }
 
+// Marca de tiempo del último cambio de branding hecho EN ESTE equipo. Sirve
+// para que el canal en tiempo real NO vuelva a descargar y re-renderizar la
+// pestaña cuando el cambio lo originó este mismo dispositivo (antes, cada vez
+// que se elegía/subía/eliminaba un logo o sello, el equipo se "auto-avisaba"
+// y forzaba una recarga de red + re-render, haciendo que todo se sintiera lento).
+let lastBrandingPush = 0;
+
 // Empuja la configuración actual a la nube y avisa si no se pudo.
 async function pushBranding() {
+  lastBrandingPush = Date.now();
   const ok = await Branding.save(snapshotBranding());
   if (!ok) toast('Se guardó en este equipo, pero no se pudo sincronizar con los demás dispositivos. Revise su conexión.', 'error');
   return ok;
@@ -992,6 +1000,11 @@ function subscribeBrandingRealtime() {
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'configuracion', filter: 'clave=eq.branding' },
         async () => {
+          // Si el cambio lo acaba de hacer ESTE equipo (hace menos de 8 s),
+          // no hace falta volver a descargar nada ni re-renderizar: ya tenemos
+          // la última versión localmente. Esto evita el "lag" al elegir, subir
+          // o eliminar logos/sellos (antes se recargaba todo en cada acción).
+          if (Date.now() - lastBrandingPush < 8000) return;
           try {
             await ensureImgCache();
             await hydrateBranding(true);
@@ -4722,9 +4735,14 @@ async function seleccionarSello(id) {
 // ============================================================
 async function renderSellos() {
   loading();
+  // Pinta de inmediato con lo que ya está en este equipo (IndexedDB + caché
+  // local) y, SOLO la primera vez por sesión, baja la versión de la nube en
+  // segundo plano y refresca una vez. Antes esperaba la red (hasta 8 s) ANTES
+  // de mostrar nada, por eso la pestaña "se abría lenta".
   try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) { console.warn('Sellos: ensureImgCache falló/timeout', e); }
-  try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) { console.warn('Sellos: hydrateBranding falló/timeout', e); }
+  const necesitaRed = !brandingHydrated;
 
+  function paint() {
   const logoActual = pickActiveLogo(localStorage.getItem('lexfive_logo'));
   const selloActual = pickActiveSello(localStorage.getItem('lexfive_sello'));
   const logosVisibles = brandLogosVisibles();
@@ -4975,17 +4993,27 @@ async function renderSellos() {
     w.document.write('<img src="' + abs + '" style="width:6cm;height:6cm;object-fit:contain" onload="window.print();window.close()">');
     w.document.close();
   };
+  } // ---- fin de paint() ----
+
+  paint(); // muestra YA la pestaña con los datos locales
+  // Solo la primera vez por sesión se baja la versión de la nube y, si llega,
+  // se vuelve a pintar una vez (las siguientes aperturas ya son instantáneas).
+  if (necesitaRed) hydrateBranding().then(() => { if (state.view === 'sellos') paint(); }).catch(() => {});
 }
 
 async function renderCredenciales() {
   loading();
-  // Blindaje: si la carga de imágenes/branding/credenciales se cuelga o falla,
-  // NO dejamos la vista atascada en "Cargando..."; se renderiza igual con lo
-  // que haya disponible (mismo criterio que el arranque con reintentos).
+  // Pinta de inmediato con lo que hay en este equipo y refresca en segundo
+  // plano (el branding la 1ª vez por sesión y la lista de credenciales si no
+  // está en caché). Antes esperaba la red ANTES de pintar: por eso "se abría
+  // lenta". Las siguientes aperturas en la misma sesión ya son instantáneas.
   try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) { console.warn('Credenciales: ensureImgCache falló/timeout', e); }
-  try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) { console.warn('Credenciales: hydrateBranding falló/timeout', e); }
-  let credList = [];
-  try { credList = (await withTimeout(CredStore.listCached(), 8000, 'credenciales')) || []; } catch (e) { console.warn('Credenciales: CredStore.list falló/timeout', e); credList = []; }
+  const necesitaRed = !brandingHydrated;
+  let credList = CredStore.cache;
+  if (!credList) { try { credList = JSON.parse(localStorage.getItem('lexfive_cred_cache') || '[]'); } catch (e) { credList = []; } }
+  credList = credList || [];
+
+  function paint() {
   const p = state.profile;
   const rolLabel = ROLES[p.rol] || p.rol;
 
@@ -5430,6 +5458,23 @@ async function renderCredenciales() {
       toast('No se pudo eliminar la credencial. Revise su conexión e intente de nuevo.', 'error');
     }
   });
+  } // ---- fin de paint() ----
+
+  paint(); // muestra YA la pestaña con los datos locales
+
+  // Refresco en segundo plano (no bloquea la apertura): baja el branding la
+  // primera vez por sesión y la lista de credenciales si aún no está en caché.
+  (async () => {
+    let cambiar = false;
+    if (necesitaRed) { try { await withTimeout(hydrateBranding(), 8000, 'branding'); cambiar = true; } catch (e) {} }
+    if (!CredStore.cache) {
+      try {
+        const fresh = await withTimeout(CredStore.list(), 8000, 'credenciales');
+        if (fresh && JSON.stringify(fresh) !== JSON.stringify(credList)) { credList = fresh; cambiar = true; }
+      } catch (e) {}
+    }
+    if (cambiar && state.view === 'credenciales') paint();
+  })();
 }
 
 // Lee una imagen subida por el bufete (kind = 'logo' | 'sello'), la valida y la guarda.
