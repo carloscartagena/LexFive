@@ -4,7 +4,7 @@
 << /Type /Catalog /Pages 2 0 R >>
 endobj
 2 0 obj
-<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R] /Count 12 >>
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R 22 0 R 24 0 R 26 0 R 28 0 R 30 0 R] /Count 13 >>
 endobj
 3 0 obj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
@@ -85,7 +85,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 5 0 R >>
 endobj
 7 0 obj
-<< /Length 8131 >>
+<< /Length 8450 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -511,7 +511,7 @@ ET
 BT
 /F1 10.50 Tf
 60.00 325.89 Td
-(22. Respaldos, instalación y conexión a internet) Tj
+(22. Sitio web \(imágenes y fondo de la página\)) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -522,14 +522,14 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-290.36 325.89 Td
-(...............................................................................) Tj
+281.02 325.89 Td
+(..................................................................................) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 60.00 307.89 Td
-(23. Soporte) Tj
+(23. Respaldos, instalación y conexión a internet) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -540,7 +540,25 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-122.28 307.89 Td
+290.36 307.89 Td
+(...............................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 289.89 Td
+(24. Soporte) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+527.60 289.89 Td
+(11) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+122.28 289.89 Td
 (........................................................................................................................................) Tj
 ET
 
@@ -3196,7 +3214,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 23 0 R >>
 endobj
 25 0 obj
-<< /Length 6228 >>
+<< /Length 6408 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -3508,7 +3526,7 @@ ET
 BT
 /F2 16.00 Tf
 56.00 121.39 Td
-(22. Respaldos, instalación y conexión a internet) Tj
+(22. Sitio web \(imágenes y fondo de la página\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
@@ -3517,7 +3535,13 @@ ET
 BT
 /F1 10.50 Tf
 56.00 86.89 Td
-(El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:) Tj
+(La pestaña «Sitio web» \(administrador y abogados\) permite controlar las imágenes y el fondo de la) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 72.39 Td
+(página de inicio \(lexfive.netlify.app\) sin tocar el código. Lo que cambia aquí se ve en la web pública en) Tj
 ET
 
 endstream
@@ -3526,7 +3550,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 25 0 R >>
 endobj
 27 0 obj
-<< /Length 3299 >>
+<< /Length 6009 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -3561,158 +3585,293 @@ BT
 279.63 52.00 Td
 (Página 11) Tj
 ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 757.39 Td
+(unos segundos y se sincroniza entre todos los dispositivos.) Tj
+ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 757.39 Td
+60.00 735.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 757.39 Td
-(Respaldo automático: la base de datos se respalda sola cada día \(mediante GitHub Actions\). No) Tj
+74.00 735.89 Td
+(Imagen principal \(hero\): suba o quite la imagen que aparece como una tarjeta al costado del título.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 742.89 Td
-(tiene que hacer nada.) Tj
+74.00 721.39 Td
+(Conviene horizontal o cuadrada \(ideal ~1200×900 px\). Si no sube ninguna, se muestra la ilustración) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 706.89 Td
+(por defecto.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 726.39 Td
+60.00 690.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 726.39 Td
-(Respaldo manual: en el «Panel general», el administrador puede pulsar «Exportar respaldo) Tj
+74.00 690.39 Td
+(Imagen de «Sobre el bufete»: la del recuadro de esa sección. Como el recuadro es alto, conviene) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 711.89 Td
-(\(JSON\)» para descargar una copia de los datos principales en su equipo. Se muestra la fecha del) Tj
+74.00 675.89 Td
+(una imagen vertical \(ideal ~800×950 px\). Si no sube ninguna, se usa la ilustración \(la balanza\) por) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 697.39 Td
-(último respaldo manual.) Tj
+74.00 661.39 Td
+(defecto.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 680.89 Td
+60.00 644.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 680.89 Td
-(Instalar como app: en el celular puede «Agregar a la pantalla de inicio» desde el navegador y usar) Tj
+74.00 644.89 Td
+(Fondo del sitio: elija el patrón tenue que se ve detrás de algunas secciones — código binario) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 666.39 Td
-(el sistema como una aplicación \(abre más rápido y a pantalla completa\).) Tj
+74.00 630.39 Td
+(\(recomendado\), circuito, líneas finas o ninguno.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 649.89 Td
+60.00 613.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 649.89 Td
-(Aviso de «sin conexión»: si se queda sin internet, aparece un aviso. Lo que guarde queda en el) Tj
+74.00 613.89 Td
+(Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título del hero \(ideal) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 635.39 Td
-(equipo y se sincroniza al volver la conexión.) Tj
+74.00 599.39 Td
+(~1920×1080 px\). El sistema le pone automáticamente una capa oscura por encima para que el) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 584.89 Td
+(título y los botones siempre se lean; solo afecta al encabezado, no a toda la página.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 568.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 568.39 Td
+(Cada imagen tiene botones «Subir» y «Quitar». Al quitarla, vuelve la ilustración o el fondo por) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 553.89 Td
+(defecto.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 532.39 Td
+(Formatos admitidos: JPG, PNG o WebP \(máximo 6 MB; el sistema las optimiza al subir\).) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 569.89 483.28 58.50 re
+56.00 453.39 483.28 72.00 re
 f
 0.760 0.635 0.353 rg
-56.00 569.89 4.00 58.50 re
+56.00 453.39 4.00 72.00 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 608.89 Td
+71.00 505.89 Td
 (Recomendación) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 595.39 Td
+71.00 492.39 Td
+(Todo se guarda en la configuración compartida del bufete \(branding\) y no requiere ningún script SQL.) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 478.89 Td
+(Consejo: para el fondo del encabezado, use imágenes oscuras o con poco detalle en el centro, ya que) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 465.39 Td
+(el título y los botones van encima.) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 413.39 Td
+(23. Respaldos, instalación y conexión a internet) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 405.39 m 539.28 405.39 l S
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 378.89 Td
+(El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 357.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 357.39 Td
+(Respaldo automático: la base de datos se respalda sola cada día \(mediante GitHub Actions\). No) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 342.89 Td
+(tiene que hacer nada.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 326.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 326.39 Td
+(Respaldo manual: en el «Panel general», el administrador puede pulsar «Exportar respaldo) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 311.89 Td
+(\(JSON\)» para descargar una copia de los datos principales en su equipo. Se muestra la fecha del) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 297.39 Td
+(último respaldo manual.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 280.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 280.89 Td
+(Instalar como app: en el celular puede «Agregar a la pantalla de inicio» desde el navegador y usar) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 266.39 Td
+(el sistema como una aplicación \(abre más rápido y a pantalla completa\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 249.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 249.89 Td
+(Aviso de «sin conexión»: si se queda sin internet, aparece un aviso. Lo que guarde queda en el) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 235.39 Td
+(equipo y se sincroniza al volver la conexión.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 169.89 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 169.89 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 208.89 Td
+(Recomendación) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 195.39 Td
 (Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o restaurar datos) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 581.89 Td
+71.00 181.89 Td
 (antiguos.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 529.89 Td
-(23. Soporte) Tj
+56.00 129.89 Td
+(24. Soporte) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 521.89 m 539.28 521.89 l S
+56.00 121.89 m 539.28 121.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 495.39 Td
+56.00 95.39 Td
 (Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 480.89 Td
+56.00 80.89 Td
 (mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 466.39 Td
-(posible lo que necesita.) Tj
-ET
-0.965 0.957 0.937 rg
-56.00 392.89 483.28 58.50 re
-f
-0.760 0.635 0.353 rg
-56.00 392.89 4.00 58.50 re
-f
-0.659 0.522 0.235 rg
-BT
-/F2 10.00 Tf
-71.00 431.89 Td
-(Versión) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 418.39 Td
-(Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.00 Tf
-71.00 404.89 Td
-(actualiza, solicite una versión nueva del manual.) Tj
 ET
 
 endstream
@@ -3720,39 +3879,113 @@ endobj
 28 0 obj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 27 0 R >>
 endobj
+29 0 obj
+<< /Length 993 >>
+stream
+0.760 0.635 0.353 rg
+56.00 787.89 18.00 18.00 re
+f
+0.055 0.106 0.173 rg
+BT
+/F2 9.00 Tf
+59.75 792.89 Td
+(L5) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 9.50 Tf
+82.00 792.89 Td
+(LexFive Abogados) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 8.50 Tf
+464.64 792.89 Td
+(Manual del Sistema) Tj
+ET
+0.760 0.635 0.353 RG
+0.80 w
+56.00 781.89 m 539.28 781.89 l S
+0.900 0.900 0.900 RG
+0.60 w
+56.00 62.00 m 539.28 62.00 l S
+0.361 0.400 0.459 rg
+BT
+/F1 8.00 Tf
+279.63 52.00 Td
+(Página 12) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 757.39 Td
+(posible lo que necesita.) Tj
+ET
+0.965 0.957 0.937 rg
+56.00 683.89 483.28 58.50 re
+f
+0.760 0.635 0.353 rg
+56.00 683.89 4.00 58.50 re
+f
+0.659 0.522 0.235 rg
+BT
+/F2 10.00 Tf
+71.00 722.89 Td
+(Versión) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 709.39 Td
+(Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 695.89 Td
+(actualiza, solicite una versión nueva del manual.) Tj
+ET
+
+endstream
+endobj
+30 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 29 0 R >>
+endobj
 xref
-0 29
+0 31
 0000000000 65535 f 
 0000000015 00000 n 
 0000000064 00000 n 
-0000000198 00000 n 
-0000000295 00000 n 
-0000000397 00000 n 
-0000001377 00000 n 
-0000001541 00000 n 
-0000009724 00000 n 
-0000009888 00000 n 
-0000014998 00000 n 
-0000015163 00000 n 
-0000021646 00000 n 
-0000021812 00000 n 
-0000027591 00000 n 
-0000027757 00000 n 
-0000033501 00000 n 
-0000033667 00000 n 
-0000038848 00000 n 
-0000039014 00000 n 
-0000044312 00000 n 
-0000044478 00000 n 
-0000050985 00000 n 
-0000051151 00000 n 
-0000057114 00000 n 
-0000057280 00000 n 
-0000063561 00000 n 
-0000063727 00000 n 
-0000067079 00000 n 
+0000000205 00000 n 
+0000000302 00000 n 
+0000000404 00000 n 
+0000001384 00000 n 
+0000001548 00000 n 
+0000010050 00000 n 
+0000010214 00000 n 
+0000015324 00000 n 
+0000015489 00000 n 
+0000021972 00000 n 
+0000022138 00000 n 
+0000027917 00000 n 
+0000028083 00000 n 
+0000033827 00000 n 
+0000033993 00000 n 
+0000039174 00000 n 
+0000039340 00000 n 
+0000044638 00000 n 
+0000044804 00000 n 
+0000051311 00000 n 
+0000051477 00000 n 
+0000057440 00000 n 
+0000057606 00000 n 
+0000064067 00000 n 
+0000064233 00000 n 
+0000070295 00000 n 
+0000070461 00000 n 
+0000071506 00000 n 
 trailer
-<< /Size 29 /Root 1 0 R >>
+<< /Size 31 /Root 1 0 R >>
 startxref
-67245
+71672
 %%EOF

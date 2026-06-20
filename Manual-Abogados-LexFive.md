@@ -15,8 +15,9 @@ _Guía de uso del panel para el equipo legal · Versión: junio de 2026 · lexfi
 - 9. Blog del bufete
 - 10. Credenciales de procuradores
 - 11. Certificados y constancias
-- 12. Consejos y seguridad
-- 13. Soporte
+- 12. Sitio web (imágenes y fondo)
+- 13. Consejos y seguridad
+- 14. Soporte
 
 
 ## 1. Bienvenido al panel de LexFive
@@ -101,14 +102,24 @@ En «Certificados» puede emitir, en hoja membretada del bufete (tamaño carta) 
 - Imprima/guarde en PDF o descargue en Word. El sello del bufete va impreso.
 - Cada certificado queda registrado y se verifica por su QR. En «Certificados emitidos» puede buscar, filtrar por fecha, ver quién lo emitió, reimprimir o eliminar.
 
-## 12. Consejos y seguridad
+## 12. Sitio web (imágenes y fondo)
+
+En la pestaña «Sitio web» puede cambiar, sin ayuda técnica, las imágenes y el fondo de la página de inicio. Lo que cambie se ve en la web en unos segundos.
+
+- Imagen principal (hero): la que va junto al título (horizontal o cuadrada, ~1200×900).
+- Imagen de «Sobre el bufete»: la del recuadro de esa sección (vertical, ~800×950).
+- Fondo del sitio: el patrón tenue (código binario, circuito, líneas o ninguno).
+- Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título; el sistema le pone una capa oscura para que el texto se lea.
+- Cada una tiene botones «Subir» y «Quitar» (al quitar, vuelve la ilustración por defecto). Use JPG, PNG o WebP (máx. 6 MB).
+
+## 13. Consejos y seguridad
 
 - Cierre sesión al terminar, sobre todo en computadoras compartidas.
 - Si pierde el internet, aparece un aviso de «sin conexión»: lo que guarde queda en el equipo y se sincroniza al volver la conexión.
 - No comparta su contraseña. Si la olvida, pídale al administrador que la reinicie.
 - Revise el panel general al iniciar el día para no perder audiencias ni plazos.
 
-## 13. Soporte
+## 14. Soporte
 
 Ante cualquier duda, contacte al administrador del bufete. Para el detalle completo de cada función, consulte el «Manual del Sistema».
 
