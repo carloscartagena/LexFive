@@ -920,6 +920,8 @@ function snapshotBranding() {
   // está vacía (se quitó), se guarda nulo.
   const heroLS = localStorage.getItem('lexfive_hero_url');
   const bgLS = localStorage.getItem('lexfive_bg_style');
+  const sobreLS = localStorage.getItem('lexfive_sobre_url');
+  const heroBgLS = localStorage.getItem('lexfive_herobg_url');
   return {
     logoId: logoId,
     logoImg: logoImg,
@@ -929,7 +931,12 @@ function snapshotBranding() {
     logosHidden: readList('lexfive_logos_hidden'),
     sellosHidden: readList('lexfive_sellos_hidden'),
     heroImg: (heroLS !== null) ? (heroLS || null) : (cache.heroImg || null),
-    bgStyle: (bgLS !== null) ? (bgLS || null) : (cache.bgStyle || null)
+    bgStyle: (bgLS !== null) ? (bgLS || null) : (cache.bgStyle || null),
+    // Imagen de la sección «Sobre el bufete» (vertical) y foto de fondo del
+    // encabezado/hero. Mismo criterio: si la clave no está en este equipo, se
+    // conserva lo de la nube; si está vacía (se quitó), se guarda nulo.
+    sobreImg: (sobreLS !== null) ? (sobreLS || null) : (cache.sobreImg || null),
+    heroBgImg: (heroBgLS !== null) ? (heroBgLS || null) : (cache.heroBgImg || null)
   };
 }
 
@@ -5021,6 +5028,8 @@ async function renderSitio() {
   const b = (Branding && Branding.local) ? (Branding.local() || {}) : {};
   const heroActual = b.heroImg || null;
   const bgActual = b.bgStyle || 'binario';
+  const sobreActual = b.sobreImg || null;
+  const heroBgActual = b.heroBgImg || null;
 
   const BGS = [
     { id: 'binario', label: 'Código binario', desc: 'Números 0 y 1 (tecnología). Recomendado.' },
@@ -5029,26 +5038,38 @@ async function renderSitio() {
     { id: 'ninguno', label: 'Ninguno', desc: 'Fondo liso, sin patrón.' }
   ];
 
+  // Caja reutilizable de vista previa + botones Subir/Quitar para una imagen.
+  const cajaImg = (url, idSubir, idQuitar, idFile, alto) => `
+    <div class="sello-box">
+      <div class="big-preview big-preview--sello" style="max-width:340px">
+        ${url ? `<img src="${esc(url)}" alt="Vista previa" style="width:100%;${alto ? '' : ''}border-radius:10px;display:block">` : '<p class="cell-sub" style="padding:22px;text-align:center">Sin imagen propia (se usa la ilustración por defecto).</p>'}
+      </div>
+      <div class="sello-actions">
+        <button class="btn btn--primary btn--sm" id="${idSubir}" type="button">Subir imagen</button>
+        ${url ? `<button class="btn btn--ghost btn--sm" id="${idQuitar}" type="button">Quitar imagen</button>` : ''}
+        <input type="file" id="${idFile}" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
+      </div>
+    </div>`;
+
   content().innerHTML = `
     <div class="card"><div class="card__body">
       <h3 class="intro-title">Sitio web público</h3>
-      <p class="cell-sub">Controle la <strong>imagen principal</strong> y el <strong>fondo</strong> de la página de inicio (lexfive.netlify.app). Los cambios se ven en la web en unos segundos.</p>
+      <p class="cell-sub">Controle las <strong>imágenes</strong> y el <strong>fondo</strong> de la página de inicio (lexfive.netlify.app). Todo se guarda solo y se ve en la web en unos segundos. Formatos: <strong>JPG, PNG o WebP</strong> (máx. 6 MB; el sistema las optimiza al subir).</p>
     </div></div>
 
     <div class="card">
       <div class="card__head"><h3>Imagen principal (hero)</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">Aparece junto al título en la página de inicio. Use una imagen horizontal (recomendado ~1200×900 px). Si no sube ninguna, se muestra la ilustración por defecto.</p>
-        <div class="sello-box">
-          <div class="big-preview big-preview--sello" style="max-width:340px">
-            ${heroActual ? `<img src="${esc(heroActual)}" alt="Imagen del hero" style="width:100%;border-radius:10px;display:block">` : '<p class="cell-sub" style="padding:22px;text-align:center">Sin imagen propia (se usa la ilustración por defecto).</p>'}
-          </div>
-          <div class="sello-actions">
-            <button class="btn btn--primary btn--sm" id="btnSubirHero" type="button">Subir imagen</button>
-            ${heroActual ? '<button class="btn btn--ghost btn--sm" id="btnQuitarHero" type="button">Quitar imagen</button>' : ''}
-            <input type="file" id="fileHero" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
-          </div>
-        </div>
+        <p class="cell-sub" style="margin-bottom:12px">La que aparece al costado del título, como una tarjeta. Horizontal o cuadrada (ideal ~1200×900 px). Si no sube ninguna, se muestra la ilustración por defecto.</p>
+        ${cajaImg(heroActual, 'btnSubirHero', 'btnQuitarHero', 'fileHero')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Imagen de «Sobre el bufete»</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:12px">La del recuadro de la sección «Sobre el bufete». El recuadro es alto, así que conviene una imagen <strong>vertical</strong> (ideal ~800×950 px). Si no sube ninguna, se muestra la ilustración (balanza) por defecto.</p>
+        ${cajaImg(sobreActual, 'btnSubirSobre', 'btnQuitarSobre', 'fileSobre')}
       </div>
     </div>
 
@@ -5063,38 +5084,55 @@ async function renderSitio() {
               <span class="cell-sub">${o.desc}</span>
             </label>`).join('')}
         </div>
+
+        <hr style="border:none;border-top:1px solid var(--line,rgba(0,0,0,.1));margin:20px 0">
+        <h4 style="margin:0 0 6px">Imagen de fondo del encabezado</h4>
+        <p class="cell-sub" style="margin-bottom:12px">Opcional: una foto detrás del título del encabezado (hero). Horizontal/panorámica (ideal ~1920×1080 px); mejor si es <strong>oscura</strong>, porque el texto va encima. El sistema le pone <strong>automáticamente una capa oscura</strong> para que el título y los botones siempre se lean. Si la quita, vuelve el fondo por defecto.</p>
+        ${cajaImg(heroBgActual, 'btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg')}
       </div>
     </div>`;
 
-  const fileHero = $('#fileHero');
-  const btnSubirHero = $('#btnSubirHero');
-  if (btnSubirHero) btnSubirHero.onclick = () => fileHero.click();
-  if (fileHero) fileHero.onchange = () => {
-    const f = fileHero.files && fileHero.files[0]; fileHero.value = '';
-    if (!f) return;
-    if (f.size > 6 * 1024 * 1024) { toast('La imagen pesa demasiado (máx. 6 MB). Use una más liviana.', 'error'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      redimensionarDataUrl(reader.result, 1400, async (peq) => {
-        toast('Subiendo imagen...', 'success');
-        const url = await subirImagenBranding(peq, 'hero');
-        if (!url) { toast('No se pudo subir la imagen. Revise su conexión e intente de nuevo.', 'error'); return; }
-        localStorage.setItem('lexfive_hero_url', url);
-        await pushBranding();
-        toast('Imagen del hero actualizada. Se verá en la web en unos segundos.', 'success');
-        renderSitio();
-      });
+  // Conecta un control de subida/quitar de imagen con su clave de branding.
+  // lsKey: clave en localStorage; prefijo: carpeta en Storage; maxLado: tamaño
+  // máximo del lado mayor al optimizar; okMsg/quitarMsg: avisos al usuario.
+  const wireImagen = (idSubir, idQuitar, idFile, lsKey, prefijo, maxLado, okMsg, quitarMsg) => {
+    const file = $('#' + idFile);
+    const btn = $('#' + idSubir);
+    if (btn) btn.onclick = () => file.click();
+    if (file) file.onchange = () => {
+      const f = file.files && file.files[0]; file.value = '';
+      if (!f) return;
+      if (f.size > 6 * 1024 * 1024) { toast('La imagen pesa demasiado (máx. 6 MB). Use una más liviana.', 'error'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        redimensionarDataUrl(reader.result, maxLado, async (peq) => {
+          toast('Subiendo imagen...', 'success');
+          const url = await subirImagenBranding(peq, prefijo);
+          if (!url) { toast('No se pudo subir la imagen. Revise su conexión e intente de nuevo.', 'error'); return; }
+          localStorage.setItem(lsKey, url);
+          await pushBranding();
+          toast(okMsg, 'success');
+          renderSitio();
+        });
+      };
+      reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
+      reader.readAsDataURL(f);
     };
-    reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
-    reader.readAsDataURL(f);
+    const btnQ = $('#' + idQuitar);
+    if (btnQ) btnQ.onclick = async () => {
+      localStorage.setItem(lsKey, '');
+      await pushBranding();
+      toast(quitarMsg, 'success');
+      renderSitio();
+    };
   };
-  const btnQuitarHero = $('#btnQuitarHero');
-  if (btnQuitarHero) btnQuitarHero.onclick = async () => {
-    localStorage.setItem('lexfive_hero_url', '');
-    await pushBranding();
-    toast('Imagen quitada. Se usará la ilustración por defecto.', 'success');
-    renderSitio();
-  };
+
+  wireImagen('btnSubirHero', 'btnQuitarHero', 'fileHero', 'lexfive_hero_url', 'hero', 1400,
+    'Imagen del hero actualizada. Se verá en la web en unos segundos.', 'Imagen quitada. Se usará la ilustración por defecto.');
+  wireImagen('btnSubirSobre', 'btnQuitarSobre', 'fileSobre', 'lexfive_sobre_url', 'sobre', 1200,
+    'Imagen de «Sobre el bufete» actualizada. Se verá en la web en unos segundos.', 'Imagen quitada. Se usará la ilustración por defecto.');
+  wireImagen('btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg', 'lexfive_herobg_url', 'herobg', 1920,
+    'Fondo del encabezado actualizado. Se verá en la web en unos segundos.', 'Fondo del encabezado quitado. Vuelve el fondo por defecto.');
 
   content().querySelectorAll('input[name="bgStyle"]').forEach(r => r.onchange = async () => {
     localStorage.setItem('lexfive_bg_style', r.value);

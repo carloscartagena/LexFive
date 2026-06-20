@@ -540,6 +540,36 @@
             var hp = document.querySelector('.hero__photo');
             if (hp && hp.getAttribute('src') !== b.heroImg) hp.setAttribute('src', b.heroImg);
         }
+        // Imagen de la sección «Sobre el bufete». El <img> trae onerror que lo
+        // quita si la foto por defecto no existe; por eso, si hay una imagen
+        // configurada y el elemento ya no está, se vuelve a crear.
+        if (b.sobreImg) {
+            var ai = document.querySelector('.about__image');
+            var ap = document.querySelector('.about__photo');
+            if (!ap && ai) {
+                ap = document.createElement('img');
+                ap.className = 'about__photo';
+                ap.setAttribute('alt', '');
+                var illu = ai.querySelector('.about__illu');
+                if (illu) ai.insertBefore(ap, illu); else ai.appendChild(ap);
+            }
+            if (ap && ap.getAttribute('src') !== b.sobreImg) ap.setAttribute('src', b.sobreImg);
+        }
+        // Imagen de fondo del encabezado (hero). Se aplica SOLO al hero, con una
+        // capa oscura automática por encima para que el título y los botones
+        // (texto claro) siempre se lean. Si no hay imagen, se deja el fondo CSS.
+        var hero = document.querySelector('.hero');
+        if (hero) {
+            if (b.heroBgImg) {
+                hero.style.backgroundImage = 'linear-gradient(rgba(8,18,33,.72), rgba(10,22,38,.82)), url("' + b.heroBgImg + '")';
+                hero.style.backgroundSize = 'cover';
+                hero.style.backgroundPosition = 'center';
+            } else {
+                hero.style.backgroundImage = '';
+                hero.style.backgroundSize = '';
+                hero.style.backgroundPosition = '';
+            }
+        }
         if (BG_VALIDOS.indexOf(b.bgStyle) !== -1) document.documentElement.setAttribute('data-bg', b.bgStyle);
         else document.documentElement.removeAttribute('data-bg');
     }
