@@ -474,52 +474,51 @@
 })();
 
 
-/* ---------- Selector de variantes de estilo (solo para comparar) ----------
-   Abra el sitio con  ?preview=1  para ver el panel A/B/C y elegir un estilo.
-   La elección se recuerda en este navegador. Los visitantes normales no lo ven. */
+/* ---------- Botón de modo oscuro / claro (en el encabezado) ----------
+   Recuerda la preferencia en el navegador; si no hay, sigue la del sistema.
+   El tema ya se aplica en <head> para evitar parpadeo; aquí se crea el botón. */
 (function () {
-    function initThemeSwitch() {
-        var sw = document.getElementById('themeSwitch');
-        if (!sw) return;
-        var root = document.documentElement;
+    var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+    var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>';
 
-        // Restaura la última variante elegida en este navegador.
-        var saved = null;
-        try { saved = localStorage.getItem('lexfive_tema'); } catch (e) {}
-        if (saved) { root.setAttribute('data-tema', saved); }
+    function currentTheme() {
+        try { var t = localStorage.getItem('lexfive_theme'); if (t) return t; } catch (e) {}
+        return 'dark';
+    }
+    function apply(theme) {
+        document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+    }
 
-        // Permite forzar una variante por URL: ?tema=a (o b, c).
-        var m = location.search.match(/[?&]tema=([abc])/);
-        if (m) {
-            root.setAttribute('data-tema', m[1]);
-            try { localStorage.setItem('lexfive_tema', m[1]); } catch (e) {}
+    function build() {
+        var bar = document.querySelector('.header__inner');
+        if (!bar || document.getElementById('modeToggle')) return;
+        apply(currentTheme());
+
+        var btn = document.createElement('button');
+        btn.id = 'modeToggle';
+        btn.className = 'mode-toggle';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Cambiar entre modo claro y oscuro');
+
+        function refresh() {
+            var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            btn.innerHTML = dark ? SUN : MOON;
+            btn.title = dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
         }
+        refresh();
 
-        function mark() {
-            var cur = root.getAttribute('data-tema');
-            sw.querySelectorAll('button').forEach(function (b) {
-                b.classList.toggle('active', b.getAttribute('data-tema') === cur);
-            });
-        }
-
-        // Muestra el panel solo en modo vista previa.
-        var preview = /[?&]preview/.test(location.search) || location.hash === '#preview';
-        if (preview) { sw.classList.add('is-on'); sw.setAttribute('aria-hidden', 'false'); }
-
-        sw.querySelectorAll('button').forEach(function (b) {
-            b.addEventListener('click', function () {
-                var t = b.getAttribute('data-tema');
-                root.setAttribute('data-tema', t);
-                try { localStorage.setItem('lexfive_tema', t); } catch (e) {}
-                mark();
-            });
+        btn.addEventListener('click', function () {
+            var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            var next = dark ? 'light' : 'dark';
+            apply(next);
+            try { localStorage.setItem('lexfive_theme', next); } catch (e) {}
+            refresh();
         });
-        mark();
+
+        var toggle = bar.querySelector('.nav__toggle');
+        if (toggle) bar.insertBefore(btn, toggle); else bar.appendChild(btn);
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initThemeSwitch);
-    } else {
-        initThemeSwitch();
-    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
+    else build();
 })();

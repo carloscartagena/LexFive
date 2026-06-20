@@ -85,20 +85,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <script>(function(){try{var t=localStorage.getItem('lexfive_theme')||'dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
 <!-- Para cambiar la paleta de color, añade una clase al body:
      theme-charcoal (negro/dorado), theme-emerald (verde/dorado) o theme-burgundy (vino/dorado).
      Ejemplo: <body class="theme-emerald"> -->
 <body>
     <div id="fb-root"></div>
-
-    <!-- Selector de variantes de estilo (solo visible con ?preview=1, para comparar) -->
-    <div class="theme-switch" id="themeSwitch" aria-hidden="true">
-        <strong>Estilo</strong>
-        <button type="button" data-tema="a">A &middot; Tech oscuro</button>
-        <button type="button" data-tema="b">B &middot; Suave</button>
-        <button type="button" data-tema="c">C &middot; Dorado</button>
-    </div>
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v19.0"></script>
 
     <!-- Botón flotante de Messenger -->
@@ -156,6 +149,47 @@
         <!-- ===== Hero ===== -->
         <section class="hero" id="inicio">
             <div class="hero__overlay"></div>
+            <div class="hero__visual">
+                <!-- Ilustracion original "Derecho + Tecnologia". Si luego quiere una
+                     FOTO real, reemplace este archivo o cambie el src a su imagen. -->
+                <img class="hero__photo" src="assets/hero-derecho-tech.svg" alt="Derecho y tecnología en LexFive" loading="lazy" onerror="this.remove()">
+                <svg class="hero__art" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- conectores de circuito -->
+                <g stroke="#38bdf8" stroke-width="1.6" opacity=".45" stroke-linecap="round">
+                    <path d="M200 205 96 96"/><path d="M200 205 304 96"/>
+                    <path d="M200 205 96 312"/><path d="M200 205 304 312"/>
+                </g>
+                <g fill="#38bdf8" opacity=".7">
+                    <circle cx="200" cy="205" r="3.5"/>
+                    <circle cx="150" cy="160" r="2.6"/><circle cx="252" cy="160" r="2.6"/>
+                    <circle cx="150" cy="258" r="2.6"/><circle cx="252" cy="258" r="2.6"/>
+                </g>
+                <!-- aro central -->
+                <circle cx="200" cy="205" r="96" stroke="#38bdf8" stroke-width="1.5" opacity=".4"/>
+                <!-- balanza (derecho) -->
+                <g stroke="#e0c074" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M200 150v122"/>
+                    <path d="M170 272h60"/>
+                    <path d="M150 168h100"/>
+                    <path d="M150 168 134 208M150 168 166 208"/>
+                    <path d="M250 168 234 208M250 168 266 208"/>
+                    <path d="M128 208a22 9 0 0 0 44 0"/>
+                    <path d="M228 208a22 9 0 0 0 44 0"/>
+                </g>
+                <circle cx="200" cy="150" r="6" fill="#e0c074"/>
+                <!-- satélites: iconos derecho + tecnología -->
+                <g stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="96" cy="96" r="30" stroke="#38bdf8" opacity=".55"/>
+                    <g transform="translate(82 82) scale(1.18)"><path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></g>
+                    <circle cx="304" cy="96" r="30" stroke="#38bdf8" opacity=".55"/>
+                    <g transform="translate(290 82) scale(1.18)"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12"/></g>
+                    <circle cx="96" cy="312" r="30" stroke="#38bdf8" opacity=".55"/>
+                    <g transform="translate(82 298) scale(1.18)"><path d="M14 6 18.5 10.5"/><path d="M9.5 5.5 14 10"/><path d="m11.7 7.8-6.3 6.3a1.5 1.5 0 0 0 2.1 2.1l6.3-6.3"/><path d="M4 21h10"/></g>
+                    <circle cx="304" cy="312" r="30" stroke="#38bdf8" opacity=".55"/>
+                    <g transform="translate(290 298) scale(1.18)"><path d="M3 9h18L12 3 3 9z"/><path d="M5 9v8M10 9v8M14 9v8M19 9v8"/><path d="M3 21h18"/></g>
+                </g>
+            </svg>
+            </div>
             <div class="container hero__content">
                 <p class="hero__eyebrow">Bufete de abogados &middot; Derecho &amp; Tecnología</p>
                 <h1 class="hero__title">Defendemos sus derechos con<br><em>experiencia y compromiso</em></h1>
