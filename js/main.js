@@ -483,7 +483,7 @@
 
     function currentTheme() {
         try { var t = localStorage.getItem('lexfive_theme'); if (t) return t; } catch (e) {}
-        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        return 'dark';
     }
     function apply(theme) {
         document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');

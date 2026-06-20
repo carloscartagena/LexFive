@@ -85,7 +85,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
-    <script>(function(){try{var t=localStorage.getItem('lexfive_theme');if(!t)t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
+    <script>(function(){try{var t=localStorage.getItem('lexfive_theme')||'dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
 <!-- Para cambiar la paleta de color, añade una clase al body:
      theme-charcoal (negro/dorado), theme-emerald (verde/dorado) o theme-burgundy (vino/dorado).
@@ -149,7 +149,11 @@
         <!-- ===== Hero ===== -->
         <section class="hero" id="inicio">
             <div class="hero__overlay"></div>
-            <svg class="hero__art" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <div class="hero__visual">
+                <!-- Para usar una FOTO real: suba el archivo a  assets/hero-derecho-tech.jpg
+                     Mientras no exista, se muestra la ilustracion vectorial de abajo. -->
+                <img class="hero__photo" src="assets/hero-derecho-tech.jpg" alt="Derecho y tecnología en LexFive" loading="lazy" onerror="this.remove()">
+                <svg class="hero__art" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <!-- conectores de circuito -->
                 <g stroke="#38bdf8" stroke-width="1.6" opacity=".45" stroke-linecap="round">
                     <path d="M200 205 96 96"/><path d="M200 205 304 96"/>
@@ -185,6 +189,7 @@
                     <g transform="translate(290 298) scale(1.18)"><path d="M3 9h18L12 3 3 9z"/><path d="M5 9v8M10 9v8M14 9v8M19 9v8"/><path d="M3 21h18"/></g>
                 </g>
             </svg>
+            </div>
             <div class="container hero__content">
                 <p class="hero__eyebrow">Bufete de abogados &middot; Derecho &amp; Tecnología</p>
                 <h1 class="hero__title">Defendemos sus derechos con<br><em>experiencia y compromiso</em></h1>
