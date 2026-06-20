@@ -472,3 +472,54 @@
 
     });
 })();
+
+
+/* ---------- Selector de variantes de estilo (solo para comparar) ----------
+   Abra el sitio con  ?preview=1  para ver el panel A/B/C y elegir un estilo.
+   La elección se recuerda en este navegador. Los visitantes normales no lo ven. */
+(function () {
+    function initThemeSwitch() {
+        var sw = document.getElementById('themeSwitch');
+        if (!sw) return;
+        var root = document.documentElement;
+
+        // Restaura la última variante elegida en este navegador.
+        var saved = null;
+        try { saved = localStorage.getItem('lexfive_tema'); } catch (e) {}
+        if (saved) { root.setAttribute('data-tema', saved); }
+
+        // Permite forzar una variante por URL: ?tema=a (o b, c).
+        var m = location.search.match(/[?&]tema=([abc])/);
+        if (m) {
+            root.setAttribute('data-tema', m[1]);
+            try { localStorage.setItem('lexfive_tema', m[1]); } catch (e) {}
+        }
+
+        function mark() {
+            var cur = root.getAttribute('data-tema');
+            sw.querySelectorAll('button').forEach(function (b) {
+                b.classList.toggle('active', b.getAttribute('data-tema') === cur);
+            });
+        }
+
+        // Muestra el panel solo en modo vista previa.
+        var preview = /[?&]preview/.test(location.search) || location.hash === '#preview';
+        if (preview) { sw.classList.add('is-on'); sw.setAttribute('aria-hidden', 'false'); }
+
+        sw.querySelectorAll('button').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var t = b.getAttribute('data-tema');
+                root.setAttribute('data-tema', t);
+                try { localStorage.setItem('lexfive_tema', t); } catch (e) {}
+                mark();
+            });
+        });
+        mark();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeSwitch);
+    } else {
+        initThemeSwitch();
+    }
+})();

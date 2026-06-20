@@ -91,6 +91,14 @@
      Ejemplo: <body class="theme-emerald"> -->
 <body>
     <div id="fb-root"></div>
+
+    <!-- Selector de variantes de estilo (solo visible con ?preview=1, para comparar) -->
+    <div class="theme-switch" id="themeSwitch" aria-hidden="true">
+        <strong>Estilo</strong>
+        <button type="button" data-tema="a">A &middot; Tech oscuro</button>
+        <button type="button" data-tema="b">B &middot; Suave</button>
+        <button type="button" data-tema="c">C &middot; Dorado</button>
+    </div>
     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v19.0"></script>
 
     <!-- Botón flotante de Messenger -->

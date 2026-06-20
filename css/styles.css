@@ -430,3 +430,57 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 @media (max-width: 380px) {
     .areas__grid, .team__grid { grid-template-columns: 1fr; }
 }
+
+
+
+/* ============================================================
+   VARIANTES DE ESTILO PARA COMPARAR (A / B / C)
+   Se activan con data-tema="a|b|c" en <html>. Abra el sitio con
+   ?preview=1 para ver el selector flotante y elegir una.
+   ============================================================ */
+
+/* A · Tech oscuro: hero impactante azul/cian (como la imagen de referencia) */
+html[data-tema="a"] .hero { background:
+    radial-gradient(900px 520px at 16% -12%, rgba(56,189,248,.30), transparent 55%),
+    radial-gradient(820px 480px at 88% 6%, rgba(47,123,214,.22), transparent 55%),
+    linear-gradient(160deg, #0a1626 0%, #0c2f55 58%, #0a1626 100%); }
+html[data-tema="a"] .hero__title { color: #fff; }
+html[data-tema="a"] .hero__title em { color: var(--tech-cyan); }
+html[data-tema="a"] .hero__subtitle { color: rgba(255,255,255,.84); }
+html[data-tema="a"] .hero__eyebrow { color: var(--tech-cyan); background: rgba(56,189,248,.14); }
+html[data-tema="a"] .hero__overlay { opacity: .55;
+    -webkit-mask-image: linear-gradient(180deg,#000,transparent 82%); mask-image: linear-gradient(180deg,#000,transparent 82%);
+    background-image: var(--circuit-tech), radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1.4px); }
+html[data-tema="a"] .hero .btn--ghost { color: #fff; border-color: rgba(255,255,255,.45); }
+html[data-tema="a"] .hero .btn--ghost:hover { background: #fff; color: var(--navy); border-color: #fff; }
+
+/* B · Suave: azul muy tenue, aspecto limpio y minimalista */
+html[data-tema="b"] .hero { background:
+    radial-gradient(1100px 600px at 82% -10%, var(--gold-tint) 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%); }
+html[data-tema="b"] .hero__overlay { background-image: radial-gradient(circle, rgba(14,27,44,.045) 1px, transparent 1.4px); background-size: 26px 26px; opacity: .5; }
+html[data-tema="b"] .testimonials::before { opacity: .035; }
+html[data-tema="b"] .about__image::after { background-image:
+    radial-gradient(circle at 28% 18%, rgba(56,189,248,.16), transparent 52%),
+    radial-gradient(circle at 82% 88%, rgba(184,146,63,.16), transparent 52%); background-size: cover, cover; opacity: .55; }
+
+/* C · Dorado dominante: clásico, con apenas toques azules */
+html[data-tema="c"] .hero { background:
+    radial-gradient(1200px 600px at 82% -10%, var(--gold-tint) 0%, transparent 55%),
+    linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%); }
+html[data-tema="c"] .hero__eyebrow { color: var(--gold); background: var(--gold-tint); }
+html[data-tema="c"] .hero__overlay { background-image: var(--circuit-gold), radial-gradient(circle, rgba(14,27,44,.05) 1px, transparent 1.4px); }
+html[data-tema="c"] .testimonials::before { background-image: var(--circuit-gold); opacity: .06; }
+html[data-tema="c"] .about__image { background: linear-gradient(150deg, var(--navy), var(--navy-700) 72%); }
+html[data-tema="c"] .about__image::after { background-image: var(--circuit-gold), radial-gradient(circle at 30% 20%, rgba(184,146,63,.22), transparent 46%); background-size: 84px 84px, cover; }
+html[data-tema="c"] .section__eyebrow--tech { color: var(--gold); }
+html[data-tema="c"] .tech-card__icon { background: var(--gold-tint); color: var(--gold); }
+html[data-tema="c"] .tech-card:hover .tech-card__icon { background: var(--gold); color: #fff; }
+
+/* Selector flotante de variantes (oculto salvo en modo ?preview=1) */
+.theme-switch { position: fixed; right: 16px; bottom: 16px; z-index: 1200; display: none; flex-direction: column; gap: 8px; background: rgba(14,27,44,.94); padding: 12px; border-radius: 14px; box-shadow: 0 14px 34px rgba(0,0,0,.35); }
+.theme-switch.is-on { display: flex; }
+.theme-switch strong { color: #fff; font-family: var(--sans); font-size: .72rem; letter-spacing: .5px; text-transform: uppercase; opacity: .8; }
+.theme-switch button { font: inherit; font-size: .82rem; font-weight: 600; color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 9px; padding: 9px 14px; cursor: pointer; text-align: left; transition: background .15s ease; }
+.theme-switch button.active { background: var(--tech-cyan); color: var(--navy); border-color: var(--tech-cyan); }
+.theme-switch button:hover { background: rgba(255,255,255,.22); }
