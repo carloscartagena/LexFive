@@ -540,6 +540,22 @@
             var hp = document.querySelector('.hero__photo');
             if (hp && hp.getAttribute('src') !== b.heroImg) hp.setAttribute('src', b.heroImg);
         }
+        if (b.aboutImg) {
+            var ap = document.querySelector('.about__photo');
+            if (ap) { if (ap.getAttribute('src') !== b.aboutImg) ap.setAttribute('src', b.aboutImg); ap.removeAttribute('hidden'); }
+        }
+        var hero = document.querySelector('.hero');
+        if (hero) {
+            if (b.bgImg) {
+                hero.style.backgroundImage = "linear-gradient(160deg, rgba(10,22,38,.80), rgba(9,19,36,.88)), url('" + b.bgImg + "')";
+                hero.style.backgroundSize = 'cover';
+                hero.style.backgroundPosition = 'center';
+            } else {
+                hero.style.backgroundImage = '';
+                hero.style.backgroundSize = '';
+                hero.style.backgroundPosition = '';
+            }
+        }
         if (BG_VALIDOS.indexOf(b.bgStyle) !== -1) document.documentElement.setAttribute('data-bg', b.bgStyle);
         else document.documentElement.removeAttribute('data-bg');
     }
