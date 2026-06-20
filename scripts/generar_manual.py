@@ -431,7 +431,34 @@ def build_blocks():
     note("Requiere ejecutar una sola vez los scripts db/25 y db/26 en Supabase para activar el "
          "registro y la verificación de certificados.", "Configuración")
 
-    h1("22. Respaldos, instalación y conexión a internet")
+    h1("22. Sitio web (imágenes y fondo de la página)")
+    p("La pestaña «Sitio web» (administrador y abogados) permite controlar las imágenes y el "
+      "fondo de la página de inicio (%s) sin tocar el código. Lo que cambia aquí se ve en la "
+      "web pública en unos segundos y se sincroniza entre todos los dispositivos." % SITIO)
+    bul([
+        "Imagen principal (hero): suba o quite la imagen que aparece como una tarjeta al "
+        "costado del título. Conviene horizontal o cuadrada (ideal ~1200×900 px). Si no sube "
+        "ninguna, se muestra la ilustración por defecto.",
+        "Imagen de «Sobre el bufete»: la del recuadro de esa sección. Como el recuadro es alto, "
+        "conviene una imagen vertical (ideal ~800×950 px). Si no sube ninguna, se usa la "
+        "ilustración (la balanza) por defecto.",
+        "Fondo del sitio: elija el patrón tenue que se ve detrás de algunas secciones — código "
+        "binario (recomendado), circuito, líneas finas o ninguno.",
+        "Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título del "
+        "hero (ideal ~1920×1080 px). El sistema le pone automáticamente una capa oscura por "
+        "encima para que el título y los botones siempre se lean; solo afecta al encabezado, no "
+        "a toda la página.",
+        "Cada imagen tiene botones «Subir» y «Quitar», y «Ampliar» para verla en grande. Al "
+        "quitarla, vuelve la ilustración o el fondo por defecto.",
+    ])
+    p("Formatos admitidos: JPG, PNG o WebP (máximo 25 MB; el sistema las optimiza al subir, así "
+      "que no necesita reducirlas usted).")
+    note("Todo se guarda en la configuración compartida del bufete (branding) y no requiere "
+         "ningún script SQL. Las imágenes se sincronizan solas en todos los dispositivos y en "
+         "la web pública. Consejo: para el fondo del encabezado, use imágenes oscuras o con "
+         "poco detalle en el centro, ya que el título y los botones van encima.", "Recomendación")
+
+    h1("23. Respaldos, instalación y conexión a internet")
     p("El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:")
     bul([
         "Respaldo automático: la base de datos se respalda sola cada día (mediante GitHub "
@@ -448,7 +475,7 @@ def build_blocks():
     note("Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o "
          "restaurar datos antiguos.", "Recomendación")
 
-    h1("23. Soporte")
+    h1("24. Soporte")
     p("Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. "
       "Para cambios o mejoras en la web o el panel, conserve este manual como referencia y "
       "describa con el mayor detalle posible lo que necesita.")
@@ -585,7 +612,20 @@ def build_blocks_abogados():
         "puede buscar, filtrar por fecha, ver quién lo emitió, reimprimir o eliminar.",
     ])
 
-    h1("12. Consejos y seguridad")
+    h1("12. Sitio web (imágenes y fondo)")
+    p("En la pestaña «Sitio web» puede cambiar, sin ayuda técnica, las imágenes y el fondo de "
+      "la página de inicio. Lo que cambie se ve en la web en unos segundos.")
+    bul([
+        "Imagen principal (hero): la que va junto al título (horizontal o cuadrada, ~1200×900).",
+        "Imagen de «Sobre el bufete»: la del recuadro de esa sección (vertical, ~800×950).",
+        "Fondo del sitio: el patrón tenue (código binario, circuito, líneas o ninguno).",
+        "Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título; el "
+        "sistema le pone una capa oscura para que el texto se lea.",
+        "Cada una tiene botones «Subir» y «Quitar» (al quitar, vuelve la ilustración por "
+        "defecto), y «Ampliar» para verla en grande. Use JPG, PNG o WebP (máx. 25 MB).",
+    ])
+
+    h1("13. Consejos y seguridad")
     bul([
         "Cierre sesión al terminar, sobre todo en computadoras compartidas.",
         "Si pierde el internet, aparece un aviso de «sin conexión»: lo que guarde queda en el "
@@ -594,7 +634,7 @@ def build_blocks_abogados():
         "Revise el panel general al iniciar el día para no perder audiencias ni plazos.",
     ])
 
-    h1("13. Soporte")
+    h1("14. Soporte")
     p("Ante cualquier duda, contacte al administrador del bufete. Para el detalle completo de "
       "cada función, consulte el «Manual del Sistema».")
     sp(8)

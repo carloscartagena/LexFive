@@ -85,7 +85,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 5 0 R >>
 endobj
 7 0 obj
-<< /Length 4891 >>
+<< /Length 5219 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -331,7 +331,7 @@ ET
 BT
 /F1 10.50 Tf
 60.00 505.89 Td
-(12. Consejos y seguridad) Tj
+(12. Sitio web \(imágenes y fondo\)) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -342,14 +342,14 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-186.47 505.89 Td
-(....................................................................................................................) Tj
+220.90 505.89 Td
+(.........................................................................................................) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 60.00 487.89 Td
-(13. Soporte) Tj
+(13. Consejos y seguridad) Tj
 ET
 0.361 0.400 0.459 rg
 BT
@@ -360,7 +360,25 @@ ET
 0.800 0.820 0.850 rg
 BT
 /F1 10.50 Tf
-122.28 487.89 Td
+186.47 487.89 Td
+(....................................................................................................................) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+60.00 469.89 Td
+(14. Soporte) Tj
+ET
+0.361 0.400 0.459 rg
+BT
+/F1 10.50 Tf
+533.44 469.89 Td
+(5) Tj
+ET
+0.800 0.820 0.850 rg
+BT
+/F1 10.50 Tf
+122.28 469.89 Td
 (..........................................................................................................................................) Tj
 ET
 
@@ -979,7 +997,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 11 0 R >>
 endobj
 13 0 obj
-<< /Length 5214 >>
+<< /Length 5195 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1228,22 +1246,16 @@ ET
 BT
 /F2 16.00 Tf
 56.00 109.39 Td
-(12. Consejos y seguridad) Tj
+(12. Sitio web \(imágenes y fondo\)) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
 56.00 101.39 m 539.28 101.39 l S
-0.659 0.522 0.235 rg
-BT
-/F2 10.50 Tf
-60.00 74.89 Td
-(•) Tj
-ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 74.89 Td
-(Cierre sesión al terminar, sobre todo en computadoras compartidas.) Tj
+56.00 74.89 Td
+(En la pestaña «Sitio web» puede cambiar, sin ayuda técnica, las imágenes y el fondo de la página de) Tj
 ET
 
 endstream
@@ -1252,7 +1264,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 13 0 R >>
 endobj
 15 0 obj
-<< /Length 1911 >>
+<< /Length 3668 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -1287,85 +1299,184 @@ BT
 281.85 52.00 Td
 (Página 5) Tj
 ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 757.39 Td
+(inicio. Lo que cambie se ve en la web en unos segundos.) Tj
+ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 757.39 Td
+60.00 735.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 757.39 Td
+74.00 735.89 Td
+(Imagen principal \(hero\): la que va junto al título \(horizontal o cuadrada, ~1200×900\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 719.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 719.39 Td
+(Imagen de «Sobre el bufete»: la del recuadro de esa sección \(vertical, ~800×950\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 702.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 702.89 Td
+(Fondo del sitio: el patrón tenue \(código binario, circuito, líneas o ninguno\).) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 686.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 686.39 Td
+(Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título; el sistema le) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 671.89 Td
+(pone una capa oscura para que el texto se lea.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 655.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 655.39 Td
+(Cada una tiene botones «Subir» y «Quitar» \(al quitar, vuelve la ilustración por defecto\), y «Ampliar») Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 640.89 Td
+(para verla en grande. Use JPG, PNG o WebP \(máx. 25 MB\).) Tj
+ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 603.89 Td
+(13. Consejos y seguridad) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 595.89 m 539.28 595.89 l S
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 569.39 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 569.39 Td
+(Cierre sesión al terminar, sobre todo en computadoras compartidas.) Tj
+ET
+0.659 0.522 0.235 rg
+BT
+/F2 10.50 Tf
+60.00 552.89 Td
+(•) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+74.00 552.89 Td
 (Si pierde el internet, aparece un aviso de «sin conexión»: lo que guarde queda en el equipo y se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 742.89 Td
+74.00 538.39 Td
 (sincroniza al volver la conexión.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 726.39 Td
+60.00 521.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 726.39 Td
+74.00 521.89 Td
 (No comparta su contraseña. Si la olvida, pídale al administrador que la reinicie.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 709.89 Td
+60.00 505.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 709.89 Td
+74.00 505.39 Td
 (Revise el panel general al iniciar el día para no perder audiencias ni plazos.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 672.89 Td
-(13. Soporte) Tj
+56.00 468.39 Td
+(14. Soporte) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 664.89 m 539.28 664.89 l S
+56.00 460.39 m 539.28 460.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 638.39 Td
+56.00 433.89 Td
 (Ante cualquier duda, contacte al administrador del bufete. Para el detalle completo de cada función,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 623.89 Td
+56.00 419.39 Td
 (consulte el «Manual del Sistema».) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 563.89 483.28 45.00 re
+56.00 359.39 483.28 45.00 re
 f
 0.760 0.635 0.353 rg
-56.00 563.89 4.00 45.00 re
+56.00 359.39 4.00 45.00 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 589.39 Td
+71.00 384.89 Td
 (Versión) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 575.89 Td
+71.00 371.39 Td
 (Versión del manual a la fecha de la portada. Si el sistema se actualiza, solicite una versión nueva.) Tj
 ET
 
@@ -1384,17 +1495,17 @@ xref
 0000000354 00000 n 
 0000001356 00000 n 
 0000001520 00000 n 
-0000006463 00000 n 
-0000006627 00000 n 
-0000012624 00000 n 
-0000012789 00000 n 
-0000017483 00000 n 
-0000017649 00000 n 
-0000022916 00000 n 
-0000023082 00000 n 
-0000025046 00000 n 
+0000006791 00000 n 
+0000006955 00000 n 
+0000012952 00000 n 
+0000013117 00000 n 
+0000017811 00000 n 
+0000017977 00000 n 
+0000023225 00000 n 
+0000023391 00000 n 
+0000027112 00000 n 
 trailer
 << /Size 17 /Root 1 0 R >>
 startxref
-25212
+27278
 %%EOF

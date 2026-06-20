@@ -114,6 +114,7 @@ Las páginas públicas están en la raíz; el panel privado, en la carpeta /sist
 - Notificaciones: recordatorios diarios (audiencias, plazos y tareas) por correo y push; aviso al cliente por nueva actuación (correo, push y campanita); centro de notificaciones (campanita).
 - Portal del cliente: estado de cuenta descargable en PDF.
 - Certificados y constancias en hoja membretada (tamaño carta) con QR de verificación contra la base de datos, registro de emitidos (búsqueda, reimprimir) y página pública de verificación de certificados.
+- Pestaña «Sitio web» (admin y abogados): control sin código de la imagen principal (hero), la imagen de «Sobre el bufete», el patrón de fondo (binario/circuito/líneas/ninguno) y una imagen de fondo del encabezado con capa oscura automática; todo sincronizado con la web pública vía branding.
 
 ## 5. Modelo de datos (resumen)
 

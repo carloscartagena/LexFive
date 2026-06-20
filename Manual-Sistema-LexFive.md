@@ -25,8 +25,9 @@ _Guía completa de uso y gestión · Versión: junio de 2026 · lexfive.netlify.
 - 19. Solución de problemas frecuentes
 - 20. Credenciales del bufete (administrador y abogados)
 - 21. Certificados y constancias
-- 22. Respaldos, instalación y conexión a internet
-- 23. Soporte
+- 22. Sitio web (imágenes y fondo de la página)
+- 23. Respaldos, instalación y conexión a internet
+- 24. Soporte
 
 
 ## 1. Introducción: qué es el sistema
@@ -312,7 +313,21 @@ La pestaña «Certificados» (administrador y abogados) genera certificados y co
 
 > **Configuración:** Requiere ejecutar una sola vez los scripts db/25 y db/26 en Supabase para activar el registro y la verificación de certificados.
 
-## 22. Respaldos, instalación y conexión a internet
+## 22. Sitio web (imágenes y fondo de la página)
+
+La pestaña «Sitio web» (administrador y abogados) permite controlar las imágenes y el fondo de la página de inicio (lexfive.netlify.app) sin tocar el código. Lo que cambia aquí se ve en la web pública en unos segundos y se sincroniza entre todos los dispositivos.
+
+- Imagen principal (hero): suba o quite la imagen que aparece como una tarjeta al costado del título. Conviene horizontal o cuadrada (ideal ~1200×900 px). Si no sube ninguna, se muestra la ilustración por defecto.
+- Imagen de «Sobre el bufete»: la del recuadro de esa sección. Como el recuadro es alto, conviene una imagen vertical (ideal ~800×950 px). Si no sube ninguna, se usa la ilustración (la balanza) por defecto.
+- Fondo del sitio: elija el patrón tenue que se ve detrás de algunas secciones — código binario (recomendado), circuito, líneas finas o ninguno.
+- Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título del hero (ideal ~1920×1080 px). El sistema le pone automáticamente una capa oscura por encima para que el título y los botones siempre se lean; solo afecta al encabezado, no a toda la página.
+- Cada imagen tiene botones «Subir» y «Quitar», y «Ampliar» para verla en grande. Al quitarla, vuelve la ilustración o el fondo por defecto.
+
+Formatos admitidos: JPG, PNG o WebP (máximo 25 MB; el sistema las optimiza al subir, así que no necesita reducirlas usted).
+
+> **Recomendación:** Todo se guarda en la configuración compartida del bufete (branding) y no requiere ningún script SQL. Las imágenes se sincronizan solas en todos los dispositivos y en la web pública. Consejo: para el fondo del encabezado, use imágenes oscuras o con poco detalle en el centro, ya que el título y los botones van encima.
+
+## 23. Respaldos, instalación y conexión a internet
 
 El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:
 
@@ -323,7 +338,7 @@ El sistema incluye varias ayudas para la seguridad de los datos y la comodidad d
 
 > **Recomendación:** Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o restaurar datos antiguos.
 
-## 23. Soporte
+## 24. Soporte
 
 Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle posible lo que necesita.
 
