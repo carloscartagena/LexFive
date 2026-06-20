@@ -625,6 +625,17 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
    modo oscuro. */
 .big-preview--sello { background: #fff !important; background-image: none !important; }
 
+/* En MODO OSCURO las miniaturas de logos/sellos y sus vistas previas mantienen
+   FONDO BLANCO: los logos y sellos tienen trazos oscuros y, sobre una tarjeta
+   oscura, no se alcanzaban a ver. Además se oscurece el texto de la etiqueta
+   para que se lea sobre el blanco de la miniatura. */
+html[data-theme="dark"] .logo-option { background: #fff; border-color: #d4d7dd; }
+html[data-theme="dark"] .logo-option span { color: #5c6675; }
+html[data-theme="dark"] .logo-option.is-selected span { color: #0e1b2c; }
+html[data-theme="dark"] .sello-img,
+html[data-theme="dark"] .brand-preview__img { background: #fff; background-image: none; }
+html[data-theme="dark"] .logo-upload { background: #fcfaf4; }
+
 
 /* ============================================================
    Mejoras: Agenda/Calendario, gráficos, buscador global
