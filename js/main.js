@@ -151,7 +151,7 @@
 
         /* ---------- Animaciones de aparición al hacer scroll ---------- */
         var revealTargets = document.querySelectorAll(
-            '.area-card, .tech-card, .member, .testimonial, .stat, .about__content, .about__media, .contact__info, .contact__form, .section__head, .why-card, .step'
+            '.area-card, .tech-card, .member, .testimonial, .stat, .about__content, .about__media, .contact__info, .contact__form, .section__head, .why-card, .step, .social-card'
         );
         revealTargets.forEach(function (el) { el.classList.add('reveal'); });
 
@@ -521,4 +521,44 @@
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
     else build();
+})();
+
+
+/* ---------- Imagen del hero y estilo de fondo (controlados desde el panel) ----------
+   El bufete elige, en el panel «Sitio web», la imagen del hero y el patrón de
+   fondo (código binario, circuito, líneas o ninguno). Se guarda en Supabase
+   (config 'branding') y aquí se aplica al sitio público. Si no hay nada
+   configurado, se mantiene la imagen y el fondo por defecto. */
+(function () {
+    var SB_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
+    var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
+    var BG_VALIDOS = ['circuito', 'lineas', 'ninguno'];
+
+    function aplicar(b) {
+        if (!b) return;
+        if (b.heroImg) {
+            var hp = document.querySelector('.hero__photo');
+            if (hp && hp.getAttribute('src') !== b.heroImg) hp.setAttribute('src', b.heroImg);
+        }
+        if (BG_VALIDOS.indexOf(b.bgStyle) !== -1) document.documentElement.setAttribute('data-bg', b.bgStyle);
+        else document.documentElement.removeAttribute('data-bg');
+    }
+
+    // 1) Pintado rápido con la última copia local.
+    try { aplicar(JSON.parse(localStorage.getItem('lexfive_branding') || '{}')); } catch (e) {}
+
+    // 2) Refresco desde la nube (fuente de verdad para todos los dispositivos).
+    try {
+        fetch(SB_URL + '/rest/v1/configuracion?clave=eq.branding&select=valor', {
+            headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+        })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (rows) {
+            if (rows && rows[0] && rows[0].valor) {
+                try { localStorage.setItem('lexfive_branding', JSON.stringify(rows[0].valor)); } catch (e) {}
+                aplicar(rows[0].valor);
+            }
+        })
+        .catch(function () {});
+    } catch (e) {}
 })();
