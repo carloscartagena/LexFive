@@ -472,3 +472,53 @@
 
     });
 })();
+
+
+/* ---------- Botón de modo oscuro / claro (en el encabezado) ----------
+   Recuerda la preferencia en el navegador; si no hay, sigue la del sistema.
+   El tema ya se aplica en <head> para evitar parpadeo; aquí se crea el botón. */
+(function () {
+    var MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+    var SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2 12h2.4M19.6 12H22M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>';
+
+    function currentTheme() {
+        try { var t = localStorage.getItem('lexfive_theme'); if (t) return t; } catch (e) {}
+        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    function apply(theme) {
+        document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+    }
+
+    function build() {
+        var bar = document.querySelector('.header__inner');
+        if (!bar || document.getElementById('modeToggle')) return;
+        apply(currentTheme());
+
+        var btn = document.createElement('button');
+        btn.id = 'modeToggle';
+        btn.className = 'mode-toggle';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'Cambiar entre modo claro y oscuro');
+
+        function refresh() {
+            var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            btn.innerHTML = dark ? SUN : MOON;
+            btn.title = dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+        }
+        refresh();
+
+        btn.addEventListener('click', function () {
+            var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+            var next = dark ? 'light' : 'dark';
+            apply(next);
+            try { localStorage.setItem('lexfive_theme', next); } catch (e) {}
+            refresh();
+        });
+
+        var toggle = bar.querySelector('.nav__toggle');
+        if (toggle) bar.insertBefore(btn, toggle); else bar.appendChild(btn);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
+    else build();
+})();
