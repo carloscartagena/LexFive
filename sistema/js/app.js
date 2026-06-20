@@ -57,6 +57,7 @@ const NAV = [
   { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
   { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
+  { key: 'credguardadas', label: 'Credenciales guardadas', icon: ICON.usuarios, credOnly: true },
   { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true },
   { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
@@ -2763,7 +2764,7 @@ function buildCertDoc(d) {
       ${d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:92px;height:92px;object-fit:contain;display:block;margin:0 auto 6px;">` : ''}
       <div style="font-size:30px;font-weight:700;color:#0e1b2c;letter-spacing:1px;">Lex<span style="color:#c2a25a;">Five</span></div>
       <div style="font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div>
-      <div style="font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;line-height:1.55;">Calle 12 Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.&deg; 85, P.B., of. 1-A &mdash; El Alto, Bolivia<br>Tel/WhatsApp: +591 78360469 &nbsp;&middot;&nbsp; lexfive.netlify.app</div>
+      <div style="font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;line-height:1.55;">Calle Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.&deg; 85, P.B., of. 1-A &mdash; El Alto, Bolivia<br>Tel/WhatsApp: +591 78360469 &nbsp;&middot;&nbsp; lexfive.netlify.app</div>
     </div>
     <div style="position:relative;text-align:right;font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:6px;">Ref. N.º ${esc(d.ref || '')}</div>
     <h1 style="position:relative;text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:18px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>
@@ -2781,7 +2782,7 @@ function buildCertDoc(d) {
       ${d.qrSrc ? `<img src="${d.qrSrc}" alt="QR de verificación" style="width:2.1cm;height:2.1cm;flex-shrink:0;">` : ''}
       <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.55;">
         <strong style="color:#0e1b2c;">Verificación:</strong> escanee el código QR para confirmar la autenticidad de este documento y la vinculación de la persona con el Bufete LexFive.<br>
-        LexFive &middot; Bufete de Abogados &middot; Calle 12 Uruguay esq. Raúl Salmón, Ed. Señor de Mayo N.&deg; 85, of. 1-A, El Alto - Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
+        LexFive &middot; Bufete de Abogados &middot; Calle Uruguay esq. Raúl Salmón, Ed. Señor de Mayo N.&deg; 85, of. 1-A, El Alto - Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
       </div>
     </div>
   </div>`;
@@ -5009,9 +5010,6 @@ async function renderCredenciales() {
   // lenta". Las siguientes aperturas en la misma sesión ya son instantáneas.
   try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) { console.warn('Credenciales: ensureImgCache falló/timeout', e); }
   const necesitaRed = !brandingHydrated;
-  let credList = CredStore.cache;
-  if (!credList) { try { credList = JSON.parse(localStorage.getItem('lexfive_cred_cache') || '[]'); } catch (e) { credList = []; } }
-  credList = credList || [];
 
   function paint() {
   const p = state.profile;
@@ -5243,27 +5241,12 @@ async function renderCredenciales() {
     </div>
     ${credEditId ? `<p class="cell-sub" id="credEditBanner" style="text-align:center;margin-top:4px"><strong>Editando una credencial guardada.</strong> Los cambios se aplicarán al actualizar.</p>` : ''}
 
-    <div class="card" id="credSavedCard">
-      <div class="card__head"><h3>${ICON.usuarios || ''} Credenciales guardadas (${credList.length})</h3></div>
-      <div class="card__body">
-        ${credList.length ? `
-        <p class="cell-sub" style="margin-bottom:12px">Aquí quedan guardadas todas las credenciales que creó. Puede <strong>editarlas</strong>, <strong>volver a imprimirlas</strong> o eliminarlas. Se guardan en la nube y se ven en todos los dispositivos del bufete.</p>
-        ${credList.length > 3 ? '<input type="text" class="cred-search" id="credSearch" placeholder="Buscar por nombre, CI o cargo...">' : ''}
-        <div class="cred-saved-list">
-          ${credList.map(c => `
-            <div class="cred-saved-item" data-cred="${esc(c.id)}">
-              <div class="cred-saved-item__info">
-                <strong>${esc(c.nombre || 'Sin nombre')}</strong>
-                <span class="cell-sub">${esc(c.cargo || '')}${c.ci ? ' &middot; CI ' + esc(c.ci) : ''}${c.emision ? ' &middot; Emisión ' + esc(fmtFechaCorta(c.emision)) : ''}</span>
-              </div>
-              <div class="cred-saved-item__actions">
-                <button class="btn btn--primary btn--sm" data-cred-print="${esc(c.id)}" type="button">${ICON.doc} Imprimir / PDF</button>
-                <button class="btn btn--ghost btn--sm" data-cred-edit="${esc(c.id)}" type="button">Editar</button>
-                <button class="btn btn--danger btn--sm" data-cred-del="${esc(c.id)}" type="button">Eliminar</button>
-              </div>
-            </div>`).join('')}
+    <div class="card">
+      <div class="card__body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <p class="cell-sub" style="margin:0">Las credenciales que guarde quedan en la pestaña <strong>«Credenciales guardadas»</strong>, donde puede volver a imprimirlas, editarlas o eliminarlas.</p>
         </div>
-        <p class="cred-saved-empty-search" id="credSearchNone" style="display:none">No se encontraron credenciales con ese texto.</p>` : '<p class="cell-sub">Todavía no ha guardado ninguna credencial. Complete los datos y pulse <strong>Guardar credencial</strong> para conservarla aquí.</p>'}
+        <button class="btn btn--ghost btn--sm" id="btnVerGuardadas" type="button" style="flex-shrink:0">Ver credenciales guardadas</button>
       </div>
     </div>
 
@@ -5357,22 +5340,12 @@ async function renderCredenciales() {
       ], true);
   };
 
-  // Buscador de credenciales guardadas (filtra en vivo por nombre, CI o cargo).
-  const cs = $('#credSearch');
-  if (cs) cs.addEventListener('input', () => {
-    const q = cs.value.trim().toLowerCase();
-    let visibles = 0;
-    content().querySelectorAll('.cred-saved-item').forEach(it => {
-      const ok = !q || it.textContent.toLowerCase().includes(q);
-      it.style.display = ok ? '' : 'none';
-      if (ok) visibles++;
-    });
-    const none = $('#credSearchNone');
-    if (none) none.style.display = (visibles || !q) ? 'none' : 'block';
-  });
+  // Botón para ver la pestaña de credenciales guardadas (la lista se movió allí).
+  const btnVerGuardadas = $('#btnVerGuardadas');
+  if (btnVerGuardadas) btnVerGuardadas.onclick = () => navigate('credguardadas');
 
 
-  // ---- Guardado, edición y eliminación de credenciales ----
+  // ---- Guardado y edición de la credencial en curso ----
   const leerCred = () => {
     const v = id => ((($('#' + id) || {}).value) || '').trim();
     const emi = v('cr_emision') || hoyISO();
@@ -5411,70 +5384,145 @@ async function renderCredenciales() {
     renderCredenciales();
     toast('Formulario listo para una credencial nueva.', 'success');
   };
-  content().querySelectorAll('[data-cred-print]').forEach(b => b.onclick = async () => {
-    const rec = credList.find(c => c.id === b.dataset.credPrint);
-    if (!rec) return;
-    credEditId = rec.id;
-    Draft.save('credencial', {
-      nombre: rec.nombre || '', cargo: rec.cargo || '', ci: rec.ci || '',
-      telPersonal: rec.telPersonal || '', telOficina: rec.telOficina || '',
-      emision: rec.emision || hoyISO(), validez: rec.validez || '',
-      frase: rec.frase || '', representacion: rec.representacion || ''
-    });
-    if (rec.foto) { IMG.foto = rec.foto; try { await ImgDB.set('foto', rec.foto); } catch (e) {} }
-    else { borrarImagen('foto'); }
-    await renderCredenciales();
-    toast('Preparando la credencial para imprimir/descargar...', 'success');
-    setTimeout(imprimirCredencial, 250);
-  });
-  content().querySelectorAll('[data-cred-edit]').forEach(b => b.onclick = async () => {
-    const rec = credList.find(c => c.id === b.dataset.credEdit);
-    if (!rec) return;
-    credEditId = rec.id;
-    Draft.save('credencial', {
-      nombre: rec.nombre || '', cargo: rec.cargo || '', ci: rec.ci || '',
-      telPersonal: rec.telPersonal || '', telOficina: rec.telOficina || '',
-      emision: rec.emision || hoyISO(), validez: rec.validez || '',
-      frase: rec.frase || '', representacion: rec.representacion || ''
-    });
-    if (rec.foto) { IMG.foto = rec.foto; try { await ImgDB.set('foto', rec.foto); } catch (e) {} }
-    else { borrarImagen('foto'); }
-    renderCredenciales();
-    const cap = content().querySelector('#credPrintArea');
-    if (cap && cap.scrollIntoView) cap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    toast('Credencial cargada. Edite los datos y pulse «Actualizar credencial».', 'success');
-  });
-  content().querySelectorAll('[data-cred-del]').forEach(b => b.onclick = async () => {
-    if (!confirm('¿Eliminar esta credencial guardada? Se quitará de todos los dispositivos y no se podrá recuperar.')) return;
-    const id = b.dataset.credDel;
-    b.disabled = true;
-    try {
-      await CredStore.remove(id);
-      if (credEditId === id) credEditId = null;
-      renderCredenciales();
-      toast('Credencial eliminada en todos los dispositivos.', 'success');
-    } catch (e) {
-      b.disabled = false;
-      toast('No se pudo eliminar la credencial. Revise su conexión e intente de nuevo.', 'error');
-    }
-  });
   } // ---- fin de paint() ----
 
   paint(); // muestra YA la pestaña con los datos locales
 
-  // Refresco en segundo plano (no bloquea la apertura): baja el branding la
-  // primera vez por sesión y la lista de credenciales si aún no está en caché.
-  (async () => {
-    let cambiar = false;
-    if (necesitaRed) { try { await withTimeout(hydrateBranding(), 8000, 'branding'); cambiar = true; } catch (e) {} }
-    if (!CredStore.cache) {
+  // Refresco en segundo plano: solo la 1ª vez por sesión baja el branding
+  // (logo/sello elegido) de la nube y vuelve a pintar una vez.
+  if (necesitaRed) hydrateBranding().then(() => { if (state.view === 'credenciales') paint(); }).catch(() => {});
+}
+
+// ============================================================
+//  Pestaña «Credenciales guardadas»: lista de todas las credenciales
+//  creadas, separada del formulario de creación (pestaña «Credenciales»).
+//  Permite reimprimir, editar (abre el formulario con los datos cargados) y
+//  eliminar. Pinta al instante con la caché local y refresca desde la nube.
+// ============================================================
+async function renderCredGuardadas() {
+  loading();
+  let credList = CredStore.cache;
+  if (!credList) { try { credList = JSON.parse(localStorage.getItem('lexfive_cred_cache') || '[]'); } catch (e) { credList = []; } }
+  credList = credList || [];
+
+  // Carga los datos de una credencial guardada en el formulario (borrador +
+  // foto) para editarla o reimprimirla en la pestaña «Credenciales».
+  const prepararForm = (rec) => {
+    credEditId = rec.id;
+    Draft.save('credencial', {
+      nombre: rec.nombre || '', cargo: rec.cargo || '', ci: rec.ci || '',
+      telPersonal: rec.telPersonal || '', telOficina: rec.telOficina || '',
+      emision: rec.emision || hoyISO(), validez: rec.validez || '',
+      frase: rec.frase || '', representacion: rec.representacion || ''
+    });
+    if (rec.foto) { IMG.foto = rec.foto; ImgDB.set('foto', rec.foto).catch(() => {}); }
+    else { borrarImagen('foto'); }
+  };
+
+  function paint() {
+    content().innerHTML = `
+      <div class="card">
+        <div class="card__body" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <h3 class="intro-title">Credenciales guardadas</h3>
+            <p class="cell-sub" style="margin:0">Todas las credenciales que creó. Puede <strong>volver a imprimirlas</strong>, <strong>editarlas</strong> o eliminarlas. Se guardan en la nube y se ven en todos los dispositivos del bufete.</p>
+          </div>
+          <button class="btn btn--primary btn--sm" id="btnNuevaCred" type="button" style="flex-shrink:0">${ICON.llave || ''} Crear nueva credencial</button>
+        </div>
+      </div>
+
+      <div class="card" id="credSavedCard">
+        <div class="card__head"><h3>${ICON.usuarios || ''} Guardadas (${credList.length})</h3></div>
+        <div class="card__body">
+          ${credList.length ? `
+          ${credList.length > 3 ? '<input type="text" class="cred-search" id="credSearch" placeholder="Buscar por nombre, CI o cargo...">' : ''}
+          <div class="cred-saved-list">
+            ${credList.map(c => `
+              <div class="cred-saved-item" data-cred="${esc(c.id)}">
+                <div class="cred-saved-item__info">
+                  <strong>${esc(c.nombre || 'Sin nombre')}</strong>
+                  <span class="cell-sub">${esc(c.cargo || '')}${c.ci ? ' &middot; CI ' + esc(c.ci) : ''}${c.emision ? ' &middot; Emisión ' + esc(fmtFechaCorta(c.emision)) : ''}</span>
+                </div>
+                <div class="cred-saved-item__actions">
+                  <button class="btn btn--primary btn--sm" data-cred-print="${esc(c.id)}" type="button">${ICON.doc} Imprimir / PDF</button>
+                  <button class="btn btn--ghost btn--sm" data-cred-edit="${esc(c.id)}" type="button">Editar</button>
+                  <button class="btn btn--danger btn--sm" data-cred-del="${esc(c.id)}" type="button">Eliminar</button>
+                </div>
+              </div>`).join('')}
+          </div>
+          <p class="cred-saved-empty-search" id="credSearchNone" style="display:none">No se encontraron credenciales con ese texto.</p>` : '<p class="cell-sub">Todavía no ha guardado ninguna credencial. Vaya a <strong>Credenciales</strong>, complete los datos y pulse <strong>Guardar credencial</strong> para conservarla aquí.</p>'}
+        </div>
+      </div>`;
+
+    const btnNueva = $('#btnNuevaCred');
+    if (btnNueva) btnNueva.onclick = () => { credEditId = null; Draft.clear('credencial'); borrarImagen('foto'); navigate('credenciales'); };
+
+    // Buscador en vivo (nombre, CI o cargo).
+    const cs = $('#credSearch');
+    if (cs) cs.addEventListener('input', () => {
+      const q = cs.value.trim().toLowerCase();
+      let visibles = 0;
+      content().querySelectorAll('.cred-saved-item').forEach(it => {
+        const ok = !q || it.textContent.toLowerCase().includes(q);
+        it.style.display = ok ? '' : 'none';
+        if (ok) visibles++;
+      });
+      const none = $('#credSearchNone');
+      if (none) none.style.display = (visibles || !q) ? 'none' : 'block';
+    });
+
+    // Reimprimir: carga la credencial en el formulario, abre la pestaña
+    // «Credenciales» y manda a imprimir en cuanto el área esté lista.
+    content().querySelectorAll('[data-cred-print]').forEach(b => b.onclick = () => {
+      const rec = credList.find(c => c.id === b.dataset.credPrint);
+      if (!rec) return;
+      prepararForm(rec);
+      navigate('credenciales');
+      toast('Preparando la credencial para imprimir/descargar...', 'success');
+      const esperar = (n = 24) => {
+        if (document.getElementById('credPrintArea')) { setTimeout(imprimirCredencial, 250); return; }
+        if (n <= 0) return;
+        setTimeout(() => esperar(n - 1), 150);
+      };
+      esperar();
+    });
+
+    // Editar: carga los datos y abre el formulario.
+    content().querySelectorAll('[data-cred-edit]').forEach(b => b.onclick = () => {
+      const rec = credList.find(c => c.id === b.dataset.credEdit);
+      if (!rec) return;
+      prepararForm(rec);
+      navigate('credenciales');
+      toast('Credencial cargada. Edite los datos y pulse «Actualizar credencial».', 'success');
+    });
+
+    // Eliminar: borra en la nube y quita de la lista al instante.
+    content().querySelectorAll('[data-cred-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('¿Eliminar esta credencial guardada? Se quitará de todos los dispositivos y no se podrá recuperar.')) return;
+      const id = b.dataset.credDel;
+      b.disabled = true;
       try {
-        const fresh = await withTimeout(CredStore.list(), 8000, 'credenciales');
-        if (fresh && JSON.stringify(fresh) !== JSON.stringify(credList)) { credList = fresh; cambiar = true; }
-      } catch (e) {}
-    }
-    if (cambiar && state.view === 'credenciales') paint();
-  })();
+        await CredStore.remove(id);
+        if (credEditId === id) credEditId = null;
+        credList = credList.filter(c => c.id !== id);
+        paint();
+        toast('Credencial eliminada en todos los dispositivos.', 'success');
+      } catch (e) {
+        b.disabled = false;
+        toast('No se pudo eliminar la credencial. Revise su conexión e intente de nuevo.', 'error');
+      }
+    });
+  }
+
+  paint(); // muestra YA la lista con la caché local
+
+  // Si aún no hay caché en memoria, baja la lista de la nube en segundo plano.
+  if (!CredStore.cache) {
+    try {
+      const fresh = await withTimeout(CredStore.list(), 8000, 'credenciales');
+      if (fresh && JSON.stringify(fresh) !== JSON.stringify(credList) && state.view === 'credguardadas') { credList = fresh; paint(); }
+    } catch (e) { console.warn('Credenciales guardadas: lista falló/timeout', e); }
+  }
 }
 
 // Lee una imagen subida por el bufete (kind = 'logo' | 'sello'), la valida y la guarda.
@@ -5771,6 +5819,7 @@ const VIEWS = {
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
   blog: { title: 'Blog', render: renderBlog },
   credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
+  credguardadas: { title: 'Credenciales guardadas', render: renderCredGuardadas },
   sellos: { title: 'Sellos y logos del bufete', render: renderSellos },
   certificados: { title: 'Certificados y constancias', render: renderCertificados },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
@@ -5797,6 +5846,7 @@ function navigate(key) {
     if (!VIEWS[key]) key = 'dashboard';
     if (['usuarios', 'auditoria', 'testimonios', 'categorias', 'papelera'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
     if (key === 'credenciales' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
+    if (key === 'credguardadas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'sellos' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'certificados' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
