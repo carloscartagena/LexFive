@@ -920,6 +920,8 @@ function snapshotBranding() {
   // está vacía (se quitó), se guarda nulo.
   const heroLS = localStorage.getItem('lexfive_hero_url');
   const bgLS = localStorage.getItem('lexfive_bg_style');
+  const aboutLS = localStorage.getItem('lexfive_about_url');
+  const bgImgLS = localStorage.getItem('lexfive_bg_img');
   return {
     logoId: logoId,
     logoImg: logoImg,
@@ -929,7 +931,9 @@ function snapshotBranding() {
     logosHidden: readList('lexfive_logos_hidden'),
     sellosHidden: readList('lexfive_sellos_hidden'),
     heroImg: (heroLS !== null) ? (heroLS || null) : (cache.heroImg || null),
-    bgStyle: (bgLS !== null) ? (bgLS || null) : (cache.bgStyle || null)
+    bgStyle: (bgLS !== null) ? (bgLS || null) : (cache.bgStyle || null),
+    aboutImg: (aboutLS !== null) ? (aboutLS || null) : (cache.aboutImg || null),
+    bgImg: (bgImgLS !== null) ? (bgImgLS || null) : (cache.bgImg || null)
   };
 }
 
@@ -5021,6 +5025,8 @@ async function renderSitio() {
   const b = (Branding && Branding.local) ? (Branding.local() || {}) : {};
   const heroActual = b.heroImg || null;
   const bgActual = b.bgStyle || 'binario';
+  const aboutActual = b.aboutImg || null;
+  const bgImgActual = b.bgImg || null;
 
   const BGS = [
     { id: 'binario', label: 'Código binario', desc: 'Números 0 y 1 (tecnología). Recomendado.' },
@@ -5053,6 +5059,23 @@ async function renderSitio() {
     </div>
 
     <div class="card">
+      <div class="card__head"><h3>Imagen de «Sobre el bufete»</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:12px">Es la imagen vertical del bloque «Sobre el bufete». Recomendado vertical (~800×950 px). Si no sube ninguna, se usa la ilustración por defecto.</p>
+        <div class="sello-box">
+          <div class="big-preview big-preview--sello" style="max-width:260px">
+            ${aboutActual ? `<img src="${esc(aboutActual)}" alt="Imagen Sobre el bufete" style="width:100%;border-radius:10px;display:block">` : '<p class="cell-sub" style="padding:22px;text-align:center">Sin imagen propia (se usa la ilustración por defecto).</p>'}
+          </div>
+          <div class="sello-actions">
+            <button class="btn btn--primary btn--sm" id="btnSubirAbout" type="button">Subir imagen</button>
+            ${aboutActual ? '<button class="btn btn--ghost btn--sm" id="btnQuitarAbout" type="button">Quitar imagen</button>' : ''}
+            <input type="file" id="fileAbout" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card__head"><h3>Fondo del sitio</h3></div>
       <div class="card__body">
         <p class="cell-sub" style="margin-bottom:12px">Patrón que se ve, muy tenue, detrás de algunas secciones.</p>
@@ -5062,6 +5085,17 @@ async function renderSitio() {
               <span class="bg-option__top"><input type="radio" name="bgStyle" value="${o.id}" ${o.id === bgActual ? 'checked' : ''}> <strong>${o.label}</strong></span>
               <span class="cell-sub">${o.desc}</span>
             </label>`).join('')}
+        </div>
+        <p class="cell-sub" style="margin:18px 0 10px">O suba una <strong>imagen de fondo</strong> para el encabezado (hero). Recomendado horizontal (~1920×1080 px), preferible oscura. Si la sube, tiene prioridad sobre el patrón de arriba.</p>
+        <div class="sello-box">
+          <div class="big-preview big-preview--sello" style="max-width:340px">
+            ${bgImgActual ? `<img src="${esc(bgImgActual)}" alt="Imagen de fondo" style="width:100%;border-radius:10px;display:block">` : '<p class="cell-sub" style="padding:18px;text-align:center">Sin imagen de fondo (se usa el patrón elegido).</p>'}
+          </div>
+          <div class="sello-actions">
+            <button class="btn btn--primary btn--sm" id="btnSubirBgImg" type="button">Subir imagen de fondo</button>
+            ${bgImgActual ? '<button class="btn btn--ghost btn--sm" id="btnQuitarBgImg" type="button">Quitar imagen</button>' : ''}
+            <input type="file" id="fileBgImg" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
+          </div>
         </div>
       </div>
     </div>`;
@@ -5095,6 +5129,39 @@ async function renderSitio() {
     toast('Imagen quitada. Se usará la ilustración por defecto.', 'success');
     renderSitio();
   };
+
+  // Subida genérica de una imagen a una clave del branding (about / fondo).
+  function subirImagenA(fileEl, prefijo, lsKey, maxLado, okMsg) {
+    const f = fileEl.files && fileEl.files[0]; fileEl.value = '';
+    if (!f) return;
+    if (f.size > 6 * 1024 * 1024) { toast('La imagen pesa demasiado (máx. 6 MB). Use una más liviana.', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = () => redimensionarDataUrl(reader.result, maxLado, async (peq) => {
+      toast('Subiendo imagen...', 'success');
+      const url = await subirImagenBranding(peq, prefijo);
+      if (!url) { toast('No se pudo subir la imagen. Revise su conexión e intente de nuevo.', 'error'); return; }
+      localStorage.setItem(lsKey, url);
+      await pushBranding();
+      toast(okMsg, 'success');
+      renderSitio();
+    });
+    reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
+    reader.readAsDataURL(f);
+  }
+
+  const fileAbout = $('#fileAbout');
+  const btnSubirAbout = $('#btnSubirAbout');
+  if (btnSubirAbout) btnSubirAbout.onclick = () => fileAbout.click();
+  if (fileAbout) fileAbout.onchange = () => subirImagenA(fileAbout, 'about', 'lexfive_about_url', 1100, 'Imagen de «Sobre el bufete» actualizada. Se verá en la web en unos segundos.');
+  const btnQuitarAbout = $('#btnQuitarAbout');
+  if (btnQuitarAbout) btnQuitarAbout.onclick = async () => { localStorage.setItem('lexfive_about_url', ''); await pushBranding(); toast('Imagen quitada. Se usará la ilustración por defecto.', 'success'); renderSitio(); };
+
+  const fileBgImg = $('#fileBgImg');
+  const btnSubirBgImg = $('#btnSubirBgImg');
+  if (btnSubirBgImg) btnSubirBgImg.onclick = () => fileBgImg.click();
+  if (fileBgImg) fileBgImg.onchange = () => subirImagenA(fileBgImg, 'fondo', 'lexfive_bg_img', 1920, 'Imagen de fondo actualizada. Se verá en la web en unos segundos.');
+  const btnQuitarBgImg = $('#btnQuitarBgImg');
+  if (btnQuitarBgImg) btnQuitarBgImg.onclick = async () => { localStorage.setItem('lexfive_bg_img', ''); await pushBranding(); toast('Imagen de fondo quitada.', 'success'); renderSitio(); };
 
   content().querySelectorAll('input[name="bgStyle"]').forEach(r => r.onchange = async () => {
     localStorage.setItem('lexfive_bg_style', r.value);
