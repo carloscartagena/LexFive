@@ -906,3 +906,15 @@ html[data-theme="dark"] .cred-saved-item__info strong { color: #eaf0f7; }
 @media (max-width: 640px) { .cert-form { grid-template-columns: 1fr; } }
 .cert-preview { background: #e9ecf1; padding: 16px; border-radius: 8px; overflow-x: auto; }
 .cert-preview > div { box-shadow: 0 6px 24px rgba(0,0,0,.15); }
+
+
+
+/* Opciones de fondo del sitio (pestaña «Sitio web») */
+.bg-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.bg-option { display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border: 1.5px solid var(--line, #e6e8ec); border-radius: 10px; cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease; }
+.bg-option:hover { border-color: var(--gold, #c2a25a); }
+.bg-option.is-selected { border-color: var(--gold, #c2a25a); box-shadow: 0 0 0 2px var(--gold-light, #e7d3a1); }
+.bg-option__top { display: flex; align-items: center; gap: 8px; }
+.bg-option__top input { width: 16px; height: 16px; accent-color: var(--gold-dark, #a8853c); }
+.bg-option strong { font-size: .92rem; }
+@media (max-width: 560px) { .bg-options { grid-template-columns: 1fr; } }

@@ -59,6 +59,7 @@ const NAV = [
   { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
   { key: 'credguardadas', label: 'Credenciales guardadas', icon: ICON.usuarios, credOnly: true },
   { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true },
+  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true },
   { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
   { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
@@ -914,6 +915,11 @@ function snapshotBranding() {
   // (evita un logo vacío): se conserva lo último válido conocido en la caché.
   if (logoId === 'custom' && !logoImg && cache.logoId) { logoId = cache.logoId; logoImg = cache.logoImg || null; }
   if (selloId === 'custom' && !selloImg && cache.selloId) { selloId = cache.selloId; selloImg = cache.selloImg || null; }
+  // Sitio web público: imagen del hero y estilo de fondo. Si la clave no está
+  // en este equipo (no se abrió «Sitio web»), se conserva lo de la nube; si
+  // está vacía (se quitó), se guarda nulo.
+  const heroLS = localStorage.getItem('lexfive_hero_url');
+  const bgLS = localStorage.getItem('lexfive_bg_style');
   return {
     logoId: logoId,
     logoImg: logoImg,
@@ -921,7 +927,9 @@ function snapshotBranding() {
     selloImg: selloImg,
     wmOpacity: wmOpacityActual(),
     logosHidden: readList('lexfive_logos_hidden'),
-    sellosHidden: readList('lexfive_sellos_hidden')
+    sellosHidden: readList('lexfive_sellos_hidden'),
+    heroImg: (heroLS !== null) ? (heroLS || null) : (cache.heroImg || null),
+    bgStyle: (bgLS !== null) ? (bgLS || null) : (cache.bgStyle || null)
   };
 }
 
@@ -5002,6 +5010,100 @@ async function renderSellos() {
   if (necesitaRed) hydrateBranding().then(() => { if (state.view === 'sellos') paint(); }).catch(() => {});
 }
 
+// ============================================================
+//  Pestaña «Sitio web»: el bufete controla la IMAGEN principal (hero) y el
+//  ESTILO DE FONDO del sitio público. Se guardan en la nube (config
+//  'branding', campos heroImg/bgStyle) y la web los aplica automáticamente.
+// ============================================================
+async function renderSitio() {
+  loading();
+  try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) {}
+  const b = (Branding && Branding.local) ? (Branding.local() || {}) : {};
+  const heroActual = b.heroImg || null;
+  const bgActual = b.bgStyle || 'binario';
+
+  const BGS = [
+    { id: 'binario', label: 'Código binario', desc: 'Números 0 y 1 (tecnología). Recomendado.' },
+    { id: 'circuito', label: 'Circuito', desc: 'Líneas y nodos tipo placa.' },
+    { id: 'lineas', label: 'Líneas finas', desc: 'Trama diagonal discreta.' },
+    { id: 'ninguno', label: 'Ninguno', desc: 'Fondo liso, sin patrón.' }
+  ];
+
+  content().innerHTML = `
+    <div class="card"><div class="card__body">
+      <h3 class="intro-title">Sitio web público</h3>
+      <p class="cell-sub">Controle la <strong>imagen principal</strong> y el <strong>fondo</strong> de la página de inicio (lexfive.netlify.app). Los cambios se ven en la web en unos segundos.</p>
+    </div></div>
+
+    <div class="card">
+      <div class="card__head"><h3>Imagen principal (hero)</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:12px">Aparece junto al título en la página de inicio. Use una imagen horizontal (recomendado ~1200×900 px). Si no sube ninguna, se muestra la ilustración por defecto.</p>
+        <div class="sello-box">
+          <div class="big-preview big-preview--sello" style="max-width:340px">
+            ${heroActual ? `<img src="${esc(heroActual)}" alt="Imagen del hero" style="width:100%;border-radius:10px;display:block">` : '<p class="cell-sub" style="padding:22px;text-align:center">Sin imagen propia (se usa la ilustración por defecto).</p>'}
+          </div>
+          <div class="sello-actions">
+            <button class="btn btn--primary btn--sm" id="btnSubirHero" type="button">Subir imagen</button>
+            ${heroActual ? '<button class="btn btn--ghost btn--sm" id="btnQuitarHero" type="button">Quitar imagen</button>' : ''}
+            <input type="file" id="fileHero" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__head"><h3>Fondo del sitio</h3></div>
+      <div class="card__body">
+        <p class="cell-sub" style="margin-bottom:12px">Patrón que se ve, muy tenue, detrás de algunas secciones.</p>
+        <div class="bg-options">
+          ${BGS.map(o => `
+            <label class="bg-option${o.id === bgActual ? ' is-selected' : ''}">
+              <span class="bg-option__top"><input type="radio" name="bgStyle" value="${o.id}" ${o.id === bgActual ? 'checked' : ''}> <strong>${o.label}</strong></span>
+              <span class="cell-sub">${o.desc}</span>
+            </label>`).join('')}
+        </div>
+      </div>
+    </div>`;
+
+  const fileHero = $('#fileHero');
+  const btnSubirHero = $('#btnSubirHero');
+  if (btnSubirHero) btnSubirHero.onclick = () => fileHero.click();
+  if (fileHero) fileHero.onchange = () => {
+    const f = fileHero.files && fileHero.files[0]; fileHero.value = '';
+    if (!f) return;
+    if (f.size > 6 * 1024 * 1024) { toast('La imagen pesa demasiado (máx. 6 MB). Use una más liviana.', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      redimensionarDataUrl(reader.result, 1400, async (peq) => {
+        toast('Subiendo imagen...', 'success');
+        const url = await subirImagenBranding(peq, 'hero');
+        if (!url) { toast('No se pudo subir la imagen. Revise su conexión e intente de nuevo.', 'error'); return; }
+        localStorage.setItem('lexfive_hero_url', url);
+        await pushBranding();
+        toast('Imagen del hero actualizada. Se verá en la web en unos segundos.', 'success');
+        renderSitio();
+      });
+    };
+    reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
+    reader.readAsDataURL(f);
+  };
+  const btnQuitarHero = $('#btnQuitarHero');
+  if (btnQuitarHero) btnQuitarHero.onclick = async () => {
+    localStorage.setItem('lexfive_hero_url', '');
+    await pushBranding();
+    toast('Imagen quitada. Se usará la ilustración por defecto.', 'success');
+    renderSitio();
+  };
+
+  content().querySelectorAll('input[name="bgStyle"]').forEach(r => r.onchange = async () => {
+    localStorage.setItem('lexfive_bg_style', r.value);
+    content().querySelectorAll('.bg-option').forEach(l => l.classList.toggle('is-selected', l.querySelector('input').checked));
+    await pushBranding();
+    toast('Fondo del sitio actualizado.', 'success');
+  });
+}
+
 async function renderCredenciales() {
   loading();
   // Pinta de inmediato con lo que hay en este equipo y refresca en segundo
@@ -5821,6 +5923,7 @@ const VIEWS = {
   credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
   credguardadas: { title: 'Credenciales guardadas', render: renderCredGuardadas },
   sellos: { title: 'Sellos y logos del bufete', render: renderSellos },
+  sitio: { title: 'Sitio web público', render: renderSitio },
   certificados: { title: 'Certificados y constancias', render: renderCertificados },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
   categorias: { title: 'Categorías', render: renderCategorias },
@@ -5848,6 +5951,7 @@ function navigate(key) {
     if (key === 'credenciales' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'credguardadas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'sellos' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
+    if (key === 'sitio' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'certificados' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
   }
