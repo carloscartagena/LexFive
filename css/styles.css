@@ -15,6 +15,12 @@
     --gold: #b8923f;
     --gold-soft: #c8a558;
     --gold-tint: #f6efe1;
+    /* Acento tecnológico (ingeniería de sistemas): azul/cian. Convive con el
+       dorado jurídico para reflejar "Derecho + Tecnología". */
+    --tech: #2f7bd6;
+    --tech-cyan: #38bdf8;
+    --tech-deep: #0c2f55;
+    --tech-tint: #eaf3fc;
     --white: #ffffff;
     --radius: 16px;
     --radius-sm: 11px;
@@ -28,6 +34,7 @@
        Se usa muy tenue de fondo para unir tecnología + derecho sin recargar. */
     --circuit-navy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%230e1b2c' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%23b8923f'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
     --circuit-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%23c8a558' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%23c8a558'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    --circuit-tech: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%2338bdf8' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%2338bdf8'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -112,10 +119,10 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 .nav__toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ---------- Hero ---------- */
-.hero { position: relative; background: radial-gradient(1200px 600px at 82% -10%, var(--gold-tint) 0%, transparent 55%), linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%); overflow: hidden; }
+.hero { position: relative; background: radial-gradient(900px 520px at 12% -20%, var(--tech-tint) 0%, transparent 55%), radial-gradient(1200px 600px at 82% -10%, var(--gold-tint) 0%, transparent 55%), linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%); overflow: hidden; }
 .hero__overlay { position: absolute; inset: 0; pointer-events: none;
-    background-image: var(--circuit-navy), radial-gradient(circle, rgba(14,27,44,.05) 1px, transparent 1.4px);
-    background-size: 84px 84px, 26px 26px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 72%); mask-image: linear-gradient(180deg, #000, transparent 72%); opacity: .42; }
+    background-image: var(--circuit-tech), radial-gradient(circle, rgba(47,123,214,.06) 1px, transparent 1.4px);
+    background-size: 84px 84px, 26px 26px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 72%); mask-image: linear-gradient(180deg, #000, transparent 72%); opacity: .5; }
 .hero__content { position: relative; padding: 92px 24px 84px; }
 .hero__eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .76rem; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; color: var(--gold); background: var(--gold-tint); padding: 7px 14px; border-radius: 999px; margin-bottom: 22px; }
 .hero__title { font-size: clamp(2.4rem, 5.4vw, 4.1rem); color: var(--navy); margin-bottom: 20px; max-width: 780px; }
@@ -144,20 +151,34 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 /* ---------- Áreas de práctica ---------- */
 .areas { background: var(--bg); }
 .areas__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-.area-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+.area-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; text-align: center; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
 .area-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: transparent; }
-.area-card__icon { width: 50px; height: 50px; border-radius: 13px; background: var(--gold-tint); color: var(--gold); display: grid; place-items: center; margin-bottom: 18px; transition: background .22s ease, color .22s ease; }
+.area-card__icon { width: 50px; height: 50px; border-radius: 13px; background: var(--gold-tint); color: var(--gold); display: grid; place-items: center; margin: 0 auto 18px; transition: background .22s ease, color .22s ease; }
 .area-card__icon svg { width: 25px; height: 25px; }
 .area-card:hover .area-card__icon { background: var(--navy); color: var(--gold-soft); }
 .area-card__title { font-size: 1.22rem; margin-bottom: 8px; }
 .area-card__text { font-size: .9rem; color: var(--muted); line-height: 1.6; }
 
+/* Sección «Derecho + Tecnología» (ingeniería de sistemas) */
+.techlaw { background: var(--tech-tint); }
+.section__eyebrow--tech { color: var(--tech); }
+.techlaw__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.tech-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; text-align: center; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+.tech-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: transparent; }
+.tech-card__icon { width: 50px; height: 50px; border-radius: 13px; background: #e2effb; color: var(--tech); display: grid; place-items: center; margin: 0 auto 18px; transition: background .22s ease, color .22s ease; }
+.tech-card__icon svg { width: 25px; height: 25px; }
+.tech-card:hover .tech-card__icon { background: var(--tech); color: #fff; }
+.tech-card h3 { font-size: 1.18rem; margin-bottom: 8px; }
+.tech-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+
 /* ---------- Sobre nosotros ---------- */
 .about { background: var(--bg-soft); }
 .about__grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; }
 .about__media { position: relative; }
-.about__image { aspect-ratio: 4 / 4.4; border-radius: var(--radius); background: linear-gradient(150deg, var(--navy), var(--navy-700) 70%); box-shadow: var(--shadow-lg); position: relative; overflow: hidden; }
-.about__image::after { content: ""; position: absolute; inset: 0; background-image: var(--circuit-gold), radial-gradient(circle at 30% 20%, rgba(184,146,63,.22), transparent 45%); background-size: 84px 84px, cover; opacity: .5; }
+.about__image { aspect-ratio: 4 / 4.4; border-radius: var(--radius); background: linear-gradient(150deg, var(--navy), var(--tech-deep) 78%); box-shadow: var(--shadow-lg); position: relative; overflow: hidden; display: grid; place-items: center; }
+.about__image::after { content: ""; position: absolute; inset: 0; z-index: 0; background-image: var(--circuit-tech), radial-gradient(circle at 28% 18%, rgba(56,189,248,.30), transparent 48%), radial-gradient(circle at 82% 88%, rgba(184,146,63,.20), transparent 50%); background-size: 84px 84px, cover, cover; opacity: .6; }
+.about__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; }
+.about__illu { position: relative; z-index: 1; width: 76%; height: auto; filter: drop-shadow(0 10px 26px rgba(0,0,0,.35)); }
 .about__badge { position: absolute; right: -18px; bottom: 28px; background: var(--gold); color: #fff; border-radius: var(--radius-sm); padding: 18px 22px; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 12px; }
 .about__badge strong { font-family: var(--serif); font-size: 2.4rem; line-height: 1; }
 .about__badge span { font-size: .78rem; line-height: 1.25; opacity: .95; }
@@ -184,11 +205,13 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 
 /* ---------- Testimonios ---------- */
 .testimonials { background: var(--navy); position: relative; }
+.testimonials::before { content: ""; position: absolute; inset: 0; background-image: var(--circuit-tech); background-size: 84px 84px; opacity: .07; pointer-events: none; }
+.testimonials > .container { position: relative; z-index: 1; }
 .testimonials__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.testimonial { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius); padding: 30px 26px; }
+.testimonial { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius); padding: 30px 26px; text-align: center; }
 .testimonial__stars { color: var(--gold-soft); letter-spacing: 3px; margin-bottom: 14px; }
 .testimonial blockquote { color: rgba(255,255,255,.9); font-size: 1rem; line-height: 1.65; font-style: italic; }
-.testimonial figcaption { margin-top: 18px; display: flex; flex-direction: column; }
+.testimonial figcaption { margin-top: 18px; display: flex; flex-direction: column; align-items: center; }
 .testimonial figcaption strong { color: #fff; font-weight: 600; }
 .testimonial figcaption span { color: var(--gold-soft); font-size: .82rem; }
 
@@ -296,11 +319,13 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 
 @media (max-width: 860px) {
     .why__grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .techlaw__grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
     .process__grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
     .process__grid::before { display: none; }
 }
 @media (max-width: 480px) {
     .why__grid, .process__grid { grid-template-columns: 1fr; }
+    .techlaw__grid { grid-template-columns: 1fr; }
 }
 
 /* =========================================================
