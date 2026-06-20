@@ -110,7 +110,7 @@ En la pestaña «Sitio web» puede cambiar, sin ayuda técnica, las imágenes y 
 - Imagen de «Sobre el bufete»: la del recuadro de esa sección (vertical, ~800×950).
 - Fondo del sitio: el patrón tenue (código binario, circuito, líneas o ninguno).
 - Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título; el sistema le pone una capa oscura para que el texto se lea.
-- Cada una tiene botones «Subir» y «Quitar» (al quitar, vuelve la ilustración por defecto). Use JPG, PNG o WebP (máx. 6 MB).
+- Cada una tiene botones «Subir» y «Quitar» (al quitar, vuelve la ilustración por defecto), y «Ampliar» para verla en grande. Use JPG, PNG o WebP (máx. 25 MB).
 
 ## 13. Consejos y seguridad
 

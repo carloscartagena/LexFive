@@ -448,12 +448,14 @@ def build_blocks():
         "hero (ideal ~1920×1080 px). El sistema le pone automáticamente una capa oscura por "
         "encima para que el título y los botones siempre se lean; solo afecta al encabezado, no "
         "a toda la página.",
-        "Cada imagen tiene botones «Subir» y «Quitar». Al quitarla, vuelve la ilustración o el "
-        "fondo por defecto.",
+        "Cada imagen tiene botones «Subir» y «Quitar», y «Ampliar» para verla en grande. Al "
+        "quitarla, vuelve la ilustración o el fondo por defecto.",
     ])
-    p("Formatos admitidos: JPG, PNG o WebP (máximo 6 MB; el sistema las optimiza al subir).")
+    p("Formatos admitidos: JPG, PNG o WebP (máximo 25 MB; el sistema las optimiza al subir, así "
+      "que no necesita reducirlas usted).")
     note("Todo se guarda en la configuración compartida del bufete (branding) y no requiere "
-         "ningún script SQL. Consejo: para el fondo del encabezado, use imágenes oscuras o con "
+         "ningún script SQL. Las imágenes se sincronizan solas en todos los dispositivos y en "
+         "la web pública. Consejo: para el fondo del encabezado, use imágenes oscuras o con "
          "poco detalle en el centro, ya que el título y los botones van encima.", "Recomendación")
 
     h1("23. Respaldos, instalación y conexión a internet")
@@ -620,7 +622,7 @@ def build_blocks_abogados():
         "Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título; el "
         "sistema le pone una capa oscura para que el texto se lea.",
         "Cada una tiene botones «Subir» y «Quitar» (al quitar, vuelve la ilustración por "
-        "defecto). Use JPG, PNG o WebP (máx. 6 MB).",
+        "defecto), y «Ampliar» para verla en grande. Use JPG, PNG o WebP (máx. 25 MB).",
     ])
 
     h1("13. Consejos y seguridad")

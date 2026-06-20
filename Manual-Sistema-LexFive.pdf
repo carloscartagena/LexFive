@@ -553,7 +553,7 @@ ET
 BT
 /F1 10.50 Tf
 527.60 289.89 Td
-(11) Tj
+(12) Tj
 ET
 0.800 0.820 0.850 rg
 BT
@@ -3550,7 +3550,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 25 0 R >>
 endobj
 27 0 obj
-<< /Length 6009 >>
+<< /Length 5833 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -3691,187 +3691,178 @@ ET
 BT
 /F1 10.50 Tf
 74.00 568.39 Td
-(Cada imagen tiene botones «Subir» y «Quitar». Al quitarla, vuelve la ilustración o el fondo por) Tj
+(Cada imagen tiene botones «Subir» y «Quitar», y «Ampliar» para verla en grande. Al quitarla,) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 74.00 553.89 Td
-(defecto.) Tj
+(vuelve la ilustración o el fondo por defecto.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
 56.00 532.39 Td
-(Formatos admitidos: JPG, PNG o WebP \(máximo 6 MB; el sistema las optimiza al subir\).) Tj
+(Formatos admitidos: JPG, PNG o WebP \(máximo 25 MB; el sistema las optimiza al subir, así que no) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 517.89 Td
+(necesita reducirlas usted\).) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 453.39 483.28 72.00 re
+56.00 425.39 483.28 85.50 re
 f
 0.760 0.635 0.353 rg
-56.00 453.39 4.00 72.00 re
+56.00 425.39 4.00 85.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 505.89 Td
+71.00 491.39 Td
 (Recomendación) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 492.39 Td
+71.00 477.89 Td
 (Todo se guarda en la configuración compartida del bufete \(branding\) y no requiere ningún script SQL.) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 478.89 Td
-(Consejo: para el fondo del encabezado, use imágenes oscuras o con poco detalle en el centro, ya que) Tj
+71.00 464.39 Td
+(Las imágenes se sincronizan solas en todos los dispositivos y en la web pública. Consejo: para el) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 465.39 Td
-(el título y los botones van encima.) Tj
+71.00 450.89 Td
+(fondo del encabezado, use imágenes oscuras o con poco detalle en el centro, ya que el título y los) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.00 Tf
+71.00 437.39 Td
+(botones van encima.) Tj
 ET
 0.055 0.106 0.173 rg
 BT
 /F2 16.00 Tf
-56.00 413.39 Td
+56.00 385.39 Td
 (23. Respaldos, instalación y conexión a internet) Tj
 ET
 0.760 0.635 0.353 RG
 1.20 w
-56.00 405.39 m 539.28 405.39 l S
+56.00 377.39 m 539.28 377.39 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 378.89 Td
+56.00 350.89 Td
 (El sistema incluye varias ayudas para la seguridad de los datos y la comodidad de uso:) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 357.39 Td
+60.00 329.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 357.39 Td
+74.00 329.39 Td
 (Respaldo automático: la base de datos se respalda sola cada día \(mediante GitHub Actions\). No) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 342.89 Td
+74.00 314.89 Td
 (tiene que hacer nada.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 326.39 Td
+60.00 298.39 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 326.39 Td
+74.00 298.39 Td
 (Respaldo manual: en el «Panel general», el administrador puede pulsar «Exportar respaldo) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 311.89 Td
+74.00 283.89 Td
 (\(JSON\)» para descargar una copia de los datos principales en su equipo. Se muestra la fecha del) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 297.39 Td
+74.00 269.39 Td
 (último respaldo manual.) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 280.89 Td
+60.00 252.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 280.89 Td
+74.00 252.89 Td
 (Instalar como app: en el celular puede «Agregar a la pantalla de inicio» desde el navegador y usar) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 266.39 Td
+74.00 238.39 Td
 (el sistema como una aplicación \(abre más rápido y a pantalla completa\).) Tj
 ET
 0.659 0.522 0.235 rg
 BT
 /F2 10.50 Tf
-60.00 249.89 Td
+60.00 221.89 Td
 (•) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 249.89 Td
+74.00 221.89 Td
 (Aviso de «sin conexión»: si se queda sin internet, aparece un aviso. Lo que guarde queda en el) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-74.00 235.39 Td
+74.00 207.39 Td
 (equipo y se sincroniza al volver la conexión.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 169.89 483.28 58.50 re
+56.00 141.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 169.89 4.00 58.50 re
+56.00 141.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 208.89 Td
+71.00 180.89 Td
 (Recomendación) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 195.39 Td
+71.00 167.39 Td
 (Guarde los respaldos manuales en un lugar seguro. Son útiles si necesita revisar o restaurar datos) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 181.89 Td
+71.00 153.89 Td
 (antiguos.) Tj
-ET
-0.055 0.106 0.173 rg
-BT
-/F2 16.00 Tf
-56.00 129.89 Td
-(24. Soporte) Tj
-ET
-0.760 0.635 0.353 RG
-1.20 w
-56.00 121.89 m 539.28 121.89 l S
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 95.39 Td
-(Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
-ET
-0.102 0.137 0.188 rg
-BT
-/F1 10.50 Tf
-56.00 80.89 Td
-(mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
 ET
 
 endstream
@@ -3880,7 +3871,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /ProcSet [/PDF /Text] >> /Contents 27 0 R >>
 endobj
 29 0 obj
-<< /Length 993 >>
+<< /Length 1447 >>
 stream
 0.760 0.635 0.353 rg
 56.00 787.89 18.00 18.00 re
@@ -3915,34 +3906,55 @@ BT
 279.63 52.00 Td
 (Página 12) Tj
 ET
+0.055 0.106 0.173 rg
+BT
+/F2 16.00 Tf
+56.00 741.89 Td
+(24. Soporte) Tj
+ET
+0.760 0.635 0.353 RG
+1.20 w
+56.00 733.89 m 539.28 733.89 l S
 0.102 0.137 0.188 rg
 BT
 /F1 10.50 Tf
-56.00 757.39 Td
+56.00 707.39 Td
+(Ante cualquier duda sobre el uso del sistema, contacte al administrador del bufete. Para cambios o) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 692.89 Td
+(mejoras en la web o el panel, conserve este manual como referencia y describa con el mayor detalle) Tj
+ET
+0.102 0.137 0.188 rg
+BT
+/F1 10.50 Tf
+56.00 678.39 Td
 (posible lo que necesita.) Tj
 ET
 0.965 0.957 0.937 rg
-56.00 683.89 483.28 58.50 re
+56.00 604.89 483.28 58.50 re
 f
 0.760 0.635 0.353 rg
-56.00 683.89 4.00 58.50 re
+56.00 604.89 4.00 58.50 re
 f
 0.659 0.522 0.235 rg
 BT
 /F2 10.00 Tf
-71.00 722.89 Td
+71.00 643.89 Td
 (Versión) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 709.39 Td
+71.00 630.39 Td
 (Este manual describe el funcionamiento del sistema a la fecha indicada en la portada. Si el sistema se) Tj
 ET
 0.102 0.137 0.188 rg
 BT
 /F1 10.00 Tf
-71.00 695.89 Td
+71.00 616.89 Td
 (actualiza, solicite una versión nueva del manual.) Tj
 ET
 
@@ -3981,11 +3993,11 @@ xref
 0000057606 00000 n 
 0000064067 00000 n 
 0000064233 00000 n 
-0000070295 00000 n 
-0000070461 00000 n 
-0000071506 00000 n 
+0000070119 00000 n 
+0000070285 00000 n 
+0000071785 00000 n 
 trailer
 << /Size 31 /Root 1 0 R >>
 startxref
-71672
+71951
 %%EOF

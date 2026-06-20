@@ -321,11 +321,11 @@ La pestaña «Sitio web» (administrador y abogados) permite controlar las imág
 - Imagen de «Sobre el bufete»: la del recuadro de esa sección. Como el recuadro es alto, conviene una imagen vertical (ideal ~800×950 px). Si no sube ninguna, se usa la ilustración (la balanza) por defecto.
 - Fondo del sitio: elija el patrón tenue que se ve detrás de algunas secciones — código binario (recomendado), circuito, líneas finas o ninguno.
 - Imagen de fondo del encabezado: opcional, una foto panorámica detrás del título del hero (ideal ~1920×1080 px). El sistema le pone automáticamente una capa oscura por encima para que el título y los botones siempre se lean; solo afecta al encabezado, no a toda la página.
-- Cada imagen tiene botones «Subir» y «Quitar». Al quitarla, vuelve la ilustración o el fondo por defecto.
+- Cada imagen tiene botones «Subir» y «Quitar», y «Ampliar» para verla en grande. Al quitarla, vuelve la ilustración o el fondo por defecto.
 
-Formatos admitidos: JPG, PNG o WebP (máximo 6 MB; el sistema las optimiza al subir).
+Formatos admitidos: JPG, PNG o WebP (máximo 25 MB; el sistema las optimiza al subir, así que no necesita reducirlas usted).
 
-> **Recomendación:** Todo se guarda en la configuración compartida del bufete (branding) y no requiere ningún script SQL. Consejo: para el fondo del encabezado, use imágenes oscuras o con poco detalle en el centro, ya que el título y los botones van encima.
+> **Recomendación:** Todo se guarda en la configuración compartida del bufete (branding) y no requiere ningún script SQL. Las imágenes se sincronizan solas en todos los dispositivos y en la web pública. Consejo: para el fondo del encabezado, use imágenes oscuras o con poco detalle en el centro, ya que el título y los botones van encima.
 
 ## 23. Respaldos, instalación y conexión a internet
 

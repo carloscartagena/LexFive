@@ -5038,14 +5038,15 @@ async function renderSitio() {
     { id: 'ninguno', label: 'Ninguno', desc: 'Fondo liso, sin patrón.' }
   ];
 
-  // Caja reutilizable de vista previa + botones Subir/Quitar para una imagen.
-  const cajaImg = (url, idSubir, idQuitar, idFile, alto) => `
+  // Caja reutilizable de vista previa + botones Subir/Ampliar/Quitar para una imagen.
+  const cajaImg = (url, idSubir, idQuitar, idFile, idAmp) => `
     <div class="sello-box">
       <div class="big-preview big-preview--sello" style="max-width:340px">
-        ${url ? `<img src="${esc(url)}" alt="Vista previa" style="width:100%;${alto ? '' : ''}border-radius:10px;display:block">` : '<p class="cell-sub" style="padding:22px;text-align:center">Sin imagen propia (se usa la ilustración por defecto).</p>'}
+        ${url ? `<img src="${esc(url)}" alt="Vista previa" id="${idAmp}Img" style="width:100%;border-radius:10px;display:block;cursor:zoom-in" title="Toque para ampliar">` : '<p class="cell-sub" style="padding:22px;text-align:center">Sin imagen propia (se usa la ilustración por defecto).</p>'}
       </div>
       <div class="sello-actions">
         <button class="btn btn--primary btn--sm" id="${idSubir}" type="button">Subir imagen</button>
+        ${url ? `<button class="btn btn--ghost btn--sm" id="${idAmp}" type="button">Ampliar</button>` : ''}
         ${url ? `<button class="btn btn--ghost btn--sm" id="${idQuitar}" type="button">Quitar imagen</button>` : ''}
         <input type="file" id="${idFile}" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
       </div>
@@ -5054,14 +5055,14 @@ async function renderSitio() {
   content().innerHTML = `
     <div class="card"><div class="card__body">
       <h3 class="intro-title">Sitio web público</h3>
-      <p class="cell-sub">Controle las <strong>imágenes</strong> y el <strong>fondo</strong> de la página de inicio (lexfive.netlify.app). Todo se guarda solo y se ve en la web en unos segundos. Formatos: <strong>JPG, PNG o WebP</strong> (máx. 6 MB; el sistema las optimiza al subir).</p>
+      <p class="cell-sub">Controle las <strong>imágenes</strong> y el <strong>fondo</strong> de la página de inicio (lexfive.netlify.app). Todo se guarda solo y se ve en la web en unos segundos. Formatos: <strong>JPG, PNG o WebP</strong> (máx. 25 MB; el sistema las optimiza al subir).</p>
     </div></div>
 
     <div class="card">
       <div class="card__head"><h3>Imagen principal (hero)</h3></div>
       <div class="card__body">
         <p class="cell-sub" style="margin-bottom:12px">La que aparece al costado del título, como una tarjeta. Horizontal o cuadrada (ideal ~1200×900 px). Si no sube ninguna, se muestra la ilustración por defecto.</p>
-        ${cajaImg(heroActual, 'btnSubirHero', 'btnQuitarHero', 'fileHero')}
+        ${cajaImg(heroActual, 'btnSubirHero', 'btnQuitarHero', 'fileHero', 'ampHero')}
       </div>
     </div>
 
@@ -5069,7 +5070,7 @@ async function renderSitio() {
       <div class="card__head"><h3>Imagen de «Sobre el bufete»</h3></div>
       <div class="card__body">
         <p class="cell-sub" style="margin-bottom:12px">La del recuadro de la sección «Sobre el bufete». El recuadro es alto, así que conviene una imagen <strong>vertical</strong> (ideal ~800×950 px). Si no sube ninguna, se muestra la ilustración (balanza) por defecto.</p>
-        ${cajaImg(sobreActual, 'btnSubirSobre', 'btnQuitarSobre', 'fileSobre')}
+        ${cajaImg(sobreActual, 'btnSubirSobre', 'btnQuitarSobre', 'fileSobre', 'ampSobre')}
       </div>
     </div>
 
@@ -5088,28 +5089,33 @@ async function renderSitio() {
         <hr style="border:none;border-top:1px solid var(--line,rgba(0,0,0,.1));margin:20px 0">
         <h4 style="margin:0 0 6px">Imagen de fondo del encabezado</h4>
         <p class="cell-sub" style="margin-bottom:12px">Opcional: una foto detrás del título del encabezado (hero). Horizontal/panorámica (ideal ~1920×1080 px); mejor si es <strong>oscura</strong>, porque el texto va encima. El sistema le pone <strong>automáticamente una capa oscura</strong> para que el título y los botones siempre se lean. Si la quita, vuelve el fondo por defecto.</p>
-        ${cajaImg(heroBgActual, 'btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg')}
+        ${cajaImg(heroBgActual, 'btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg', 'ampHeroBg')}
       </div>
     </div>`;
 
-  // Conecta un control de subida/quitar de imagen con su clave de branding.
+  // Conecta un control de subida/quitar/ampliar de imagen con su clave de branding.
   // lsKey: clave en localStorage; prefijo: carpeta en Storage; maxLado: tamaño
-  // máximo del lado mayor al optimizar; okMsg/quitarMsg: avisos al usuario.
-  const wireImagen = (idSubir, idQuitar, idFile, lsKey, prefijo, maxLado, okMsg, quitarMsg) => {
+  // máximo del lado mayor al optimizar; idAmp: botón/imagen para ampliar.
+  const wireImagen = (idSubir, idQuitar, idFile, idAmp, urlActual, titulo, lsKey, prefijo, maxLado, okMsg, quitarMsg) => {
     const file = $('#' + idFile);
     const btn = $('#' + idSubir);
     if (btn) btn.onclick = () => file.click();
     if (file) file.onchange = () => {
       const f = file.files && file.files[0]; file.value = '';
       if (!f) return;
-      if (f.size > 6 * 1024 * 1024) { toast('La imagen pesa demasiado (máx. 6 MB). Use una más liviana.', 'error'); return; }
+      if (f.size > 25 * 1024 * 1024) { toast('La imagen pesa demasiado (máx. 25 MB). Use una más liviana.', 'error'); return; }
       const reader = new FileReader();
       reader.onload = () => {
-        redimensionarDataUrl(reader.result, maxLado, async (peq) => {
+        optimizarFotoSitio(reader.result, maxLado, async (peq) => {
           toast('Subiendo imagen...', 'success');
-          const url = await subirImagenBranding(peq, prefijo);
-          if (!url) { toast('No se pudo subir la imagen. Revise su conexión e intente de nuevo.', 'error'); return; }
-          localStorage.setItem(lsKey, url);
+          // Intenta guardarla en Storage (URL liviana). Si Storage no está
+          // configurado o falla, NO se rechaza: se guarda la propia imagen
+          // optimizada (base64) en la configuración, igual que los logos/sellos.
+          // Así funciona en todos los dispositivos sin configurar nada en Supabase.
+          let src = null;
+          try { src = await subirImagenBranding(peq, prefijo); } catch (e) {}
+          if (!src) src = peq;
+          localStorage.setItem(lsKey, src);
           await pushBranding();
           toast(okMsg, 'success');
           renderSitio();
@@ -5125,13 +5131,17 @@ async function renderSitio() {
       toast(quitarMsg, 'success');
       renderSitio();
     };
+    const amp = $('#' + idAmp);
+    if (amp) amp.onclick = () => ampliarImagenSitio(urlActual, titulo);
+    const ampImg = $('#' + idAmp + 'Img');
+    if (ampImg) ampImg.onclick = () => ampliarImagenSitio(urlActual, titulo);
   };
 
-  wireImagen('btnSubirHero', 'btnQuitarHero', 'fileHero', 'lexfive_hero_url', 'hero', 1400,
+  wireImagen('btnSubirHero', 'btnQuitarHero', 'fileHero', 'ampHero', heroActual, 'Imagen principal (hero)', 'lexfive_hero_url', 'hero', 1400,
     'Imagen del hero actualizada. Se verá en la web en unos segundos.', 'Imagen quitada. Se usará la ilustración por defecto.');
-  wireImagen('btnSubirSobre', 'btnQuitarSobre', 'fileSobre', 'lexfive_sobre_url', 'sobre', 1200,
+  wireImagen('btnSubirSobre', 'btnQuitarSobre', 'fileSobre', 'ampSobre', sobreActual, 'Imagen de «Sobre el bufete»', 'lexfive_sobre_url', 'sobre', 1200,
     'Imagen de «Sobre el bufete» actualizada. Se verá en la web en unos segundos.', 'Imagen quitada. Se usará la ilustración por defecto.');
-  wireImagen('btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg', 'lexfive_herobg_url', 'herobg', 1920,
+  wireImagen('btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg', 'ampHeroBg', heroBgActual, 'Imagen de fondo del encabezado', 'lexfive_herobg_url', 'herobg', 1920,
     'Fondo del encabezado actualizado. Se verá en la web en unos segundos.', 'Fondo del encabezado quitado. Vuelve el fondo por defecto.');
 
   content().querySelectorAll('input[name="bgStyle"]').forEach(r => r.onchange = async () => {
@@ -5695,6 +5705,52 @@ function leerImagenBufete(file, kind, done) {
   };
   reader.onerror = () => toast('No se pudo leer el archivo. Intente de nuevo.', 'error');
   reader.readAsDataURL(file);
+}
+
+// Optimiza una FOTO del sitio (hero, «Sobre el bufete» o fondo): limita el lado
+// mayor a "maxLado" y la recomprime en JPEG (mucho más liviana que PNG para
+// fotos). Así sube rápido y, si se guarda como respaldo en la configuración, no
+// infla la base de datos. Si algo falla, devuelve la imagen original.
+function optimizarFotoSitio(dataUrl, maxLado, cb) {
+  try {
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      if (!w || !h) { cb(dataUrl); return; }
+      const escala = Math.min(1, maxLado / Math.max(w, h));
+      const cw = Math.max(1, Math.round(w * escala)), ch = Math.max(1, Math.round(h * escala));
+      try {
+        const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cw, ch); // JPEG no tiene transparencia
+        ctx.drawImage(img, 0, 0, cw, ch);
+        cb(c.toDataURL('image/jpeg', 0.85));
+      } catch (e) { cb(dataUrl); }
+    };
+    img.onerror = () => cb(dataUrl);
+    img.src = dataUrl;
+  } catch (e) { cb(dataUrl); }
+}
+
+// Muestra una imagen del sitio EN GRANDE (como la vista en grande de los
+// logos/sellos), con opción de descargarla. Se cierra tocando fuera o «Cerrar».
+function ampliarImagenSitio(src, titulo) {
+  if (!src) { toast('No hay imagen para mostrar.', 'error'); return; }
+  const o = document.createElement('div');
+  o.className = 'img-editor';
+  o.innerHTML = `
+    <div class="img-editor__panel" style="width:820px;max-width:100%">
+      <h3>${esc(titulo || 'Vista ampliada')}</h3>
+      <div class="big-preview"><img src="${src}" alt="${esc(titulo || '')}" style="max-width:100%;max-height:72vh;border-radius:10px;display:block;margin:0 auto"></div>
+      <div class="img-editor__actions">
+        <a class="btn btn--ghost" href="${src}" download="imagen-sitio">Descargar</a>
+        <button class="btn btn--primary" id="aiClose" type="button">Cerrar</button>
+      </div>
+    </div>`;
+  document.body.appendChild(o);
+  const close = () => o.remove();
+  o.querySelector('#aiClose').onclick = close;
+  o.onclick = e => { if (e.target === o) close(); };
 }
 
 // Redimensiona una imagen (data URL) para que su lado mayor no supere "maxLado",
