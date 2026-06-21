@@ -194,7 +194,9 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 .tech-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
 
 /* ---------- Sobre nosotros ---------- */
-.about { background: var(--bg-soft); }
+.about { background: var(--bg-soft); position: relative; }
+.about::before { content: ""; position: absolute; inset: 0; background-image: var(--bg-pattern); background-size: var(--bg-tile); opacity: .06; pointer-events: none; }
+.about > .container { position: relative; z-index: 1; }
 .about__grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; }
 .about__media { position: relative; }
 .about__image { aspect-ratio: 4 / 4.4; border-radius: var(--radius); background: linear-gradient(150deg, var(--navy), var(--tech-deep) 78%); box-shadow: var(--shadow-lg); position: relative; overflow: hidden; display: grid; place-items: center; }
@@ -297,8 +299,10 @@ html[data-theme="dark"] .social-card--x .social-card__ico { background: #1a1a1a;
 .footer { background: var(--navy); color: rgba(255,255,255,.66); padding-top: 64px; }
 .footer__grid { display: grid; grid-template-columns: 1.6fr 1fr 1.3fr; gap: 40px; padding-bottom: 44px; }
 .footer__brand p { margin: 16px 0 18px; font-size: .9rem; max-width: 340px; }
-.footer__social a { display: inline-flex; align-items: center; gap: 9px; color: var(--gold-soft); font-size: .88rem; font-weight: 600; }
-.footer__social a:hover { color: #fff; }
+.footer__social { display: flex; gap: 12px; flex-wrap: wrap; }
+.footer__social a { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: var(--gold-soft); background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease; }
+.footer__social a:hover { color: #fff; background: var(--gold); border-color: var(--gold); transform: translateY(-2px); }
+.footer__social a svg { width: 20px; height: 20px; }
 .footer__col h4 { color: #fff; font-family: var(--sans); font-size: .82rem; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; font-weight: 600; }
 .footer__col ul { display: grid; gap: 10px; }
 .footer__col a { font-size: .9rem; transition: color .15s ease; }
@@ -333,7 +337,9 @@ html[data-theme="dark"] .social-card--x .social-card__ico { background: #1a1a1a;
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
 
 /* ---------- ¿Por qué elegirnos? ---------- */
-.why { background: var(--gold-tint); }
+.why { background: var(--gold-tint); position: relative; }
+.why::before { content: ""; position: absolute; inset: 0; background-image: var(--bg-pattern); background-size: var(--bg-tile); opacity: .07; pointer-events: none; }
+.why > .container { position: relative; z-index: 1; }
 .why__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .why-card { text-align: center; padding: 14px 12px; }
 .why-card__icon { width: 58px; height: 58px; border-radius: 15px; background: #fff; color: var(--gold); display: grid; place-items: center; margin: 0 auto 16px; box-shadow: var(--shadow-sm); }
