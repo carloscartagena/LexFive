@@ -39,15 +39,27 @@
     --binary: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='100'%3E%3Cg font-family='monospace' font-size='13' fill='%2338bdf8'%3E%3Ctext x='6' y='18'%3E1011 0100 10%3C/text%3E%3Ctext x='78' y='30'%3E0110%3C/text%3E%3Ctext x='6' y='44'%3E0100 1101 01%3C/text%3E%3Ctext x='90' y='56'%3E1011%3C/text%3E%3Ctext x='6' y='70'%3E1101 0011 10%3C/text%3E%3Ctext x='6' y='94'%3E0011 1001 01%3C/text%3E%3C/g%3E%3C/svg%3E");
     /* Líneas finas diagonales (alternativa). */
     --lineas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 24 24 0' stroke='%2338bdf8' stroke-width='1'/%3E%3C/svg%3E");
+    /* Versiones OSCURAS (color navy) de los patrones. Se usan sobre secciones de
+       fondo CLARO (p. ej. "Razones para confiar" y "Sobre el bufete"), porque las
+       versiones cian de arriba solo se ven sobre el navy oscuro (Testimonios). */
+    --binary-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='100'%3E%3Cg font-family='monospace' font-size='13' fill='%230e1b2c'%3E%3Ctext x='6' y='18'%3E1011 0100 10%3C/text%3E%3Ctext x='78' y='30'%3E0110%3C/text%3E%3Ctext x='6' y='44'%3E0100 1101 01%3C/text%3E%3Ctext x='90' y='56'%3E1011%3C/text%3E%3Ctext x='6' y='70'%3E1101 0011 10%3C/text%3E%3Ctext x='6' y='94'%3E0011 1001 01%3C/text%3E%3C/g%3E%3C/svg%3E");
+    --lineas-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 24 24 0' stroke='%230e1b2c' stroke-width='1'/%3E%3C/svg%3E");
     /* Patrón de fondo ACTIVO (se puede cambiar desde el panel). */
     --bg-pattern: var(--binary);
+    --bg-pattern-ink: var(--binary-ink);
     --bg-tile: 150px 100px;
 }
 
 /* Estilo de fondo elegido desde el panel (data-bg en <html>). */
-html[data-bg="circuito"] { --bg-pattern: var(--circuit-tech); --bg-tile: 84px 84px; }
-html[data-bg="lineas"] { --bg-pattern: var(--lineas); --bg-tile: 24px 24px; }
-html[data-bg="ninguno"] { --bg-pattern: none; }
+html[data-bg="circuito"] { --bg-pattern: var(--circuit-tech); --bg-pattern-ink: var(--circuit-navy); --bg-tile: 84px 84px; }
+html[data-bg="lineas"] { --bg-pattern: var(--lineas); --bg-pattern-ink: var(--lineas-ink); --bg-tile: 24px 24px; }
+html[data-bg="ninguno"] { --bg-pattern: none; --bg-pattern-ink: none; }
+
+/* Patrón usado en secciones de fondo CLARO ("Razones para confiar", "Sobre el
+   bufete"). En modo claro usa la versión oscura (navy) para que sea visible;
+   en modo oscuro, como esas secciones se vuelven oscuras, usa la versión cian. */
+:root { --bg-pattern-section: var(--bg-pattern-ink); --section-pattern-opacity: .16; }
+html[data-theme="dark"] { --bg-pattern-section: var(--bg-pattern); --section-pattern-opacity: .10; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -195,7 +207,7 @@ h1, h2, h3, h4 { font-family: var(--serif); color: var(--navy); font-weight: 600
 
 /* ---------- Sobre nosotros ---------- */
 .about { background: var(--bg-soft); position: relative; }
-.about::before { content: ""; position: absolute; inset: 0; background-image: var(--bg-pattern); background-size: var(--bg-tile); opacity: .06; pointer-events: none; }
+.about::before { content: ""; position: absolute; inset: 0; background-image: var(--bg-pattern-section); background-size: var(--bg-tile); opacity: var(--section-pattern-opacity); pointer-events: none; }
 .about > .container { position: relative; z-index: 1; }
 .about__grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 60px; align-items: center; }
 .about__media { position: relative; }
@@ -338,7 +350,7 @@ html[data-theme="dark"] .social-card--x .social-card__ico { background: #1a1a1a;
 
 /* ---------- ¿Por qué elegirnos? ---------- */
 .why { background: var(--gold-tint); position: relative; }
-.why::before { content: ""; position: absolute; inset: 0; background-image: var(--bg-pattern); background-size: var(--bg-tile); opacity: .07; pointer-events: none; }
+.why::before { content: ""; position: absolute; inset: 0; background-image: var(--bg-pattern-section); background-size: var(--bg-tile); opacity: var(--section-pattern-opacity); pointer-events: none; }
 .why > .container { position: relative; z-index: 1; }
 .why__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .why-card { text-align: center; padding: 14px 12px; }
