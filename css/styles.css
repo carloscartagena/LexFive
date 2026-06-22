@@ -584,7 +584,7 @@ html[data-theme="dark"] .mode-toggle:hover { color: var(--tech-cyan); border-col
   background: linear-gradient(135deg, var(--navy), var(--tech-deep) 80%);
 }
 .area-slide__img--empty svg { width: 46px; height: 46px; }
-.area-slide__body { padding: 18px 20px 22px; }
+.area-slide__body { padding: 18px 20px 22px; text-align: center; }
 .area-slide__title { font-size: 1.16rem; margin-bottom: 8px; }
 .area-slide__text { font-size: .9rem; color: var(--muted); line-height: 1.6; }
 .areas-carousel__nav {
