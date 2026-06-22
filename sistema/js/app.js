@@ -11,6 +11,7 @@ import { $, content } from './dom.js';
 import { paginar, pagerHTML, wirePager, barChart, toast, flashAutosave, tip, hint, initTooltipEngine, loading, openModal, closeModal } from './ui.js';
 import { state } from './state.js';
 import { loadCategorias, categoriaOptions, wireCategoriaSelect, renderCategorias } from './categorias.js';
+import { profName, clienteName, badgeEstado, optionsProfiles, checkboxesProfiles, namesFromIds, optionsClientes } from './comunes.js';
 
 // ---------- Estado global ----------
 // El objeto state se movió a ./state.js (se importa arriba) para poder
@@ -767,39 +768,9 @@ function maybeOfferDraft(draftName, draft) {
   $('#draftDiscard').onclick = () => { Draft.clear(draftName); banner.remove(); };
 }
 
-function profName(id) {
-  if (!id) return '—';
-  const p = state.profiles.find(x => x.id === id);
-  return p ? p.nombre : '—';
-}
-function clienteName(id) {
-  if (!id) return '—';
-  const c = state.clientes.find(x => x.id === id);
-  return c ? c.nombre : '—';
-}
-function badgeEstado(estado) {
-  const label = ESTADOS[estado] || estado || '—';
-  return `<span class="badge badge-estado ${esc(estado || '')}">${esc(label)}</span>`;
-}
-function optionsProfiles(selected) {
-  return '<option value="">— Sin asignar —</option>' + state.profiles.filter(p => p.activo)
-    .map(p => `<option value="${p.id}" ${p.id === selected ? 'selected' : ''}>${esc(p.nombre)} (${ROLES[p.rol] || p.rol})</option>`).join('');
-}
-
-function checkboxesProfiles(selected, cls) {
-  const sel = selected || [];
-  const staff = state.profiles.filter(p => p.activo && ['admin', 'procurador', 'abogado'].includes(p.rol));
-  if (!staff.length) return '<span class="cell-sub">No hay personal disponible.</span>';
-  return staff.map(p => `<label class="chk"><input type="checkbox" class="${cls}" value="${p.id}" ${sel.includes(p.id) ? 'checked' : ''}> ${esc(p.nombre)} <span class="chk-rol">(${ROLES[p.rol] || p.rol})</span></label>`).join('');
-}
-function namesFromIds(ids) {
-  if (!ids || !ids.length) return null;
-  return ids.map(profName).join(', ');
-}
-function optionsClientes(selected) {
-  return '<option value="">— Sin cliente —</option>' + state.clientes
-    .map(c => `<option value="${c.id}" ${c.id === selected ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('');
-}
+// Helpers comunes de presentación (profName, clienteName, badgeEstado,
+// optionsProfiles, checkboxesProfiles, namesFromIds, optionsClientes) se
+// movieron a ./comunes.js (se importan arriba).
 
 // ============================================================
 //  Carga de datos comunes
