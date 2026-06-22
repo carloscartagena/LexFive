@@ -698,6 +698,15 @@ function applyWmOpacity(pct) {
   document.documentElement.style.setProperty('--cred-wm-op', (p / 100).toFixed(2));
 }
 
+// ---- Visibilidad (opacidad) de la imagen de fondo de las secciones ----
+// «Razones para confiar» y «Sobre el bufete». Se guarda como porcentaje
+// (10–100): a MAYOR valor, la imagen se ve MÁS; a menor valor, queda más tenue
+// y el texto se lee mejor. Se sincroniza con los demás equipos.
+function bgImgOpacityActual() {
+  const v = Number(localStorage.getItem('lexfive_bgimg_op'));
+  return (v >= 10 && v <= 100) ? v : 35;
+}
+
 // ---- Indicador de "sin conexión" (offline) ----
 // Avisa cuando no hay internet: los cambios se guardan localmente y se
 // sincronizan al volver la conexión.
@@ -930,6 +939,7 @@ function snapshotBranding() {
     selloId: selloId,
     selloImg: selloImg,
     wmOpacity: wmOpacityActual(),
+    bgImgOpacity: bgImgOpacityActual(),
     logosHidden: readList('lexfive_logos_hidden'),
     sellosHidden: readList('lexfive_sellos_hidden'),
     heroImg: (heroLS !== null) ? (heroLS || null) : (cache.heroImg || null),
@@ -980,6 +990,7 @@ async function hydrateBranding(force) {
     if (b.logoId) localStorage.setItem('lexfive_logo', b.logoId);
     if (b.selloId) localStorage.setItem('lexfive_sello', b.selloId);
     if (b.wmOpacity) { localStorage.setItem('lexfive_wm_op', b.wmOpacity); applyWmOpacity(b.wmOpacity); }
+    if (b.bgImgOpacity) localStorage.setItem('lexfive_bgimg_op', b.bgImgOpacity);
     localStorage.setItem('lexfive_logos_hidden', JSON.stringify(b.logosHidden || []));
     localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(b.sellosHidden || []));
     // La nube es la fuente de verdad para la imagen propia.
@@ -5038,6 +5049,7 @@ async function renderSitio() {
   const heroBgActual = b.heroBgImg || null;
   const aboutBgActual = b.aboutBgImg || null;
   const whyBgActual = b.whyBgImg || null;
+  const bgImgOpActual = b.bgImgOpacity || 35;
 
   const BGS = [
     { id: 'binario', label: 'Código binario', desc: 'Números 0 y 1 (tecnología). Recomendado.' },
@@ -5110,6 +5122,16 @@ async function renderSitio() {
         <hr style="border:none;border-top:1px solid var(--line,rgba(0,0,0,.1));margin:20px 0">
         <h4 style="margin:0 0 8px">Sección «Sobre el bufete»</h4>
         ${cajaImg(aboutBgActual, 'btnSubirAboutBg', 'btnQuitarAboutBg', 'fileAboutBg', 'ampAboutBg')}
+
+        <hr style="border:none;border-top:1px solid var(--line,rgba(0,0,0,.1));margin:20px 0">
+        <h4 style="margin:0 0 6px">Visibilidad de la imagen de fondo</h4>
+        <p class="cell-sub" style="margin-bottom:12px">Ajuste qué tan visible se ve la imagen detrás de esas secciones. A <strong>mayor</strong> valor, la imagen se ve más; a <strong>menor</strong> valor, queda más tenue y el texto se lee mejor. Aplica a las dos secciones de arriba.</p>
+        <div style="display:flex;align-items:center;gap:14px;max-width:420px">
+          <span class="cell-sub">Tenue</span>
+          <input type="range" id="bgImgOp" min="10" max="100" step="5" value="${bgImgOpActual}" style="flex:1" aria-label="Visibilidad de la imagen de fondo">
+          <span class="cell-sub">Visible</span>
+          <strong id="bgImgOpVal" style="min-width:46px;text-align:right">${bgImgOpActual}%</strong>
+        </div>
       </div>
     </div>`;
 
@@ -5174,6 +5196,18 @@ async function renderSitio() {
     await pushBranding();
     toast('Fondo del sitio actualizado.', 'success');
   });
+
+  // Deslizador de visibilidad de la imagen de fondo de las secciones.
+  const bgOp = $('#bgImgOp');
+  const bgOpVal = $('#bgImgOpVal');
+  if (bgOp) {
+    bgOp.oninput = () => { if (bgOpVal) bgOpVal.textContent = bgOp.value + '%'; };
+    bgOp.onchange = async () => {
+      localStorage.setItem('lexfive_bgimg_op', bgOp.value);
+      await pushBranding();
+      toast('Visibilidad de la imagen de fondo actualizada. Se verá en la web en unos segundos.', 'success');
+    };
+  }
 }
 
 async function renderCredenciales() {
