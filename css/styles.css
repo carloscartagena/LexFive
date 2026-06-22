@@ -358,6 +358,23 @@ html[data-theme="dark"] .social-card--x .social-card__ico { background: #1a1a1a;
    panel «Sitio web»), la imagen reemplaza al patrón: se oculta el ::before. */
 .about.has-bg-image::before, .why.has-bg-image::before, .testimonials.has-bg-image::before { display: none; }
 .about.has-bg-image, .why.has-bg-image, .testimonials.has-bg-image { background-size: cover; background-position: center; background-repeat: no-repeat; }
+/* Protección de legibilidad: cuando la sección tiene imagen de fondo, el texto
+   recibe una sombra suave para que se lea sobre CUALQUIER foto, además del velo.
+   text-shadow se hereda, así que basta aplicarlo a la sección y todo el texto
+   interno lo toma. La sombra se adapta al color del texto:
+     · texto OSCURO (modo claro en Razones/Sobre el bufete) -> sombra CLARA
+     · texto CLARO  (modo oscuro, y Testimonios siempre)     -> sombra OSCURA */
+.why.has-bg-image, .about.has-bg-image {
+    text-shadow: 0 1px 2px rgba(255,255,255,.92), 0 0 7px rgba(255,255,255,.6);
+}
+html[data-theme="dark"] .why.has-bg-image,
+html[data-theme="dark"] .about.has-bg-image,
+.testimonials.has-bg-image {
+    text-shadow: 0 1px 3px rgba(7,15,26,.95), 0 0 9px rgba(7,15,26,.8);
+}
+/* Las tarjetas de testimonios son casi transparentes; sobre una imagen propia
+   se oscurecen un poco más para que el texto blanco contraste mejor. */
+.testimonials.has-bg-image .testimonial { background: rgba(7,15,26,.42); border-color: rgba(255,255,255,.16); }
 .why > .container { position: relative; z-index: 1; }
 .why__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .why-card { text-align: center; padding: 14px 12px; }
