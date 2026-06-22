@@ -577,18 +577,23 @@
         // (.why) y «Sobre el bufete» (.about). Reemplaza al patrón con una capa
         // clara automática para que el texto (oscuro) se siga leyendo. Si no hay
         // imagen configurada, se mantiene el patrón por defecto.
-        aplicarFondoSeccion('.why', b.whyBgImg, b.bgImgOpacity);
-        aplicarFondoSeccion('.about', b.aboutBgImg, b.bgImgOpacity);
+        var legacyOp = b.bgImgOpacity;
+        aplicarFondoSeccion('.why', b.whyBgImg, b.whyBgOpacity || legacyOp, false);
+        aplicarFondoSeccion('.about', b.aboutBgImg, b.aboutBgOpacity || legacyOp, false);
+        aplicarFondoSeccion('.testimonials', b.testimonialsBgImg, b.testimonialsBgOpacity || legacyOp, true);
     }
 
-    function aplicarFondoSeccion(sel, img, vis) {
+    function aplicarFondoSeccion(sel, img, vis, dark) {
         var el = document.querySelector(sel);
         if (!el) return;
         if (img) {
-            // vis (10-100): a mayor valor, mas visible la imagen (menos velo blanco).
+            // vis (10-100): a mayor valor, mas visible la imagen (menos velo).
             var v = Number(vis); if (!(v >= 10 && v <= 100)) v = 35;
             var a = (0.95 - (v / 100) * 0.8).toFixed(2);
-            el.style.backgroundImage = 'linear-gradient(rgba(255,255,255,' + a + '), rgba(255,255,255,' + a + ')), url("' + img + '")';
+            // Secciones con texto claro (testimonios) -> velo OSCURO; con texto
+            // oscuro (razones, sobre) -> velo CLARO. Asi el texto siempre se lee.
+            var velo = dark ? ('rgba(14,27,44,' + a + ')') : ('rgba(255,255,255,' + a + ')');
+            el.style.backgroundImage = 'linear-gradient(' + velo + ',' + velo + '), url("' + img + '")';
             el.style.backgroundSize = 'cover';
             el.style.backgroundPosition = 'center';
             el.classList.add('has-bg-image');
@@ -657,12 +662,27 @@
         var track = wrap.querySelector('.areas-carousel__track');
         var prev = wrap.querySelector('.areas-carousel__nav--prev');
         var next = wrap.querySelector('.areas-carousel__nav--next');
-        if (prev) prev.addEventListener('click', function () {
-            track.scrollBy({ left: -Math.round(track.clientWidth * 0.8), behavior: 'smooth' });
-        });
-        if (next) next.addEventListener('click', function () {
-            track.scrollBy({ left: Math.round(track.clientWidth * 0.8), behavior: 'smooth' });
-        });
+        var slidesEls = wrap.querySelectorAll('.area-slide');
+        var idx = 0;
+        var timer = null;
+
+        function go(n) {
+            if (!slidesEls.length) return;
+            idx = (n + slidesEls.length) % slidesEls.length;
+            var sl = slidesEls[idx];
+            track.scrollTo({ left: sl.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+        }
+        function play() { stop(); timer = setInterval(function () { go(idx + 1); }, 5000); }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+        if (prev) prev.addEventListener('click', function () { go(idx - 1); play(); });
+        if (next) next.addEventListener('click', function () { go(idx + 1); play(); });
+        // Avanza solo, y se pausa cuando el usuario interactúa (mouse o toque).
+        wrap.addEventListener('mouseenter', stop);
+        wrap.addEventListener('mouseleave', play);
+        track.addEventListener('touchstart', stop, { passive: true });
+        track.addEventListener('touchend', play, { passive: true });
+        if (slidesEls.length > 1) play();
     }
 
     try {

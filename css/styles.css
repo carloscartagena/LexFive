@@ -353,8 +353,8 @@ html[data-theme="dark"] .social-card--x .social-card__ico { background: #1a1a1a;
 .why::before { content: ""; position: absolute; inset: 0; background-image: var(--bg-pattern-section); background-size: var(--bg-tile); opacity: var(--section-pattern-opacity); pointer-events: none; }
 /* Cuando el bufete sube una imagen de fondo propia para la sección (desde el
    panel «Sitio web»), la imagen reemplaza al patrón: se oculta el ::before. */
-.about.has-bg-image::before, .why.has-bg-image::before { display: none; }
-.about.has-bg-image, .why.has-bg-image { background-size: cover; background-position: center; background-repeat: no-repeat; }
+.about.has-bg-image::before, .why.has-bg-image::before, .testimonials.has-bg-image::before { display: none; }
+.about.has-bg-image, .why.has-bg-image, .testimonials.has-bg-image { background-size: cover; background-position: center; background-repeat: no-repeat; }
 .why > .container { position: relative; z-index: 1; }
 .why__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .why-card { text-align: center; padding: 14px 12px; }
