@@ -618,3 +618,59 @@
         .catch(function () {});
     } catch (e) {}
 })();
+
+
+/* ---------- Áreas de práctica: carrusel dinámico desde Supabase ----------
+   El bufete administra las áreas desde el panel («Áreas de práctica»), cada una
+   con título, descripción e imagen. Aquí se cargan desde Supabase y se muestran
+   como carrusel, reemplazando las tarjetas estáticas. Si no hay datos o no hay
+   conexión, se mantienen las tarjetas por defecto que ya trae el HTML. */
+(function () {
+    var SB_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
+    var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
+    var ICON_AREA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M5 21V9m14 12V9M9 21V9m6 12V9M2 9l10-6 10 6"/></svg>';
+
+    function esc(s) {
+        return (s == null ? '' : String(s)).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    function render(areas) {
+        var grid = document.querySelector('.areas .areas__grid');
+        if (!grid || !areas || !areas.length) return;
+        var slides = areas.map(function (a) {
+            var img = a.imagen_url
+                ? '<div class="area-slide__img" style="background-image:url(\'' + esc(a.imagen_url) + '\')"></div>'
+                : '<div class="area-slide__img area-slide__img--empty">' + ICON_AREA + '</div>';
+            return '<article class="area-slide">' + img +
+                '<div class="area-slide__body"><h3 class="area-slide__title">' + esc(a.titulo) +
+                '</h3><p class="area-slide__text">' + esc(a.descripcion || '') + '</p></div></article>';
+        }).join('');
+        var wrap = document.createElement('div');
+        wrap.className = 'areas-carousel';
+        wrap.innerHTML =
+            '<button class="areas-carousel__nav areas-carousel__nav--prev" type="button" aria-label="Anterior">\u2039</button>' +
+            '<div class="areas-carousel__track">' + slides + '</div>' +
+            '<button class="areas-carousel__nav areas-carousel__nav--next" type="button" aria-label="Siguiente">\u203A</button>';
+        grid.replaceWith(wrap);
+        var track = wrap.querySelector('.areas-carousel__track');
+        var prev = wrap.querySelector('.areas-carousel__nav--prev');
+        var next = wrap.querySelector('.areas-carousel__nav--next');
+        if (prev) prev.addEventListener('click', function () {
+            track.scrollBy({ left: -Math.round(track.clientWidth * 0.8), behavior: 'smooth' });
+        });
+        if (next) next.addEventListener('click', function () {
+            track.scrollBy({ left: Math.round(track.clientWidth * 0.8), behavior: 'smooth' });
+        });
+    }
+
+    try {
+        fetch(SB_URL + '/rest/v1/areas_practica?select=titulo,descripcion,imagen_url,orden&activo=eq.true&order=orden.asc', {
+            headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+        })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (rows) { if (rows && rows.length) render(rows); })
+        .catch(function () {});
+    } catch (e) {}
+})();
