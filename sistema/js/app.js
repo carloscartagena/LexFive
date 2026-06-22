@@ -5056,7 +5056,6 @@ async function renderSitio() {
   try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) {}
   const b = (Branding && Branding.local) ? (Branding.local() || {}) : {};
   const heroActual = b.heroImg || null;
-  const bgActual = b.bgStyle || 'binario';
   const sobreActual = b.sobreImg || null;
   const heroBgActual = b.heroBgImg || null;
   const heroBgOpActual = bgOpOf('lexfive_herobg_op');
@@ -5066,13 +5065,6 @@ async function renderSitio() {
   const whyOpActual = bgOpOf('lexfive_whybg_op');
   const aboutOpActual = bgOpOf('lexfive_aboutbg_op');
   const testimonialsOpActual = bgOpOf('lexfive_testimonialsbg_op');
-
-  const BGS = [
-    { id: 'binario', label: 'Código binario', desc: 'Números 0 y 1 (tecnología). Recomendado.' },
-    { id: 'circuito', label: 'Circuito', desc: 'Líneas y nodos tipo placa.' },
-    { id: 'lineas', label: 'Líneas finas', desc: 'Trama diagonal discreta.' },
-    { id: 'ninguno', label: 'Ninguno', desc: 'Fondo liso, sin patrón.' }
-  ];
 
   // Caja reutilizable de vista previa + botones Subir/Ampliar/Quitar para una imagen.
   const cajaImg = (url, idSubir, idQuitar, idFile, idAmp) => `
@@ -5120,19 +5112,8 @@ async function renderSitio() {
     </div>
 
     <div class="card">
-      <div class="card__head"><h3>Fondo del sitio</h3></div>
+      <div class="card__head"><h3>Imagen de fondo del encabezado</h3></div>
       <div class="card__body">
-        <p class="cell-sub" style="margin-bottom:12px">Patrón que se ve, muy tenue, detrás de algunas secciones.</p>
-        <div class="bg-options">
-          ${BGS.map(o => `
-            <label class="bg-option${o.id === bgActual ? ' is-selected' : ''}">
-              <span class="bg-option__top"><input type="radio" name="bgStyle" value="${o.id}" ${o.id === bgActual ? 'checked' : ''}> <strong>${o.label}</strong></span>
-              <span class="cell-sub">${o.desc}</span>
-            </label>`).join('')}
-        </div>
-
-        <hr style="border:none;border-top:1px solid var(--line,rgba(0,0,0,.1));margin:20px 0">
-        <h4 style="margin:0 0 6px">Imagen de fondo del encabezado</h4>
         <p class="cell-sub" style="margin-bottom:12px">Opcional: una foto detrás del título del encabezado (hero). Horizontal/panorámica (ideal ~1920×1080 px); mejor si es <strong>oscura</strong>, porque el texto va encima. El sistema le pone <strong>automáticamente una capa oscura</strong> para que el título y los botones siempre se lean. Si la quita, vuelve el fondo por defecto.</p>
         ${cajaImg(heroBgActual, 'btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg', 'ampHeroBg')}
         ${sliderOpacidad('opHero', heroBgOpActual)}
@@ -5217,13 +5198,6 @@ async function renderSitio() {
     'Fondo de la sección «Sobre el bufete» actualizado. Se verá en la web en unos segundos.', 'Fondo quitado. Vuelve el patrón por defecto.');
   wireImagen('btnSubirTestiBg', 'btnQuitarTestiBg', 'fileTestiBg', 'ampTestiBg', testimonialsBgActual, 'Fondo de «Testimonios de clientes»', 'lexfive_testimonialsbg_url', 'testibg', 1920,
     'Fondo de la sección «Testimonios» actualizado. Se verá en la web en unos segundos.', 'Fondo quitado. Vuelve el patrón por defecto.');
-
-  content().querySelectorAll('input[name="bgStyle"]').forEach(r => r.onchange = async () => {
-    localStorage.setItem('lexfive_bg_style', r.value);
-    content().querySelectorAll('.bg-option').forEach(l => l.classList.toggle('is-selected', l.querySelector('input').checked));
-    await pushBranding();
-    toast('Fondo del sitio actualizado.', 'success');
-  });
 
   // Deslizadores de visibilidad: uno por cada imagen de fondo de sección.
   const wireOp = (id, lsKey) => {
