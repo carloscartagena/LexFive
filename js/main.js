@@ -513,6 +513,9 @@
             apply(next);
             try { localStorage.setItem('lexfive_theme', next); } catch (e) {}
             refresh();
+            // Avisamos a otros módulos (p. ej. fondos de sección) que el tema cambió,
+            // para que recalculen colores dependientes del modo claro/oscuro.
+            try { window.dispatchEvent(new Event('lexfive:themechange')); } catch (e) {}
         });
 
         var toggle = bar.querySelector('.nav__toggle');
@@ -533,9 +536,11 @@
     var SB_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
     var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
     var BG_VALIDOS = ['circuito', 'lineas', 'ninguno'];
+    var brandingActual = {}; // ultima config aplicada (para re-aplicar al cambiar de tema)
 
     function aplicar(b) {
         if (!b) return;
+        brandingActual = b; // recordamos la ultima config para re-aplicar al cambiar de tema
         if (b.heroImg) {
             var hp = document.querySelector('.hero__photo');
             if (hp && hp.getAttribute('src') !== b.heroImg) hp.setAttribute('src', b.heroImg);
@@ -592,9 +597,16 @@
             // vis (10-100): a mayor valor, mas visible la imagen (menos velo).
             var v = Number(vis); if (!(v >= 10 && v <= 100)) v = 35;
             var a = (0.9 - (v / 100) * 0.5).toFixed(2); // velo mas fuerte: el texto siempre se lee
-            // Secciones con texto claro (testimonios) -> velo OSCURO; con texto
-            // oscuro (razones, sobre) -> velo CLARO. Asi el texto siempre se lee.
-            var velo = dark ? ('rgba(14,27,44,' + a + ')') : ('rgba(255,255,255,' + a + ')');
+            // El velo debe contrastar con el color del texto de la seccion:
+            //  - texto CLARO  -> velo OSCURO
+            //  - texto OSCURO -> velo CLARO
+            // Testimonios siempre tiene texto claro (dark=true). Razones y Sobre
+            // el bufete tienen texto oscuro en modo claro, pero texto CLARO en
+            // modo oscuro: por eso, si el tema es oscuro, tambien usamos velo
+            // oscuro. Asi el texto siempre se lee en ambos modos.
+            var temaOscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+            var usarVeloOscuro = dark || temaOscuro;
+            var velo = usarVeloOscuro ? ('rgba(14,27,44,' + a + ')') : ('rgba(255,255,255,' + a + ')');
             el.style.backgroundImage = 'linear-gradient(' + velo + ',' + velo + '), url("' + img + '")';
             el.style.backgroundSize = 'cover';
             el.style.backgroundPosition = 'center';
@@ -609,6 +621,13 @@
 
     // 1) Pintado rápido con la última copia local.
     try { aplicar(JSON.parse(localStorage.getItem('lexfive_branding') || '{}')); } catch (e) {}
+
+    // Al cambiar entre modo claro y oscuro, el color del texto de las secciones
+    // cambia; por eso re-aplicamos el fondo para recalcular el velo (claro/oscuro)
+    // y que el texto siga siendo legible.
+    window.addEventListener('lexfive:themechange', function () {
+        try { aplicar(brandingActual); } catch (e) {}
+    });
 
     // 2) Refresco desde la nube (fuente de verdad para todos los dispositivos).
     try {
