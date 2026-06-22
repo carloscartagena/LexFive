@@ -24,15 +24,30 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000"
 
+# CSS y JS NO llevan versión en el nombre (styles.css, main.js, app.js...), así
+# que NO deben cachearse de forma "dura": el navegador debe revalidar siempre.
+# Con "no-cache" el navegador pregunta "¿cambió?" y recibe un 304 instantáneo si
+# no cambió, o la versión nueva si sí. Así los cambios se ven de inmediato tras
+# un despliegue, sin tener que forzar recarga (Ctrl+Shift+R).
 [[headers]]
   for = "/css/*"
   [headers.values]
-    Cache-Control = "public, max-age=604800"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=604800"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sistema/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sistema/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # El service worker no debe cachearse para que se actualice de inmediato
 [[headers]]
