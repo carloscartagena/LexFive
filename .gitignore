@@ -1,3 +1,39 @@
-# Python
+# ============================================================
+#  LexFive — Archivos que NO se versionan
+# ============================================================
+
+# --- Python (scripts/) ---
 __pycache__/
 *.pyc
+*.pyo
+.venv/
+venv/
+
+# --- Node / herramientas (scripts/gen_*.js) ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# --- Sistema operativo / editores ---
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.idea/
+.vscode/
+*.swp
+
+# --- Temporales / registros ---
+*.log
+*.tmp
+*.bak
+
+# ------------------------------------------------------------
+# NOTA: los manuales .docx/.pdf SÍ se versionan a propósito,
+# porque el equipo los descarga desde GitHub. Se generan con los
+# scripts de la carpeta scripts/ (generar_*.py). Si en el futuro
+# se prefiere no versionarlos, descomente las líneas siguientes
+# y ejecute:  git rm --cached *.docx *.pdf
+# *.docx
+# *.pdf
+# ------------------------------------------------------------

@@ -19,7 +19,7 @@
      segundo plano. Así el panel se siente rápido.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v39';
+const CACHE = 'lexfive-sistema-v40';
 const SHELL = [
   './',
   './index.html',
@@ -29,6 +29,7 @@ const SHELL = [
   './js/app.js',
   './js/auth.js',
   './js/config.js',
+  './js/icons.js',
   './js/supabase.js',
   './manifest.webmanifest',
   '../js/branding.js',
@@ -75,10 +76,36 @@ function fetchConTimeout(req, ms) {
 
 // Stale-while-revalidate: responde al instante con la copia en caché (si la
 // hay) y, en paralelo, actualiza la caché desde la red para la próxima vez.
-function staleWhileRevalidate(req) {
+// Si "avisar" es true (JS/CSS de la app) y la versión del servidor cambió
+// respecto a la copia en caché, avisa a las pestañas abiertas para que el
+// usuario pueda recargar y aplicar la nueva versión sin forzar nada.
+function staleWhileRevalidate(req, avisar) {
   return caches.match(req).then((cached) => {
-    const red = fetch(req).then((res) => actualizarCache(req, res)).catch(() => cached);
+    const red = fetch(req).then((res) => {
+      if (avisar && cached && res && res.ok && cambioDeVersion(cached, res)) notificarNuevaVersion();
+      return actualizarCache(req, res);
+    }).catch(() => cached);
     return cached || red;
+  });
+}
+
+// Compara dos respuestas por su validador HTTP (ETag o Last-Modified) para
+// saber si el archivo cambió en el servidor.
+function cambioDeVersion(a, b) {
+  const ea = a.headers.get('etag'), eb = b.headers.get('etag');
+  if (ea && eb) return ea !== eb;
+  const la = a.headers.get('last-modified'), lb = b.headers.get('last-modified');
+  if (la && lb) return la !== lb;
+  return false;
+}
+
+// Avisa UNA vez (por vida del SW) a todas las pestañas/clientes abiertos.
+let _avisoEnviado = false;
+function notificarNuevaVersion() {
+  if (_avisoEnviado) return;
+  _avisoEnviado = true;
+  self.clients.matchAll({ includeUncontrolled: true }).then((cs) => {
+    cs.forEach((c) => c.postMessage({ tipo: 'lexfive-nueva-version' }));
   });
 }
 
@@ -110,7 +137,7 @@ self.addEventListener('fetch', (event) => {
   // desde la caché (carga rápida en el celular) y se actualiza en segundo
   // plano, así la próxima carga ya trae la última versión tras un despliegue.
   if (/\.(?:m?js|css)$/i.test(url.pathname)) {
-    event.respondWith(staleWhileRevalidate(req));
+    event.respondWith(staleWhileRevalidate(req, true));
     return;
   }
 
