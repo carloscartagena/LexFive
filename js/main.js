@@ -572,6 +572,29 @@
         }
         if (BG_VALIDOS.indexOf(b.bgStyle) !== -1) document.documentElement.setAttribute('data-bg', b.bgStyle);
         else document.documentElement.removeAttribute('data-bg');
+
+        // Imagen de fondo OPCIONAL para las secciones «Razones para confiar»
+        // (.why) y «Sobre el bufete» (.about). Reemplaza al patrón con una capa
+        // clara automática para que el texto (oscuro) se siga leyendo. Si no hay
+        // imagen configurada, se mantiene el patrón por defecto.
+        aplicarFondoSeccion('.why', b.whyBgImg);
+        aplicarFondoSeccion('.about', b.aboutBgImg);
+    }
+
+    function aplicarFondoSeccion(sel, img) {
+        var el = document.querySelector(sel);
+        if (!el) return;
+        if (img) {
+            el.style.backgroundImage = 'linear-gradient(rgba(255,255,255,.82), rgba(255,255,255,.88)), url("' + img + '")';
+            el.style.backgroundSize = 'cover';
+            el.style.backgroundPosition = 'center';
+            el.classList.add('has-bg-image');
+        } else {
+            el.style.backgroundImage = '';
+            el.style.backgroundSize = '';
+            el.style.backgroundPosition = '';
+            el.classList.remove('has-bg-image');
+        }
     }
 
     // 1) Pintado rápido con la última copia local.
