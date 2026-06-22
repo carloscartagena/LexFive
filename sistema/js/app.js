@@ -946,6 +946,7 @@ function snapshotBranding() {
     whyBgOpacity: bgOpOf('lexfive_whybg_op'),
     aboutBgOpacity: bgOpOf('lexfive_aboutbg_op'),
     testimonialsBgOpacity: bgOpOf('lexfive_testimonialsbg_op'),
+    heroBgOpacity: bgOpOf('lexfive_herobg_op'),
     logosHidden: readList('lexfive_logos_hidden'),
     sellosHidden: readList('lexfive_sellos_hidden'),
     heroImg: (heroLS !== null) ? (heroLS || null) : (cache.heroImg || null),
@@ -1001,6 +1002,7 @@ async function hydrateBranding(force) {
     if (b.whyBgOpacity) localStorage.setItem('lexfive_whybg_op', b.whyBgOpacity);
     if (b.aboutBgOpacity) localStorage.setItem('lexfive_aboutbg_op', b.aboutBgOpacity);
     if (b.testimonialsBgOpacity) localStorage.setItem('lexfive_testimonialsbg_op', b.testimonialsBgOpacity);
+    if (b.heroBgOpacity) localStorage.setItem('lexfive_herobg_op', b.heroBgOpacity);
     localStorage.setItem('lexfive_logos_hidden', JSON.stringify(b.logosHidden || []));
     localStorage.setItem('lexfive_sellos_hidden', JSON.stringify(b.sellosHidden || []));
     // La nube es la fuente de verdad para la imagen propia.
@@ -5057,6 +5059,7 @@ async function renderSitio() {
   const bgActual = b.bgStyle || 'binario';
   const sobreActual = b.sobreImg || null;
   const heroBgActual = b.heroBgImg || null;
+  const heroBgOpActual = bgOpOf('lexfive_herobg_op');
   const aboutBgActual = b.aboutBgImg || null;
   const whyBgActual = b.whyBgImg || null;
   const testimonialsBgActual = b.testimonialsBgImg || null;
@@ -5132,6 +5135,7 @@ async function renderSitio() {
         <h4 style="margin:0 0 6px">Imagen de fondo del encabezado</h4>
         <p class="cell-sub" style="margin-bottom:12px">Opcional: una foto detrás del título del encabezado (hero). Horizontal/panorámica (ideal ~1920×1080 px); mejor si es <strong>oscura</strong>, porque el texto va encima. El sistema le pone <strong>automáticamente una capa oscura</strong> para que el título y los botones siempre se lean. Si la quita, vuelve el fondo por defecto.</p>
         ${cajaImg(heroBgActual, 'btnSubirHeroBg', 'btnQuitarHeroBg', 'fileHeroBg', 'ampHeroBg')}
+        ${sliderOpacidad('opHero', heroBgOpActual)}
       </div>
     </div>
 
@@ -5235,6 +5239,7 @@ async function renderSitio() {
   wireOp('opWhy', 'lexfive_whybg_op');
   wireOp('opAbout', 'lexfive_aboutbg_op');
   wireOp('opTesti', 'lexfive_testimonialsbg_op');
+  wireOp('opHero', 'lexfive_herobg_op');
 }
 
 // ============================================================
@@ -5974,7 +5979,7 @@ function optimizarFotoSitio(dataUrl, maxLado, cb) {
         const ctx = c.getContext('2d');
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cw, ch); // JPEG no tiene transparencia
         ctx.drawImage(img, 0, 0, cw, ch);
-        cb(c.toDataURL('image/jpeg', 0.85));
+        cb(c.toDataURL('image/jpeg', 0.72));
       } catch (e) { cb(dataUrl); }
     };
     img.onerror = () => cb(dataUrl);

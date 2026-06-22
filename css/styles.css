@@ -58,8 +58,11 @@ html[data-bg="ninguno"] { --bg-pattern: none; --bg-pattern-ink: none; }
 /* Patrón usado en secciones de fondo CLARO ("Razones para confiar", "Sobre el
    bufete"). En modo claro usa la versión oscura (navy) para que sea visible;
    en modo oscuro, como esas secciones se vuelven oscuras, usa la versión cian. */
-:root { --bg-pattern-section: var(--bg-pattern-ink); --section-pattern-opacity: .16; }
-html[data-theme="dark"] { --bg-pattern-section: var(--bg-pattern); --section-pattern-opacity: .10; }
+/* El patrón (binario/circuito) detrás de las secciones se quitó por pedido del
+   bufete: ya no es necesario. Las secciones quedan limpias (color sólido) salvo
+   que se les ponga una imagen de fondo. El encabezado (hero) conserva su patrón. */
+:root { --bg-pattern-section: var(--bg-pattern-ink); --section-pattern-opacity: 0; }
+html[data-theme="dark"] { --bg-pattern-section: var(--bg-pattern); --section-pattern-opacity: 0; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 

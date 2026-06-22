@@ -561,7 +561,9 @@
         var hero = document.querySelector('.hero');
         if (hero) {
             if (b.heroBgImg) {
-                hero.style.backgroundImage = 'linear-gradient(rgba(8,18,33,.72), rgba(10,22,38,.82)), url("' + b.heroBgImg + '")';
+                var hv = Number(b.heroBgOpacity); if (!(hv >= 10 && hv <= 100)) hv = 25;
+                var ha = (0.92 - (hv / 100) * 0.55).toFixed(2); // capa oscura graduable (texto legible)
+                hero.style.backgroundImage = 'linear-gradient(rgba(8,18,33,' + ha + '), rgba(10,22,38,' + ha + ')), url("' + b.heroBgImg + '")';
                 hero.style.backgroundSize = 'cover';
                 hero.style.backgroundPosition = 'center';
             } else {
@@ -589,7 +591,7 @@
         if (img) {
             // vis (10-100): a mayor valor, mas visible la imagen (menos velo).
             var v = Number(vis); if (!(v >= 10 && v <= 100)) v = 35;
-            var a = (0.95 - (v / 100) * 0.8).toFixed(2);
+            var a = (0.9 - (v / 100) * 0.5).toFixed(2); // velo mas fuerte: el texto siempre se lee
             // Secciones con texto claro (testimonios) -> velo OSCURO; con texto
             // oscuro (razones, sobre) -> velo CLARO. Asi el texto siempre se lee.
             var velo = dark ? ('rgba(14,27,44,' + a + ')') : ('rgba(255,255,255,' + a + ')');
