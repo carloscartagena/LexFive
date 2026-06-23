@@ -22,7 +22,7 @@ import { subirDocumento, enlaceDocumento } from './storage.js';
 import { openHoras } from './horas.js';
 import { mountOpinion } from './opiniones.js';
 import { supabase } from './supabase.js';
-import { openPlazos } from './app.js';
+import { openPlazos } from './agenda.js';
 
 // Construye el CSV de la lista de procesos (usa datos del panel, por eso vive
 // junto a la vista de Procesos en vez de en ./exportar.js).
