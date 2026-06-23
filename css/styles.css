@@ -375,6 +375,33 @@ html[data-theme="dark"] .about.has-bg-image,
 /* Las tarjetas de testimonios son casi transparentes; sobre una imagen propia
    se oscurecen un poco más para que el texto blanco contraste mejor. */
 .testimonials.has-bg-image .testimonial { background: rgba(7,15,26,.42); border-color: rgba(255,255,255,.16); }
+/* REFUERZO DE LEGIBILIDAD (Razones para confiar / Sobre el bufete):
+   estas dos secciones colocaban el texto directamente sobre la imagen y solo
+   se apoyaban en el velo + la sombra, por lo que sobre fotos claras o con
+   mucho detalle el texto se perdía y el control de opacidad casi no ayudaba.
+   Igual que los testimonios, ahora el contenido recibe un PANEL semitransparente
+   (efecto cristal) que garantiza el contraste sobre CUALQUIER imagen.
+   Modo claro -> panel claro con texto oscuro · Modo oscuro -> panel oscuro con texto claro. */
+.why.has-bg-image .why-card,
+.about.has-bg-image .about__content {
+    background: rgba(255,255,255,.9);
+    border: 1px solid rgba(15,30,52,.08);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    box-shadow: var(--shadow-md);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    /* dentro del panel el texto ya contrasta: la sombra estorba, se anula */
+    text-shadow: none;
+}
+html[data-theme="dark"] .why.has-bg-image .why-card,
+html[data-theme="dark"] .about.has-bg-image .about__content {
+    background: rgba(12,22,38,.84);
+    border-color: rgba(255,255,255,.14);
+    box-shadow: 0 12px 32px rgba(0,0,0,.5);
+}
+/* En el panel claro, los párrafos atenuados (gris) se oscurecen para leerse mejor. */
+.why.has-bg-image .why-card p { color: var(--ink); }
 .why > .container { position: relative; z-index: 1; }
 .why__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .why-card { text-align: center; padding: 14px 12px; }
