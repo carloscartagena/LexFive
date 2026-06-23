@@ -19,7 +19,7 @@
      segundo plano. Así el panel se siente rápido.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v59';
+const CACHE = 'lexfive-sistema-v60';
 const SHELL = [
   './',
   './index.html',
@@ -31,6 +31,7 @@ const SHELL = [
   './js/areas.js',
   './js/auth.js',
   './js/blog.js',
+  './js/branding.js',
   './js/branding-catalogos.js',
   './js/categorias.js',
   './js/comunes.js',
