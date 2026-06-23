@@ -25,8 +25,9 @@ import { abrirImpresion } from './print.js';
 import { renderReportes } from './reportes.js';
 import { renderFinanzas, openHonorarios } from './finanzas.js';
 import { renderPapelera } from './papelera.js';
-import { optimizarFotoSitio, ampliarImagenSitio } from './imagenes.js';
+import { optimizarFotoSitio, ampliarImagenSitio, redimensionarDataUrl } from './imagenes.js';
 import { renderAreas } from './areas.js';
+import { normCred, CredStore } from './credstore.js';
 
 // ---------- Estado global ----------
 // El objeto state se movió a ./state.js (se importa arriba) para poder
@@ -166,65 +167,8 @@ function procesosToCSV(rows) {
 //  y eliminar IGUAL desde cualquier dispositivo del bufete.
 //  Se mantiene una caché local para pintar rápido y tolerar cortes de red.
 // ============================================================
-// Convierte una fila de la tabla (snake_case) al formato que usa la interfaz.
-function normCred(r) {
-  r = r || {};
-  return {
-    id: r.id,
-    nombre: r.nombre || '', cargo: r.cargo || '', ci: r.ci || '',
-    telPersonal: r.tel_personal || '', telOficina: r.tel_oficina || '',
-    emision: r.emision || '', validez: r.validez || '',
-    frase: r.frase || '', representacion: r.representacion || '',
-    foto: r.foto || null
-  };
-}
-const CredStore = {
-  cache: null,
-  // Devuelve la caché en memoria al instante si ya existe (para que los
-  // re-render de la pestaña —al elegir/subir/eliminar un logo o sello— NO
-  // vuelvan a descargar las credenciales de la nube y se sientan rápidos).
-  // Solo va a la red la primera vez o cuando la caché se invalidó tras
-  // guardar/eliminar una credencial.
-  async listCached() {
-    if (this.cache) return this.cache;
-    return this.list();
-  },
-  // Trae las credenciales de la nube (y guarda copia local por si no hay red).
-  async list() {
-    try {
-      const { data, error } = await supabase
-        .from('credenciales').select('*').order('updated_at', { ascending: false });
-      if (error) throw error;
-      this.cache = (data || []).map(normCred);
-      try { localStorage.setItem('lexfive_cred_cache', JSON.stringify(this.cache)); } catch (e) {}
-      return this.cache;
-    } catch (e) {
-      if (this.cache) return this.cache;
-      try { return JSON.parse(localStorage.getItem('lexfive_cred_cache') || '[]'); } catch (e2) { return []; }
-    }
-  },
-  // Crea o actualiza una credencial en la nube. Devuelve la fila guardada.
-  async upsert(rec) {
-    const row = {
-      nombre: rec.nombre || '', cargo: rec.cargo || null, ci: rec.ci || null,
-      tel_personal: rec.telPersonal || null, tel_oficina: rec.telOficina || null,
-      emision: rec.emision || null, validez: rec.validez || null,
-      frase: rec.frase || null, representacion: rec.representacion || null,
-      foto: rec.foto || null, updated_at: new Date().toISOString()
-    };
-    if (rec.id) row.id = rec.id;
-    const { data, error } = await supabase.from('credenciales').upsert(row).select().maybeSingle();
-    if (error) throw error;
-    this.cache = null; // forzar relectura desde la nube en el próximo render
-    return normCred(data);
-  },
-  // Elimina una credencial de la nube.
-  async remove(id) {
-    const { error } = await supabase.from('credenciales').delete().eq('id', id);
-    if (error) throw error;
-    this.cache = null;
-  }
-};
+// normCred y CredStore (almacén de credenciales en la nube) se movieron a
+// ./credstore.js (se importan arriba).
 // Credencial que se está editando en este momento (null = se creará una nueva).
 let credEditId = null;
 
@@ -3945,24 +3889,7 @@ function leerImagenBufete(file, kind, done) {
 // Redimensiona una imagen (data URL) para que su lado mayor no supere "maxLado",
 // recomprimiéndola en PNG (conserva transparencia). Si ya es pequeña o algo falla,
 // devuelve la original. Reduce mucho el peso de logos/sellos subidos como foto.
-function redimensionarDataUrl(dataUrl, maxLado, cb) {
-  try {
-    const img = new Image();
-    img.onload = () => {
-      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
-      if (!w || !h || (w <= maxLado && h <= maxLado)) { cb(dataUrl); return; }
-      const esc = Math.min(maxLado / w, maxLado / h);
-      const cw = Math.max(1, Math.round(w * esc)), ch = Math.max(1, Math.round(h * esc));
-      try {
-        const c = document.createElement('canvas'); c.width = cw; c.height = ch;
-        c.getContext('2d').drawImage(img, 0, 0, cw, ch);
-        cb(c.toDataURL('image/png'));
-      } catch (e) { cb(dataUrl); }
-    };
-    img.onerror = () => cb(dataUrl);
-    img.src = dataUrl;
-  } catch (e) { cb(dataUrl); }
-}
+// redimensionarDataUrl se movió a ./imagenes.js (se importa arriba).
 
 // Editor de imagen para logos/sellos: recortar (cuadrado), acercar, opcionalmente quitar
 // el fondo blanco, y exportar en PNG al tamaño exacto que necesita el sistema.
