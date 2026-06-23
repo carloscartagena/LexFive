@@ -29,6 +29,7 @@ import { optimizarFotoSitio, ampliarImagenSitio, redimensionarDataUrl } from './
 import { renderAreas } from './areas.js';
 import { normCred, CredStore } from './credstore.js';
 import { openHoras } from './horas.js';
+import { BRAND_LOGOS, BRAND_SELLOS, BRAND_LOGO_DEFAULT, BRAND_SELLO_DEFAULT, brandHidden, brandLogosVisibles, brandSellosVisibles } from './branding-catalogos.js';
 
 // ---------- Estado global ----------
 // El objeto state se movió a ./state.js (se importa arriba) para poder
@@ -2709,35 +2710,9 @@ async function renderTestimonios() {
 //  Se comparten entre la pestaña «Sellos y logos» (renderSellos) y la
 //  marca de agua de la credencial (renderCredenciales).
 // ============================================================
-const BRAND_LOGOS = [
-  { id: 'ds1-balanza-codigo', nombre: 'Emblema · Balanza' },
-  { id: 'ds2-L5-circuito', nombre: 'Emblema · Monograma L5' },
-  { id: 'ds3-mazo-pulso', nombre: 'Emblema · Mazo del juez' },
-  { id: 'ds4-columna-circuito', nombre: 'Emblema · Templo de justicia' },
-  { id: 'ds5-balanza-chip', nombre: 'Emblema · Balanza en chip' },
-  { id: 'opcion-6-LF-circuito', nombre: 'Monograma LF con circuito' },
-  { id: 'ds7-balanza-binario', nombre: 'Balanza · Código binario' },
-  { id: 'ds8-balanza-red', nombre: 'Balanza · Red de nodos' },
-  { id: 'ds9-codigo-justicia', nombre: 'Balanza · Código </>' },
-  { id: 'ds10-engranaje-ley', nombre: 'Balanza · Engranaje' },
-  { id: 'ds11-LF-binario', nombre: 'Monograma LF · Binario' },
-  { id: 'ds12-buho-circuito', nombre: 'Búho · Circuito' },
-  { id: 'ds13-buho-hexagono', nombre: 'Búho · Hexágono tech' },
-  { id: 'ds14-buho-balanza', nombre: 'Búho · Balanza' }
-];
-const BRAND_LOGO_DEFAULT = 'ds1-balanza-codigo';
-const BRAND_SELLOS = [
-  { id: 'sello-1-clasico', nombre: 'Clásico — balanza' },
-  { id: 'sello-2-mazo', nombre: 'Mazo del juez' },
-  { id: 'sello-3-ovalado', nombre: 'Ovalado institucional' },
-  { id: 'sello-4-circuito', nombre: 'Derecho & Tecnología' },
-  { id: 'sello-5-columnas', nombre: 'Templo de justicia' }
-];
-const BRAND_SELLO_DEFAULT = 'sello-1-clasico';
-
-function brandHidden(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch (e) { return []; } }
-function brandLogosVisibles() { const h = brandHidden('lexfive_logos_hidden'); return BRAND_LOGOS.filter(l => h.indexOf(l.id) === -1); }
-function brandSellosVisibles() { const h = brandHidden('lexfive_sellos_hidden'); return BRAND_SELLOS.filter(s => h.indexOf(s.id) === -1); }
+// El catálogo de logos/sellos (BRAND_LOGOS, BRAND_SELLOS, *_DEFAULT, brandHidden,
+// brandLogosVisibles, brandSellosVisibles) se movió a ./branding-catalogos.js
+// (se importan arriba). findCustomLogo/findCustomSello usan IMG y se quedan aquí.
 function findCustomLogo(cid) { return IMG.logosCustom.find(x => x && x.id === cid); }
 function findCustomSello(sid) { return IMG.sellosCustom.find(x => x && x.id === sid); }
 function pickActiveLogo(saved) {
