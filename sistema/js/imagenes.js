@@ -48,3 +48,26 @@ export function ampliarImagenSitio(src, titulo) {
   o.querySelector('#aiClose').onclick = close;
   o.onclick = e => { if (e.target === o) close(); };
 }
+
+
+// Redimensiona una imagen (data URL) para que su lado mayor no supere "maxLado",
+// recomprimiéndola en PNG (conserva transparencia). Si ya es pequeña o algo
+// falla, devuelve la original. Reduce el peso de logos/sellos subidos como foto.
+export function redimensionarDataUrl(dataUrl, maxLado, cb) {
+  try {
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      if (!w || !h || (w <= maxLado && h <= maxLado)) { cb(dataUrl); return; }
+      const escala = Math.min(maxLado / w, maxLado / h);
+      const cw = Math.max(1, Math.round(w * escala)), ch = Math.max(1, Math.round(h * escala));
+      try {
+        const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+        c.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        cb(c.toDataURL('image/png'));
+      } catch (e) { cb(dataUrl); }
+    };
+    img.onerror = () => cb(dataUrl);
+    img.src = dataUrl;
+  } catch (e) { cb(dataUrl); }
+}
