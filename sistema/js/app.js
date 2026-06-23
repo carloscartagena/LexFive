@@ -2,53 +2,38 @@
 //  LexFive — Sistema de Gestión Legal · Lógica principal
 // ============================================================
 import { supabase } from './supabase.js';
-import { requireAuth, getProfile, signOut, signOutTo, logAccion, can, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from './auth.js';
-import { ROLES, ESTADOS, MATERIAS, WHATSAPP, ABOGADOS, VAPID_PUBLIC_KEY } from './config.js';
+import { requireAuth, signOut, signOutTo, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from './auth.js';
+import { ROLES, VAPID_PUBLIC_KEY } from './config.js';
 import { ICON } from './icons.js';
-import { esc, hoyISO, addAnios, fmtFechaCorta, qrURL, RPA_URL, SITIO_URL, qrPersona, resaltarRepre, fmtDate, fmtDateTime, fmtHora, initials, esEmailValido } from './util.js';
-import { descargarArchivo, srcDe, pad2, icsFecha, icsEscape, buildICS, googleCalURL, sumarDiasHabiles, fmtMoneda, clientesToCSV, honorariosToCSV, montoEnLetras } from './exportar.js';
+import { esc, hoyISO, fmtDate, fmtDateTime, initials } from './util.js';
 import { $, content } from './dom.js';
-import { paginar, pagerHTML, wirePager, barChart, toast, flashAutosave, tip, hint, initTooltipEngine, loading, openModal, closeModal } from './ui.js';
+import { toast, tip, initTooltipEngine, loading, openModal, closeModal } from './ui.js';
 import { state } from './state.js';
-import { loadCategorias, categoriaOptions, wireCategoriaSelect, renderCategorias } from './categorias.js';
-import { profName, clienteName, badgeEstado, optionsProfiles, checkboxesProfiles, namesFromIds, optionsClientes } from './comunes.js';
+import { renderCategorias } from './categorias.js';
+import { clienteName } from './comunes.js';
 import { renderConsultas, consultaNombre, openConsultaDetail } from './consultas.js';
-import { loadProfiles, loadClientes } from './datos.js';
+import { loadProfiles } from './datos.js';
 import { renderUsuarios, renderAuditoria } from './admin.js';
-import { Draft, wireDraft, maybeOfferDraft } from './draft.js';
 import { renderBlog } from './blog.js';
 import { renderPlantillas } from './plantillas.js';
-import { subirDocumento, enlaceDocumento, subirImagenBranding } from './storage.js';
 import { renderModelos } from './modelos.js';
-import { renderTareas, TAREA_PRIOR } from './tareas.js';
-import { abrirImpresion } from './print.js';
+import { renderTareas } from './tareas.js';
 import { renderReportes } from './reportes.js';
-import { renderFinanzas, openHonorarios } from './finanzas.js';
+import { renderFinanzas } from './finanzas.js';
 import { renderPapelera } from './papelera.js';
-import { abrirEditorImagen } from './imagenes.js';
 import { renderAreas } from './areas.js';
 import { renderSitio } from './sitio.js';
 import { renderSellos } from './sellos.js';
 import { renderCredenciales, renderCredGuardadas } from './credenciales.js';
 import { renderCertificados } from './certificados.js';
-import { mountOpinion, renderMiOpinion, renderTestimonios } from './opiniones.js';
+import { renderMiOpinion, renderTestimonios } from './opiniones.js';
 import { renderClientes, clienteForm } from './clientes.js';
 import { renderProcesos, openProcesoDetail } from './procesos.js';
 import { renderAgenda } from './agenda.js';
 import { renderDashboard } from './dashboard.js';
 import { updateNovedadesBadge, renderNovedades, renderMisProcesos } from './portal-cliente.js';
-import { normCred, CredStore } from './credstore.js';
-import { openHoras } from './horas.js';
-import { BRAND_LOGOS, BRAND_SELLOS, BRAND_LOGO_DEFAULT, BRAND_SELLO_DEFAULT, brandHidden, brandLogosVisibles, brandSellosVisibles } from './branding-catalogos.js';
-import { ImgDB, IMG, ensureImgCache, guardarImagen, borrarImagen, saveLogosCustom, saveSellosCustom, findCustomLogo, findCustomSello } from './media.js';
-import { wmOpacityActual, applyWmOpacity, bgOpOf, Branding, Galerias, snapshotGalerias, pushGalerias, snapshotBranding, lastBrandingPush, pushBranding, hydrateBranding, brandingHydrated, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, nombreLogoArchivo, nombreSelloArchivo, applyLogo } from './branding.js';
-
-// ---------- Estado global ----------
-// El objeto state se movió a ./state.js (se importa arriba) para poder
-// compartirlo con los módulos de vistas.
-
-// ---------- Iconos ----------
-// El objeto ICON se movió a ./icons.js y se importa arriba.
+import { IMG, ensureImgCache } from './media.js';
+import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from './branding.js';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
@@ -76,12 +61,6 @@ const NAV = [
 ];
 // credOnly = solo administrador y abogado (NO procurador ni cliente)
 
-// ============================================================
-//  Utilidades de interfaz
-// ============================================================
-// Los atajos $ y content están en ./dom.js; los helpers de UI (paginación,
-// toast, modal, tooltips, etc.) en ./ui.js. Ambos se importan arriba.
-
 // Barra discreta que avisa cuando hay una versión nueva del panel disponible
 // (la detecta el Service Worker). Con un botón para recargar y aplicarla.
 let _avisoActualizacionVisible = false;
@@ -100,85 +79,6 @@ function mostrarAvisoActualizacion() {
   bar.querySelector('#updateNow').onclick = () => location.reload();
   bar.querySelector('#updateLater').onclick = cerrar;
 }
-
-// ---------- Utilidades puras ----------
-// Las funciones esc, fmtDate, fmtDateTime, fmtHora, hoyISO, addAnios,
-// fmtFechaCorta, qrURL, qrPersona, resaltarRepre, initials, esEmailValido y las
-// constantes RPA_URL / SITIO_URL se movieron a ./util.js y se importan arriba.
-
-// ============================================================
-//  Utilidades de exportación (descargas, calendario .ics, CSV)
-// ============================================================
-// descargarArchivo, srcDe, pad2, icsFecha, icsEscape, buildICS, googleCalURL,
-// sumarDiasHabiles, fmtMoneda, clientesToCSV, honorariosToCSV y montoEnLetras
-// se movieron a ./exportar.js y se importan arriba.
-
-// --- Operaciones de Storage con TIEMPO LÍMITE ---------------------------------
-// subirDocumento, enlaceDocumento y subirImagenBranding se movieron a
-// ./storage.js (se importan arriba).
-
-// ICS/calendario movidos a ./exportar.js (pad2, icsFecha, icsEscape, buildICS).
-
-// Descarga la audiencia de un proceso como archivo de calendario.
-function descargarICS(proc) {
-  const ics = buildICS(proc);
-  if (!ics) { toast('Este proceso no tiene fecha de audiencia.', 'error'); return; }
-  const nombre = 'audiencia-' + (proc.caratula || 'proceso').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40) + '.ics';
-  descargarArchivo(nombre, ics, 'text/calendar;charset=utf-8');
-  toast('Evento descargado. Ábralo para agregarlo a su calendario.', 'success');
-}
-
-// googleCalURL y sumarDiasHabiles se movieron a ./exportar.js.
-
-
-// fmtMoneda, clientesToCSV, honorariosToCSV y montoEnLetras se movieron a
-// ./exportar.js; procesosToCSV se movió a ./procesos.js (junto a su vista).
-
-
-// ============================================================
-//  Utilidades de interfaz (paginación, barras, toast, tooltips, modal)
-//  Se movieron a ./ui.js y se importan arriba.
-// ============================================================
-
-
-
-
-// ============================================================
-//  BORRADORES — autoguardado para no perder lo que se está escribiendo
-//  (p. ej. la descripción de un caso o un memorial largo). Se guarda en
-//  el navegador, por usuario, y se recupera aunque la sesión se cierre
-//  por inactividad o se cierre el navegador.
-// ============================================================
-// El sistema de borradores (Draft, wireDraft, maybeOfferDraft) se movió a
-// ./draft.js (se importa arriba).
-
-// ============================================================
-//  Credenciales guardadas (compartidas en la nube vía Supabase).
-//  Antes la credencial solo se autoguardaba como un único borrador
-//  local, así que al crear otra se perdía la anterior y no se veía en
-//  otros equipos. Ahora cada credencial creada se GUARDA en la tabla
-//  "credenciales" de Supabase, por lo que se puede EDITAR, REIMPRIMIR
-//  y eliminar IGUAL desde cualquier dispositivo del bufete.
-//  Se mantiene una caché local para pintar rápido y tolerar cortes de red.
-// ============================================================
-// normCred y CredStore (almacén de credenciales en la nube) se movieron a
-// ./credstore.js (se importan arriba).
-
-// ============================================================
-//  Almacén de imágenes del bufete (logo y sello) en IndexedDB.
-//  Antes se guardaban en localStorage, pero las imágenes en base64
-//  son grandes y llenaban el cupo (~5MB), lo que hacía que el
-//  autoguardado de la credencial fallara y se perdieran datos.
-//  IndexedDB tiene mucho más espacio y resuelve ese problema.
-// ============================================================
-// El almacén de imágenes (ImgDB, IMG, ensureImgCache, guardarImagen,
-// borrarImagen, saveLogosCustom, saveSellosCustom, findCustomLogo,
-// findCustomSello) se movió a ./media.js (se importa arriba).
-
-// ---- Intensidad (opacidad) de la marca de agua del logo en la credencial ----
-// Se guarda como porcentaje (3–40) y se sincroniza con los demás dispositivos
-// junto al resto del branding.
-// Opacidades (wmOpacityActual, applyWmOpacity, bgOpOf) se movieron a ./branding.js.
 
 // ---- Indicador de "sin conexión" (offline) ----
 // Avisa cuando no hay internet: los cambios se guardan localmente y se
@@ -305,12 +205,6 @@ function revisarRespaldoConDump(dump, nombre) {
 //  se guarda en la nube (tabla "configuracion", clave 'branding')
 //  y se aplica igual en todos los dispositivos y en la web pública.
 // ============================================================
-// El motor de branding (Branding, Galerias, snapshotGalerias, pushGalerias,
-// snapshotBranding, pushBranding, hydrateBranding y lastBrandingPush) se movió a
-// ./branding.js (se importan arriba). El canal en tiempo real se queda aquí
-// porque refresca las vistas Sellos/Credenciales.
-
-// ============================================================
 //  Branding en tiempo real: si el logo o el sello del bufete cambia en
 //  otro dispositivo, este equipo lo aplica al instante (sin recargar).
 //  Requiere haber ejecutado db/18_realtime_branding.sql en Supabase.
@@ -345,31 +239,6 @@ function subscribeBrandingRealtime() {
   } catch (e) { brandingRealtimeOn = false; }
 }
 
-// draftAgo, wireDraft y maybeOfferDraft se movieron a ./draft.js (se importan arriba).
-
-// Helpers comunes de presentación (profName, clienteName, badgeEstado,
-// optionsProfiles, checkboxesProfiles, namesFromIds, optionsClientes) se
-// movieron a ./comunes.js (se importan arriba).
-
-// ============================================================
-//  Carga de datos comunes
-// ============================================================
-// loadProfiles y loadClientes se movieron a ./datos.js (se importan arriba).
-
-// ---------- Categorías / áreas del derecho (dinámicas) ----------
-// loadCategorias, categoriaOptions, crearCategoria, wireCategoriaSelect,
-// renombrarCategoria, eliminarCategoria y renderCategorias se movieron a
-// ./categorias.js (se importan arriba).
-
-// ============================================================
-//  VISTA: CATEGORÍAS / ÁREAS DEL DERECHO (solo admin)
-// ============================================================
-// renderCategorias se movió a ./categorias.js (se importa arriba).
-
-
-// La vista «Dashboard» (renderDashboard) y el recordatorio de audiencia por
-// WhatsApp/correo (recordarPorWhatsApp) se movieron a ./dashboard.js (renderDashboard
-// se importa arriba). waRecordatorio era código muerto y se eliminó.
 
 // ============================================================
 //  SEGURIDAD: verificación en dos pasos (2FA / TOTP)
@@ -535,128 +404,6 @@ function urlBase64ToUint8Array(base64String) {
   for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
   return arr;
 }
-
-
-// La vista «Agenda/Calendario» (renderAgenda + descargarICSEvento) y la gestión
-// de plazos de un proceso (openPlazos) se movieron a ./agenda.js (renderAgenda se
-// importa arriba; openPlazos lo importa ./procesos.js desde ./agenda.js).
-// ============================================================
-//  VISTA: TAREAS / PENDIENTES  (tablero del equipo)
-// ============================================================
-// La vista de Tareas (TAREA_ESTADOS, renderTareas, tareaForm, saveTarea,
-// toggleTareaEstado, deleteTarea) se movió a ./tareas.js. Se importan arriba
-// renderTareas y TAREA_PRIOR (este último lo usa el Dashboard).
-
-
-// ============================================================
-//  HONORARIOS y PAGOS de un proceso  (solo admin y abogado)
-// ============================================================
-// openHonorarios (gestión de honorarios y pagos de un proceso) se movió a
-// ./finanzas.js (se importa arriba; lo usan Finanzas y Procesos).
-
-// ============================================================
-//  REGISTRO DE HORAS de un proceso  (time tracking · admin/abogado)
-// ============================================================
-// fmtDuracion y openHoras se movieron a ./horas.js (se importa openHoras arriba).
-
-// ============================================================
-//  VISTA: FINANZAS  (resumen de honorarios por proceso · admin/abogado)
-// ============================================================
-// renderFinanzas (cartera de honorarios/pagos) se movió a ./finanzas.js
-// (se importa arriba).
-
-// ============================================================
-//  VISTA: REPORTES  (procesos por estado, materia y abogado, por período)
-// ============================================================
-// renderReportes (estadísticas de procesos y cobranza) se movió a ./reportes.js
-// (se importa arriba).
-
-// ============================================================
-//  VISTA: PLANTILLAS DE MEMORIALES  (texto con campos que se rellenan)
-// ============================================================
-// Toda la vista de Plantillas (motor de campos {{...}}, generación e impresión
-// y la vista en sí) se movió a ./plantillas.js (se importa renderPlantillas).
-
-// HTML imprimible / Word del memorial generado.
-// Abre una ventana con cabecera de LexFive lista para imprimir o guardar como PDF.
-// abrirImpresion (impresión con membrete del bufete) se movió a ./print.js
-// (se importa arriba).
-
-// Genera e imprime un recibo de un pago concreto (imprimirReciboPago) se movió
-// a ./finanzas.js.
-
-// El bloque «Certificados y constancias» (renderCertificados + CERT_PLANTILLAS +
-// urlAbs/fechaLarga/qrCertificado/buildCertDoc/abrirImpresionCert) se movió a
-// ./certificados.js (renderCertificados se importa arriba).
-
-// renderPlantillas (y plantillaForm/savePlantilla/deletePlantilla/usarPlantilla)
-// se movió a ./plantillas.js (se importa renderPlantillas arriba).
-
-// El portal del cliente (Novedades: fetchNovedades/updateNovedadesBadge/
-// renderNovedades; y Mis procesos: renderMisProcesos/descargarEstadoCuenta) se
-// movió a ./portal-cliente.js (updateNovedadesBadge/renderNovedades/renderMisProcesos
-// se importan arriba).
-
-
-// El bloque «Opiniones y testimonios» (starsHtml + mountOpinion + renderMiOpinion
-// + renderTestimonios) se movió a ./opiniones.js (mountOpinion/renderMiOpinion/
-// renderTestimonios se importan arriba).
-
-// ============================================================
-//  VISTA: MODELOS DE MEMORIALES (biblioteca reutilizable, solo personal)
-// ============================================================
-// renderModelos se movió a ./modelos.js (se importa arriba).
-
-// ============================================================
-//  VISTA: CONSULTAS (bandeja del formulario de contacto de la web)
-// ============================================================
-// La vista de Consultas (consultaNombre, consultaEstadoBadge, waLinkTel,
-// renderConsultas, openConsultaDetail, setConsultaEstado, deleteConsulta) se
-// movió a ./consultas.js (se importan arriba renderConsultas, consultaNombre y
-// openConsultaDetail; las demás son internas del módulo).
-
-// ============================================================
-//  VISTA: CREDENCIALES Y ACCESOS (solo administrador y abogados)
-//  Genera una credencial/carnet del bufete para el usuario, lista para
-//  imprimir. El administrador y los abogados son los únicos que la ven;
-//  ellos entregan las credenciales a sus procuradores.
-// ============================================================
-// ============================================================
-//  Catálogo y utilidades de branding (logo y sello del bufete).
-//  Se comparten entre la pestaña «Sellos y logos» (renderSellos) y la
-//  marca de agua de la credencial (renderCredenciales).
-// ============================================================
-// El catálogo de logos/sellos (BRAND_LOGOS, BRAND_SELLOS, *_DEFAULT, brandHidden,
-// brandLogosVisibles, brandSellosVisibles) se movió a ./branding-catalogos.js
-// (se importan arriba). findCustomLogo/findCustomSello usan IMG y se quedan aquí.
-// findCustomLogo/findCustomSello se movieron a ./media.js (se importan arriba).
-// pickActiveLogo/pickActiveSello/brandLogoSrc/brandSelloSrc/nombreLogoArchivo/
-// nombreSelloArchivo se movieron a ./branding.js (se importan arriba).
-
-// El bloque «Sellos y logos» (renderSellos + previewBrandImage/seleccionarLogo/
-// seleccionarSello/leerImagenBufete) se movió a ./sellos.js (renderSellos se importa arriba).
-
-// ============================================================
-//  Pestaña «Sitio web»: el bufete controla la IMAGEN principal (hero) y el
-//  ESTILO DE FONDO del sitio público. Se guardan en la nube (config
-//  'branding', campos heroImg/bgStyle) y la web los aplica automáticamente.
-// ============================================================
-// La vista «Sitio web» (renderSitio + sus helpers cajaImg/sliderOpacidad/
-// wireImagen/wireOp) se movió a ./sitio.js (se importa renderSitio arriba).
-
-// ============================================================
-//  VISTA: ÁREAS DE PRÁCTICA (carrusel de la web pública)
-//  Tabla areas_practica (db/27_areas_practica.sql). Cada área tiene
-//  título, descripción e imagen. Se administran aquí y se muestran
-//  como carrusel en la página de inicio.
-// ============================================================
-// La vista de Áreas de práctica (renderAreas + paintAreas/formArea/guardarArea/
-// eliminarArea/moverArea y su caché) se movió a ./areas.js (se importa
-// renderAreas arriba).
-
-// El bloque «Credenciales y accesos» (renderCredenciales + renderCredGuardadas +
-// imprimirCredencial + credEditId) se movió a ./credenciales.js (las vistas se
-// importan arriba). verImagenGrande era código muerto y se eliminó en este paso.
 
 // ============================================================
 //  Navegación
