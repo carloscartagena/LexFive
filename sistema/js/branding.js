@@ -145,7 +145,9 @@ export async function pushBranding() {
   return ok;
 }
 
-let brandingHydrated = false;
+// Estado de hidratación del branding desde la nube. Export "vivo": app.js y
+// las vistas (sellos, credenciales) lo leen para saber si deben pedir red.
+export let brandingHydrated = false;
 export async function hydrateBranding(force) {
   if (brandingHydrated && !force) {
     const lg = localStorage.getItem('lexfive_logo'); if (lg) applyLogo(lg);
