@@ -20,6 +20,7 @@ import { loadClientes } from './datos.js';
 import { Draft, wireDraft, maybeOfferDraft } from './draft.js';
 import { subirDocumento, enlaceDocumento } from './storage.js';
 import { openHoras } from './horas.js';
+import { openHonorarios } from './finanzas.js';
 import { mountOpinion } from './opiniones.js';
 import { supabase } from './supabase.js';
 import { openPlazos } from './agenda.js';

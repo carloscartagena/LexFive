@@ -84,7 +84,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=20260624">
+    <link rel="manifest" href="sistema/manifest.webmanifest">
+    <meta name="theme-color" content="#0e1b2c">
+    <link rel="apple-touch-icon" href="assets/pwa/icon-192.png">
     <script>(function(){try{var t=localStorage.getItem('lexfive_theme')||'dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
 <!-- Para cambiar la paleta de color, añade una clase al body:
@@ -837,7 +840,7 @@
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
     </button>
 
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=20260624"></script>
     <script type="module">
       // Carga dinámica de testimonios aprobados desde el panel (Supabase)
       import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';

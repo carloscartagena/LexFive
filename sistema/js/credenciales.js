@@ -16,6 +16,7 @@ import { state } from './state.js';
 import { Draft } from './draft.js';
 import { CredStore } from './credstore.js';
 import { ImgDB, IMG, ensureImgCache, guardarImagen, borrarImagen } from './media.js';
+import { abrirEditorImagen } from './imagenes.js';
 import { wmOpacityActual, applyWmOpacity, pushBranding, hydrateBranding, brandingHydrated, pickActiveLogo, pickActiveSello } from './branding.js';
 import { navigate } from './app.js';
 

@@ -7,7 +7,7 @@
 import { logAccion, can } from './auth.js';
 import { ICON } from './icons.js';
 import { esc, hoyISO, SITIO_URL, esEmailValido } from './util.js';
-import { descargarArchivo } from './exportar.js';
+import { descargarArchivo, clientesToCSV } from './exportar.js';
 import { $, content } from './dom.js';
 import { paginar, pagerHTML, wirePager, toast, tip, hint, loading, openModal, closeModal } from './ui.js';
 import { state } from './state.js';

@@ -14,6 +14,7 @@ import { state } from './state.js';
 import { badgeEstado } from './comunes.js';
 import { supabase } from './supabase.js';
 import { openProcesoDetail } from './procesos.js';
+import { mountOpinion } from './opiniones.js';
 
 async function fetchNovedades() {
   const [{ data: procs }, { data: acts }, { data: docs }] = await Promise.all([
