@@ -99,12 +99,12 @@ function initOfflineIndicator() {
 }
 
 // ---- Respaldo manual de datos (exportar a JSON) ----
-function lastBackupText() {
+export function lastBackupText() {
   const ts = Number(localStorage.getItem('lexfive_last_backup'));
   if (!ts) return 'Aún no ha exportado un respaldo manual.';
   return 'Último respaldo manual: ' + new Date(ts).toLocaleString('es-BO');
 }
-async function exportarRespaldo(btn) {
+export async function exportarRespaldo(btn) {
   if (btn) { btn.disabled = true; btn.textContent = 'Generando...'; }
   try {
     const tablas = ['profiles', 'clientes', 'procesos', 'consultas', 'articulos', 'testimonios',
@@ -132,7 +132,7 @@ async function exportarRespaldo(btn) {
 
 // Permite abrir un archivo de respaldo JSON exportado previamente y explorar
 // su contenido en una tabla interactiva (solo lectura). No modifica la base.
-function revisarRespaldo() {
+export function revisarRespaldo() {
   const input = document.createElement('input');
   input.type = 'file'; input.accept = '.json,application/json';
   input.onchange = () => {
@@ -243,7 +243,7 @@ function subscribeBrandingRealtime() {
 // ============================================================
 //  SEGURIDAD: verificación en dos pasos (2FA / TOTP)
 // ============================================================
-async function openSeguridad2FA() {
+export async function openSeguridad2FA() {
   openModal('Verificación en dos pasos', '<div class="loading"><div class="spinner"></div>Cargando...</div>', [], true);
   const factors = await mfaFactors();
   const activos = (factors.totp || []).filter(f => f.status === 'verified');
@@ -296,7 +296,7 @@ async function openSeguridad2FA() {
 // ============================================================
 //  NOTIFICACIONES PUSH (función #10 — Fase A: activar + prueba local)
 // ============================================================
-async function openNotificaciones() {
+export async function openNotificaciones() {
   const soporta = ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
   if (!soporta) {
     openModal('Notificaciones', '<p class="cell-sub">Este navegador no soporta notificaciones push. En iPhone/iPad primero debe <strong>instalar la app</strong> en la pantalla de inicio (iOS 16.4+).</p>', [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }]);

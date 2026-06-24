@@ -103,7 +103,7 @@ export async function renderTareas() {
   $('#btnNuevaTarea').onclick = () => tareaForm();
 }
 
-async function tareaForm(t = null) {
+export async function tareaForm(t = null) {
   const { data: procs } = await supabase.from('procesos').select('id,caratula').eq('eliminado', false).order('created_at', { ascending: false });
   const tarea = t || {};
   const opcionesProc = `<option value="">— Sin proceso —</option>` +
