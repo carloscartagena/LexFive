@@ -53,6 +53,20 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
+# Las páginas HTML deben revalidarse SIEMPRE para que el navegador (sobre todo
+# en el celular) reciba al instante la versión nueva, que ya apunta a los CSS/JS
+# con su parámetro ?v=<commit>. Sin esto, un HTML viejo en caché seguiría
+# pidiendo el CSS viejo y los cambios no se verían.
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 # El service worker no debe cachearse para que se actualice de inmediato
 [[headers]]
   for = "/sistema/sw.js"
