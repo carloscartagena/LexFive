@@ -507,6 +507,9 @@ html[data-theme="dark"] .about.has-bg-image .about__content {
     .nav__link.is-active { background: var(--gold-tint); }
     .nav__link--cta { margin-left: 0; margin-top: 8px; text-align: center; }
     .nav.is-open::before { content: ""; position: fixed; inset: 0; background: rgba(14,27,44,.45); z-index: -1; width: 100vw; }
+    /* En modo oscuro el cajón del menú móvil debe ser oscuro; con el fondo blanco
+       por defecto los enlaces (texto claro en modo oscuro) quedaban invisibles. */
+    html[data-theme="dark"] .nav { background: var(--bg-soft); box-shadow: -8px 0 30px rgba(0,0,0,.5); }
     .stats__grid { grid-template-columns: repeat(2, 1fr); gap: 26px; }
     .stat + .stat::before { display: none; }
     .testimonials__grid { grid-template-columns: 1fr; }
