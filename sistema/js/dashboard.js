@@ -14,9 +14,9 @@ import { barChart, toast, hint, loading, openModal, closeModal } from './ui.js';
 import { state } from './state.js';
 import { profName, namesFromIds } from './comunes.js';
 import { supabase } from './supabase.js';
-import { TAREA_PRIOR } from './tareas.js';
+import { TAREA_PRIOR, tareaForm } from './tareas.js';
 import { openProcesoDetail } from './procesos.js';
-import { navigate } from './app.js';
+import { navigate, lastBackupText, exportarRespaldo, revisarRespaldo, openSeguridad2FA, openNotificaciones } from './app.js';
 
 // Abre un modal para enviar el recordatorio por WhatsApp (a los 5 abogados)
 // o por correo (a todo el personal del bufete).

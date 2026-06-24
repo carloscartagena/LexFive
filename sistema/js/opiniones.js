@@ -15,6 +15,7 @@ import { $, content } from './dom.js';
 import { toast, loading } from './ui.js';
 import { state } from './state.js';
 import { profName } from './comunes.js';
+import { loadProfiles } from './datos.js';
 import { Draft } from './draft.js';
 import { supabase } from './supabase.js';
 
