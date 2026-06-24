@@ -511,6 +511,14 @@ html[data-theme="dark"] .about.has-bg-image .about__content {
     .stat + .stat::before { display: none; }
     .testimonials__grid { grid-template-columns: 1fr; }
     .contact__grid { grid-template-columns: 1fr; gap: 36px; }
+    /* En móvil el bloque de contacto ("Hablemos") se ve mejor centrado */
+    .contact__info { text-align: center; }
+    .contact__info .section__eyebrow,
+    .contact__info .section__title,
+    .contact__lead,
+    .wa-direct__title { text-align: center; }
+    .contact__details li { justify-content: center; }
+    .wa-direct__list { justify-content: center; }
     .cases-grid { grid-template-columns: 1fr; }
     .section { padding: 70px 0; }
 }
