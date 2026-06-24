@@ -7,6 +7,7 @@
 //  Extraído de app.js (split por módulos).
 // ============================================================
 import { ICON } from './icons.js';
+import { WHATSAPP } from './config.js';
 import { esc, hoyISO, fmtDate, fmtDateTime } from './util.js';
 import { $, content } from './dom.js';
 import { toast, loading } from './ui.js';

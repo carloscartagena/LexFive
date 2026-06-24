@@ -142,7 +142,10 @@ export async function renderAgenda() {
     const it = items[b.dataset.i];
     if (!it) return;
     if (it.kind === 'ev') descargarICSEvento(it.ev, it.proc ? it.proc.caratula : '');
-    else descargarICS(it.proc);
+    else descargarICSEvento(
+      { id: 'proc-' + it.procId, fecha: it.fecha, titulo: it.titulo, nota: it.proc && it.proc.numero ? 'Nº ' + it.proc.numero : '' },
+      it.proc ? it.proc.caratula : ''
+    );
   });
   const bexp = $('#calExport');
   if (bexp) bexp.onclick = () => {
