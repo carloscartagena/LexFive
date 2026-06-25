@@ -12,7 +12,7 @@ import { descargarArchivo } from './exportar.js';
 import { $, content } from './dom.js';
 import { toast, loading } from './ui.js';
 import { ensureImgCache } from './media.js';
-import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual } from './branding.js';
+import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual, applyWmOpacity, pushBranding } from './branding.js';
 import { supabase } from './supabase.js';
 
 const PAGES = {
@@ -284,6 +284,14 @@ export async function renderInforme() {
           <button class="btn btn--ghost" id="in_word">Descargar Word</button>
         </div>
       </div>
+      <div class="field" style="margin:14px 0 0;max-width:440px">
+        <label>Intensidad de la marca de agua (logo de fondo)</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="range" id="in_wm" min="3" max="40" step="1" value="${wmOpacityActual()}" style="flex:1">
+          <output id="in_wm_out" style="min-width:42px;text-align:right">${wmOpacityActual()}%</output>
+        </div>
+        <p class="cell-sub" style="margin:4px 0 0">Más a la derecha = marca de agua más oscura. (Se comparte con certificados y credenciales.)</p>
+      </div>
     </div></div>
 
     <div class="card">
@@ -362,6 +370,12 @@ export async function renderInforme() {
   const taC = $('#in_cuerpo');
   if (taC) ['keyup', 'click', 'select', 'focus', 'input'].forEach(ev => taC.addEventListener(ev, () => { caretCuerpo = taC.selectionStart; }));
   $('#in_tam').onchange = pintar;
+  // Control de opacidad de la marca de agua (igual que en certificados/credenciales).
+  const wmS = $('#in_wm'), wmOut = $('#in_wm_out');
+  if (wmS) {
+    wmS.addEventListener('input', () => { localStorage.setItem('lexfive_wm_op', wmS.value); applyWmOpacity(wmS.value); if (wmOut) wmOut.textContent = wmS.value + '%'; pintar(); });
+    wmS.addEventListener('change', () => { pushBranding(); });
+  }
   $('#in_restaurar').onclick = () => { $('#in_cuerpo').value = CUERPO_EJEMPLO; caretCuerpo = null; pintar(); toast('Cuerpo restaurado al modelo.', 'success'); };
 
   $('#in_print').onclick = () => { const p = page(); abrirImpresion('Informe Único de Pasantía', buildInforme(datos()), p.css); };
