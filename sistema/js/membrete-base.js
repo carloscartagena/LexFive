@@ -27,7 +27,7 @@ export function setModeloMembrete(id) {
 
 // Datos fijos del bufete que aparecen en el encabezado/pie.
 const NAVY = '#0e1b2c', NAVY2 = '#16273d', GOLD = '#c2a25a', GOLD2 = '#e7d3a1';
-const DIRECCION = 'Calle Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.° 85, P.B., of. 1-A — El Alto, Bolivia';
+const DIRECCION = 'Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina 6-A — El Alto, Bolivia';
 const TEL = 'Tel/WhatsApp: +591 78360469';
 const WEB = 'lexfive.netlify.app';
 
