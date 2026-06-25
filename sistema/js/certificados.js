@@ -76,7 +76,7 @@ function buildCertDoc(d) {
   const wmOp = (wmOpacityActual() / 100).toFixed(2);
   const wm = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="position:absolute;top:52%;left:50%;width:12cm;height:12cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${wmOp};pointer-events:none;">` : '';
   return `
-  <div style="position:relative;font-family:Georgia,'Times New Roman',serif;color:#1a2330;background:#fff;width:21.6cm;min-height:27.9cm;margin:0 auto;padding:1.6cm 2cm 1.3cm;box-sizing:border-box;overflow:hidden;">
+  <div style="position:relative;display:flex;flex-direction:column;font-family:Georgia,'Times New Roman',serif;color:#1a2330;background:#fff;width:21.6cm;min-height:27.9cm;margin:0 auto;padding:1.6cm 2cm 1.3cm;box-sizing:border-box;overflow:hidden;">
     <div style="position:absolute;top:0;left:0;bottom:0;width:0.5cm;background:linear-gradient(#0e1b2c,#16273d);"></div>
     ${wm}
     <div style="position:relative;text-align:center;border-bottom:2px solid #c2a25a;padding-bottom:14px;">
@@ -97,7 +97,8 @@ function buildCertDoc(d) {
       </div>
       ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="width:3.3cm;height:3.3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;transform:rotate(-6deg);margin-right:.4cm;">` : ''}
     </div>
-    <div style="position:relative;display:flex;align-items:center;gap:12px;margin-top:30px;border-top:1px solid #d9dce1;padding-top:10px;">
+    <div style="flex:1 1 auto;min-height:24px;"></div>
+    <div style="position:relative;display:flex;align-items:center;gap:12px;margin-top:0;border-top:1px solid #d9dce1;padding-top:10px;">
       ${d.qrSrc ? `<img src="${d.qrSrc}" alt="QR de verificación" style="width:2.1cm;height:2.1cm;flex-shrink:0;">` : ''}
       <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.55;">
         <strong style="color:#0e1b2c;">Verificación:</strong> escanee el código QR para confirmar la autenticidad de este documento y la vinculación de la persona con el Bufete LexFive.<br>
