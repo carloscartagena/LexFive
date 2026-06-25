@@ -87,6 +87,13 @@ async function guardarTareas(arr) {
   try { await supabase.from('configuracion').upsert({ clave: 'informe_tareas', valor: arr, updated_at: new Date().toISOString() }); } catch (e) {}
 }
 
+// Lista local de informes guardados (para reabrirlos y editarlos), guardada en
+// este equipo. Permite tener varios y empezar uno nuevo al guardar.
+const INFORMES_KEY = 'lexfive_informes_guardados';
+let informeEditId = null;
+function leerInformes() { try { const a = JSON.parse(localStorage.getItem(INFORMES_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function guardarInformes(arr) { try { localStorage.setItem(INFORMES_KEY, JSON.stringify(arr)); } catch (e) {} }
+
 const CUERPO_EJEMPLO = `I. ANTECEDENTES
 
 1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobado mediante Resolución del Honorable Consejo Universitario.
@@ -297,6 +304,11 @@ export async function renderInforme() {
     </div></div>
 
     <div class="card">
+      <div class="card__head"><h3>Informes guardados</h3></div>
+      <div class="card__body--flush"><div id="inGuardados"></div></div>
+    </div>
+
+    <div class="card">
       <div class="card__head"><h3>Vista previa</h3></div>
       <div class="card__body"><div class="cert-preview" id="inPreview"></div></div>
     </div>`;
@@ -366,11 +378,35 @@ export async function renderInforme() {
 
   // Guarda el borrador del informe en este equipo (para no perder lo escrito).
   const FIELD_IDS = ['in_a', 'in_acargo', 'in_de', 'in_desub', 'in_ref', 'in_lugar', 'in_fecha', 'in_dur', 'in_inst', 'in_sup', 'in_cuerpo', 'in_f1', 'in_f1sub', 'in_f2', 'in_f2sub'];
-  function saveDraft() {
+  function recolectar() {
     const o = {};
     FIELD_IDS.forEach(id => { const el = $('#' + id); if (el) o[id] = el.value; });
     o.in_sello = $('#in_sello') ? $('#in_sello').checked : true;
-    Draft.save('informe', o);
+    return o;
+  }
+  function saveDraft() { Draft.save('informe', recolectar()); }
+
+  // Lista de informes guardados (reabrir / eliminar).
+  function pintarInformesGuardados() {
+    const cont = $('#inGuardados'); if (!cont) return;
+    const lista = leerInformes();
+    if (!lista.length) { cont.innerHTML = '<p class="cell-sub" style="padding:16px">Aún no hay informes guardados. Complete uno y pulse «Guardar».</p>'; return; }
+    cont.innerHTML = `<div class="table-wrap"><table class="data"><thead><tr><th>Pasante / etiqueta</th><th>Guardado</th><th></th></tr></thead><tbody>${lista.map(it => `<tr>
+        <td class="cell-strong">${esc(it.label || 'Informe')}</td>
+        <td class="cell-sub">${esc(new Date(it.ts).toLocaleString('es-BO'))}</td>
+        <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-inf-open" data-id="${esc(it.id)}">Reabrir</button> <button class="btn btn--danger btn--sm js-inf-del" data-id="${esc(it.id)}" title="Eliminar">&times;</button></td>
+      </tr>`).join('')}</tbody></table></div>`;
+    cont.querySelectorAll('.js-inf-open').forEach(b => b.onclick = () => {
+      const it = leerInformes().find(x => x.id === b.dataset.id); if (!it) return;
+      informeEditId = it.id; Draft.save('informe', it.data); renderInforme();
+      toast('Informe reabierto para editar.', 'success');
+    });
+    cont.querySelectorAll('.js-inf-del').forEach(b => b.onclick = () => {
+      if (!confirm('¿Eliminar este informe guardado?')) return;
+      guardarInformes(leerInformes().filter(x => x.id !== b.dataset.id));
+      pintarInformesGuardados();
+      toast('Informe eliminado.', 'success');
+    });
   }
 
   ['in_a', 'in_acargo', 'in_de', 'in_desub', 'in_ref', 'in_lugar', 'in_dur', 'in_inst', 'in_sup', 'in_cuerpo', 'in_f1', 'in_f1sub', 'in_f2', 'in_f2sub'].forEach(id => {
@@ -389,8 +425,24 @@ export async function renderInforme() {
     wmS.addEventListener('change', () => { pushBranding(); });
   }
   $('#in_restaurar').onclick = () => { $('#in_cuerpo').value = CUERPO_EJEMPLO; caretCuerpo = null; pintar(); saveDraft(); toast('Cuerpo restaurado al modelo.', 'success'); };
-  $('#in_guardar').onclick = () => { saveDraft(); toast('Borrador del informe guardado en este equipo. Puede volver a editarlo cuando quiera.', 'success'); };
-  $('#in_limpiar').onclick = () => { if (!confirm('¿Limpiar el informe y volver al modelo de ejemplo? Se borrará el borrador guardado.')) return; Draft.clear('informe'); renderInforme(); toast('Informe reiniciado.', 'success'); };
+  $('#in_guardar').onclick = () => {
+    const data = recolectar();
+    const etiqueta = (data.in_de || data.in_f1 || 'Informe de pasantía').trim();
+    const lista = leerInformes();
+    if (informeEditId) {
+      const i = lista.findIndex(x => x.id === informeEditId);
+      if (i >= 0) lista[i] = Object.assign({}, lista[i], { data, label: etiqueta, ts: Date.now() });
+      else lista.unshift({ id: informeEditId, label: etiqueta, data, ts: Date.now() });
+    } else {
+      lista.unshift({ id: 'inf' + Date.now(), label: etiqueta, data, ts: Date.now() });
+    }
+    guardarInformes(lista);
+    informeEditId = null;
+    Draft.clear('informe');
+    toast('Informe guardado. El formulario quedó listo para uno nuevo.', 'success');
+    renderInforme();
+  };
+  $('#in_limpiar').onclick = () => { if (!confirm('¿Limpiar el formulario? (No borra los informes guardados.)')) return; informeEditId = null; Draft.clear('informe'); renderInforme(); toast('Formulario listo para uno nuevo.', 'success'); };
   const inSelloChk = $('#in_sello'); if (inSelloChk) inSelloChk.onchange = () => { pintar(); saveDraft(); };
 
   $('#in_print').onclick = () => { saveDraft(); const p = page(); abrirImpresion('Informe Único de Pasantía', buildInforme(datos()), p.css); };
@@ -402,4 +454,5 @@ export async function renderInforme() {
   };
 
   pintar();
+  pintarInformesGuardados();
 }
