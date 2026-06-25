@@ -53,6 +53,7 @@ const SHELL = [
   './js/imagenes.js',
   './js/informe.js',
   './js/media.js',
+  './js/membrete-base.js',
   './js/membrete.js',
   './js/modelos.js',
   './js/opiniones.js',
