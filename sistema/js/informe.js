@@ -15,6 +15,7 @@ import { toast, loading } from './ui.js';
 import { ensureImgCache } from './media.js';
 import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual, applyWmOpacity, pushBranding } from './branding.js';
 import { supabase } from './supabase.js';
+import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membreteDocFluido, PRINT_COLOR_CSS } from './membrete-base.js';
 
 const PAGES = {
   carta:  { label: 'Carta',  w: '21.6cm', h: '27.9cm', css: '21.6cm 27.9cm' },
@@ -144,60 +145,44 @@ function buildInforme(d) {
   const deSub = esc(d.deSub || '').replace(/\n/g, '<br>');
   const f1Sub = esc(d.f1Sub || '').replace(/\n/g, '<br>');
   const f2Sub = esc(d.f2Sub || '').replace(/\n/g, '<br>');
-  const wmOp = (wmOpacityActual() / 100).toFixed(2);
-  const wm = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="position:absolute;top:46%;left:50%;width:12cm;height:12cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${wmOp};pointer-events:none;z-index:0;">` : '';
-  const logoBadge = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:66px;height:66px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 6px;box-shadow:0 0 0 2px rgba(194,162,90,.6);">` : '';
-  return `
-  <div style="position:relative;font-family:'Times New Roman',Georgia,serif;color:#101820;background:#fff;width:${d.pageW};margin:0 auto;padding:1.5cm 2.2cm 1.6cm;box-sizing:border-box;font-size:12.5px;line-height:1.5;">
-    <div style="position:absolute;top:0;left:0;bottom:0;width:0.45cm;background:linear-gradient(#0e1b2c,#16273d);"></div>
-    ${wm}
-    <div style="position:relative;z-index:1;text-align:center;border-bottom:2px solid #c2a25a;padding-bottom:10px;margin-bottom:14px;">
-      ${logoBadge}
-      <div style="font-size:24px;font-weight:700;color:#0e1b2c;letter-spacing:1px;font-family:Georgia,serif;">Lex<span style="color:#c2a25a;">Five</span></div>
-      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div>
-    </div>
-    <table style="position:relative;z-index:1;border-collapse:collapse;font-size:12.5px;margin-bottom:6px;">
+  const contentHTML = `
+    <table style="border-collapse:collapse;font-size:12.5px;margin-bottom:6px;">
       ${fila('A', '<strong>' + esc(d.a) + '</strong>' + (aCargo ? '<br>' + aCargo : ''))}
       ${fila('DE', '<strong>' + esc(d.de) + '</strong>' + (deSub ? '<br>' + deSub : ''))}
       ${fila('REF', '<strong>' + esc(d.ref) + '</strong>')}
       ${fila('FECHA', esc(d.fechaTxt))}
     </table>
-    <hr style="position:relative;z-index:1;border:none;border-top:1px solid #101820;margin:8px 0 14px;">
-    <div style="position:relative;z-index:1;">
-      <p style="margin:0 0 10px;">Señor docente guía:</p>
-      <p style="margin:0 0 10px;text-align:justify;">A continuación, pongo a su consideración el Informe Único de Pasantía, que detalla mis actividades realizadas como Pasante, bajo las siguientes características:</p>
-      <div style="margin:0 0 14px;">
-        <div><strong>Duración de Pasantía:</strong> ${esc(d.duracion)}</div>
-        <div><strong>Institución:</strong> ${esc(d.institucion)}</div>
-        <div><strong>Supervisión:</strong> ${esc(d.supervision)}</div>
-      </div>
-      <div>${bodyHTML(d.cuerpo)}</div>
-      <p style="margin:14px 0 0;">Atentamente,</p>
-      <table style="width:100%;border-collapse:collapse;margin-top:64px;font-size:12px;position:relative;page-break-inside:avoid;">
-        ${d.selloSrc ? `<tr><td colspan="2" style="text-align:center;padding:0;height:0;"><img src="${d.selloSrc}" alt="" style="position:absolute;left:50%;top:-58px;transform:translateX(-50%) rotate(-6deg);width:3cm;height:3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.25) brightness(1.08);opacity:.92;"></td></tr>` : ''}
-        <tr>
-          <td style="width:50%;text-align:center;vertical-align:bottom;padding:0 12px;">
-            <div style="border-top:1px solid #101820;padding-top:5px;font-weight:700;">${esc(d.f1)}</div>
-            <div>${f1Sub}</div>
-          </td>
-          <td style="width:50%;text-align:center;vertical-align:bottom;padding:0 12px;">
-            <div style="border-top:1px solid #101820;padding-top:5px;font-weight:700;">${esc(d.f2)}</div>
-            <div>${f2Sub}</div>
-          </td>
-        </tr>
-      </table>
-      <div style="border-top:1px solid #d9dce1;padding-top:8px;margin-top:22px;text-align:center;font-size:9px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.5;">
-        LexFive &middot; Bufete de Abogados &middot; Derecho &amp; Tecnolog&iacute;a &middot; El Alto - La Paz, Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
-      </div>
+    <hr style="border:none;border-top:1px solid #101820;margin:8px 0 14px;">
+    <p style="margin:0 0 10px;">Señor docente guía:</p>
+    <p style="margin:0 0 10px;text-align:justify;">A continuación, pongo a su consideración el Informe Único de Pasantía, que detalla mis actividades realizadas como Pasante, bajo las siguientes características:</p>
+    <div style="margin:0 0 14px;">
+      <div><strong>Duración de Pasantía:</strong> ${esc(d.duracion)}</div>
+      <div><strong>Institución:</strong> ${esc(d.institucion)}</div>
+      <div><strong>Supervisión:</strong> ${esc(d.supervision)}</div>
     </div>
-  </div>`;
+    <div>${bodyHTML(d.cuerpo)}</div>
+    <p style="margin:14px 0 0;">Atentamente,</p>
+    <table style="width:100%;border-collapse:collapse;margin-top:64px;font-size:12px;position:relative;page-break-inside:avoid;">
+      ${d.selloSrc ? `<tr><td colspan="2" style="text-align:center;padding:0;height:0;"><img src="${d.selloSrc}" alt="" style="position:absolute;left:50%;top:-58px;transform:translateX(-50%) rotate(-6deg);width:3cm;height:3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.25) brightness(1.08);opacity:.92;"></td></tr>` : ''}
+      <tr>
+        <td style="width:50%;text-align:center;vertical-align:bottom;padding:0 12px;">
+          <div style="border-top:1px solid #101820;padding-top:5px;font-weight:700;">${esc(d.f1)}</div>
+          <div>${f1Sub}</div>
+        </td>
+        <td style="width:50%;text-align:center;vertical-align:bottom;padding:0 12px;">
+          <div style="border-top:1px solid #101820;padding-top:5px;font-weight:700;">${esc(d.f2)}</div>
+          <div>${f2Sub}</div>
+        </td>
+      </tr>
+    </table>`;
+  return membreteDocFluido({ model: d.model, logoSrc: d.logoSrc, pageW: d.pageW, wmOp: wmOpacityActual() / 100, contentHTML });
 }
 
 function abrirImpresion(titulo, docHTML, pageCss) {
   const w = window.open('', '_blank');
   if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
   w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title>
-    <style>@page{size:${pageCss};margin:0;} html,body{margin:0;background:#fff;}</style></head><body>${docHTML}
+    <style>@page{size:${pageCss};margin:0;} html,body{margin:0;background:#fff;} ${PRINT_COLOR_CSS}</style></head><body>${docHTML}
     <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},400);});<\/script></body></html>`);
   w.document.close();
 }
@@ -286,6 +271,8 @@ export async function renderInforme() {
 
     <div class="card"><div class="card__body">
       <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;">
+        <div class="field" style="margin:0;min-width:230px"><label>Modelo de hoja membretada</label>
+          <select id="in_modelo">${MEMBRETE_MODELOS.map(m => `<option value="${m.id}">${esc(m.nombre)}</option>`).join('')}</select></div>
         <div class="field" style="margin:0;min-width:200px"><label>Tamaño de hoja</label>
           <select id="in_tam">
             <option value="carta">Carta (21.6 &times; 27.9 cm)</option>
@@ -325,7 +312,7 @@ export async function renderInforme() {
       duracion: val('in_dur'), institucion: val('in_inst'), supervision: val('in_sup'),
       cuerpo: val('in_cuerpo'), f1: val('in_f1'), f1Sub: val('in_f1sub'),
       f2: val('in_f2'), f2Sub: val('in_f2sub'),
-      logoSrc, selloSrc: ($('#in_sello') && $('#in_sello').checked) ? selloSrc : '', pageW: p.w, pageH: p.h
+      logoSrc, selloSrc: ($('#in_sello') && $('#in_sello').checked) ? selloSrc : '', model: modeloMembrete(), pageW: p.w, pageH: p.h
     };
   };
   const pintar = () => { $('#inPreview').innerHTML = buildInforme(datos()); };
@@ -394,6 +381,7 @@ export async function renderInforme() {
   const taC = $('#in_cuerpo');
   if (taC) ['keyup', 'click', 'select', 'focus', 'input'].forEach(ev => taC.addEventListener(ev, () => { caretCuerpo = taC.selectionStart; }));
   $('#in_tam').onchange = pintar;
+  const inModelo = $('#in_modelo'); if (inModelo) { inModelo.value = modeloMembrete(); inModelo.onchange = () => { setModeloMembrete(inModelo.value); pintar(); }; }
   // Control de opacidad de la marca de agua (igual que en certificados/credenciales).
   const wmS = $('#in_wm'), wmOut = $('#in_wm_out');
   if (wmS) {

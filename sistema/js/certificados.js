@@ -16,6 +16,7 @@ import { profName } from './comunes.js';
 import { ensureImgCache } from './media.js';
 import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual, applyWmOpacity, pushBranding } from './branding.js';
 import { supabase } from './supabase.js';
+import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membretePagina, PRINT_COLOR_CSS } from './membrete-base.js';
 
 function urlAbs(src) {
   if (!src) return '';
@@ -73,41 +74,27 @@ function buildCertDoc(d) {
     `<p style="margin:0 0 13px;text-align:justify;">${resaltar(esc(p).replace(/\n/g, '<br>'))}</p>`).join('');
   // Marca de agua del logo: usa la intensidad configurable del branding (por
   // defecto 15%), para que SÍ se note. Antes estaba fija en 5% y casi no se veía.
-  const wmOp = (wmOpacityActual() / 100).toFixed(2);
-  const wm = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="position:absolute;top:52%;left:50%;width:12cm;height:12cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${wmOp};pointer-events:none;">` : '';
-  return `
-  <div style="position:relative;display:flex;flex-direction:column;font-family:Georgia,'Times New Roman',serif;color:#1a2330;background:#fff;width:21.6cm;min-height:27.9cm;margin:0 auto;padding:1.6cm 2cm 1.3cm;box-sizing:border-box;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;bottom:0;width:0.5cm;background:linear-gradient(#0e1b2c,#16273d);"></div>
-    ${wm}
-    <div style="position:relative;text-align:center;border-bottom:2px solid #c2a25a;padding-bottom:14px;">
-      ${d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:82px;height:82px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 8px;box-shadow:0 0 0 2px rgba(194,162,90,.6);">` : ''}
-      <div style="font-size:30px;font-weight:700;color:#0e1b2c;letter-spacing:1px;">Lex<span style="color:#c2a25a;">Five</span></div>
-      <div style="font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div>
-      <div style="font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;line-height:1.55;">Calle Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.&deg; 85, P.B., of. 1-A &mdash; El Alto, Bolivia<br>Tel/WhatsApp: +591 78360469 &nbsp;&middot;&nbsp; lexfive.netlify.app</div>
-    </div>
-    <div style="position:relative;text-align:right;font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:6px;">Ref. N.º ${esc(d.ref || '')}</div>
-    <h1 style="position:relative;text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:18px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>
-    <div style="position:relative;text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:24px;">A QUIEN CORRESPONDA</div>
-    <div style="position:relative;font-size:14px;line-height:1.95;">${parrafos}</div>
-    <p style="position:relative;margin:24px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>
-    <div style="position:relative;display:flex;justify-content:space-between;align-items:flex-end;margin-top:58px;gap:20px;">
+  const contentHTML = `
+    <div style="text-align:right;font-size:10px;color:#5c6675;font-family:Arial,sans-serif;">Ref. N.º ${esc(d.ref || '')}</div>
+    <h1 style="text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:8px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>
+    <div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>
+    <div style="font-size:14px;line-height:1.95;">${parrafos}</div>
+    <p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:54px;gap:20px;">
       <div style="text-align:center;flex:1;max-width:58%;">
         <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">Firma y Sello</div>
         <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;">LexFive &middot; Bufete de Abogados</div>
       </div>
-      ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="width:3.3cm;height:3.3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;transform:rotate(-6deg);margin-right:.4cm;">` : ''}
+      ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="width:3.3cm;height:3.3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;transform:rotate(-6deg);">` : ''}
     </div>
     <div style="flex:1 1 auto;min-height:24px;"></div>
-    <div style="position:relative;display:flex;align-items:center;gap:12px;padding-bottom:8px;">
+    <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #d9dce1;padding-top:8px;">
       ${d.qrSrc ? `<img src="${d.qrSrc}" alt="QR de verificación" style="width:2.1cm;height:2.1cm;flex-shrink:0;">` : ''}
       <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.55;">
         <strong style="color:#0e1b2c;">Verificación:</strong> escanee el código QR para confirmar la autenticidad de este documento y la vinculación de la persona con el Bufete LexFive.
       </div>
-    </div>
-    <div style="position:relative;border-top:1px solid #d9dce1;padding-top:8px;text-align:center;font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.5;">
-      LexFive &middot; Bufete de Abogados &middot; Derecho &amp; Tecnolog&iacute;a &middot; El Alto - La Paz, Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
-    </div>
-  </div>`;
+    </div>`;
+  return membretePagina({ model: d.model, logoSrc: d.logoSrc, pageW: '21.6cm', pageH: '27.9cm', wmOp: wmOpacityActual() / 100, contentHTML });
 }
 
 // Abre una ventana de impresión (tamaño carta) con un documento de certificado.
@@ -115,7 +102,7 @@ function abrirImpresionCert(titulo, docHTML) {
   const w = window.open('', '_blank');
   if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
   w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title>
-    <style>@page{size:letter;margin:0;} html,body{margin:0;background:#fff;}</style></head><body>${docHTML}
+    <style>@page{size:letter;margin:0;} html,body{margin:0;background:#fff;} ${PRINT_COLOR_CSS}</style></head><body>${docHTML}
     <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},400);});<\/script></body></html>`);
   w.document.close();
 }
@@ -164,6 +151,10 @@ export async function renderCertificados() {
           <button class="btn btn--primary" id="ce_guardar">Guardar</button>
           <button class="btn btn--ghost" id="ce_print">${ICON.doc} Imprimir / Guardar PDF</button>
           <button class="btn btn--ghost" id="ce_word">Descargar Word</button>
+        </div>
+        <div class="field" style="margin-top:16px;max-width:440px"><label>Modelo de hoja membretada</label>
+          <select id="ce_modelo">${MEMBRETE_MODELOS.map(m => `<option value="${m.id}">${esc(m.nombre)}</option>`).join('')}</select>
+          <p class="cell-sub" style="margin:4px 0 0">El modelo se comparte con la hoja membretada y el informe.</p>
         </div>
         <div class="field" style="margin-top:16px;max-width:440px">
           <label>Intensidad de la marca de agua (logo de fondo)</label>
@@ -221,7 +212,7 @@ export async function renderCertificados() {
       fechaTxt: fechaLarga(fecha),
       ref: refActual,
       qrSrc: qrURL(qrCertificado({ nombre, ci, cargo: cargo || 'Colaborador', tipo: tplActual().titulo, ref: refActual, fecha })),
-      logoSrc, selloSrc: selloActivo()
+      logoSrc, selloSrc: selloActivo(), model: modeloMembrete()
     });
   };
   const pintar = () => { $('#certPreview').innerHTML = docActual(); };
@@ -298,7 +289,7 @@ export async function renderCertificados() {
       titulo: c.tipo || 'CERTIFICADO', cuerpoTexto: cuerpo, nombre: c.nombre, ci: c.ci || '',
       fechaTxt: fechaLarga(c.fecha_emision), ref: c.ref,
       qrSrc: qrURL(qrCertificado({ nombre: c.nombre, ci: c.ci, cargo: c.cargo, tipo: c.tipo, ref: c.ref, fecha: c.fecha_emision })),
-      logoSrc, selloSrc: selloActivo()
+      logoSrc, selloSrc: selloActivo(), model: modeloMembrete()
     });
     abrirImpresionCert(c.tipo || 'Certificado', doc);
   }
@@ -351,6 +342,7 @@ export async function renderCertificados() {
     wmS.addEventListener('change', () => { pushBranding(); });
   }
   const ceSello = $('#ce_sello'); if (ceSello) ceSello.onchange = pintar;
+  const ceModelo = $('#ce_modelo'); if (ceModelo) { ceModelo.value = modeloMembrete(); ceModelo.onchange = () => { setModeloMembrete(ceModelo.value); pintar(); }; }
 
   $('#ce_guardar').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
