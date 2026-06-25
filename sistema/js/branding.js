@@ -86,9 +86,9 @@ export function snapshotGalerias() {
   return { logosCustom: IMG.logosCustom || [], sellosCustom: IMG.sellosCustom || [] };
 }
 export async function pushGalerias() {
-  const ok = await Galerias.save(snapshotGalerias());
-  if (!ok) toast('El logo/sello se guardó en este equipo, pero no se pudo sincronizar. Revise su conexión.', 'error');
-  return ok;
+  // Silencioso: el aviso al usuario lo da pushBranding (que se llama junto a
+  // este), para no mostrar dos mensajes a la vez al subir un logo/sello.
+  return await Galerias.save(snapshotGalerias());
 }
 
 // Toma una "foto" del logo/sello elegido en este equipo para guardarla en la nube.
@@ -141,7 +141,11 @@ export let lastBrandingPush = 0;
 export async function pushBranding() {
   lastBrandingPush = Date.now();
   const ok = await Branding.save(snapshotBranding());
-  if (!ok) toast('Se guardó en este equipo, pero no se pudo sincronizar con los demás dispositivos. Revise su conexión.', 'error');
+  // El logo/sello YA quedó guardado y funcionando en este equipo. Si no se pudo
+  // sincronizar con la nube, se avisa con un tono neutro (no es un error grave):
+  // los demás dispositivos y la web pública lo verán cuando haya conexión o
+  // cuando se configure el almacenamiento de imágenes en la nube.
+  if (!ok) toast('Logo/sello aplicado en este equipo. Aún no se sincroniza con la nube (otros dispositivos y la web lo verán cuando haya conexión).', '');
   return ok;
 }
 
