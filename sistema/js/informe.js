@@ -15,6 +15,7 @@ import { toast, loading } from './ui.js';
 import { ensureImgCache } from './media.js';
 import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual, applyWmOpacity, pushBranding } from './branding.js';
 import { supabase } from './supabase.js';
+import { state } from './state.js';
 import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membreteDocFluido, PRINT_COLOR_CSS } from './membrete-base.js';
 
 const PAGES = {
@@ -87,12 +88,18 @@ async function guardarTareas(arr) {
   try { await supabase.from('configuracion').upsert({ clave: 'informe_tareas', valor: arr, updated_at: new Date().toISOString() }); } catch (e) {}
 }
 
-// Lista local de informes guardados (para reabrirlos y editarlos), guardada en
-// este equipo. Permite tener varios y empezar uno nuevo al guardar.
-const INFORMES_KEY = 'lexfive_informes_guardados';
+// Informes de pasantía guardados en la NUBE (tabla public.informes, db/28), con
+// caché local para mostrar al instante y como respaldo sin conexión.
+const INFORMES_CACHE = 'lexfive_informes_cache';
 let informeEditId = null;
-function leerInformes() { try { const a = JSON.parse(localStorage.getItem(INFORMES_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
-function guardarInformes(arr) { try { localStorage.setItem(INFORMES_KEY, JSON.stringify(arr)); } catch (e) {} }
+function cacheInformes() { try { const a = JSON.parse(localStorage.getItem(INFORMES_CACHE) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+async function fetchInformes() {
+  try {
+    const { data } = await withTimeout(supabase.from('informes').select('*').order('updated_at', { ascending: false }).limit(200), 8000, 'informes');
+    if (Array.isArray(data)) { try { localStorage.setItem(INFORMES_CACHE, JSON.stringify(data)); } catch (e) {} return data; }
+  } catch (e) {}
+  return cacheInformes();
+}
 
 const CUERPO_EJEMPLO = `I. ANTECEDENTES
 
@@ -386,28 +393,39 @@ export async function renderInforme() {
   }
   function saveDraft() { Draft.save('informe', recolectar()); }
 
-  // Lista de informes guardados (reabrir / eliminar).
-  function pintarInformesGuardados() {
+  // Validación de campos obligatorios antes de imprimir / descargar / guardar.
+  function validar() {
+    const faltan = [];
+    if (!(val('in_de') || '').trim()) faltan.push('DE (pasante)');
+    if (!(val('in_a') || '').trim()) faltan.push('A (destinatario)');
+    if (!(val('in_f1') || '').trim()) faltan.push('Firma del pasante');
+    if (faltan.length) { toast('Complete antes de continuar: ' + faltan.join(', ') + '.', 'error'); return false; }
+    return true;
+  }
+
+  // Lista de informes guardados (en la nube) — reabrir / eliminar.
+  let INFORMES = cacheInformes();
+  function pintarInformes() {
     const cont = $('#inGuardados'); if (!cont) return;
-    const lista = leerInformes();
-    if (!lista.length) { cont.innerHTML = '<p class="cell-sub" style="padding:16px">Aún no hay informes guardados. Complete uno y pulse «Guardar».</p>'; return; }
-    cont.innerHTML = `<div class="table-wrap"><table class="data"><thead><tr><th>Pasante / etiqueta</th><th>Guardado</th><th></th></tr></thead><tbody>${lista.map(it => `<tr>
-        <td class="cell-strong">${esc(it.label || 'Informe')}</td>
-        <td class="cell-sub">${esc(new Date(it.ts).toLocaleString('es-BO'))}</td>
+    if (!INFORMES.length) { cont.innerHTML = '<p class="cell-sub" style="padding:16px">Aún no hay informes guardados. Complete uno y pulse «Guardar».</p>'; return; }
+    cont.innerHTML = `<div class="table-wrap"><table class="data"><thead><tr><th>Pasante / etiqueta</th><th>Guardado</th><th></th></tr></thead><tbody>${INFORMES.map(it => `<tr>
+        <td class="cell-strong">${esc(it.etiqueta || 'Informe')}</td>
+        <td class="cell-sub">${esc(new Date(it.updated_at || it.created_at || Date.now()).toLocaleString('es-BO'))}</td>
         <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-inf-open" data-id="${esc(it.id)}">Reabrir</button> <button class="btn btn--danger btn--sm js-inf-del" data-id="${esc(it.id)}" title="Eliminar">&times;</button></td>
       </tr>`).join('')}</tbody></table></div>`;
     cont.querySelectorAll('.js-inf-open').forEach(b => b.onclick = () => {
-      const it = leerInformes().find(x => x.id === b.dataset.id); if (!it) return;
-      informeEditId = it.id; Draft.save('informe', it.data); renderInforme();
+      const it = INFORMES.find(x => x.id === b.dataset.id); if (!it) return;
+      informeEditId = it.id; Draft.save('informe', it.datos || {}); renderInforme();
       toast('Informe reabierto para editar.', 'success');
     });
-    cont.querySelectorAll('.js-inf-del').forEach(b => b.onclick = () => {
-      if (!confirm('¿Eliminar este informe guardado?')) return;
-      guardarInformes(leerInformes().filter(x => x.id !== b.dataset.id));
-      pintarInformesGuardados();
-      toast('Informe eliminado.', 'success');
+    cont.querySelectorAll('.js-inf-del').forEach(b => b.onclick = async () => {
+      if (!confirm('¿Eliminar este informe guardado? Se quita de todos los dispositivos.')) return;
+      try { await supabase.from('informes').delete().eq('id', b.dataset.id); toast('Informe eliminado.', 'success'); }
+      catch (e) { toast('No se pudo eliminar.', 'error'); }
+      cargarInformes();
     });
   }
+  async function cargarInformes() { INFORMES = await fetchInformes(); pintarInformes(); }
 
   ['in_a', 'in_acargo', 'in_de', 'in_desub', 'in_ref', 'in_lugar', 'in_dur', 'in_inst', 'in_sup', 'in_cuerpo', 'in_f1', 'in_f1sub', 'in_f2', 'in_f2sub'].forEach(id => {
     const el = $('#' + id); if (el) el.oninput = () => { pintar(); saveDraft(); };
@@ -425,28 +443,30 @@ export async function renderInforme() {
     wmS.addEventListener('change', () => { pushBranding(); });
   }
   $('#in_restaurar').onclick = () => { $('#in_cuerpo').value = CUERPO_EJEMPLO; caretCuerpo = null; pintar(); saveDraft(); toast('Cuerpo restaurado al modelo.', 'success'); };
-  $('#in_guardar').onclick = () => {
-    const data = recolectar();
-    const etiqueta = (data.in_de || data.in_f1 || 'Informe de pasantía').trim();
-    const lista = leerInformes();
-    if (informeEditId) {
-      const i = lista.findIndex(x => x.id === informeEditId);
-      if (i >= 0) lista[i] = Object.assign({}, lista[i], { data, label: etiqueta, ts: Date.now() });
-      else lista.unshift({ id: informeEditId, label: etiqueta, data, ts: Date.now() });
-    } else {
-      lista.unshift({ id: 'inf' + Date.now(), label: etiqueta, data, ts: Date.now() });
+  $('#in_guardar').onclick = async () => {
+    if (!validar()) return;
+    const datos = recolectar();
+    const etiqueta = (datos.in_de || datos.in_f1 || 'Informe de pasantía').trim();
+    const payload = { etiqueta, datos, updated_at: new Date().toISOString() };
+    if (informeEditId) payload.id = informeEditId; else payload.created_by = state.profile.id;
+    const btn = $('#in_guardar'); if (btn) btn.disabled = true;
+    try {
+      const { error } = await supabase.from('informes').upsert(payload);
+      if (error) throw error;
+      informeEditId = null; Draft.clear('informe');
+      toast('Informe guardado y sincronizado. El formulario quedó listo para uno nuevo.', 'success');
+      renderInforme();
+    } catch (e) {
+      if (btn) btn.disabled = false;
+      toast('No se pudo guardar en la nube. ¿Ya ejecutó el script db/28 en Supabase?', 'error');
     }
-    guardarInformes(lista);
-    informeEditId = null;
-    Draft.clear('informe');
-    toast('Informe guardado. El formulario quedó listo para uno nuevo.', 'success');
-    renderInforme();
   };
   $('#in_limpiar').onclick = () => { if (!confirm('¿Limpiar el formulario? (No borra los informes guardados.)')) return; informeEditId = null; Draft.clear('informe'); renderInforme(); toast('Formulario listo para uno nuevo.', 'success'); };
   const inSelloChk = $('#in_sello'); if (inSelloChk) inSelloChk.onchange = () => { pintar(); saveDraft(); };
 
-  $('#in_print').onclick = () => { saveDraft(); const p = page(); abrirImpresion('Informe Único de Pasantía', buildInforme(datos()), p.css); };
+  $('#in_print').onclick = () => { if (!validar()) return; saveDraft(); const p = page(); abrirImpresion('Informe Único de Pasantía', buildInforme(datos()), p.css); };
   $('#in_word').onclick = () => {
+    if (!validar()) return;
     const p = page();
     const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>@page{size:' + p.css + ';margin:0;}</style></head><body>' + buildInforme(datos()) + '</body></html>';
     descargarArchivo('informe-pasantia-' + p.label.toLowerCase() + '.doc', '\ufeff' + html, 'application/msword');
@@ -454,5 +474,5 @@ export async function renderInforme() {
   };
 
   pintar();
-  pintarInformesGuardados();
+  cargarInformes();
 }
