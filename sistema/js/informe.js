@@ -308,6 +308,7 @@ export async function renderInforme() {
   const pintar = () => { $('#inPreview').innerHTML = buildInforme(datos()); };
 
   // ---- Catálogo de tareas (CRUD) ----
+  let caretCuerpo = null; // última posición del cursor en el cuerpo (si la hubo)
   function pintarTareas() {
     const cont = $('#in_tareas_list'); if (!cont) return;
     if (!TAREAS.length) { cont.innerHTML = '<p class="cell-sub" style="margin:6px">Catálogo vacío. Agregue tareas o restaure el catálogo.</p>'; return; }
@@ -323,11 +324,13 @@ export async function renderInforme() {
   }
   function insertarEnCuerpo(texto) {
     const ta = $('#in_cuerpo'); if (!ta) return;
-    const pos = (typeof ta.selectionStart === 'number') ? ta.selectionStart : ta.value.length;
+    // Si el usuario colocó el cursor en algún punto, inserta ahí; si no, agrega al FINAL.
+    const pos = (caretCuerpo != null) ? caretCuerpo : ta.value.length;
     const antes = ta.value.slice(0, pos), despues = ta.value.slice(pos);
     const sep = (antes && !antes.endsWith('\n')) ? '\n' : '';
     ta.value = antes + sep + texto + (despues.startsWith('\n') || !despues ? '' : '\n') + despues;
     const nuevaPos = (antes + sep + texto).length;
+    caretCuerpo = nuevaPos;
     try { ta.focus(); ta.setSelectionRange(nuevaPos, nuevaPos); } catch (e) {}
     pintar();
   }
@@ -355,8 +358,11 @@ export async function renderInforme() {
     const el = $('#' + id); if (el) el.oninput = pintar;
   });
   $('#in_fecha').onchange = pintar;
+  // Recuerda dónde está el cursor en el cuerpo, para insertar las tareas ahí.
+  const taC = $('#in_cuerpo');
+  if (taC) ['keyup', 'click', 'select', 'focus', 'input'].forEach(ev => taC.addEventListener(ev, () => { caretCuerpo = taC.selectionStart; }));
   $('#in_tam').onchange = pintar;
-  $('#in_restaurar').onclick = () => { $('#in_cuerpo').value = CUERPO_EJEMPLO; pintar(); toast('Cuerpo restaurado al modelo.', 'success'); };
+  $('#in_restaurar').onclick = () => { $('#in_cuerpo').value = CUERPO_EJEMPLO; caretCuerpo = null; pintar(); toast('Cuerpo restaurado al modelo.', 'success'); };
 
   $('#in_print').onclick = () => { const p = page(); abrirImpresion('Informe Único de Pasantía', buildInforme(datos()), p.css); };
   $('#in_word').onclick = () => {
