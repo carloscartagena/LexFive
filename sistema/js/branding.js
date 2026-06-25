@@ -192,19 +192,34 @@ export async function hydrateBranding(force) {
 // ---- Resolución del logo/sello activo y sus fuentes (src) ----
 export function pickActiveLogo(saved) {
   if (saved && saved.indexOf('custom:') === 0 && findCustomLogo(saved.slice(7))) return saved;
-  if (saved === 'custom' && IMG.logosCustom.length) return 'custom:' + IMG.logosCustom[0].id;
+  if (saved === 'custom' && IMG.logosCustom.length) {
+    // El id concreto se pierde al sincronizar (se guarda como 'custom'); resolver
+    // el logo ACTIVO real: el que coincide con la imagen activa (IMG.logo) y, si
+    // no, el último subido (no el primero, que antes causaba mostrar otro logo).
+    if (IMG.logo) { const m = IMG.logosCustom.find(x => x && srcDe(x) === IMG.logo); if (m) return 'custom:' + m.id; }
+    return 'custom:' + IMG.logosCustom[IMG.logosCustom.length - 1].id;
+  }
   const vis = brandLogosVisibles();
   if (vis.some(x => x.id === saved)) return saved;
-  if (IMG.logosCustom.length) return 'custom:' + IMG.logosCustom[0].id;
+  if (IMG.logosCustom.length) {
+    if (IMG.logo) { const m = IMG.logosCustom.find(x => x && srcDe(x) === IMG.logo); if (m) return 'custom:' + m.id; }
+    return 'custom:' + IMG.logosCustom[IMG.logosCustom.length - 1].id;
+  }
   if (vis.length) return vis[0].id;
   return BRAND_LOGO_DEFAULT;
 }
 export function pickActiveSello(saved) {
   if (saved && saved.indexOf('custom:') === 0 && findCustomSello(saved.slice(7))) return saved;
-  if (saved === 'custom' && IMG.sellosCustom.length) return 'custom:' + IMG.sellosCustom[0].id;
+  if (saved === 'custom' && IMG.sellosCustom.length) {
+    if (IMG.sello) { const m = IMG.sellosCustom.find(x => x && srcDe(x) === IMG.sello); if (m) return 'custom:' + m.id; }
+    return 'custom:' + IMG.sellosCustom[IMG.sellosCustom.length - 1].id;
+  }
   const vis = brandSellosVisibles();
   if (vis.some(x => x.id === saved)) return saved;
-  if (IMG.sellosCustom.length) return 'custom:' + IMG.sellosCustom[0].id;
+  if (IMG.sellosCustom.length) {
+    if (IMG.sello) { const m = IMG.sellosCustom.find(x => x && srcDe(x) === IMG.sello); if (m) return 'custom:' + m.id; }
+    return 'custom:' + IMG.sellosCustom[IMG.sellosCustom.length - 1].id;
+  }
   if (vis.length) return vis[0].id;
   return BRAND_SELLO_DEFAULT;
 }
