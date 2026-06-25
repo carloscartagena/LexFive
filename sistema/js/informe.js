@@ -185,6 +185,9 @@ function buildInforme(d) {
           </td>
         </tr>
       </table>
+      <div style="border-top:1px solid #d9dce1;padding-top:8px;margin-top:22px;text-align:center;font-size:9px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.5;">
+        LexFive &middot; Bufete de Abogados &middot; Derecho &amp; Tecnolog&iacute;a &middot; El Alto - La Paz, Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
+      </div>
     </div>
   </div>`;
 }

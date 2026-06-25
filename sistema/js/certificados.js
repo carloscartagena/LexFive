@@ -98,12 +98,14 @@ function buildCertDoc(d) {
       ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="width:3.3cm;height:3.3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;transform:rotate(-6deg);margin-right:.4cm;">` : ''}
     </div>
     <div style="flex:1 1 auto;min-height:24px;"></div>
-    <div style="position:relative;display:flex;align-items:center;gap:12px;margin-top:0;border-top:1px solid #d9dce1;padding-top:10px;">
+    <div style="position:relative;display:flex;align-items:center;gap:12px;padding-bottom:8px;">
       ${d.qrSrc ? `<img src="${d.qrSrc}" alt="QR de verificación" style="width:2.1cm;height:2.1cm;flex-shrink:0;">` : ''}
       <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.55;">
-        <strong style="color:#0e1b2c;">Verificación:</strong> escanee el código QR para confirmar la autenticidad de este documento y la vinculación de la persona con el Bufete LexFive.<br>
-        LexFive &middot; Bufete de Abogados &middot; Calle Uruguay esq. Raúl Salmón, Ed. Señor de Mayo N.&deg; 85, of. 1-A, El Alto - Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
+        <strong style="color:#0e1b2c;">Verificación:</strong> escanee el código QR para confirmar la autenticidad de este documento y la vinculación de la persona con el Bufete LexFive.
       </div>
+    </div>
+    <div style="position:relative;border-top:1px solid #d9dce1;padding-top:8px;text-align:center;font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.5;">
+      LexFive &middot; Bufete de Abogados &middot; Derecho &amp; Tecnolog&iacute;a &middot; El Alto - La Paz, Bolivia &middot; Tel/WhatsApp +591 78360469 &middot; lexfive.netlify.app
     </div>
   </div>`;
 }
