@@ -6,6 +6,7 @@
 //  insertar por semana/día. Descargable en PDF y Word, tamaño Carta y Oficio.
 // ============================================================
 import { withTimeout } from './auth.js';
+import { Draft } from './draft.js';
 import { ICON } from './icons.js';
 import { esc, hoyISO, fmtDate } from './util.js';
 import { descargarArchivo } from './exportar.js';
@@ -147,7 +148,7 @@ function buildInforme(d) {
   const wm = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="position:absolute;top:46%;left:50%;width:12cm;height:12cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${wmOp};pointer-events:none;z-index:0;">` : '';
   const logoBadge = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:66px;height:66px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 6px;box-shadow:0 0 0 2px rgba(194,162,90,.6);">` : '';
   return `
-  <div style="position:relative;font-family:'Times New Roman',Georgia,serif;color:#101820;background:#fff;width:${d.pageW};min-height:${d.pageH};margin:0 auto;padding:1.5cm 2.2cm 1.6cm;box-sizing:border-box;font-size:12.5px;line-height:1.5;overflow:hidden;">
+  <div style="position:relative;font-family:'Times New Roman',Georgia,serif;color:#101820;background:#fff;width:${d.pageW};margin:0 auto;padding:1.5cm 2.2cm 1.6cm;box-sizing:border-box;font-size:12.5px;line-height:1.5;">
     <div style="position:absolute;top:0;left:0;bottom:0;width:0.45cm;background:linear-gradient(#0e1b2c,#16273d);"></div>
     ${wm}
     <div style="position:relative;z-index:1;text-align:center;border-bottom:2px solid #c2a25a;padding-bottom:10px;margin-bottom:14px;">
@@ -172,7 +173,7 @@ function buildInforme(d) {
       </div>
       <div>${bodyHTML(d.cuerpo)}</div>
       <p style="margin:14px 0 0;">Atentamente,</p>
-      <table style="width:100%;border-collapse:collapse;margin-top:64px;font-size:12px;position:relative;">
+      <table style="width:100%;border-collapse:collapse;margin-top:64px;font-size:12px;position:relative;page-break-inside:avoid;">
         ${d.selloSrc ? `<tr><td colspan="2" style="text-align:center;padding:0;height:0;"><img src="${d.selloSrc}" alt="" style="position:absolute;left:50%;top:-58px;transform:translateX(-50%) rotate(-6deg);width:3cm;height:3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.25) brightness(1.08);opacity:.92;"></td></tr>` : ''}
         <tr>
           <td style="width:50%;text-align:center;vertical-align:bottom;padding:0 12px;">
@@ -209,6 +210,15 @@ export async function renderInforme() {
   const selloSrc = urlAbs(brandSelloSrc(pickActiveSello(localStorage.getItem('lexfive_sello'))));
   let TAREAS = await cargarTareas();
 
+  // Borrador guardado en este equipo (para no perder lo escrito y poder editar luego).
+  const sv = (Draft.load('informe') || {}).data || {};
+  const V = Object.assign({
+    in_a: DEF.a, in_acargo: DEF.aCargo, in_de: DEF.de, in_desub: DEF.deSub, in_ref: DEF.ref,
+    in_lugar: DEF.lugar, in_fecha: hoyISO(), in_dur: DEF.duracion, in_inst: DEF.institucion,
+    in_sup: DEF.supervision, in_cuerpo: CUERPO_EJEMPLO, in_f1: DEF.f1, in_f1sub: DEF.f1Sub,
+    in_f2: DEF.f2, in_f2sub: DEF.f2Sub
+  }, sv);
+
   const campo = (id, label, val, ph) => `<div class="field"><label>${label}</label><input id="${id}" value="${esc(val)}" placeholder="${esc(ph || '')}"></div>`;
   const campoArea = (id, label, val, rows) => `<div class="field"><label>${label}</label><textarea id="${id}" rows="${rows || 2}" style="font-family:inherit">${esc(val)}</textarea></div>`;
 
@@ -222,17 +232,17 @@ export async function renderInforme() {
       <div class="card__head"><h3>Encabezado</h3></div>
       <div class="card__body">
         <div class="cert-form">
-          ${campo('in_a', 'A (docente / destinatario)', DEF.a)}
-          ${campo('in_de', 'DE (pasante)', DEF.de)}
-          ${campo('in_desub', 'Datos del pasante (R.U.)', DEF.deSub)}
-          ${campo('in_ref', 'Referencia', DEF.ref)}
-          ${campo('in_lugar', 'Lugar', DEF.lugar)}
-          <div class="field"><label>Fecha</label><input id="in_fecha" type="date" value="${hoyISO()}"></div>
-          ${campo('in_dur', 'Duración de la pasantía', DEF.duracion)}
-          ${campo('in_inst', 'Institución', DEF.institucion)}
-          ${campo('in_sup', 'Supervisión', DEF.supervision)}
+          ${campo('in_a', 'A (docente / destinatario)', V.in_a)}
+          ${campo('in_de', 'DE (pasante)', V.in_de)}
+          ${campo('in_desub', 'Datos del pasante (R.U.)', V.in_desub)}
+          ${campo('in_ref', 'Referencia', V.in_ref)}
+          ${campo('in_lugar', 'Lugar', V.in_lugar)}
+          <div class="field"><label>Fecha</label><input id="in_fecha" type="date" value="${esc(V.in_fecha)}"></div>
+          ${campo('in_dur', 'Duración de la pasantía', V.in_dur)}
+          ${campo('in_inst', 'Institución', V.in_inst)}
+          ${campo('in_sup', 'Supervisión', V.in_sup)}
         </div>
-        ${campoArea('in_acargo', 'Cargo del destinatario (debajo del nombre en «A»)', DEF.aCargo, 2)}
+        ${campoArea('in_acargo', 'Cargo del destinatario (debajo del nombre en «A»)', V.in_acargo, 2)}
       </div>
     </div>
 
@@ -260,17 +270,17 @@ export async function renderInforme() {
         <button class="btn btn--ghost btn--sm" id="in_restaurar" type="button">Restaurar modelo</button>
       </div>
       <div class="card__body">
-        ${campoArea('in_cuerpo', 'Antecedentes, detalle de funciones y conclusiones', CUERPO_EJEMPLO, 16)}
+        ${campoArea('in_cuerpo', 'Antecedentes, detalle de funciones y conclusiones', V.in_cuerpo, 16)}
       </div>
     </div>
 
     <div class="card">
       <div class="card__head"><h3>Firmas</h3></div>
       <div class="card__body"><div class="cert-form">
-        ${campo('in_f1', 'Firma izquierda (pasante)', DEF.f1)}
-        ${campoArea('in_f1sub', 'Datos (firma izquierda)', DEF.f1Sub, 2)}
-        ${campo('in_f2', 'Firma derecha (supervisor)', DEF.f2)}
-        ${campoArea('in_f2sub', 'Datos (firma derecha)', DEF.f2Sub, 2)}
+        ${campo('in_f1', 'Firma izquierda (pasante)', V.in_f1)}
+        ${campoArea('in_f1sub', 'Datos (firma izquierda)', V.in_f1sub, 2)}
+        ${campo('in_f2', 'Firma derecha (supervisor)', V.in_f2)}
+        ${campoArea('in_f2sub', 'Datos (firma derecha)', V.in_f2sub, 2)}
       </div></div>
     </div>
 
@@ -281,10 +291,12 @@ export async function renderInforme() {
             <option value="carta">Carta (21.6 &times; 27.9 cm)</option>
             <option value="oficio">Oficio (21.6 &times; 33 cm)</option>
           </select></div>
-        <label class="cell-sub" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="in_sello" checked> Incluir sello del bufete</label>
+        <label class="cell-sub" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="in_sello" ${sv.in_sello === false ? '' : 'checked'}> Incluir sello del bufete</label>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn" id="in_guardar">Guardar borrador</button>
           <button class="btn btn--primary" id="in_print">${ICON.doc} Imprimir / Guardar PDF</button>
           <button class="btn btn--ghost" id="in_word">Descargar Word</button>
+          <button class="btn btn--ghost" id="in_limpiar" type="button">Limpiar</button>
         </div>
       </div>
       <div class="field" style="margin:14px 0 0;max-width:440px">
@@ -365,10 +377,19 @@ export async function renderInforme() {
   $('#in_add_semana').onclick = () => { const t = (prompt('Título de la semana:', 'PRIMERA SEMANA (del __ al __)') || '').trim(); if (t) insertarEnCuerpo('\n' + t); };
   $('#in_add_dia').onclick = () => { const d = (prompt('Día:', 'Lunes') || '').trim(); if (d) insertarEnCuerpo(d.replace(/:+$/, '') + ':'); };
 
+  // Guarda el borrador del informe en este equipo (para no perder lo escrito).
+  const FIELD_IDS = ['in_a', 'in_acargo', 'in_de', 'in_desub', 'in_ref', 'in_lugar', 'in_fecha', 'in_dur', 'in_inst', 'in_sup', 'in_cuerpo', 'in_f1', 'in_f1sub', 'in_f2', 'in_f2sub'];
+  function saveDraft() {
+    const o = {};
+    FIELD_IDS.forEach(id => { const el = $('#' + id); if (el) o[id] = el.value; });
+    o.in_sello = $('#in_sello') ? $('#in_sello').checked : true;
+    Draft.save('informe', o);
+  }
+
   ['in_a', 'in_acargo', 'in_de', 'in_desub', 'in_ref', 'in_lugar', 'in_dur', 'in_inst', 'in_sup', 'in_cuerpo', 'in_f1', 'in_f1sub', 'in_f2', 'in_f2sub'].forEach(id => {
-    const el = $('#' + id); if (el) el.oninput = pintar;
+    const el = $('#' + id); if (el) el.oninput = () => { pintar(); saveDraft(); };
   });
-  $('#in_fecha').onchange = pintar;
+  $('#in_fecha').onchange = () => { pintar(); saveDraft(); };
   // Recuerda dónde está el cursor en el cuerpo, para insertar las tareas ahí.
   const taC = $('#in_cuerpo');
   if (taC) ['keyup', 'click', 'select', 'focus', 'input'].forEach(ev => taC.addEventListener(ev, () => { caretCuerpo = taC.selectionStart; }));
@@ -379,9 +400,12 @@ export async function renderInforme() {
     wmS.addEventListener('input', () => { localStorage.setItem('lexfive_wm_op', wmS.value); applyWmOpacity(wmS.value); if (wmOut) wmOut.textContent = wmS.value + '%'; pintar(); });
     wmS.addEventListener('change', () => { pushBranding(); });
   }
-  $('#in_restaurar').onclick = () => { $('#in_cuerpo').value = CUERPO_EJEMPLO; caretCuerpo = null; pintar(); toast('Cuerpo restaurado al modelo.', 'success'); };
+  $('#in_restaurar').onclick = () => { $('#in_cuerpo').value = CUERPO_EJEMPLO; caretCuerpo = null; pintar(); saveDraft(); toast('Cuerpo restaurado al modelo.', 'success'); };
+  $('#in_guardar').onclick = () => { saveDraft(); toast('Borrador del informe guardado en este equipo. Puede volver a editarlo cuando quiera.', 'success'); };
+  $('#in_limpiar').onclick = () => { if (!confirm('¿Limpiar el informe y volver al modelo de ejemplo? Se borrará el borrador guardado.')) return; Draft.clear('informe'); renderInforme(); toast('Informe reiniciado.', 'success'); };
+  const inSelloChk = $('#in_sello'); if (inSelloChk) inSelloChk.onchange = () => { pintar(); saveDraft(); };
 
-  $('#in_print').onclick = () => { const p = page(); abrirImpresion('Informe Único de Pasantía', buildInforme(datos()), p.css); };
+  $('#in_print').onclick = () => { saveDraft(); const p = page(); abrirImpresion('Informe Único de Pasantía', buildInforme(datos()), p.css); };
   $('#in_word').onclick = () => {
     const p = page();
     const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>@page{size:' + p.css + ';margin:0;}</style></head><body>' + buildInforme(datos()) + '</body></html>';

@@ -161,7 +161,8 @@ export async function renderCertificados() {
           <textarea id="ce_cuerpo" rows="8" style="font-family:inherit"></textarea>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-          <button class="btn btn--primary" id="ce_print">${ICON.doc} Imprimir / Guardar PDF</button>
+          <button class="btn btn--primary" id="ce_guardar">Guardar</button>
+          <button class="btn btn--ghost" id="ce_print">${ICON.doc} Imprimir / Guardar PDF</button>
           <button class="btn btn--ghost" id="ce_word">Descargar Word</button>
         </div>
         <div class="field" style="margin-top:16px;max-width:440px">
@@ -351,6 +352,11 @@ export async function renderCertificados() {
   }
   const ceSello = $('#ce_sello'); if (ceSello) ceSello.onchange = pintar;
 
+  $('#ce_guardar').onclick = () => {
+    if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+    registrarCert();
+    toast(editando ? 'Cambios guardados en el certificado ' + refActual + '.' : 'Certificado guardado. Aparece en «Certificados emitidos» y se puede editar.', 'success');
+  };
   $('#ce_print').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
     registrarCert();
