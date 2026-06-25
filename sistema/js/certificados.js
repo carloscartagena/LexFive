@@ -200,6 +200,10 @@ export async function renderCertificados() {
   const nuevoRef = () => 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
   let refActual = nuevoRef();
   let editando = false;
+  let guardadoActual = false; // true cuando el certificado actual ya se emitió: el siguiente cambio crea uno nuevo
+  // Si ya se emitió/guardó este certificado, el próximo cambio de datos genera
+  // una referencia NUEVA (para no reemplazar el anterior y reutilizar los datos).
+  const forkSiNecesario = () => { if (guardadoActual && !editando) { refActual = nuevoRef(); guardadoActual = false; } };
   const docActual = () => {
     const nombre = ($('#ce_nombre').value || '').trim();
     const ci = ($('#ce_ci').value || '').trim();
@@ -233,6 +237,7 @@ export async function renderCertificados() {
       };
       // Solo al crear uno nuevo se fija el autor; al editar se conserva el original.
       if (!editando) row.created_by = state.profile.id;
+      guardadoActual = true;
       supabase.from('certificados').upsert(row, { onConflict: 'ref' }).then(() => { cargarEmitidos(); }, () => {});
     } catch (e) { /* ignorado */ }
   };
@@ -268,10 +273,11 @@ export async function renderCertificados() {
         <td class="cell-sub">${esc(c.created_by ? profName(c.created_by) : '—')}</td>
         <td class="cell-sub">${esc(c.ref)}</td>
         <td class="cell-sub">${fmtDate(c.created_at)}</td>
-        <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-editcert" data-id="${c.id}">Editar</button> <button class="btn btn--ghost btn--sm js-reimp" data-id="${c.id}">Reimprimir</button> <button class="btn btn--danger btn--sm js-delcert" data-id="${c.id}" title="Eliminar registro">&times;</button></td>
+        <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-dupcert" data-id="${c.id}" title="Crear otro certificado para esta misma persona">Nuevo p/ esta persona</button> <button class="btn btn--ghost btn--sm js-editcert" data-id="${c.id}">Editar</button> <button class="btn btn--ghost btn--sm js-reimp" data-id="${c.id}">Reimprimir</button> <button class="btn btn--danger btn--sm js-delcert" data-id="${c.id}" title="Eliminar registro">&times;</button></td>
       </tr>`).join('')}</tbody></table></div>`;
     cont.querySelectorAll('.js-reimp').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) reimprimirCert(c); });
     cont.querySelectorAll('.js-editcert').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) editarCert(c); });
+    cont.querySelectorAll('.js-dupcert').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) nuevoConDatos(c); });
     cont.querySelectorAll('.js-delcert').forEach(b => b.onclick = async () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id); if (!c) return;
       if (!confirm('¿Eliminar el registro del certificado ' + c.ref + '? Ya no se podrá verificar por su QR.')) return;
@@ -308,6 +314,7 @@ export async function renderCertificados() {
     cuerpoEditado = true;
     refActual = c.ref;
     editando = true;
+    guardadoActual = false;
     const banner = $('#ce_editbanner'); if (banner) { banner.style.display = ''; const r = $('#ce_editref'); if (r) r.textContent = c.ref; }
     pintar();
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
@@ -317,6 +324,7 @@ export async function renderCertificados() {
   // Sale del modo edición y prepara un certificado nuevo (referencia nueva).
   function nuevoCert() {
     editando = false;
+    guardadoActual = false;
     refActual = nuevoRef();
     cuerpoEditado = false;
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
@@ -326,13 +334,34 @@ export async function renderCertificados() {
     pintar();
   }
 
+  // Carga los DATOS de una persona (de un certificado emitido) en un certificado
+  // NUEVO, para no volver a escribirlos. No reemplaza el anterior.
+  function nuevoConDatos(c) {
+    $('#ce_nombre').value = c.nombre || '';
+    $('#ce_ci').value = c.ci || '';
+    $('#ce_calidad').value = c.cargo || '';
+    $('#ce_periodo').value = c.periodo || '';
+    $('#ce_fecha').value = hoyISO();
+    editando = false; guardadoActual = false; refActual = nuevoRef(); cuerpoEditado = false;
+    const banner = $('#ce_editbanner'); if (banner) banner.style.display = 'none';
+    regenerar(); pintar();
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    toast('Datos de ' + (c.nombre || 'la persona') + ' cargados. Elija el tipo y guarde un certificado NUEVO.', 'success');
+  }
+
   // Campos que, si el texto no fue editado a mano, regeneran el borrador.
   ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => {
-    $('#' + id).oninput = () => { if (!cuerpoEditado) regenerar(); pintar(); };
+    $('#' + id).oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
-  $('#ce_tipo').onchange = () => { regenerar(); pintar(); };
-  $('#ce_fecha').onchange = pintar;
-  $('#ce_cuerpo').oninput = () => { cuerpoEditado = true; pintar(); };
+  $('#ce_tipo').onchange = () => {
+    // Cambiar el TIPO nunca debe reemplazar un certificado ya guardado: se crea
+    // uno nuevo conservando los datos de la persona.
+    if (editando) { editando = false; guardadoActual = false; refActual = nuevoRef(); const b = $('#ce_editbanner'); if (b) b.style.display = 'none'; toast('Nuevo certificado (se conservan los datos de la persona).', 'success'); }
+    else forkSiNecesario();
+    regenerar(); pintar();
+  };
+  $('#ce_fecha').onchange = () => { forkSiNecesario(); pintar(); };
+  $('#ce_cuerpo').oninput = () => { forkSiNecesario(); cuerpoEditado = true; pintar(); };
   $('#ce_restaurar').onclick = () => { regenerar(); pintar(); toast('Texto regenerado a partir de los datos.', 'success'); };
   const btnNuevo = $('#ce_nuevo'); if (btnNuevo) btnNuevo.onclick = nuevoCert;
   // Control de opacidad de la marca de agua (logo de fondo), igual que en credenciales.
@@ -347,8 +376,9 @@ export async function renderCertificados() {
   $('#ce_guardar').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
     registrarCert();
-    toast('Certificado guardado. Quedó en «Certificados emitidos»; el formulario está listo para uno nuevo.', 'success');
-    nuevoCert();
+    editando = false;
+    const banner = $('#ce_editbanner'); if (banner) banner.style.display = 'none';
+    toast('Certificado guardado en «Certificados emitidos». Para la misma persona, cambie el tipo y vuelva a Guardar: se crea otro sin reemplazar este.', 'success');
   };
   $('#ce_print').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
