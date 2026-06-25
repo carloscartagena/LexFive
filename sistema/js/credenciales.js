@@ -123,6 +123,9 @@ export async function renderCredenciales() {
     return SELLO_DEFAULT;
   };
   const selloActual = pickActiveSello(localStorage.getItem('lexfive_sello'));
+  // Mostrar u ocultar el sello en la credencial (por defecto sí). Se controla
+  // con un check; útil mientras el bufete prepara sus propios sellos.
+  const selloOn = localStorage.getItem('lexfive_cred_sello') !== '0';
 
   // Devuelven la fuente correcta: archivo del repo o imagen subida por el bufete (data URL)
   const logoSrc = id => {
@@ -207,6 +210,7 @@ export async function renderCredenciales() {
       <input type="range" id="cr_wm" min="3" max="40" step="1" value="${wmOpacityActual()}">
       <output id="cr_wm_out">${wmOpacityActual()}%</output>
     </div>
+    <label class="cell-sub" style="display:flex;align-items:center;gap:6px;margin:2px 0 8px"><input type="checkbox" id="cr_sello" ${selloOn ? 'checked' : ''}> Incluir el sello del bufete en la credencial</label>
     <p class="cell-sub" style="margin:2px 0 10px">La línea punteada alrededor de cada cara es la <strong>guía de corte</strong>: imprima y recorte por ahí. Tamaño final: 9 × 6 cm.</p>
     <div class="cred-wrap" id="credPrintArea">
       <!-- ANVERSO -->
@@ -229,7 +233,7 @@ export async function renderCredenciales() {
             <div class="cred-foot__qr"><img src="${qrURL(RPA_URL)}" alt="SAJ-RPA" class="cred-qr-cert"><small class="cred-qr-cap">SAJ-RPA</small></div>
           </div>
           <div class="cred-foot__validez"><span>Válido hasta</span><strong id="cv_validez">${esc(fmtFechaCorta(addAnios(datos.emision, 3)))}</strong>
-            ${selloActual ? `<img class="cred-sello-img cred-sello-img--front" src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
+            ${selloActual ? `<img class="cred-sello-img cred-sello-img--front"${selloOn ? '' : ' style="display:none"'} src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
           </div>
         </div>
       </div>
@@ -245,7 +249,7 @@ export async function renderCredenciales() {
         <div class="cred-sign">
           <div class="cred-sign__line">Firma autorizada</div>
           <div class="cred-sign__line cred-sign__sello">
-            ${selloActual ? `<img class="cred-sello-img" id="cv_sello" src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
+            ${selloActual ? `<img class="cred-sello-img"${selloOn ? '' : ' style="display:none"'} id="cv_sello" src="${selloSrc(selloActual)}" alt="Sello del bufete">` : ''}
             Sello del bufete
           </div>
         </div>
@@ -346,6 +350,13 @@ export async function renderCredenciales() {
     wm.addEventListener('input', () => { applyWmOpacity(wm.value); if (wmOut) wmOut.textContent = wm.value + '%'; });
     wm.addEventListener('change', () => { localStorage.setItem('lexfive_wm_op', wm.value); pushBranding(); });
   }
+
+  // Mostrar/ocultar el sello del bufete en la credencial (anverso y reverso).
+  const crSello = $('#cr_sello');
+  if (crSello) crSello.addEventListener('change', () => {
+    localStorage.setItem('lexfive_cred_sello', crSello.checked ? '1' : '0');
+    content().querySelectorAll('.cred-sello-img').forEach(im => { im.style.display = crSello.checked ? '' : 'none'; });
+  });
 
   // Vista previa de impresión: muestra ambas caras tal como saldrán.
   const bPrev = $('#btnPreviewCred');

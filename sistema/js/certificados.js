@@ -123,6 +123,8 @@ export async function renderCertificados() {
   try { await withTimeout(hydrateBranding(), 8000, 'branding'); } catch (e) {}
   const logoSrc = urlAbs(brandLogoSrc(pickActiveLogo(localStorage.getItem('lexfive_logo'))));
   const selloSrc = urlAbs(brandSelloSrc(pickActiveSello(localStorage.getItem('lexfive_sello'))));
+  // Devuelve el sello solo si el check «Incluir sello» está activo.
+  const selloActivo = () => ($('#ce_sello') && $('#ce_sello').checked) ? selloSrc : '';
 
   content().innerHTML = `
     <div class="card">
@@ -167,6 +169,7 @@ export async function renderCertificados() {
           </div>
           <p class="cell-sub" style="margin:4px 0 0">Hacia la derecha = marca de agua más oscura. Es el logo del bufete de fondo. (Se aplica igual a las credenciales.)</p>
         </div>
+        <label class="cell-sub" style="display:flex;align-items:center;gap:6px;margin-top:12px"><input type="checkbox" id="ce_sello" checked> Incluir el sello del bufete</label>
       </div>
     </div>
 
@@ -214,7 +217,7 @@ export async function renderCertificados() {
       fechaTxt: fechaLarga(fecha),
       ref: refActual,
       qrSrc: qrURL(qrCertificado({ nombre, ci, cargo: cargo || 'Colaborador', tipo: tplActual().titulo, ref: refActual, fecha })),
-      logoSrc, selloSrc
+      logoSrc, selloSrc: selloActivo()
     });
   };
   const pintar = () => { $('#certPreview').innerHTML = docActual(); };
@@ -291,7 +294,7 @@ export async function renderCertificados() {
       titulo: c.tipo || 'CERTIFICADO', cuerpoTexto: cuerpo, nombre: c.nombre, ci: c.ci || '',
       fechaTxt: fechaLarga(c.fecha_emision), ref: c.ref,
       qrSrc: qrURL(qrCertificado({ nombre: c.nombre, ci: c.ci, cargo: c.cargo, tipo: c.tipo, ref: c.ref, fecha: c.fecha_emision })),
-      logoSrc, selloSrc
+      logoSrc, selloSrc: selloActivo()
     });
     abrirImpresionCert(c.tipo || 'Certificado', doc);
   }
@@ -343,6 +346,7 @@ export async function renderCertificados() {
     wmS.addEventListener('input', () => { localStorage.setItem('lexfive_wm_op', wmS.value); applyWmOpacity(wmS.value); if (wmOut) wmOut.textContent = wmS.value + '%'; pintar(); });
     wmS.addEventListener('change', () => { pushBranding(); });
   }
+  const ceSello = $('#ce_sello'); if (ceSello) ceSello.onchange = pintar;
 
   $('#ce_print').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
