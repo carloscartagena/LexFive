@@ -95,7 +95,9 @@ let informeEditId = null;
 function cacheInformes() { try { const a = JSON.parse(localStorage.getItem(INFORMES_CACHE) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
 async function fetchInformes() {
   try {
-    const { data } = await withTimeout(supabase.from('informes').select('*').order('updated_at', { ascending: false }).limit(200), 8000, 'informes');
+    // Lista liviana: sin la columna "datos" (contenido completo) para ahorrar
+    // datos. El contenido se trae solo al reabrir un informe.
+    const { data } = await withTimeout(supabase.from('informes').select('id, etiqueta, updated_at, created_at').order('updated_at', { ascending: false }).limit(200), 8000, 'informes');
     if (Array.isArray(data)) { try { localStorage.setItem(INFORMES_CACHE, JSON.stringify(data)); } catch (e) {} return data; }
   } catch (e) {}
   return cacheInformes();
@@ -434,9 +436,11 @@ export async function renderInforme() {
         <td class="cell-sub">${esc(new Date(it.updated_at || it.created_at || Date.now()).toLocaleString('es-BO'))}</td>
         <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-inf-open" data-id="${esc(it.id)}">Reabrir</button> <button class="btn btn--danger btn--sm js-inf-del" data-id="${esc(it.id)}" title="Eliminar">&times;</button></td>
       </tr>`).join('')}</tbody></table></div>`;
-    cont.querySelectorAll('.js-inf-open').forEach(b => b.onclick = () => {
-      const it = INFORMES.find(x => x.id === b.dataset.id); if (!it) return;
-      informeEditId = it.id; Draft.save('informe', it.datos || {}); renderInforme();
+    cont.querySelectorAll('.js-inf-open').forEach(b => b.onclick = async () => {
+      const id = b.dataset.id;
+      let datos = {};
+      try { const { data } = await supabase.from('informes').select('datos').eq('id', id).maybeSingle(); datos = (data && data.datos) || {}; } catch (e) {}
+      informeEditId = id; Draft.save('informe', datos); renderInforme();
       toast('Informe reabierto para editar.', 'success');
     });
     cont.querySelectorAll('.js-inf-del').forEach(b => b.onclick = async () => {

@@ -246,10 +246,20 @@ export async function renderCertificados() {
   let EMITIDOS = [];
   async function cargarEmitidos() {
     try {
-      const { data } = await supabase.from('certificados').select('*').order('created_at', { ascending: false }).limit(500);
+      // No se trae la columna "cuerpo" (texto completo) en la lista para ahorrar
+      // datos (egress). El cuerpo se pide solo al reimprimir/editar uno.
+      const { data } = await supabase.from('certificados')
+        .select('id, ref, tipo, nombre, ci, cargo, periodo, fecha_emision, created_by, created_at')
+        .order('created_at', { ascending: false }).limit(500);
       EMITIDOS = data || [];
     } catch (e) { EMITIDOS = []; }
     pintarEmitidos();
+  }
+  // Trae el texto guardado (cuerpo) de un certificado solo cuando se necesita.
+  async function fetchCuerpo(c) {
+    if (c.cuerpo) return c.cuerpo;
+    try { const { data } = await supabase.from('certificados').select('cuerpo').eq('id', c.id).maybeSingle(); return (data && data.cuerpo) || ''; }
+    catch (e) { return ''; }
   }
   function pintarEmitidos() {
     const cont = $('#certList'); if (!cont) return;
@@ -285,8 +295,8 @@ export async function renderCertificados() {
       catch (e) { toast('No se pudo eliminar.', 'error'); }
     });
   }
-  function reimprimirCert(c) {
-    let cuerpo = c.cuerpo;
+  async function reimprimirCert(c) {
+    let cuerpo = await fetchCuerpo(c);
     if (!cuerpo) {
       const tpl = CERT_PLANTILLAS.find(t => t.titulo === c.tipo) || CERT_PLANTILLAS[0];
       cuerpo = tpl.cuerpo({ nombre: c.nombre, ci: c.ci, calidad: c.cargo, periodo: c.periodo || 'el período indicado', universidad: '', carrera: '', horas: '', destinatario: '' });
@@ -302,15 +312,16 @@ export async function renderCertificados() {
 
   // Carga un certificado emitido en el formulario para EDITARLO (se guarda sobre
   // el mismo registro / N.º de referencia, no crea uno nuevo).
-  function editarCert(c) {
+  async function editarCert(c) {
     const tpl = CERT_PLANTILLAS.find(t => t.titulo === c.tipo) || CERT_PLANTILLAS[0];
+    const cuerpoGuardado = await fetchCuerpo(c);
     $('#ce_tipo').value = tpl.id;
     $('#ce_nombre').value = c.nombre || '';
     $('#ce_ci').value = c.ci || '';
     $('#ce_calidad').value = c.cargo || '';
     $('#ce_periodo').value = c.periodo || '';
     $('#ce_fecha').value = (c.fecha_emision || hoyISO()).slice(0, 10);
-    $('#ce_cuerpo').value = c.cuerpo || tpl.cuerpo({ nombre: c.nombre || '', ci: c.ci || '', calidad: c.cargo || '', periodo: c.periodo || 'el período indicado', universidad: '', carrera: '', horas: '', destinatario: '' });
+    $('#ce_cuerpo').value = cuerpoGuardado || tpl.cuerpo({ nombre: c.nombre || '', ci: c.ci || '', calidad: c.cargo || '', periodo: c.periodo || 'el período indicado', universidad: '', carrera: '', horas: '', destinatario: '' });
     cuerpoEditado = true;
     refActual = c.ref;
     editando = true;
