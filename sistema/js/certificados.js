@@ -14,7 +14,7 @@ import { toast, loading } from './ui.js';
 import { state } from './state.js';
 import { profName } from './comunes.js';
 import { ensureImgCache } from './media.js';
-import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual } from './branding.js';
+import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual, applyWmOpacity, pushBranding } from './branding.js';
 import { supabase } from './supabase.js';
 
 function urlAbs(src) {
@@ -135,6 +135,9 @@ export async function renderCertificados() {
     <div class="card">
       <div class="card__head"><h3>Datos</h3></div>
       <div class="card__body">
+        <div id="ce_editbanner" style="display:none;background:var(--gold-tint);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:.85rem">
+          Editando el certificado <strong id="ce_editref"></strong>. Los cambios se guardarán sobre el mismo registro al imprimir o descargar. <button class="btn btn--ghost btn--sm" id="ce_nuevo" type="button" style="margin-left:6px">Empezar uno nuevo</button>
+        </div>
         <div class="field"><label>Tipo de certificado</label>
           <select id="ce_tipo">${CERT_PLANTILLAS.map(t => `<option value="${t.id}">${esc(t.nombre)}</option>`).join('')}</select></div>
         <div class="cert-form">
@@ -155,6 +158,14 @@ export async function renderCertificados() {
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
           <button class="btn btn--primary" id="ce_print">${ICON.doc} Imprimir / Guardar PDF</button>
           <button class="btn btn--ghost" id="ce_word">Descargar Word</button>
+        </div>
+        <div class="field" style="margin-top:16px;max-width:440px">
+          <label>Intensidad de la marca de agua (logo de fondo)</label>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="range" id="ce_wm" min="3" max="40" step="1" value="${wmOpacityActual()}" style="flex:1">
+            <output id="ce_wm_out" style="min-width:42px;text-align:right">${wmOpacityActual()}%</output>
+          </div>
+          <p class="cell-sub" style="margin:4px 0 0">Hacia la derecha = marca de agua más oscura. Es el logo del bufete de fondo. (Se aplica igual a las credenciales.)</p>
         </div>
       </div>
     </div>
@@ -188,7 +199,9 @@ export async function renderCertificados() {
     destinatario: ($('#ce_dest').value || '').trim()
   });
   const regenerar = () => { $('#ce_cuerpo').value = tplActual().cuerpo(datos()); cuerpoEditado = false; };
-  const ref = 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
+  const nuevoRef = () => 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
+  let refActual = nuevoRef();
+  let editando = false;
   const docActual = () => {
     const nombre = ($('#ce_nombre').value || '').trim();
     const ci = ($('#ce_ci').value || '').trim();
@@ -199,8 +212,8 @@ export async function renderCertificados() {
       cuerpoTexto: $('#ce_cuerpo').value,
       nombre, ci,
       fechaTxt: fechaLarga(fecha),
-      ref,
-      qrSrc: qrURL(qrCertificado({ nombre, ci, cargo: cargo || 'Colaborador', tipo: tplActual().titulo, ref, fecha })),
+      ref: refActual,
+      qrSrc: qrURL(qrCertificado({ nombre, ci, cargo: cargo || 'Colaborador', tipo: tplActual().titulo, ref: refActual, fecha })),
       logoSrc, selloSrc
     });
   };
@@ -210,17 +223,19 @@ export async function renderCertificados() {
   // por su N.º de referencia. Si la tabla aún no existe (db/25), no pasa nada.
   const registrarCert = () => {
     try {
-      supabase.from('certificados').upsert({
-        ref,
+      const row = {
+        ref: refActual,
         tipo: tplActual().titulo,
         nombre: ($('#ce_nombre').value || '').trim(),
         ci: ($('#ce_ci').value || '').trim() || null,
         cargo: ($('#ce_calidad').value || '').trim() || null,
         periodo: ($('#ce_periodo').value || '').trim() || null,
         cuerpo: $('#ce_cuerpo').value || null,
-        fecha_emision: $('#ce_fecha').value || null,
-        created_by: state.profile.id
-      }, { onConflict: 'ref' }).then(() => { cargarEmitidos(); }, () => {});
+        fecha_emision: $('#ce_fecha').value || null
+      };
+      // Solo al crear uno nuevo se fija el autor; al editar se conserva el original.
+      if (!editando) row.created_by = state.profile.id;
+      supabase.from('certificados').upsert(row, { onConflict: 'ref' }).then(() => { cargarEmitidos(); }, () => {});
     } catch (e) { /* ignorado */ }
   };
 
@@ -255,9 +270,10 @@ export async function renderCertificados() {
         <td class="cell-sub">${esc(c.created_by ? profName(c.created_by) : '—')}</td>
         <td class="cell-sub">${esc(c.ref)}</td>
         <td class="cell-sub">${fmtDate(c.created_at)}</td>
-        <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-reimp" data-id="${c.id}">Reimprimir</button> <button class="btn btn--danger btn--sm js-delcert" data-id="${c.id}" title="Eliminar registro">&times;</button></td>
+        <td class="cell-actions" style="white-space:nowrap"><button class="btn btn--ghost btn--sm js-editcert" data-id="${c.id}">Editar</button> <button class="btn btn--ghost btn--sm js-reimp" data-id="${c.id}">Reimprimir</button> <button class="btn btn--danger btn--sm js-delcert" data-id="${c.id}" title="Eliminar registro">&times;</button></td>
       </tr>`).join('')}</tbody></table></div>`;
     cont.querySelectorAll('.js-reimp').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) reimprimirCert(c); });
+    cont.querySelectorAll('.js-editcert').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) editarCert(c); });
     cont.querySelectorAll('.js-delcert').forEach(b => b.onclick = async () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id); if (!c) return;
       if (!confirm('¿Eliminar el registro del certificado ' + c.ref + '? Ya no se podrá verificar por su QR.')) return;
@@ -280,6 +296,38 @@ export async function renderCertificados() {
     abrirImpresionCert(c.tipo || 'Certificado', doc);
   }
 
+  // Carga un certificado emitido en el formulario para EDITARLO (se guarda sobre
+  // el mismo registro / N.º de referencia, no crea uno nuevo).
+  function editarCert(c) {
+    const tpl = CERT_PLANTILLAS.find(t => t.titulo === c.tipo) || CERT_PLANTILLAS[0];
+    $('#ce_tipo').value = tpl.id;
+    $('#ce_nombre').value = c.nombre || '';
+    $('#ce_ci').value = c.ci || '';
+    $('#ce_calidad').value = c.cargo || '';
+    $('#ce_periodo').value = c.periodo || '';
+    $('#ce_fecha').value = (c.fecha_emision || hoyISO()).slice(0, 10);
+    $('#ce_cuerpo').value = c.cuerpo || tpl.cuerpo({ nombre: c.nombre || '', ci: c.ci || '', calidad: c.cargo || '', periodo: c.periodo || 'el período indicado', universidad: '', carrera: '', horas: '', destinatario: '' });
+    cuerpoEditado = true;
+    refActual = c.ref;
+    editando = true;
+    const banner = $('#ce_editbanner'); if (banner) { banner.style.display = ''; const r = $('#ce_editref'); if (r) r.textContent = c.ref; }
+    pintar();
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
+    toast('Editando el certificado ' + c.ref + '. Modifique y vuelva a imprimir/descargar para guardar los cambios.', 'success');
+  }
+
+  // Sale del modo edición y prepara un certificado nuevo (referencia nueva).
+  function nuevoCert() {
+    editando = false;
+    refActual = nuevoRef();
+    cuerpoEditado = false;
+    ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+    $('#ce_fecha').value = hoyISO();
+    const banner = $('#ce_editbanner'); if (banner) banner.style.display = 'none';
+    regenerar();
+    pintar();
+  }
+
   // Campos que, si el texto no fue editado a mano, regeneran el borrador.
   ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => {
     $('#' + id).oninput = () => { if (!cuerpoEditado) regenerar(); pintar(); };
@@ -288,6 +336,13 @@ export async function renderCertificados() {
   $('#ce_fecha').onchange = pintar;
   $('#ce_cuerpo').oninput = () => { cuerpoEditado = true; pintar(); };
   $('#ce_restaurar').onclick = () => { regenerar(); pintar(); toast('Texto regenerado a partir de los datos.', 'success'); };
+  const btnNuevo = $('#ce_nuevo'); if (btnNuevo) btnNuevo.onclick = nuevoCert;
+  // Control de opacidad de la marca de agua (logo de fondo), igual que en credenciales.
+  const wmS = $('#ce_wm'), wmOut = $('#ce_wm_out');
+  if (wmS) {
+    wmS.addEventListener('input', () => { localStorage.setItem('lexfive_wm_op', wmS.value); applyWmOpacity(wmS.value); if (wmOut) wmOut.textContent = wmS.value + '%'; pintar(); });
+    wmS.addEventListener('change', () => { pushBranding(); });
+  }
 
   $('#ce_print').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }

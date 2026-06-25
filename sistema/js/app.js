@@ -27,6 +27,7 @@ import { renderSellos } from './sellos.js';
 import { renderCredenciales, renderCredGuardadas } from './credenciales.js';
 import { renderCertificados } from './certificados.js';
 import { renderMembrete } from './membrete.js';
+import { renderInforme } from './informe.js';
 import { renderMiOpinion, renderTestimonios } from './opiniones.js';
 import { renderClientes, clienteForm } from './clientes.js';
 import { renderProcesos, openProcesoDetail } from './procesos.js';
@@ -55,6 +56,7 @@ const NAV = [
   { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true },
   { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true },
   { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true },
+  { key: 'informe', label: 'Informe de pasantía', icon: ICON.doc, credOnly: true },
   { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
   { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
@@ -429,6 +431,7 @@ const VIEWS = {
   areas: { title: 'Áreas de práctica', render: renderAreas },
   certificados: { title: 'Certificados y constancias', render: renderCertificados },
   membrete: { title: 'Hoja membretada', render: renderMembrete },
+  informe: { title: 'Informe Único de Pasantía', render: renderInforme },
   testimonios: { title: 'Testimonios', render: renderTestimonios },
   categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
@@ -459,6 +462,7 @@ export function navigate(key) {
     if (key === 'areas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'certificados' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'membrete' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
+    if (key === 'informe' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
   }
   state.view = key;
