@@ -14,7 +14,7 @@ import { toast, loading } from './ui.js';
 import { state } from './state.js';
 import { profName } from './comunes.js';
 import { ensureImgCache } from './media.js';
-import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc } from './branding.js';
+import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual } from './branding.js';
 import { supabase } from './supabase.js';
 
 function urlAbs(src) {
@@ -71,13 +71,16 @@ function buildCertDoc(d) {
   };
   const parrafos = (d.cuerpoTexto || '').split(/\n\s*\n/).map(p =>
     `<p style="margin:0 0 13px;text-align:justify;">${resaltar(esc(p).replace(/\n/g, '<br>'))}</p>`).join('');
-  const wm = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="position:absolute;top:52%;left:50%;width:12cm;height:12cm;object-fit:contain;transform:translate(-50%,-50%);opacity:.05;pointer-events:none;">` : '';
+  // Marca de agua del logo: usa la intensidad configurable del branding (por
+  // defecto 15%), para que SÍ se note. Antes estaba fija en 5% y casi no se veía.
+  const wmOp = (wmOpacityActual() / 100).toFixed(2);
+  const wm = d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="position:absolute;top:52%;left:50%;width:12cm;height:12cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${wmOp};pointer-events:none;">` : '';
   return `
   <div style="position:relative;font-family:Georgia,'Times New Roman',serif;color:#1a2330;background:#fff;width:21.6cm;min-height:27.9cm;margin:0 auto;padding:1.6cm 2cm 1.3cm;box-sizing:border-box;overflow:hidden;">
     <div style="position:absolute;top:0;left:0;bottom:0;width:0.5cm;background:linear-gradient(#0e1b2c,#16273d);"></div>
     ${wm}
     <div style="position:relative;text-align:center;border-bottom:2px solid #c2a25a;padding-bottom:14px;">
-      ${d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:92px;height:92px;object-fit:contain;display:block;margin:0 auto 6px;">` : ''}
+      ${d.logoSrc ? `<img src="${d.logoSrc}" alt="" style="width:82px;height:82px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 8px;box-shadow:0 0 0 2px rgba(194,162,90,.6);">` : ''}
       <div style="font-size:30px;font-weight:700;color:#0e1b2c;letter-spacing:1px;">Lex<span style="color:#c2a25a;">Five</span></div>
       <div style="font-size:12px;letter-spacing:4px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div>
       <div style="font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;line-height:1.55;">Calle Uruguay esq. Raúl Salmón, zona 12 de Octubre, Ed. Señor de Mayo N.&deg; 85, P.B., of. 1-A &mdash; El Alto, Bolivia<br>Tel/WhatsApp: +591 78360469 &nbsp;&middot;&nbsp; lexfive.netlify.app</div>
