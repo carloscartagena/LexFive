@@ -140,17 +140,38 @@ const DEF = {
 
 // Convierte el texto del cuerpo en HTML legible.
 function bodyHTML(text) {
-  return (text || '').split('\n').map(raw => {
-    const t = raw.trim();
+  const lines = (text || '').split('\n');
+  let out = '';
+  let weekOpen = false;
+  const closeWeek = () => { if (weekOpen) { out += '</div>'; weekOpen = false; } };
+  const render = (t) => {
     if (!t) return '<div style="height:7px"></div>';
-    const esTitulo = /^(I{1,3}|IV|V)\.\s/.test(t) || /SEMANA/.test(t);
     const esDia = /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+:$/.test(t);
     const esBullet = /^[•·\-]/.test(t);
-    if (esTitulo) return `<div style="font-weight:700;margin:12px 0 4px;color:#0e1b2c;">${esc(t)}</div>`;
     if (esDia) return `<div style="font-weight:700;margin:6px 0 2px;">${esc(t)}</div>`;
     if (esBullet) return `<div style="padding-left:20px;text-indent:-14px;margin:2px 0;text-align:justify;">${esc(t)}</div>`;
     return `<div style="margin:3px 0;text-align:justify;">${esc(t)}</div>`;
-  }).join('');
+  };
+  for (const raw of lines) {
+    const t = raw.trim();
+    if (/SEMANA/.test(t)) {
+      // Cada SEMANA empieza en una hoja NUEVA (con el mismo encabezado/pie) y se
+      // mantiene junta para que no se parta a la mitad.
+      closeWeek();
+      out += '<div style="page-break-before:always;break-before:page;page-break-inside:avoid;break-inside:avoid;">';
+      weekOpen = true;
+      out += `<div style="font-weight:700;margin:0 0 4px;color:#0e1b2c;">${esc(t)}</div>`;
+      continue;
+    }
+    if (/^(I{1,3}|IV|V)\.\s/.test(t)) {
+      closeWeek();
+      out += `<div style="font-weight:700;margin:12px 0 4px;color:#0e1b2c;">${esc(t)}</div>`;
+      continue;
+    }
+    out += render(t);
+  }
+  closeWeek();
+  return out;
 }
 
 function buildInforme(d) {
