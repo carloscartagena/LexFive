@@ -52,6 +52,7 @@ const SHELL = [
   './js/icons.js',
   './js/imagenes.js',
   './js/media.js',
+  './js/membrete.js',
   './js/modelos.js',
   './js/opiniones.js',
   './js/papelera.js',
