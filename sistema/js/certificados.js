@@ -347,7 +347,8 @@ export async function renderCertificados() {
   $('#ce_guardar').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
     registrarCert();
-    toast(editando ? 'Cambios guardados en el certificado ' + refActual + '.' : 'Certificado guardado. Aparece en «Certificados emitidos» y se puede editar.', 'success');
+    toast('Certificado guardado. Quedó en «Certificados emitidos»; el formulario está listo para uno nuevo.', 'success');
+    nuevoCert();
   };
   $('#ce_print').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
