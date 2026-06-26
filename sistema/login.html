@@ -143,10 +143,23 @@
 
   <script src="../js/branding.js"></script>
   <script>
-    /* Registra el service worker para que el sistema se pueda instalar como app. */
+    /* Registra el service worker para que el sistema se pueda instalar como app.
+       Además, si aparece una versión nueva (tras un despliegue), se activa y la
+       página se recarga una sola vez, para que el celular nunca se quede con
+       archivos viejos en caché. */
     if ('serviceWorker' in navigator) {
+      var _recargaPorSW = false;
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+          if (_recargaPorSW) return;
+          _recargaPorSW = true;
+          location.reload();
+        });
+      }
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('sw.js').catch(function () {});
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          try { reg.update(); } catch (e) {}
+        }).catch(function () {});
       });
     }
     /* Botón "Instalar app": aparece cuando el navegador permite instalar la PWA

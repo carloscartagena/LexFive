@@ -19,7 +19,7 @@
      segundo plano. Así el panel se siente rápido.
    - Las peticiones a Supabase y otros servicios externos NO se interceptan.
    ========================================================= */
-const CACHE = 'lexfive-sistema-v74';
+const CACHE = 'lexfive-sistema-v75';
 const SHELL = [
   './',
   './index.html',
@@ -79,8 +79,14 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (event) => {
+  // Cacheamos cada archivo por separado: si uno falla (red débil en el celular),
+  // los demás igual quedan guardados, en vez de abortar toda la instalación y
+  // dejar la caché incompleta o vieja.
   event.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => {}))))
+      .catch(() => {})
+      .then(() => self.skipWaiting())
   );
 });
 

@@ -865,12 +865,43 @@ async function arrancarSesion() {
   initNotifBell();
 
   // Registrar el service worker para que el sistema se pueda instalar como
-  // app en el celular y funcione mejor (PWA).
+  // app en el celular y funcione mejor (PWA). Además, nos aseguramos de que el
+  // celular SIEMPRE termine con la última versión: si aparece un service worker
+  // nuevo (tras un despliegue), se activa y la página se recarga UNA sola vez
+  // para aplicarlo, de modo que no se quede sirviendo archivos viejos en caché
+  // (esa era la causa de que el panel o los testimonios no cargaran en algunos
+  // teléfonos aunque en la PC sí funcionaran).
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-    // El SW avisa cuando detecta una versión nueva del panel (app.js/CSS) en el
-    // servidor. Mostramos una barra discreta con un botón para recargar, así el
-    // usuario siempre puede pasar a la última versión sin tener que forzar nada.
+    // Solo recargamos automáticamente si ya había un service worker controlando
+    // la página; en la primera instalación (sin controlador previo) no se
+    // recarga, para no duplicar la carga inicial.
+    let _recargaPorSW = false;
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (_recargaPorSW) return;
+        _recargaPorSW = true;
+        // Si hay un modal abierto (el usuario está en medio de algo) no
+        // recargamos de golpe: mostramos la barra para que recargue cuando
+        // quiera. Si no, recargamos al instante para aplicar la versión nueva.
+        const modal = document.getElementById('modalOverlay');
+        if (modal && modal.classList.contains('open')) { mostrarAvisoActualizacion(); return; }
+        location.reload();
+      });
+    }
+
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      // Comprobar de inmediato si hay una versión nueva en el servidor.
+      try { reg.update(); } catch (e) {}
+      // Volver a comprobar al regresar a la app (muy típico en el celular) y,
+      // como respaldo, cada 30 minutos si la app queda abierta.
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') { try { reg.update(); } catch (e) {} }
+      });
+      setInterval(() => { try { reg.update(); } catch (e) {} }, 30 * 60 * 1000);
+    }).catch(() => {});
+
+    // El SW también avisa cuando detecta una versión nueva (barra discreta con
+    // botón "Actualizar"), por si la recarga automática no llegara a aplicarse.
     navigator.serviceWorker.addEventListener('message', (e) => {
       if (e.data && e.data.tipo === 'lexfive-nueva-version') mostrarAvisoActualizacion();
     });
