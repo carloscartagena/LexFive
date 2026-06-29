@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarjeta de presentación · Abg. e Ing. Carlos Cartagena — LexFive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0e1b2c; --navy-700:#16273d; --navy-800:#0a1420;
+    --gold:#b8923f; --gold-soft:#c8a558; --gold-bright:#e7d3a1;
+    --tech:#2f7bd6; --tech-cyan:#38bdf8;
+    --ink:#1b2430; --muted:#5d6b7d; --line:#e8eaef;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    /* Tarjeta estándar 85 x 55 mm */
+    --cw:85mm; --ch:55mm;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  body{
+    font-family:var(--sans);
+    background:#eceef2;
+    color:var(--ink);
+    padding:40px 20px 60px;
+    display:flex; flex-direction:column; align-items:center; gap:34px;
+  }
+
+  .page-title{ text-align:center; max-width:760px; }
+  .page-title h1{ font-family:var(--serif); color:var(--navy); font-size:1.9rem; font-weight:700; }
+  .page-title p{ color:var(--muted); margin-top:8px; font-size:.95rem; line-height:1.6; }
+
+  .cards{ display:flex; flex-wrap:wrap; gap:34px; justify-content:center; }
+
+  .card-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .card-label{ font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+
+  .card{
+    width:var(--cw); height:var(--ch);
+    border-radius:9px;
+    overflow:hidden; position:relative;
+    box-shadow:0 18px 44px rgba(16,27,44,.22), 0 4px 12px rgba(16,27,44,.12);
+    color:#fff;
+    background:var(--navy);
+  }
+
+  /* Fondo: degradado navy + trama de circuito muy tenue */
+  .card::before{
+    content:""; position:absolute; inset:0;
+    background:
+      radial-gradient(120% 120% at 0% 0%, rgba(47,123,214,.18), transparent 55%),
+      linear-gradient(135deg, var(--navy-700) 0%, var(--navy) 55%, var(--navy-800) 100%);
+  }
+  .card::after{
+    content:""; position:absolute; inset:0; opacity:.10;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%2338bdf8' stroke-width='1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%23c8a558'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    background-size:84px 84px;
+  }
+  .card > *{ position:relative; z-index:1; }
+
+  /* Filo dorado superior */
+  .gold-edge{ position:absolute; top:0; left:0; right:0; height:4px;
+    background:linear-gradient(90deg,var(--gold) 0%,var(--gold-bright) 50%,var(--gold) 100%); z-index:2; }
+
+  /* ---------- ANVERSO ---------- */
+  .front{ display:flex; flex-direction:column; padding:7mm 8mm; }
+  .front__top{ display:flex; align-items:center; gap:3.4mm; }
+  .logo-mark{ width:15mm; height:15mm; flex-shrink:0;
+    border-radius:3mm; box-shadow:0 4px 12px rgba(0,0,0,.35); overflow:hidden; }
+  .logo-mark svg{ width:100%; height:100%; display:block; }
+  .brand{ display:flex; flex-direction:column; }
+  .brand__name{ font-family:var(--serif); font-size:7.6mm; font-weight:700; line-height:1;
+    letter-spacing:.5px; }
+  .brand__name b{ color:var(--gold-soft); font-weight:700; }
+  .brand__tag{ font-size:2.5mm; letter-spacing:.34em; text-transform:uppercase;
+    color:rgba(255,255,255,.62); margin-top:1.4mm; }
+
+  .front__name{ margin-top:auto; }
+  .front__name h2{ font-family:var(--serif); font-size:6.6mm; font-weight:600;
+    color:#fff; line-height:1.05; }
+  .roles{ display:flex; align-items:center; gap:2.4mm; margin-top:2mm; flex-wrap:wrap; }
+  .role{ display:inline-flex; align-items:center; gap:1.4mm;
+    font-size:2.7mm; font-weight:600; letter-spacing:.02em; }
+  .role svg{ width:3.4mm; height:3.4mm; }
+  .role--law{ color:var(--gold-bright); }
+  .role--tech{ color:var(--tech-cyan); }
+  .role-sep{ width:1px; height:3.6mm; background:rgba(255,255,255,.28); }
+
+  .front__foot{ margin-top:3mm; display:flex; align-items:center; justify-content:space-between; }
+  .front__foot .line{ font-size:2.5mm; color:rgba(255,255,255,.7); letter-spacing:.02em; }
+  .dual-badge{ font-size:2.2mm; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--navy); background:linear-gradient(90deg,var(--gold-bright),var(--gold-soft));
+    padding:1mm 2.6mm; border-radius:999px; font-weight:700; }
+
+  /* ---------- REVERSO ---------- */
+  .back{ padding:6.5mm 8mm; display:flex; flex-direction:column; }
+  .back__head{ display:flex; align-items:center; gap:2.6mm; padding-bottom:3mm;
+    border-bottom:1px solid rgba(255,255,255,.14); }
+  .back__head .logo-mark{ width:9mm; height:9mm; border-radius:2mm; }
+  .back__head .who h3{ font-family:var(--serif); font-size:4.4mm; font-weight:600; line-height:1; }
+  .back__head .who p{ font-size:2.4mm; color:rgba(255,255,255,.6);
+    letter-spacing:.05em; margin-top:.8mm; }
+
+  .contact{ margin-top:3.4mm; display:flex; flex-direction:column; gap:2.2mm; }
+  .contact .row{ display:flex; align-items:center; gap:2.6mm; font-size:2.85mm; color:rgba(255,255,255,.9); }
+  .contact .ico{ width:5mm; height:5mm; border-radius:1.6mm; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(56,189,248,.14); border:1px solid rgba(56,189,248,.28); }
+  .contact .ico svg{ width:3mm; height:3mm; color:var(--tech-cyan); }
+
+  .areas{ margin-top:auto; padding-top:3mm; border-top:1px solid rgba(255,255,255,.14); }
+  .areas .lbl{ font-size:2.2mm; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--gold-soft); font-weight:700; margin-bottom:1.6mm; }
+  .areas .chips{ display:flex; flex-wrap:wrap; gap:1.6mm; }
+  .areas .chip{ font-size:2.3mm; padding:.9mm 2.2mm; border-radius:999px;
+    background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16);
+    color:rgba(255,255,255,.85); }
+
+  /* ---------- Impresión ---------- */
+  .toolbar{ display:flex; gap:12px; }
+  .btn{ font-family:var(--sans); border:0; cursor:pointer; font-weight:600; font-size:.9rem;
+    padding:11px 22px; border-radius:999px; }
+  .btn--print{ background:var(--gold); color:#fff; box-shadow:0 8px 20px rgba(184,146,63,.3); }
+  .note{ color:var(--muted); font-size:.82rem; max-width:680px; text-align:center; line-height:1.6; }
+
+  @media print{
+    @page{ size:auto; margin:10mm; }
+    body{ background:#fff; padding:0; gap:8mm; }
+    .page-title,.toolbar,.note,.card-label{ display:none; }
+    .cards{ gap:8mm; }
+    .card{ box-shadow:none; outline:.2mm solid #d8dbe0; }
+    .card::after{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="page-title">
+    <h1>Tarjeta de presentación — LexFive</h1>
+    <p>Diseño de doble cara (85 × 55 mm) para <strong>Abg. e Ing. Zenón Carlos Cartagena Álvarez</strong>.
+       Refleja tu doble perfil: <strong>Abogado</strong> e <strong>Ingeniero de Sistemas</strong>,
+       con el emblema que une la balanza de la justicia y un microchip.</p>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn--print" onclick="window.print()">Imprimir / Guardar como PDF</button>
+  </div>
+
+  <div class="cards">
+
+    <!-- ===================== ANVERSO ===================== -->
+    <div class="card-wrap">
+      <span class="card-label">Anverso</span>
+      <div class="card front">
+        <span class="gold-edge"></span>
+
+        <div class="front__top">
+          <div class="logo-mark">
+            <!-- Emblema: balanza de la justicia dentro de un microchip (Derecho + Sistemas) -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive">
+              <defs>
+                <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2f49"/><stop offset="1" stop-color="#0d1826"/></linearGradient>
+                <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecdcb2"/><stop offset="0.45" stop-color="#cba765"/><stop offset="1" stop-color="#a07f3a"/></linearGradient>
+              </defs>
+              <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+              <rect x="3.25" y="3.25" width="57.5" height="57.5" rx="11" fill="none" stroke="url(#gold)" stroke-width="0.8" opacity="0.55"/>
+              <g fill="none" stroke="url(#gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="19" y="13" width="26" height="26" rx="3.5"/>
+                <path d="M25 13 L25 9.5 M32 13 L32 9.5 M39 13 L39 9.5"/>
+                <path d="M25 39 L25 42.5 M32 39 L32 42.5 M39 39 L39 42.5"/>
+                <path d="M19 20 L15.5 20 M19 26 L15.5 26 M19 32 L15.5 32"/>
+                <path d="M45 20 L48.5 20 M45 26 L48.5 26 M45 32 L48.5 32"/>
+              </g>
+              <g fill="none" stroke="url(#gold)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M32 18 L32 34"/>
+                <path d="M24 22 L40 22"/>
+                <path d="M24 22 L21.5 27 M24 22 L26.5 27"/>
+                <path d="M40 22 L37.5 27 M40 22 L42.5 27"/>
+                <path d="M20.5 27 Q24 30.8 27.5 27"/>
+                <path d="M36.5 27 Q40 30.8 43.5 27"/>
+                <path d="M28 34 L36 34"/>
+              </g>
+              <circle cx="32" cy="17.4" r="1.7" fill="url(#gold)"/>
+              <circle cx="32" cy="22" r="1.2" fill="url(#gold)"/>
+            </svg>
+          </div>
+          <div class="brand">
+            <div class="brand__name">Lex<b>Five</b></div>
+            <div class="brand__tag">Abogados · Derecho + Tecnología</div>
+          </div>
+        </div>
+
+        <div class="front__name">
+          <h2>Zenón Carlos<br>Cartagena Álvarez</h2>
+          <div class="roles">
+            <span class="role role--law">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M7 7l-3 6h6L7 7Zm10 0-3 6h6l-3-6ZM8 21h8"/></svg>
+              Abogado
+            </span>
+            <span class="role-sep"></span>
+            <span class="role role--tech">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 7V4M14 7V4M10 20v-3M14 20v-3M7 10H4M7 14H4M20 10h-3M20 14h-3"/></svg>
+              Ingeniero de Sistemas
+            </span>
+          </div>
+        </div>
+
+        <div class="front__foot">
+          <span class="line">Socio Fundador</span>
+          <span class="dual-badge">Derecho Informático</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== REVERSO ===================== -->
+    <div class="card-wrap">
+      <span class="card-label">Reverso</span>
+      <div class="card back">
+        <span class="gold-edge"></span>
+
+        <div class="back__head">
+          <div class="logo-mark">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="LexFive">
+              <defs>
+                <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2f49"/><stop offset="1" stop-color="#0d1826"/></linearGradient>
+                <linearGradient id="gold2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecdcb2"/><stop offset="0.45" stop-color="#cba765"/><stop offset="1" stop-color="#a07f3a"/></linearGradient>
+              </defs>
+              <rect width="64" height="64" rx="14" fill="url(#bg2)"/>
+              <g fill="none" stroke="url(#gold2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="19" y="13" width="26" height="26" rx="3.5"/>
+                <path d="M25 13 L25 9.5 M32 13 L32 9.5 M39 13 L39 9.5"/>
+                <path d="M25 39 L25 42.5 M32 39 L32 42.5 M39 39 L39 42.5"/>
+                <path d="M19 20 L15.5 20 M19 26 L15.5 26 M19 32 L15.5 32"/>
+                <path d="M45 20 L48.5 20 M45 26 L48.5 26 M45 32 L48.5 32"/>
+              </g>
+              <g fill="none" stroke="url(#gold2)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M32 18 L32 34"/><path d="M24 22 L40 22"/>
+                <path d="M24 22 L21.5 27 M24 22 L26.5 27"/><path d="M40 22 L37.5 27 M40 22 L42.5 27"/>
+                <path d="M20.5 27 Q24 30.8 27.5 27"/><path d="M36.5 27 Q40 30.8 43.5 27"/>
+                <path d="M28 34 L36 34"/>
+              </g>
+              <circle cx="32" cy="17.4" r="1.7" fill="url(#gold2)"/>
+            </svg>
+          </div>
+          <div class="who">
+            <h3>Abg. e Ing. Carlos Cartagena</h3>
+            <p>ABOGADO · INGENIERO DE SISTEMAS</p>
+          </div>
+        </div>
+
+        <div class="contact">
+          <div class="row">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2Z"/></svg></span>
+            +591 78360469 · WhatsApp
+          </div>
+          <div class="row">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+            alba23meira@gmail.com
+          </div>
+          <div class="row">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15.5 0 18M12 3c-2.5 2.5-2.5 15.5 0 18"/></svg></span>
+            lexfive.netlify.app
+          </div>
+          <div class="row">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg></span>
+            Av. Alfredo Franco Valle 708-51, Ed. Real, of. 6-A · El Alto, Bolivia
+          </div>
+        </div>
+
+        <div class="areas">
+          <div class="lbl">Áreas de práctica</div>
+          <div class="chips">
+            <span class="chip">Derecho Laboral</span>
+            <span class="chip">Derecho Informático</span>
+            <span class="chip">Derecho Administrativo</span>
+            <span class="chip">Asesoría Legal Tech</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="note">
+    Para imprimir: usa el botón superior y elige <strong>Guardar como PDF</strong>. En las opciones de impresión
+    activa <strong>“Gráficos de fondo”</strong> para conservar los colores. Tamaño final 85 × 55 mm (con sangrado
+    recomendado de 3 mm al enviar a imprenta).
+  </p>
+
+</body>
+</html>
