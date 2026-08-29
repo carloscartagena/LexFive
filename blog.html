@@ -224,11 +224,11 @@
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
     </button>
 
-    <script src="js/main.js?v=20260624"></script>
+    <script type="module" src="js/main.js?v=20260624"></script>
     <script type="module">
       // Carga dinámica de artículos publicados desde el panel (Supabase)
       import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-      import { SUPABASE_URL, SUPABASE_KEY } from './sistema/js/config.js';
+      import { SUPABASE_URL, SUPABASE_KEY } from './sistema/js/utils/config.js';
       const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
       const grid = document.querySelector('.blog-grid');
       const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

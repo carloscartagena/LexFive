@@ -1,42 +1,42 @@
 // ============================================================
 //  LexFive — Sistema de Gestión Legal · Lógica principal
 // ============================================================
-import { supabase } from './supabase.js';
-import { requireAuth, signOut, signOutTo, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from './auth.js';
-import { ROLES, VAPID_PUBLIC_KEY } from './config.js';
-import { ICON } from './icons.js';
-import { esc, hoyISO, fmtDate, fmtDateTime, initials } from './util.js';
-import { $, content } from './dom.js';
-import { toast, tip, initTooltipEngine, loading, openModal, closeModal } from './ui.js';
-import { state } from './state.js';
-import { renderCategorias } from './categorias.js';
-import { clienteName } from './comunes.js';
-import { renderConsultas, consultaNombre, openConsultaDetail } from './consultas.js';
-import { loadProfiles } from './datos.js';
-import { renderUsuarios, renderAuditoria } from './admin.js';
-import { renderBlog } from './blog.js';
-import { renderPlantillas } from './plantillas.js';
-import { renderModelos } from './modelos.js';
-import { renderTareas } from './tareas.js';
-import { renderReportes } from './reportes.js';
-import { renderFinanzas } from './finanzas.js';
-import { renderPapelera } from './papelera.js';
-import { renderAreas } from './areas.js';
-import { renderSitio } from './sitio.js';
-import { renderSellos } from './sellos.js';
-import { renderCredenciales, renderCredGuardadas } from './credenciales.js';
-import { renderCertificados } from './certificados.js';
-import { renderTarjetas } from './tarjetas.js';
-import { renderMembrete } from './membrete.js';
-import { renderInforme } from './informe.js';
-import { renderMiOpinion, renderTestimonios } from './opiniones.js';
-import { renderClientes, clienteForm } from './clientes.js';
-import { renderProcesos, openProcesoDetail } from './procesos.js';
-import { renderAgenda } from './agenda.js';
-import { renderDashboard } from './dashboard.js';
-import { updateNovedadesBadge, renderNovedades, renderMisProcesos } from './portal-cliente.js';
-import { IMG, ensureImgCache } from './media.js';
-import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from './branding.js';
+import { supabase } from '@/api/supabase.js';
+import { requireAuth, signOut, signOutTo, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from '@/api/auth.js';
+import { ROLES, VAPID_PUBLIC_KEY } from '@/utils/config.js';
+import { ICON } from '@/utils/icons.js';
+import { esc, hoyISO, fmtDate, fmtDateTime, initials } from '@/utils/util.js';
+import { $, content } from '@/utils/dom.js';
+import { toast, tip, initTooltipEngine, loading, openModal, closeModal } from '@/utils/ui.js';
+import { state } from '@/utils/state.js';
+import { renderCategorias } from '@/views/categorias.js';
+import { clienteName } from '@/shared/comunes.js';
+import { renderConsultas, consultaNombre, openConsultaDetail } from '@/views/consultas.js';
+import { loadProfiles } from '@/shared/datos.js';
+import { renderUsuarios, renderAuditoria } from '@/views/admin.js';
+import { renderBlog } from '@/views/blog.js';
+import { renderPlantillas } from '@/views/plantillas.js';
+import { renderModelos } from '@/views/modelos.js';
+import { renderTareas } from '@/views/tareas.js';
+import { renderReportes } from '@/views/reportes.js';
+import { renderFinanzas } from '@/views/finanzas.js';
+import { renderPapelera } from '@/views/papelera.js';
+import { renderAreas } from '@/views/areas.js';
+import { renderSitio } from '@/views/sitio.js';
+import { renderSellos } from '@/views/sellos.js';
+import { renderCredenciales, renderCredGuardadas } from '@/views/credenciales.js';
+import { renderCertificados } from '@/views/certificados.js';
+import { renderTarjetas } from '@/views/tarjetas.js';
+import { renderMembrete } from '@/views/membrete.js';
+import { renderInforme } from '@/views/informe.js';
+import { renderMiOpinion, renderTestimonios } from '@/views/opiniones.js';
+import { renderClientes, clienteForm } from '@/views/clientes.js';
+import { renderProcesos, openProcesoDetail } from '@/views/procesos.js';
+import { renderAgenda } from '@/views/agenda.js';
+import { renderDashboard } from '@/views/dashboard.js';
+import { updateNovedadesBadge, renderNovedades, renderMisProcesos } from '@/views/portal-cliente.js';
+import { IMG, ensureImgCache } from '@/utils/media.js';
+import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from '@/shared/branding.js';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },

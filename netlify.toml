@@ -2,11 +2,9 @@
 # Define la página 404, cabeceras de seguridad y caché de recursos estáticos.
 
 [build]
-  publish = "."
-  # Estampa una versión nueva en CSS/JS y en el Service Worker en cada despliegue,
-  # para que los cambios se vean de inmediato en todos los dispositivos (incluido
-  # el celular) sin tener que tocar nada a mano. Ver scripts/cache-bust.js
-  command = "node scripts/cache-bust.js"
+  publish = "dist"
+  command = "npm run build"
+  functions = "netlify/functions"
 
 # ---- Página de error 404 personalizada ----
 # Netlify usa automáticamente /404.html para rutas no encontradas.

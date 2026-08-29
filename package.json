@@ -1,0 +1,31 @@
+{
+  "name": "lexfive",
+  "version": "1.0.0",
+  "description": "Sitio web profesional, moderno y totalmente responsive para el despacho **LexFive** (El Alto, Bolivia).\r Construido con **HTML5, CSS3 y JavaScript puro** (sin frameworks ni dependencias): rápido, ligero\r y fácil de mantener o desplegar en cualquier servicio.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/copy-assets.js",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carloscartagena/LexFive.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/carloscartagena/LexFive/issues"
+  },
+  "homepage": "https://github.com/carloscartagena/LexFive#readme",
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.112.4",
+    "netlify-cli": "^27.4.1",
+    "vite": "^8.2.2"
+  },
+  "dependencies": {
+    "@google/genai": "^2.19.0"
+  }
+}

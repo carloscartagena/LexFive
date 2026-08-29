@@ -135,7 +135,7 @@
                 if (ref) {
                     try {
                         var mod = await import('https://esm.sh/@supabase/supabase-js@2');
-                        var cfg = await import('./sistema/js/config.js');
+                        var cfg = await import('./sistema/js/utils/config.js');
                         var sb = mod.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_KEY);
                         var res = await sb.rpc('verificar_certificado', { p_ref: ref });
                         if (res && res.data && res.data.length) cert = res.data[0];
@@ -148,6 +148,6 @@
             })();
         })();
     </script>
-    <script src="js/branding.js?v=20260624"></script>
+    <script type="module" src="js/branding.js?v=20260624"></script>
 </body>
 </html>

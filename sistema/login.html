@@ -141,7 +141,7 @@
     </main>
   </div>
 
-  <script src="../js/branding.js"></script>
+  <script type="module" src="../js/branding.js"></script>
   <script>
     /* Registra el service worker para que el sistema se pueda instalar como app.
        Además, si aparece una versión nueva (tras un despliegue), se activa y la
@@ -183,7 +183,7 @@
     })();
   </script>
   <script type="module">
-    import { signIn, signUp, getSession, resetPassword, updatePassword, onPasswordRecovery, mfaAssuranceLevel, mfaFactors, mfaVerify } from './js/auth.js';
+    import { signIn, signUp, getSession, resetPassword, updatePassword, onPasswordRecovery, mfaAssuranceLevel, mfaFactors, mfaVerify } from './js/api/auth.js';
     document.getElementById('y').textContent = new Date().getFullYear();
 
     const VIEWS = ['viewLogin', 'viewRegister', 'viewRecuperar', 'viewReset', 'viewMFA'];
