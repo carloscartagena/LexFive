@@ -68,6 +68,8 @@
             navToggle.setAttribute('aria-expanded', 'false');
             navToggle.setAttribute('aria-label', 'Abrir menú');
             document.body.style.overflow = '';
+            var header = document.getElementById('header');
+            if (header) header.classList.remove('menu-open');
         }
 
         if (navToggle && nav) {
@@ -77,6 +79,8 @@
                 navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
                 navToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
                 document.body.style.overflow = isOpen ? 'hidden' : '';
+                var header = document.getElementById('header');
+                if (header) header.classList.toggle('menu-open', isOpen);
             });
 
             // Cerrar al hacer clic en un enlace
