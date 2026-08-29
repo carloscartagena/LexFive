@@ -198,7 +198,7 @@ async function savePlantilla(pl) {
   $('#pl_save').disabled = true;
   const payload = { titulo, categoria: $('#pl_categoria').value.trim() || null, cuerpo };
   let error;
-  if (pl) {
+  if (pl && pl.id) {
     payload.updated_at = new Date().toISOString();
     ({ error } = await supabase.from('plantillas').update(payload).eq('id', pl.id));
   } else {
