@@ -139,13 +139,16 @@ function abrirIARedactar() {
         const res = await fetch('/.netlify/functions/ai-draft', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt })
+          body: JSON.stringify({ 
+            tema: prompt,
+            contexto: { caratula: 'Plantilla General' }
+          })
         });
         if (!res.ok) throw new Error('Error en la API');
         const data = await res.json();
         
         closeModal();
-        plantillaForm({ titulo: 'Borrador IA', cuerpo: data.text });
+        plantillaForm({ titulo: 'Borrador IA', cuerpo: data.draft });
         toast('Plantilla generada por IA. Por favor revisa y guarda.', 'success');
       } catch (err) {
         feedback.textContent = 'Hubo un error de conexión con la IA.';
