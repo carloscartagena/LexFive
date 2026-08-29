@@ -1,0 +1,21 @@
+/* ----------  Proceso / Cómo trabajamos ---------- */
+.process { background: var(--bg); }
+.process__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; position: relative; }
+.process__grid::before { content: ""; position: absolute; top: 30px; left: 13%; right: 13%; height: 2px; background: linear-gradient(90deg, var(--line), var(--gold-soft) 50%, var(--line)); z-index: 1; }
+.step { text-align: center; position: relative; z-index: 2; }
+.step__num { width: 62px; height: 62px; border-radius: 50%; background: var(--navy); color: var(--gold-soft); font-family: var(--serif); font-size: 1.7rem; font-weight: 700; display: grid; place-items: center; margin: 0 auto 18px; box-shadow: 0 6px 18px rgba(14,27,44,.18); }
+.step__title { font-size: 1.12rem; margin-bottom: 8px; }
+.step__text { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+
+@media (max-width: 860px) {
+    .why__grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .techlaw__grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .social-grid { grid-template-columns: repeat(2, 1fr); }
+    .process__grid { grid-template-columns: repeat(2, 1fr); gap: 30px; }
+    .process__grid::before { display: none; }
+}
+@media (max-width: 480px) {
+    .why__grid, .process__grid { grid-template-columns: 1fr; }
+    .techlaw__grid { grid-template-columns: 1fr; }
+}
+

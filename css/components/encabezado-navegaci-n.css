@@ -1,0 +1,35 @@
+/* ----------  Encabezado / navegación ---------- */
+.header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.92); backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid var(--line); transition: box-shadow .25s ease; }
+.header.is-scrolled { box-shadow: var(--shadow-sm); }
+.header__inner { display: flex; align-items: center; justify-content: space-between; min-height: 74px; gap: 16px; }
+
+.logo { display: inline-flex; align-items: center; gap: 11px; }
+.logo__mark {
+    width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--navy), var(--navy-700));
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+    color: var(--gold-soft); display: grid; place-items: center;
+    font-family: var(--serif); font-weight: 700; font-size: 1.1rem; letter-spacing: .5px;
+}
+.logo__text { display: flex; flex-direction: column; line-height: 1.05; }
+.logo__text strong { font-family: var(--serif); font-size: 1.34rem; color: var(--navy); font-weight: 700; }
+.logo__text small { font-size: .62rem; letter-spacing: 3.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+.logo--light .logo__text strong { color: #fff; }
+.logo--light .logo__text small { color: var(--gold-soft); }
+
+.nav__list { display: flex; align-items: center; gap: 4px; }
+.nav__link { position: relative; display: inline-block; padding: 9px 14px; font-size: .92rem; font-weight: 500; color: var(--ink); border-radius: 8px; transition: color .15s ease, background .15s ease; }
+.nav__link:hover { color: var(--gold); }
+.nav__link.is-active { color: var(--gold); }
+.nav__link.is-active::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 2px; height: 2px; background: var(--gold); border-radius: 2px; }
+.nav__item--access .nav__link { color: var(--muted); }
+.nav__link--cta { background: var(--navy); color: #fff !important; padding: 11px 20px; border-radius: 999px; margin-left: 6px; }
+.nav__link--cta:hover { background: var(--gold); }
+.nav__link--cta::after { display: none; }
+
+.nav__toggle { display: none; width: 44px; height: 44px; border: none; background: transparent; flex-direction: column; justify-content: center; align-items: center; gap: 5px; border-radius: 10px; }
+.nav__toggle span { width: 24px; height: 2px; background: var(--navy); border-radius: 2px; transition: transform .25s ease, opacity .2s ease; }
+.nav__toggle.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav__toggle.is-open span:nth-child(2) { opacity: 0; }
+.nav__toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+

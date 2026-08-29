@@ -1,0 +1,11 @@
+/* ---------- Tablas ---------- */
+.table-wrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; font-size: .9rem; }
+table.data th { text-align: left; padding: 13px 16px; background: var(--bg); color: var(--muted); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.data td { padding: 13px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.data tbody tr { transition: background .15s; }
+table.data tbody tr:hover { background: #fafaf7; cursor: pointer; }
+table.data tr.no-hover:hover { background: transparent; cursor: default; }
+.cell-strong { font-weight: 600; color: var(--navy); }
+.cell-sub { color: var(--muted); font-size: .82rem; }
+

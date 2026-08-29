@@ -1,0 +1,12 @@
+/* ---------- Alertas de audiencias (dashboard) ---------- */
+.card__head h3 svg { width: 20px; height: 20px; vertical-align: -4px; margin-right: 6px; color: var(--amber); }
+.btn svg { width: 15px; height: 15px; }
+.alert-title { font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+.alert-title--red { color: var(--red); }
+.alert-title--amber { color: var(--amber); }
+.alert-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--line); background: var(--bg); }
+.alert-row--red { border-left-color: var(--red); background: #fdf1f1; }
+.alert-row--amber { border-left-color: var(--amber); background: #fdf8ee; }
+.alert-row .btn { color: var(--green); border-color: #cfe8da; }
+.alert-row .btn:hover { background: #eef7f1; }
+

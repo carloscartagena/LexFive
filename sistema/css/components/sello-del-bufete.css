@@ -1,0 +1,24 @@
+/* ---------- Sello del bufete ---------- */
+.sello-box { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+/* Fondo blanco detrás del sello: los sellos tienen trazos oscuros y, en modo
+   oscuro, sin fondo no se distinguían sobre la tarjeta. Así se ve siempre. */
+.sello-img { width: 150px; height: 150px; object-fit: contain; background: #fff; border: 1px solid var(--line, #e6e8ec); border-radius: 10px; padding: 8px; }
+.sello-actions { display: flex; flex-direction: column; gap: 8px; }
+
+/* Vista EN GRANDE de un sello: fondo blanco sólido (en vez del tablero a
+   cuadros) para que el diseño del sello se distinga con claridad, también en
+   modo oscuro. */
+.big-preview--sello { background: #fff !important; background-image: none !important; }
+
+/* En MODO OSCURO las miniaturas de logos/sellos y sus vistas previas mantienen
+   FONDO BLANCO: los logos y sellos tienen trazos oscuros y, sobre una tarjeta
+   oscura, no se alcanzaban a ver. Además se oscurece el texto de la etiqueta
+   para que se lea sobre el blanco de la miniatura. */
+html[data-theme="dark"] .logo-option { background: #fff; border-color: #d4d7dd; }
+html[data-theme="dark"] .logo-option span { color: #5c6675; }
+html[data-theme="dark"] .logo-option.is-selected span { color: #0e1b2c; }
+html[data-theme="dark"] .sello-img,
+html[data-theme="dark"] .brand-preview__img { background: #fff; background-image: none; }
+html[data-theme="dark"] .logo-upload { background: #fcfaf4; }
+
+

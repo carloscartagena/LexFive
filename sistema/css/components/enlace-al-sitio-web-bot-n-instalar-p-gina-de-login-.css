@@ -1,0 +1,8 @@
+/* ---------- Enlace al sitio web + botón instalar (página de login) ---------- */
+.login-back { margin-top: 20px; text-align: center; font-size: .9rem; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; }
+.login-back a { color: var(--navy, #0e1b2c); text-decoration: none; font-weight: 600; }
+.login-back a:hover { text-decoration: underline; }
+.login-back #btnInstalar { background: var(--navy, #0e1b2c); color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.login-back #btnInstalar:hover { background: #16273d; }
+
+

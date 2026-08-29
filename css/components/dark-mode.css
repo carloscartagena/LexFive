@@ -1,0 +1,51 @@
+/* =========================================================
+   MODO OSCURO  ·  se activa con  <html data-theme="dark">
+   (botón en el encabezado). Pensado para quienes prefieren
+   oscuro; recuerda la elección en el navegador.
+   ========================================================= */
+html[data-theme="dark"] {
+    --bg: #0a131f;
+    --bg-soft: #0d1828;
+    --bg-soft2: #102132;
+    --white: #0f1d2e;
+    --ink: #dde6f1;
+    --muted: #9fb0c4;
+    --line: #213347;
+    --gold-tint: #1a2740;
+    --tech-tint: #0d1f33;
+}
+html[data-theme="dark"] body { background: var(--bg); }
+html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3, html[data-theme="dark"] h4 { color: #eef3f9; }
+html[data-theme="dark"] .section__title { color: #eef3f9; }
+html[data-theme="dark"] .logo__text strong { color: #eef3f9; }
+html[data-theme="dark"] .stat__number { color: #eef3f9; }
+html[data-theme="dark"] .field label,
+html[data-theme="dark"] .contact__details strong,
+html[data-theme="dark"] .faq-item__q,
+html[data-theme="dark"] .wa-menu__title { color: #e7eef7; }
+html[data-theme="dark"] .member__areas { color: #cfe0f5; }
+html[data-theme="dark"] .header { background: rgba(10,19,31,.9); border-bottom-color: var(--line); }
+html[data-theme="dark"] .nav__toggle span { background: #cfe0f5; }
+html[data-theme="dark"] .nav__link { color: var(--ink); }
+html[data-theme="dark"] .btn--ghost { color: var(--ink); border-color: var(--line); }
+html[data-theme="dark"] .btn--ghost:hover { background: #fff; color: var(--navy); border-color: #fff; }
+html[data-theme="dark"] .why-card__icon { background: #14233a; }
+html[data-theme="dark"] .tech-card__icon { background: #14263d; }
+html[data-theme="dark"] .field input,
+html[data-theme="dark"] .field select,
+html[data-theme="dark"] .field textarea { background: #0b1726; color: var(--ink); }
+html[data-theme="dark"] .field input:focus,
+html[data-theme="dark"] .field select:focus,
+html[data-theme="dark"] .field textarea:focus { background: #0b1726; }
+html[data-theme="dark"] .wa-menu { background: var(--white); border-color: var(--line); }
+html[data-theme="dark"] .wa-menu a { color: var(--ink); }
+html[data-theme="dark"] .page-hero { background: radial-gradient(900px 400px at 80% -20%, rgba(56,189,248,.12), transparent 60%), var(--bg-soft); }
+
+/* Botón de modo oscuro/claro (se inserta en el encabezado) */
+.mode-toggle { width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid var(--line); background: transparent; color: var(--ink); display: inline-grid; place-items: center; flex-shrink: 0; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+.mode-toggle:hover { color: var(--gold); border-color: var(--gold); }
+.mode-toggle svg { width: 20px; height: 20px; }
+html[data-theme="dark"] .mode-toggle { color: var(--tech-cyan); }
+html[data-theme="dark"] .mode-toggle:hover { color: var(--tech-cyan); border-color: var(--tech-cyan); }
+
+

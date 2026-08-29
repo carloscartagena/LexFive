@@ -1,0 +1,24 @@
+/* ---------- Calendario / Agenda ---------- */
+.cal-nav { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line, #e6e8ec); }
+.cal-nav .spacer { flex: 1; }
+.cal-title { font-family: var(--font-serif, Georgia, serif); color: var(--navy, #0e1b2c); font-size: 1.15rem; margin: 0; min-width: 150px; text-align: center; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--navy, #0e1b2c); }
+.cal-weekdays div { padding: 7px 4px; text-align: center; color: var(--gold-light, #e7d3a1); font-size: .62rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-cell { min-height: 92px; border-right: 1px solid #eef0f3; border-bottom: 1px solid #eef0f3; padding: 4px; display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+.cal-cell--empty { background: #fafbfc; }
+.cal-cell--hoy { background: #fbf7ec; }
+.cal-daynum { font-size: .72rem; font-weight: 700; color: var(--muted, #5c6675); }
+.cal-cell--hoy .cal-daynum { color: var(--gold-dark, #a8853c); }
+.cal-ev { display: block; width: 100%; text-align: left; border: none; cursor: pointer; font-size: .6rem; line-height: 1.2; padding: 3px 5px; border-radius: 5px; background: var(--navy, #0e1b2c); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-ev:hover { filter: brightness(1.15); }
+.cal-ev--amber { background: #c2872a; }
+.cal-ev--red { background: #c0392b; }
+.cal-mas { font-size: .56rem; color: var(--muted, #5c6675); padding-left: 4px; }
+@media (max-width: 640px) {
+    .cal-cell { min-height: 64px; }
+    .cal-ev { font-size: 0; padding: 5px; }
+    .cal-ev::before { content: ''; display: block; width: 100%; height: 4px; border-radius: 3px; background: currentColor; }
+    .cal-mas { font-size: .5rem; }
+}
+

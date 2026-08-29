@@ -1,0 +1,9 @@
+/* ---------- Tarjetas de métricas ---------- */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-bottom: 26px; }
+.metric { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
+.metric__top { display: flex; align-items: center; justify-content: space-between; }
+.metric__icon { width: 42px; height: 42px; border-radius: 9px; display: grid; place-items: center; background: var(--bg); color: var(--navy); }
+.metric__icon svg { width: 22px; height: 22px; }
+.metric__num { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 700; color: var(--navy); margin-top: 12px; line-height: 1; }
+.metric__label { color: var(--muted); font-size: .88rem; margin-top: 4px; }
+

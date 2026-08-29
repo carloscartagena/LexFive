@@ -1,0 +1,13 @@
+/* ---------- Detalle de proceso ---------- */
+.detail-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px 24px; margin-bottom: 8px; }
+.detail-item label { display: block; font-size: .74rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 3px; }
+.detail-item span { font-size: .95rem; color: var(--ink); }
+.section-title { font-family: var(--font-serif); font-size: 1.15rem; color: var(--navy); margin: 22px 0 12px; padding-top: 18px; border-top: 1px solid var(--line); text-align: center; }
+.timeline { list-style: none; }
+.timeline li { padding: 12px 0 12px 20px; border-left: 2px solid var(--line); position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+.timeline .t-date { font-size: .78rem; color: var(--muted); }
+.doc-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px; }
+.doc-row__info { display: flex; align-items: center; gap: 11px; }
+.doc-row__icon { width: 36px; height: 36px; border-radius: 7px; background: var(--bg); display: grid; place-items: center; color: var(--navy); }
+

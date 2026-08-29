@@ -1,0 +1,7 @@
+/* ----------  Barra superior ---------- */
+.topbar { background: var(--navy); color: rgba(255,255,255,.82); font-size: .8rem; }
+.topbar__inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 38px; flex-wrap: wrap; }
+.topbar__loc { display: inline-flex; align-items: center; gap: 7px; }
+.topbar__loc svg { color: var(--gold-soft); }
+.topbar__hours { color: rgba(255,255,255,.6); }
+

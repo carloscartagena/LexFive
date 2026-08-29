@@ -1,0 +1,19 @@
+/* ---------- Paneles / Cajas ---------- */
+.card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); margin-bottom: 22px; }
+.card__head { padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.card__head h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--navy); font-weight: 600; text-align: center; }
+/* Los encabezados que tienen botones o controles de acción a la derecha
+   (Excel, Imprimir, filtros, etc.) mantienen el título a la izquierda y la
+   acción a la derecha. El resto de los títulos van centrados en todo el
+   sistema. El ícono de ayuda (?) va DENTRO del <h3>, por eso no cuenta como
+   acción y esos títulos también se centran. */
+.card__head:has(> button), .card__head:has(> a), .card__head:has(> span),
+.card__head:has(> .btn), .card__head:has(> input), .card__head:has(> select) { justify-content: space-between; }
+.card__head:has(> button) h3, .card__head:has(> a) h3, .card__head:has(> span) h3,
+.card__head:has(> .btn) h3, .card__head:has(> input) h3, .card__head:has(> select) h3 { text-align: left; }
+/* Título de introducción de cada pestaña (se nota y centrado, visible en
+   ambos modos). Antes usaba color navy en línea y desaparecía en modo oscuro. */
+.intro-title { font-family: var(--font-serif, Georgia, serif); font-size: 1.3rem; font-weight: 600; color: var(--navy, #0e1b2c); text-align: center; margin-bottom: 8px; }
+.card__body { padding: 22px; }
+.card__body--flush { padding: 0; }
+

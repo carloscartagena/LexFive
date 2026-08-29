@@ -1,0 +1,29 @@
+/* ---------- Formularios ---------- */
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: .86rem; font-weight: 500; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 12px 14px; font: inherit; font-size: .95rem; color: var(--ink);
+  border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(194,162,90,.15); }
+.field textarea { resize: vertical; min-height: 92px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; font-weight: 600; font-size: .9rem; border: 1.5px solid transparent; border-radius: 7px; transition: .2s; }
+.btn--primary { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+.btn--primary:hover { background: var(--gold-dark); border-color: var(--gold-dark); }
+.btn--navy { background: var(--navy); color: #fff; }
+.btn--navy:hover { background: var(--navy-600); }
+.btn--ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+.btn--ghost:hover { background: var(--bg); }
+.btn--danger { background: #fff; border-color: var(--red); color: var(--red); }
+.btn--danger:hover { background: var(--red); color: #fff; }
+.btn--sm { padding: 7px 13px; font-size: .82rem; }
+.btn--block { width: 100%; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+
+.form-msg { margin-top: 14px; font-size: .9rem; text-align: center; min-height: 1.2em; }
+.form-msg.error { color: var(--red); }
+.form-msg.success { color: var(--green); }
+.muted-link { color: var(--gold-dark); font-weight: 600; cursor: pointer; }
+

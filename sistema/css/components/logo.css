@@ -1,0 +1,6 @@
+/* ---------- Logo ---------- */
+.logo { display: flex; align-items: center; gap: 11px; }
+.logo__mark { display: block; width: 42px; height: 42px; background: url(../../assets/logo-emblem.svg) center / contain no-repeat; border-radius: 7px; font-size: 0; flex-shrink: 0; }
+.logo__text strong { display: block; font-family: var(--font-serif); font-size: 1.25rem; line-height: 1; }
+.logo__text small { display: block; text-transform: uppercase; letter-spacing: 3px; font-size: .58rem; color: var(--gold-dark); font-weight: 600; }
+

@@ -1,0 +1,4 @@
+/* ---------- Estado vacío ---------- */
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+.empty svg { width: 52px; height: 52px; opacity: .35; margin-bottom: 12px; }
+

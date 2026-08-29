@@ -1,0 +1,66 @@
+/* ============================================================
+   MODO OSCURO
+   ------------------------------------------------------------
+   Se activa con  <html data-theme="dark">. Redefine las variables
+   de color y ajusta las superficies que usan blanco fijo. La barra
+   lateral y los acentos dorados se mantienen.
+   ============================================================ */
+html[data-theme="dark"] {
+  --bg: #0b131e;
+  --white: #15212f;
+  --ink: #e6ecf3;
+  --muted: #aebccd;
+  --line: #28384b;
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.35);
+  --shadow-md: 0 14px 38px rgba(0,0,0,.55);
+}
+
+/* Superficies que tenían blanco fijo */
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .metric,
+html[data-theme="dark"] .modal { background: var(--white); }
+html[data-theme="dark"] .toolbar input,
+html[data-theme="dark"] .toolbar select { background: var(--white); color: var(--ink); }
+html[data-theme="dark"] table.data tbody tr:hover { background: rgba(255,255,255,.05); }
+
+/* Textos que usaban azul marino (ilegible sobre fondo oscuro) */
+html[data-theme="dark"] .topbar h1,
+html[data-theme="dark"] .card__head h3,
+html[data-theme="dark"] .metric__num,
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .intro-title,
+html[data-theme="dark"] .modal__head h3,
+html[data-theme="dark"] .md-group__head { color: var(--gold-light); }
+html[data-theme="dark"] .cell-strong { color: #eaf0f7; }
+html[data-theme="dark"] .metric__icon,
+html[data-theme="dark"] .doc-row__icon,
+html[data-theme="dark"] .act-file__icon { color: var(--gold-light); }
+
+/* Insignia de materia y botones */
+html[data-theme="dark"] .badge-mat { background: rgba(194,162,90,.16); color: var(--gold-light); }
+html[data-theme="dark"] .btn--danger { background: transparent; }
+html[data-theme="dark"] .btn--ghost:hover { background: rgba(255,255,255,.06); }
+
+/* Lista de credenciales guardadas: en modo oscuro la fila tenía fondo claro
+   fijo, lo que dejaba los botones (Editar/Eliminar) y el nombre ilegibles.
+   Se usa la superficie oscura del tema y se aclara el nombre. */
+html[data-theme="dark"] .cred-saved-item { background: var(--white); border-color: var(--line); }
+html[data-theme="dark"] .cred-saved-item__info strong { color: #eaf0f7; }
+
+/* Las credenciales/carnets se mantienen con fondo blanco y texto oscuro
+   (están pensadas para imprimir), sin importar el tema claro/oscuro.
+   Se fija la paleta clara dentro de la credencial para que el texto NO
+   salga gris/blanco en modo oscuro ni al descargar el PDF. */
+.cred-cut, .cred-card, .cred-cut *, .cred-card * {
+  --ink: #1a2330;
+  --navy: #0e1b2c;
+  --muted: #5c6675;
+  --gold: #c2a25a;
+  --gold-dark: #a8853c;
+  --gold-light: #e7d3a1;
+  --line: #e6e8ec;
+}
+.cred-card, #printRoot .cred-card { color: #1a2330; }
+
+

@@ -1,0 +1,31 @@
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .login-wrap { grid-template-columns: 1fr; }
+  .login-aside { display: none; }
+  .login-main { place-items: start center; padding: 32px 20px; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: fixed; left: -100%; width: 80%; max-width: 280px; z-index: 120; transition: left .25s; }
+  .sidebar.open { left: 0; }
+  .menu-toggle { display: inline-flex; }
+  .field-row, .detail-grid { grid-template-columns: 1fr; }
+  .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 110; display: none; }
+  .backdrop.show { display: block; }
+}
+@media (max-width: 520px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .content { padding: 18px; }
+  .topbar { padding: 0 16px; }
+  /* Modal en celular: menos relleno y botones del pie que se reparten y
+     envuelven, para que ninguno se salga del cuadro. */
+  .modal__head { padding: 16px 16px; }
+  .modal__body { padding: 18px 16px; }
+  .modal__foot { padding: 14px 16px; gap: 8px; }
+  .modal__foot .btn { flex: 1 1 130px; justify-content: center; }
+}
+
+

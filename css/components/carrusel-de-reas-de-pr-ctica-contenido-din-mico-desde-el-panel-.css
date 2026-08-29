@@ -1,0 +1,40 @@
+/* ----------  Carrusel de áreas de práctica (contenido dinámico desde el panel) ---------- */
+.areas-carousel { position: relative; }
+.areas-carousel__track {
+  display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scroll-behavior: smooth; padding: 6px 2px 18px; -webkit-overflow-scrolling: touch;
+}
+.areas-carousel__track::-webkit-scrollbar { height: 8px; }
+.areas-carousel__track::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+.area-slide {
+  flex: 0 0 300px; scroll-snap-align: start; background: var(--white);
+  border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.area-slide:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.area-slide__img {
+  height: 168px; background-size: cover; background-position: center;
+  background-repeat: no-repeat; background-color: var(--bg-soft2);
+}
+.area-slide__img--empty {
+  display: grid; place-items: center; color: var(--gold-soft);
+  background: linear-gradient(135deg, var(--navy), var(--tech-deep) 80%);
+}
+.area-slide__img--empty svg { width: 46px; height: 46px; }
+.area-slide__body { padding: 18px 20px 22px; text-align: center; }
+.area-slide__title { font-size: 1.16rem; margin-bottom: 8px; }
+.area-slide__text { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+.areas-carousel__nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line);
+  background: #fff; color: var(--navy); font-size: 1.6rem; line-height: 1;
+  box-shadow: var(--shadow-md); cursor: pointer; z-index: 2; display: grid; place-items: center;
+}
+.areas-carousel__nav:hover { background: var(--navy); color: #fff; }
+.areas-carousel__nav--prev { left: -12px; }
+.areas-carousel__nav--next { right: -12px; }
+@media (max-width: 720px) {
+  .area-slide { flex-basis: 82%; }
+  .areas-carousel__nav { display: none; }
+}

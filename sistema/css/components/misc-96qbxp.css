@@ -1,0 +1,5 @@
+/* ============================================================
+   BARRA DE PESTAÑAS (papelera: procesos / clientes)
+   ============================================================ */
+.tabs-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+

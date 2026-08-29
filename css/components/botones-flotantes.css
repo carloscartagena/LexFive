@@ -1,0 +1,18 @@
+/* ----------  Botones flotantes ---------- */
+.whatsapp-float, .msgr-fab { position: fixed; right: 22px; z-index: 90; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: #fff; box-shadow: var(--shadow-md); transition: transform .2s ease; }
+.whatsapp-float { bottom: 22px; background: #25d366; }
+.whatsapp-float svg { width: 30px; height: 30px; }
+.msgr-fab { bottom: 88px; background: linear-gradient(135deg, #0a7cff, #a033ff); }
+.whatsapp-float:hover, .msgr-fab:hover { transform: scale(1.08); }
+
+.back-to-top { position: fixed; left: 22px; bottom: 22px; z-index: 90; width: 46px; height: 46px; border-radius: 50%; background: var(--navy); color: #fff; border: none; display: grid; place-items: center; opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity .25s ease, transform .25s ease, visibility .25s; }
+.back-to-top.is-visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.back-to-top:hover { background: var(--gold); }
+
+.wa-menu { position: fixed; right: 22px; bottom: 150px; z-index: 91; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-lg); padding: 10px; width: 240px; display: none; }
+.wa-menu.open { display: block; animation: waPop .2s ease; }
+@keyframes waPop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.wa-menu__title { font-size: .78rem; font-weight: 700; color: var(--navy); padding: 6px 8px 10px; }
+.wa-menu a { display: block; padding: 10px 12px; border-radius: 9px; font-size: .86rem; color: var(--ink); }
+.wa-menu a:hover { background: var(--gold-tint); color: var(--gold); }
+

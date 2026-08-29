@@ -1,0 +1,15 @@
+/* ---------- Insignias / Badges ---------- */
+.badge { display: inline-block; font-size: .72rem; font-weight: 600; padding: 4px 10px; border-radius: 30px; white-space: nowrap; }
+.badge-rol-admin { background: #fbecec; color: var(--red); }
+.badge-rol-procurador { background: #eef4fb; color: #2a5b8f; }
+.badge-rol-abogado { background: #f3efe4; color: var(--gold-dark); }
+.badge-rol-cliente { background: #eef7f1; color: var(--green); }
+.badge-mat { background: var(--bg); color: var(--navy); }
+.badge-estado { background: #eef7f1; color: var(--green); }
+.badge-estado.archivado, .badge-estado.concluido { background: #eef0f3; color: var(--muted); }
+.badge-estado.suspendido { background: #fdf3e6; color: var(--amber); }
+.badge-on { background: #eef7f1; color: var(--green); }
+.badge-off { background: #fbecec; color: var(--red); }
+.badge-borrador { background: #fdf3e6; color: var(--amber); }
+.badge-publicado { background: #eef7f1; color: var(--green); }
+

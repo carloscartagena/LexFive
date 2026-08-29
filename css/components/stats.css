@@ -1,0 +1,9 @@
+/* ----------  Stats ---------- */
+.stats { margin-top: -38px; position: relative; z-index: 2; padding-bottom: 10px; }
+.stats__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px 26px; box-shadow: var(--shadow-md); }
+.stat { text-align: center; position: relative; }
+.stat + .stat::before { content: ""; position: absolute; left: -9px; top: 12%; height: 76%; width: 1px; background: var(--line); }
+.stat__number { font-family: var(--serif); font-size: 2.7rem; font-weight: 700; color: var(--navy); line-height: 1; }
+.stat__plus { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--gold); }
+.stat__label { font-size: .82rem; color: var(--muted); margin-top: 8px; }
+

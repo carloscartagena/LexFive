@@ -1,0 +1,6 @@
+/* ---------- Plazos / audiencias ---------- */
+.plazo-list { display: flex; flex-direction: column; gap: 8px; }
+.plazo-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--line, #e6e8ec); border-radius: 9px; flex-wrap: wrap; }
+.plazo-row.is-done { opacity: .6; background: #f6f7f9; }
+.plazo-row__actions { display: flex; gap: 5px; flex-wrap: wrap; }
+

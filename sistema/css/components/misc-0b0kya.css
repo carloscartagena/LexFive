@@ -1,0 +1,19 @@
+/* ============================================================
+   LOGIN
+   ============================================================ */
+.login-wrap { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+.login-aside {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-700) 60%, var(--navy-600) 100%);
+  color: #fff; padding: 56px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;
+}
+.login-aside::after { content: "\2696"; position: absolute; right: -30px; bottom: -40px; font-size: 18rem; color: rgba(194,162,90,.08); }
+.login-aside .logo__text strong { color: #fff; }
+.login-aside h1 { font-family: var(--font-serif); font-weight: 600; font-size: 2.4rem; line-height: 1.15; margin-bottom: 14px; position: relative; z-index: 1; }
+.login-aside p { color: rgba(255,255,255,.8); max-width: 420px; position: relative; z-index: 1; }
+.login-aside .badge-sys { display: inline-block; font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-light); border: 1px solid rgba(194,162,90,.4); padding: 5px 12px; border-radius: 30px; margin-bottom: 26px; }
+
+.login-main { display: grid; place-items: center; padding: 40px 24px; }
+.login-card { width: 100%; max-width: 400px; }
+.login-card h2 { font-family: var(--font-serif); font-size: 1.9rem; color: var(--navy); margin-bottom: 6px; }
+.login-card .sub { color: var(--muted); margin-bottom: 30px; }
+

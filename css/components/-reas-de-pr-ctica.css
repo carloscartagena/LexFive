@@ -1,0 +1,23 @@
+/* ----------  Áreas de práctica ---------- */
+.areas { background: var(--bg); }
+.areas__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.area-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; text-align: center; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+.area-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: transparent; }
+.area-card__icon { width: 50px; height: 50px; border-radius: 13px; background: var(--gold-tint); color: var(--gold); display: grid; place-items: center; margin: 0 auto 18px; transition: background .22s ease, color .22s ease; }
+.area-card__icon svg { width: 25px; height: 25px; }
+.area-card:hover .area-card__icon { background: var(--navy); color: var(--gold-soft); }
+.area-card__title { font-size: 1.22rem; margin-bottom: 8px; }
+.area-card__text { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+
+/* Sección «Derecho + Tecnología» (ingeniería de sistemas) */
+.techlaw { background: var(--tech-tint); }
+.section__eyebrow--tech { color: var(--tech); }
+.techlaw__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.tech-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 24px; text-align: center; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+.tech-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: transparent; }
+.tech-card__icon { width: 50px; height: 50px; border-radius: 13px; background: #e2effb; color: var(--tech); display: grid; place-items: center; margin: 0 auto 18px; transition: background .22s ease, color .22s ease; }
+.tech-card__icon svg { width: 25px; height: 25px; }
+.tech-card:hover .tech-card__icon { background: var(--tech); color: #fff; }
+.tech-card h3 { font-size: 1.18rem; margin-bottom: 8px; }
+.tech-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+

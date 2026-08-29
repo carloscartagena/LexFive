@@ -1,0 +1,66 @@
+/* =========================================================
+   LexFive — Sitio público · Diseño moderno minimalista
+   Paleta: blanco/gris muy claro, tinta azul-pizarra, acento dorado.
+   ========================================================= */
+
+:root {
+    --bg: #ffffff;
+    --bg-soft: #f7f8fa;
+    --bg-soft2: #f1f3f6;
+    --navy: #0e1b2c;
+    --navy-700: #16273d;
+    --ink: #1b2430;
+    --muted: #5d6b7d;
+    --line: #e8eaef;
+    --gold: #b8923f;
+    --gold-soft: #c8a558;
+    --gold-tint: #f6efe1;
+    /* Acento tecnológico (ingeniería de sistemas): azul/cian. Convive con el
+       dorado jurídico para reflejar "Derecho + Tecnología". */
+    --tech: #2f7bd6;
+    --tech-cyan: #38bdf8;
+    --tech-deep: #0c2f55;
+    --tech-tint: #eaf3fc;
+    --white: #ffffff;
+    --radius: 16px;
+    --radius-sm: 11px;
+    --shadow-sm: 0 1px 2px rgba(16,27,44,.04), 0 4px 16px rgba(16,27,44,.05);
+    --shadow-md: 0 12px 34px rgba(16,27,44,.10);
+    --shadow-lg: 0 26px 60px rgba(16,27,44,.16);
+    --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --container: 1200px;
+    /* Trama de "circuito" (ingeniería de sistemas) en la paleta del bufete.
+       Se usa muy tenue de fondo para unir tecnología + derecho sin recargar. */
+    --circuit-navy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%230e1b2c' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%23b8923f'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    --circuit-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%23c8a558' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%23c8a558'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    --circuit-tech: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' fill='none'%3E%3Cg stroke='%2338bdf8' stroke-width='1.1'%3E%3Cpath d='M12 12h26v26'/%3E%3Cpath d='M72 24H46v22h26'/%3E%3Cpath d='M12 56h16v20'/%3E%3Cpath d='M56 72V50h16'/%3E%3C/g%3E%3Cg fill='%2338bdf8'%3E%3Ccircle cx='12' cy='12' r='2.4'/%3E%3Ccircle cx='38' cy='38' r='2.4'/%3E%3Ccircle cx='46' cy='24' r='2.4'/%3E%3Ccircle cx='28' cy='56' r='2.4'/%3E%3Ccircle cx='56' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+    /* Código binario (tecnología). Es el fondo por defecto. */
+    --binary: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='100'%3E%3Cg font-family='monospace' font-size='13' fill='%2338bdf8'%3E%3Ctext x='6' y='18'%3E1011 0100 10%3C/text%3E%3Ctext x='78' y='30'%3E0110%3C/text%3E%3Ctext x='6' y='44'%3E0100 1101 01%3C/text%3E%3Ctext x='90' y='56'%3E1011%3C/text%3E%3Ctext x='6' y='70'%3E1101 0011 10%3C/text%3E%3Ctext x='6' y='94'%3E0011 1001 01%3C/text%3E%3C/g%3E%3C/svg%3E");
+    /* Líneas finas diagonales (alternativa). */
+    --lineas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 24 24 0' stroke='%2338bdf8' stroke-width='1'/%3E%3C/svg%3E");
+    /* Versiones OSCURAS (color navy) de los patrones. Se usan sobre secciones de
+       fondo CLARO (p. ej. "Razones para confiar" y "Sobre el bufete"), porque las
+       versiones cian de arriba solo se ven sobre el navy oscuro (Testimonios). */
+    --binary-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='100'%3E%3Cg font-family='monospace' font-size='13' fill='%230e1b2c'%3E%3Ctext x='6' y='18'%3E1011 0100 10%3C/text%3E%3Ctext x='78' y='30'%3E0110%3C/text%3E%3Ctext x='6' y='44'%3E0100 1101 01%3C/text%3E%3Ctext x='90' y='56'%3E1011%3C/text%3E%3Ctext x='6' y='70'%3E1101 0011 10%3C/text%3E%3Ctext x='6' y='94'%3E0011 1001 01%3C/text%3E%3C/g%3E%3C/svg%3E");
+    --lineas-ink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M0 24 24 0' stroke='%230e1b2c' stroke-width='1'/%3E%3C/svg%3E");
+    /* Patrón de fondo ACTIVO (se puede cambiar desde el panel). */
+    --bg-pattern: var(--binary);
+    --bg-pattern-ink: var(--binary-ink);
+    --bg-tile: 150px 100px;
+}
+
+/* Estilo de fondo elegido desde el panel (data-bg en <html>). */
+html[data-bg="circuito"] { --bg-pattern: var(--circuit-tech); --bg-pattern-ink: var(--circuit-navy); --bg-tile: 84px 84px; }
+html[data-bg="lineas"] { --bg-pattern: var(--lineas); --bg-pattern-ink: var(--lineas-ink); --bg-tile: 24px 24px; }
+html[data-bg="ninguno"] { --bg-pattern: none; --bg-pattern-ink: none; }
+
+/* Patrón usado en secciones de fondo CLARO ("Razones para confiar", "Sobre el
+   bufete"). En modo claro usa la versión oscura (navy) para que sea visible;
+   en modo oscuro, como esas secciones se vuelven oscuras, usa la versión cian. */
+/* El patrón (binario/circuito) detrás de las secciones se quitó por pedido del
+   bufete: ya no es necesario. Las secciones quedan limpias (color sólido) salvo
+   que se les ponga una imagen de fondo. El encabezado (hero) conserva su patrón. */
+:root { --bg-pattern-section: var(--bg-pattern-ink); --section-pattern-opacity: 0; }
+html[data-theme="dark"] { --bg-pattern-section: var(--bg-pattern); --section-pattern-opacity: 0; }
+

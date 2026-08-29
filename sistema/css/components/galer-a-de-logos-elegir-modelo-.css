@@ -1,0 +1,116 @@
+/* ---------- Galería de logos (elegir modelo) ---------- */
+.logo-gallery { display: flex; flex-wrap: wrap; gap: 12px; }
+.logo-option {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    width: 110px; padding: 12px 8px; cursor: pointer;
+    background: #fff; border: 1.5px solid var(--line, #e6e8ec); border-radius: 10px;
+    transition: border-color .15s, box-shadow .15s, transform .1s;
+}
+.logo-option:hover { border-color: var(--gold, #c2a25a); transform: translateY(-2px); }
+.logo-option { position: relative; }
+.logo-option img { width: 56px; height: 56px; object-fit: contain; }
+.logo-option span { font-size: .68rem; text-align: center; color: var(--muted, #5c6675); line-height: 1.25; }
+.logo-option.is-selected { border-color: var(--gold, #c2a25a); box-shadow: 0 0 0 2px var(--gold-light, #e7d3a1); }
+.logo-option.is-selected span { color: var(--navy, #0e1b2c); font-weight: 600; }
+
+/* Botón ✕ para eliminar un modelo de la galería */
+.tile-del {
+    position: absolute; top: -8px; right: -8px;
+    width: 22px; height: 22px; border-radius: 50%;
+    border: none; background: #c0392b; color: #fff;
+    font-size: 15px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.25); opacity: 0; transition: opacity .15s;
+}
+.logo-option:hover .tile-del { opacity: 1; }
+.tile-del:hover { background: #a5281b; }
+
+/* Editor de imagen (recortar / redimensionar logo o sello) */
+.img-editor {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(14,27,44,.62); display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+}
+.img-editor__panel {
+    background: #fff; border-radius: 14px; padding: 22px; width: 392px; max-width: 100%;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+}
+.img-editor__panel h3 { font-family: var(--font-serif, Georgia, serif); color: var(--navy, #0e1b2c); margin: 0 0 6px; }
+.img-editor__stage {
+    width: 340px; max-width: 100%; height: 340px; margin: 12px auto; border-radius: 10px; overflow: hidden;
+    background-color: #eee;
+    background-image: linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);
+    background-size: 18px 18px; background-position: 0 0,0 9px,9px -9px,-9px 0;
+}
+.img-editor__stage canvas { display: block; cursor: grab; touch-action: none; }
+.img-editor__stage canvas:active { cursor: grabbing; }
+.img-editor__zoom { display: flex; align-items: center; gap: 10px; font-size: .82rem; color: var(--navy, #0e1b2c); margin: 6px 0; }
+.img-editor__zoom input { flex: 1; }
+.img-editor__chk { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted, #5c6675); margin-bottom: 14px; }
+.img-editor__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.img-editor__actions .btn { white-space: nowrap; }
+/* El panel del editor/vista previa es blanco SIEMPRE (también en modo oscuro)
+   para mostrar bien las imágenes. Por eso forzamos los botones secundarios a
+   texto y borde oscuros: en modo oscuro el color de texto se aclaraba y
+   quedaban casi invisibles sobre el panel blanco. */
+.img-editor__panel .btn--ghost { background: #fff; border-color: #d4d7dd; color: #1a2330; }
+.img-editor__panel .btn--ghost:hover { background: #f1f2f4; border-color: var(--gold, #c2a25a); }
+.img-editor__panel .cell-sub { color: #5c6675; }
+/* En celular los botones se apilan a lo ancho (antes se desbordaban del panel
+   y el texto "Usar este sello" se partía en varias líneas). */
+@media (max-width: 520px) {
+    .img-editor__panel { padding: 18px; }
+    .img-editor__actions { flex-direction: column; gap: 8px; }
+    .img-editor__actions .btn { width: 100%; }
+}
+
+/* Flechas para mover / centrar la imagen (estilo Word) */
+.img-editor__nudge { display: grid; grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 36px); justify-content: center; gap: 5px; margin: 4px 0 8px; }
+.img-editor__nudge button {
+    border: 1px solid var(--line, #e6e8ec); background: #fff; border-radius: 8px;
+    cursor: pointer; font-size: 13px; color: var(--navy, #0e1b2c); line-height: 1;
+    display: flex; align-items: center; justify-content: center; transition: border-color .12s, background .12s;
+}
+.img-editor__nudge button:hover { border-color: var(--gold, #c2a25a); background: #faf6ec; }
+.img-editor__nudge .n-center { color: var(--gold-dark, #a8853c); font-size: 16px; }
+.n-up { grid-area: 1 / 2; } .n-left { grid-area: 2 / 1; } .n-center { grid-area: 2 / 2; } .n-right { grid-area: 2 / 3; } .n-down { grid-area: 3 / 2; }
+
+/* Vista previa en grande */
+.big-preview {
+    margin: 12px auto; border-radius: 10px; min-height: 320px; padding: 16px;
+    display: flex; align-items: center; justify-content: center;
+    background-color: #eee;
+    background-image: linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);
+    background-size: 22px 22px; background-position: 0 0,0 11px,11px -11px,-11px 0;
+}
+.big-preview img { max-width: 100%; max-height: 460px; object-fit: contain; }
+
+/* Vista del logo en la tarjeta del panel */
+.brand-preview { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 14px; }
+.brand-preview__img {
+    width: 120px; height: 120px; object-fit: contain; border-radius: 10px; padding: 6px;
+    background-color: #f4f5f7;
+    background-image: linear-gradient(45deg,#e7e9ed 25%,transparent 25%),linear-gradient(-45deg,#e7e9ed 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e7e9ed 75%),linear-gradient(-45deg,transparent 75%,#e7e9ed 75%);
+    background-size: 16px 16px; background-position: 0 0,0 8px,8px -8px,-8px 0;
+}
+.brand-preview__side { flex: 1; min-width: 180px; }
+
+/* Botón para subir un logo o sello propio */
+.logo-upload {
+    justify-content: center;
+    border-style: dashed !important;
+    border-color: var(--gold, #c2a25a) !important;
+    background: #fcfaf4;
+}
+.logo-upload:hover { background: #f7f1e1; }
+.logo-upload__plus {
+    width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 700; line-height: 1;
+    color: var(--gold-dark, #a8853c);
+    border: 2px dashed var(--gold, #c2a25a); border-radius: 50%;
+}
+
+/* Frase del bufete en el reverso de la credencial */
+.cred-frase { font-style: italic; color: var(--gold-dark, #a8853c) !important; font-weight: 600; text-align: center; }
+
+

@@ -1,0 +1,6 @@
+/* ---------- Toast ---------- */
+#toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--navy); color: #fff; padding: 13px 22px; border-radius: 8px; box-shadow: var(--shadow-md); opacity: 0; transition: .3s; z-index: 200; font-size: .9rem; }
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.error { background: var(--red); }
+#toast.success { background: var(--green); }
+

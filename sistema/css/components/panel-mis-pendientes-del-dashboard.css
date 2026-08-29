@@ -1,0 +1,17 @@
+/* ---------- Panel "Mis pendientes" del dashboard ---------- */
+.pend-list { display: flex; flex-direction: column; }
+.pend-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.pend-row:last-child { border-bottom: none; }
+.pend-row__check { width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; border: 1.5px solid var(--line); background: transparent; color: var(--muted, #5c6675); cursor: pointer; display: grid; place-items: center; font-size: .85rem; font-weight: 700; transition: .15s; }
+.pend-row__check:hover { background: var(--green, #1f9d6b); border-color: var(--green, #1f9d6b); color: #fff; }
+.pend-row__check:disabled { opacity: .5; cursor: default; }
+.pend-row__main { flex: 1; min-width: 0; cursor: pointer; }
+.pend-row__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 3px; }
+.pend-venc { font-size: .72rem; color: var(--muted, #5c6675); }
+.pend-venc--red { color: #c0392b; font-weight: 700; }
+.pend-venc--amber { color: var(--gold-dark, #a8853c); font-weight: 700; }
+.pend-row--agenda { gap: 10px; }
+.agenda-tag { flex-shrink: 0; font-size: .6rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; padding: 3px 8px; border-radius: 20px; align-self: flex-start; margin-top: 2px; }
+.agenda-tag--aud { background: #e7eef9; color: #1f4e8c; }
+.agenda-tag--plazo { background: #fbf0db; color: #946018; }
+

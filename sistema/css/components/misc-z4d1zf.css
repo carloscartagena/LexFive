@@ -1,0 +1,5 @@
+/* ============================================================
+   Gestión avanzada: Tareas, Plazos y Honorarios
+   ============================================================ */
+.chk-inline { display: inline-flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--ink, #1a2330); white-space: nowrap; }
+

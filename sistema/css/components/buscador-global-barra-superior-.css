@@ -1,0 +1,13 @@
+/* ---------- Buscador global (barra superior) ---------- */
+.topbar__search { display: inline-flex; align-items: center; gap: 6px; }
+.topbar__search svg { width: 16px; height: 16px; }
+@media (max-width: 560px) { .topbar__search span { display: none; } }
+
+.gq-group { margin-top: 12px; }
+.gq-group__title { display: flex; align-items: center; gap: 7px; font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted, #5c6675); margin-bottom: 6px; }
+.gq-group__title svg { width: 15px; height: 15px; }
+.gq-item { display: block; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line, #e6e8ec); border-radius: 9px; padding: 9px 12px; margin-bottom: 6px; cursor: pointer; transition: border-color .12s, background .12s; }
+.gq-item:hover { border-color: var(--gold, #c2a25a); background: #fbf9f3; }
+.gq-item strong { display: block; color: var(--ink, #1a2330); font-size: .92rem; }
+.gq-item .cell-sub { display: block; margin-top: 1px; }
+
