@@ -1,6 +1,10 @@
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+.bottom-nav {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .login-wrap { grid-template-columns: 1fr; }
   .login-aside { display: none; }
@@ -9,12 +13,116 @@
 }
 @media (max-width: 760px) {
   .layout { grid-template-columns: 1fr; }
-  .sidebar { position: fixed; left: -100%; width: 80%; max-width: 280px; z-index: 120; transition: left .25s; }
+  .sidebar { position: fixed; left: -100%; width: 80%; max-width: 280px; z-index: 120; transition: left .25s; height: 100vh; padding-bottom: 80px; }
   .sidebar.open { left: 0; }
-  .menu-toggle { display: inline-flex; }
+  /* Don't show hamburger menu if we use bottom nav "Más" button */
+  .menu-toggle { display: none; }
+  
   .field-row, .detail-grid { grid-template-columns: 1fr; }
   .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 110; display: none; }
   .backdrop.show { display: block; }
+
+  /* Bottom Navigation for Mobile */
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    z-index: 100;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .bottom-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    cursor: pointer;
+    flex: 1;
+    height: 100%;
+    transition: color 0.2s;
+  }
+  
+  .bottom-nav__item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .bottom-nav__item.active {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  /* Make room for bottom nav */
+  .layout {
+    padding-bottom: 64px;
+  }
+  
+  /* Tables to Cards */
+  table.data, table.data thead, table.data tbody, table.data th, table.data td, table.data tr {
+    display: block;
+  }
+  
+  table.data thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  
+  table.data tr {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: var(--bg-card);
+  }
+  
+  table.data td {
+    border: none;
+    position: relative;
+    padding: 8px 0;
+    padding-left: 40%;
+    text-align: right;
+  }
+  
+  table.data td:before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 35%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  
+  /* Modal responsive improvements */
+  .modal {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal__body {
+    flex: 1;
+    overflow-y: auto;
+  }
 }
 @media (max-width: 520px) {
   .stats-grid { grid-template-columns: 1fr; }

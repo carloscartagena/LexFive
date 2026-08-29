@@ -1,0 +1,50 @@
+/* ============================================================
+   Accordion Menu para Sidebar
+   ============================================================ */
+
+.sidebar__group {
+  margin-bottom: 4px;
+}
+
+.sidebar__group-title.accordion-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 0.2s;
+  outline: none;
+}
+
+.sidebar__group-title.accordion-btn:hover {
+  color: var(--text-color);
+}
+
+.accordion-icon {
+  transition: transform 0.3s ease;
+  opacity: 0.6;
+}
+
+.sidebar__group.open .accordion-icon {
+  transform: rotate(180deg);
+}
+
+.sidebar__group-content.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__group.open .sidebar__group-content.accordion-content {
+  max-height: 1000px; /* Suficiente para expandir */
+}

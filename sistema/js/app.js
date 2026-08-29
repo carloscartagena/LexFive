@@ -39,28 +39,28 @@ import { IMG, ensureImgCache } from '@/utils/media.js';
 import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from '@/shared/branding.js';
 
 const NAV = [
-  { key: 'dashboard', label: 'Panel', icon: ICON.dashboard, group: 'Principal' },
-  { key: 'procesos', label: 'Procesos', icon: ICON.procesos, group: 'Principal' },
-  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia, group: 'Principal' },
-  { key: 'reportes', label: 'Reportes', icon: ICON.grafico, group: 'Principal' },
-  { key: 'tareas', label: 'Tareas', icon: ICON.tareas, group: 'Principal' },
-  { key: 'clientes', label: 'Clientes', icon: ICON.clientes, group: 'Principal' },
-  { key: 'consultas', label: 'Consultas', icon: ICON.consultas, group: 'Principal' },
-  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true, group: 'Principal' },
+  { key: 'dashboard', label: 'Panel', icon: ICON.dashboard, group: 'Gestión Jurídica' },
+  { key: 'procesos', label: 'Procesos', icon: ICON.procesos, group: 'Gestión Jurídica' },
+  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia, group: 'Gestión Jurídica' },
+  { key: 'tareas', label: 'Tareas', icon: ICON.tareas, group: 'Gestión Jurídica' },
+  { key: 'clientes', label: 'Clientes', icon: ICON.clientes, group: 'Gestión Jurídica' },
+  { key: 'consultas', label: 'Consultas', icon: ICON.consultas, group: 'Gestión Jurídica' },
   { key: 'modelos', label: 'Modelos', icon: ICON.doc, group: 'Documentos' },
   { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla, group: 'Documentos' },
   { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true, group: 'Documentos' },
   { key: 'informe', label: 'Informe de pasantía', icon: ICON.doc, credOnly: true, group: 'Documentos' },
-  { key: 'blog', label: 'Blog', icon: ICON.blog, group: 'Configuración y Web' },
-  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true, group: 'Configuración y Web' },
-  { key: 'credguardadas', label: 'Credenciales guardadas', icon: ICON.usuarios, credOnly: true, group: 'Configuración y Web' },
-  { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true, group: 'Configuración y Web' },
-  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true, group: 'Configuración y Web' },
-  { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true, group: 'Configuración y Web' },
-  { key: 'tarjetas', label: 'Tarjetas de presentación', icon: ICON.doc, credOnly: true, group: 'Configuración y Web' },
-  { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true, group: 'Configuración y Web' },
-  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true, group: 'Configuración y Web' },
-  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true, group: 'Configuración y Web' },
+  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true, group: 'Administración' },
+  { key: 'reportes', label: 'Reportes', icon: ICON.grafico, group: 'Administración' },
+  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true, group: 'Administración' },
+  { key: 'credguardadas', label: 'Cred. guardadas', icon: ICON.usuarios, credOnly: true, group: 'Administración' },
+  { key: 'blog', label: 'Blog', icon: ICON.blog, group: 'Administración' },
+  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true, group: 'Administración' },
+  { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true, group: 'Administración' },
+  { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true, group: 'Administración' },
+  { key: 'tarjetas', label: 'Tarjetas', icon: ICON.doc, credOnly: true, group: 'Administración' },
+  { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true, group: 'Administración' },
+  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true, group: 'Administración' },
+  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true, group: 'Administración' },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true, group: 'Administración' },
   { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true, group: 'Administración' },
   { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true, group: 'Administración' }
@@ -471,6 +471,12 @@ export function navigate(key) {
   }
   state.view = key;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
+  
+  // Update bottom nav (if exists)
+  document.querySelectorAll('.bottom-nav__item[data-key]').forEach(n => {
+    n.classList.toggle('active', n.dataset.key === key);
+  });
+  
   $('#pageTitle').textContent = VIEWS[key].title;
   $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show');
   // Render con red de seguridad: si la vista falla o tarda demasiado, en vez de
@@ -478,7 +484,25 @@ export function navigate(key) {
   const cont = content();
   let settled = false;
   Promise.resolve().then(() => VIEWS[key].render())
-    .then(() => { settled = true; actualizarBadgesMenu(); })
+    .then(() => { 
+      settled = true; 
+      actualizarBadgesMenu();
+      
+      // Auto-add data-label to tables for mobile responsive view
+      if (cont) {
+        cont.querySelectorAll('table.data').forEach(table => {
+          const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+          if (headers.length === 0) return;
+          table.querySelectorAll('tbody tr').forEach(tr => {
+            tr.querySelectorAll('td').forEach((td, i) => {
+              if (headers[i] && !td.hasAttribute('data-label')) {
+                td.setAttribute('data-label', headers[i]);
+              }
+            });
+          });
+        });
+      }
+    })
     .catch((e) => {
       settled = true;
       console.error('Error al cargar la vista «' + key + '»', e);
@@ -509,18 +533,64 @@ function buildSidebar() {
       });
 
   let html = '';
-  let currentGroup = '';
+  
+  if (rol === 'cliente') {
+    items.forEach(n => {
+      html += `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`;
+    });
+  } else {
+    // Agrupar por categoría
+    const groups = {};
+    items.forEach(n => {
+      const g = n.group || 'Otros';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(n);
+    });
 
-  items.forEach(n => {
-    if (n.group && n.group !== currentGroup) {
-      currentGroup = n.group;
-      html += `<div class="sidebar__group-title">${esc(currentGroup)}</div>`;
-    }
-    html += `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`;
-  });
+    Object.keys(groups).forEach(g => {
+      const groupItems = groups[g];
+      html += `<div class="sidebar__group">
+                 <button class="sidebar__group-title accordion-btn">
+                   <span>${esc(g)}</span>
+                   <svg class="accordion-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                 </button>
+                 <div class="sidebar__group-content accordion-content">`;
+      groupItems.forEach(n => {
+        html += `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`;
+      });
+      html += `  </div>
+               </div>`;
+    });
+  }
 
   nav.innerHTML = html;
+  
+  // Accordion logic
+  nav.querySelectorAll('.accordion-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      const g = e.currentTarget.closest('.sidebar__group');
+      g.classList.toggle('open');
+    };
+  });
+  
+  // Default open the first group
+  const firstGroup = nav.querySelector('.sidebar__group');
+  if (firstGroup) firstGroup.classList.add('open');
+
   nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
+  
+  // Wire up bottom nav buttons
+  const bNavItems = document.querySelectorAll('.bottom-nav__item[data-key]');
+  bNavItems.forEach(b => b.onclick = () => navigate(b.dataset.key));
+  
+  const bMore = $('#btnBottomMore');
+  if (bMore) {
+    bMore.onclick = () => {
+      $('#sidebar').classList.add('open');
+      $('#backdrop').classList.add('show');
+    };
+  }
+
   actualizarBadgesMenu();
 }
 
