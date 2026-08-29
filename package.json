@@ -23,7 +23,6 @@
   "homepage": "https://github.com/carloscartagena/LexFive#readme",
   "devDependencies": {
     "@supabase/supabase-js": "^2.112.4",
-    "netlify-cli": "^27.4.1",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
   },
