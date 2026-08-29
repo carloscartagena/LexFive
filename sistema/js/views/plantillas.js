@@ -144,14 +144,23 @@ function abrirIARedactar() {
             contexto: { caratula: 'Plantilla General' }
           })
         });
-        if (!res.ok) throw new Error('Error en la API');
+        let errorMsg = 'Hubo un error de conexión con la IA.';
+        if (!res.ok) {
+          try {
+            const errData = await res.json();
+            errorMsg = 'Error IA: ' + (errData.error || errData.message || res.statusText);
+          } catch (e) {
+            errorMsg = 'Error IA: ' + res.statusText;
+          }
+          throw new Error(errorMsg);
+        }
         const data = await res.json();
         
         closeModal();
         plantillaForm({ titulo: 'Borrador IA', cuerpo: data.draft });
         toast('Plantilla generada por IA. Por favor revisa y guarda.', 'success');
       } catch (err) {
-        feedback.textContent = 'Hubo un error de conexión con la IA.';
+        feedback.textContent = err.message || 'Hubo un error de conexión con la IA.';
         btn.disabled = false;
         btn.textContent = 'Generar';
       }

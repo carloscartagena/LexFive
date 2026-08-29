@@ -78,7 +78,16 @@
                 body: JSON.stringify({ messages: chatHistory })
             });
 
-            if (!res.ok) throw new Error('Error en la API');
+            let errorMsg = 'Lo siento, ocurrió un error de conexión. Por favor escríbenos al WhatsApp directo.';
+            if (!res.ok) {
+                try {
+                    const errData = await res.json();
+                    errorMsg = 'Error del Servidor: ' + (errData.error || errData.message || res.statusText);
+                } catch (e) {
+                    errorMsg = 'Error HTTP: ' + res.statusText;
+                }
+                throw new Error(errorMsg);
+            }
             
             const data = await res.json();
             messagesEl.removeChild(loadingDiv);
@@ -95,7 +104,7 @@
             
         } catch (error) {
             messagesEl.removeChild(loadingDiv);
-            appendMessage('model', 'Lo siento, ocurrió un error de conexión. Por favor escríbenos al WhatsApp directo.');
+            appendMessage('model', error.message || 'Lo siento, ocurrió un error de conexión. Por favor escríbenos al WhatsApp directo.');
         } finally {
             input.disabled = false;
             input.focus();
