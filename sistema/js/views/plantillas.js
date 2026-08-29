@@ -121,8 +121,17 @@ function abrirIARedactar() {
       <p class="cell-sub" style="margin:0 0 6px">Describe el documento y la IA generará una plantilla base con campos auto-rellenables.</p>
       <textarea id="ia_prompt" style="min-height:100px" placeholder="Ej: Un memorial solicitando la suspensión de audiencia por motivos de salud..."></textarea>
     </div>
+    <div class="field" style="margin-top: 10px;">
+      <label>Adjuntar imágenes (Opcional)</label>
+      <p class="cell-sub" style="margin:0 0 6px">Sube fotos de CI, folios reales u otros documentos para que la IA extraiga los datos.</p>
+      <input type="file" id="ia_files" accept="image/*" multiple style="display: block; width: 100%;">
+      <div id="ia_files_preview" style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;"></div>
+    </div>
     <div id="ia_feedback" style="margin-top:10px; font-weight:bold; color:var(--color-primary);"></div>
   `;
+  
+  let base64Images = [];
+
   openModal('✨ Redactar con IA', body, [
     { label: 'Cancelar', class: 'btn--ghost', onClick: closeModal },
     { label: 'Generar', class: 'btn--navy', id: 'ia_generar', onClick: async () => {
@@ -133,7 +142,7 @@ function abrirIARedactar() {
       const feedback = $('#ia_feedback');
       btn.disabled = true;
       btn.textContent = 'Generando...';
-      feedback.textContent = 'La IA está redactando. Esto puede tomar unos segundos...';
+      feedback.textContent = 'La IA está leyendo los documentos y redactando. Esto puede tomar unos segundos...';
 
       try {
         const res = await fetch('/.netlify/functions/ai-draft', {
@@ -141,7 +150,8 @@ function abrirIARedactar() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             tema: prompt,
-            contexto: { caratula: 'Plantilla General' }
+            contexto: { caratula: 'Plantilla General' },
+            images: base64Images
           })
         });
         let errorMsg = 'Hubo un error de conexión con la IA.';
@@ -161,6 +171,45 @@ function abrirIARedactar() {
       }
     }}
   ], true);
+
+  // File input change handler for previews and base64 encoding
+  const fileInput = $('#ia_files');
+  const previewContainer = $('#ia_files_preview');
+  
+  if (fileInput) {
+    fileInput.onchange = async (e) => {
+      base64Images = [];
+      previewContainer.innerHTML = '';
+      const files = e.target.files;
+      if (!files.length) return;
+      
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) continue;
+        
+        // Convert to base64
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const result = ev.target.result;
+          const base64Data = result.split(',')[1];
+          base64Images.push({
+            mimeType: file.type,
+            data: base64Data
+          });
+          
+          // Preview
+          const img = document.createElement('img');
+          img.src = result;
+          img.style.width = '60px';
+          img.style.height = '60px';
+          img.style.objectFit = 'cover';
+          img.style.borderRadius = '4px';
+          img.style.border = '1px solid #ccc';
+          previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  }
 }
 
 function plantillaForm(pl = null) {
