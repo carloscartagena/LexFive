@@ -9,6 +9,8 @@
 .sidebar__head { padding: 22px 20px; border-bottom: 1px solid rgba(255,255,255,.08); }
 .sidebar__head .logo__text strong { color: #fff; }
 .sidebar__nav { padding: 16px 12px; flex-grow: 1; overflow-y: auto; }
+.sidebar__group-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; color: rgba(255,255,255,.45); margin: 18px 0 6px 14px; }
+.sidebar__group-title:first-child { margin-top: 4px; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 8px; font-weight: 500; font-size: .93rem; color: rgba(255,255,255,.72); margin-bottom: 3px; transition: .18s; width: 100%; background: none; border: none; text-align: left; }
 .nav-item svg { width: 19px; height: 19px; flex-shrink: 0; }
 .nav-item:hover { background: rgba(255,255,255,.07); color: #fff; }

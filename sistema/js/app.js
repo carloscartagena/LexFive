@@ -39,31 +39,31 @@ import { IMG, ensureImgCache } from '@/utils/media.js';
 import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from '@/shared/branding.js';
 
 const NAV = [
-  { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
-  { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
-  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia },
-  { key: 'reportes', label: 'Reportes', icon: ICON.grafico },
-  { key: 'tareas', label: 'Tareas', icon: ICON.tareas },
-  { key: 'modelos', label: 'Modelos', icon: ICON.doc },
-  { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla },
-  { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
-  { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
-  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true },
-  { key: 'blog', label: 'Blog', icon: ICON.blog },
-  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
-  { key: 'credguardadas', label: 'Credenciales guardadas', icon: ICON.usuarios, credOnly: true },
-  { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true },
-  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true },
-  { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true },
-  { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true },
-  { key: 'tarjetas', label: 'Tarjetas de presentación', icon: ICON.doc, credOnly: true },
-  { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true },
-  { key: 'informe', label: 'Informe de pasantía', icon: ICON.doc, credOnly: true },
-  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
-  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
-  { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
-  { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true },
-  { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true }
+  { key: 'dashboard', label: 'Panel', icon: ICON.dashboard, group: 'Principal' },
+  { key: 'procesos', label: 'Procesos', icon: ICON.procesos, group: 'Principal' },
+  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia, group: 'Principal' },
+  { key: 'reportes', label: 'Reportes', icon: ICON.grafico, group: 'Principal' },
+  { key: 'tareas', label: 'Tareas', icon: ICON.tareas, group: 'Principal' },
+  { key: 'clientes', label: 'Clientes', icon: ICON.clientes, group: 'Principal' },
+  { key: 'consultas', label: 'Consultas', icon: ICON.consultas, group: 'Principal' },
+  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true, group: 'Principal' },
+  { key: 'modelos', label: 'Modelos', icon: ICON.doc, group: 'Documentos' },
+  { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla, group: 'Documentos' },
+  { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true, group: 'Documentos' },
+  { key: 'informe', label: 'Informe de pasantía', icon: ICON.doc, credOnly: true, group: 'Documentos' },
+  { key: 'blog', label: 'Blog', icon: ICON.blog, group: 'Configuración y Web' },
+  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true, group: 'Configuración y Web' },
+  { key: 'credguardadas', label: 'Credenciales guardadas', icon: ICON.usuarios, credOnly: true, group: 'Configuración y Web' },
+  { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true, group: 'Configuración y Web' },
+  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true, group: 'Configuración y Web' },
+  { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true, group: 'Configuración y Web' },
+  { key: 'tarjetas', label: 'Tarjetas de presentación', icon: ICON.doc, credOnly: true, group: 'Configuración y Web' },
+  { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true, group: 'Configuración y Web' },
+  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true, group: 'Configuración y Web' },
+  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true, group: 'Configuración y Web' },
+  { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true, group: 'Administración' },
+  { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true, group: 'Administración' },
+  { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true, group: 'Administración' }
 ];
 // credOnly = solo administrador y abogado (NO procurador ni cliente)
 
@@ -507,8 +507,19 @@ function buildSidebar() {
         if (n.finOnly) return rol === 'admin' || rol === 'abogado';
         return true;
       });
-  nav.innerHTML = items
-    .map(n => `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`).join('');
+
+  let html = '';
+  let currentGroup = '';
+
+  items.forEach(n => {
+    if (n.group && n.group !== currentGroup) {
+      currentGroup = n.group;
+      html += `<div class="sidebar__group-title">${esc(currentGroup)}</div>`;
+    }
+    html += `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`;
+  });
+
+  nav.innerHTML = html;
   nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
   actualizarBadgesMenu();
 }

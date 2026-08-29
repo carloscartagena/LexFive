@@ -317,14 +317,13 @@ export async function openProcesoDetail(id, readonly = false) {
     box.style.display = 'block';
     box.innerHTML = '<div class="loading"><div class="spinner"></div>Resumiendo...</div>';
     try {
-      const res = await fetch('/.netlify/functions/ai-summarize', {
-        method: 'POST',
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('ai-summarize', {
+        body: {
           caratula: p.caratula,
           actuaciones: acts.map(a => ({ fecha: a.fecha, titulo: 'Actuación', detalle: a.descripcion }))
-        })
+        }
       });
-      const data = await res.json();
+      if (error) throw new Error(error.message);
       if (data.error) throw new Error(data.error);
       box.innerHTML = '<strong>Resumen Inteligente:</strong><br><div style="margin-top:8px;line-height:1.5;">' + esc(data.summary).replace(/\\n/g, '<br>') + '</div>';
     } catch(e) {
@@ -416,10 +415,10 @@ export async function openProcesoDetail(id, readonly = false) {
     if (!texto) { toast('Escriba la descripción primero.', 'error'); return; }
     const btn = $('#btnIAPlazos'); btn.disabled = true; btn.textContent = '...';
     try {
-      const res = await fetch('/.netlify/functions/ai-extract-deadlines', {
-        method: 'POST', body: JSON.stringify({ texto })
+      const { data, error } = await supabase.functions.invoke('ai-extract-deadlines', {
+        body: { texto }
       });
-      const data = await res.json();
+      if (error) throw new Error(error.message);
       if (data.hay_plazo) {
         toast(`Plazo detectado: ${data.dias_estimados} días. ${data.justificacion}`, 'success');
         openPlazos(p);
