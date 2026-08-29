@@ -20,7 +20,7 @@ Devuelve el resumen en texto claro y profesional.
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: 'gemini-3.6-flash',
       contents: prompt
     });
 
