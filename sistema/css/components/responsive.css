@@ -109,6 +109,9 @@
     font-size: 0.8rem;
   }
   
+  /* Hide complex charts on mobile to prioritize upcoming deadlines */
+  .charts-grid { display: none; }
+  
   /* Modal responsive improvements */
   .modal {
     width: 100%;
@@ -125,8 +128,15 @@
   }
 }
 @media (max-width: 520px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .content { padding: 18px; }
+  /* Make metrics compact: 2 columns, smaller padding */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+  .metric { padding: 12px 14px; }
+  .metric__num { font-size: 1.6rem; margin-top: 8px; }
+  .metric__icon { width: 32px; height: 32px; border-radius: 8px; }
+  .metric__icon svg { width: 16px; height: 16px; }
+  .metric__label { font-size: 0.75rem; }
+
+  .content { padding: 16px; }
   .topbar { padding: 0 16px; }
   /* Modal en celular: menos relleno y botones del pie que se reparten y
      envuelven, para que ninguno se salga del cuadro. */
