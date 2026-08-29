@@ -6,6 +6,9 @@
   command = "npm run build"
   functions = "netlify/functions"
 
+[functions]
+  node_bundler = "esbuild"
+
 # ---- Página de error 404 personalizada ----
 # Netlify usa automáticamente /404.html para rutas no encontradas.
 

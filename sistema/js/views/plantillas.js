@@ -146,15 +146,10 @@ function abrirIARedactar() {
         });
         let errorMsg = 'Hubo un error de conexión con la IA.';
         if (!res.ok) {
-          try {
-            const errData = await res.json();
-            errorMsg = 'Error IA: ' + (errData.error || errData.message || res.statusText);
-          } catch (e) {
-            errorMsg = 'Error IA: ' + res.statusText;
-          }
-          throw new Error(errorMsg);
+          const rawText = await res.text();
+          throw new Error('Error ' + res.status + ': ' + rawText);
         }
-        const data = await res.json();
+        const data = JSON.parse(await res.text());
         
         closeModal();
         plantillaForm({ titulo: 'Borrador IA', cuerpo: data.draft });

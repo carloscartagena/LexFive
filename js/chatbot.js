@@ -80,16 +80,11 @@
 
             let errorMsg = 'Lo siento, ocurrió un error de conexión. Por favor escríbenos al WhatsApp directo.';
             if (!res.ok) {
-                try {
-                    const errData = await res.json();
-                    errorMsg = 'Error del Servidor: ' + (errData.error || errData.message || res.statusText);
-                } catch (e) {
-                    errorMsg = 'Error HTTP: ' + res.statusText;
-                }
-                throw new Error(errorMsg);
+                const rawText = await res.text();
+                throw new Error('Error ' + res.status + ': ' + rawText);
             }
             
-            const data = await res.json();
+            const data = JSON.parse(await res.text());
             messagesEl.removeChild(loadingDiv);
 
             if (data.functionCall) {
