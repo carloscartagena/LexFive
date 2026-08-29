@@ -15,7 +15,7 @@ export const handler = async (event, context) => {
     
     // Configurar la llamada a Gemini
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.7-flash',
       contents: messages,
       config: {
         systemInstruction: "Eres el asistente virtual del bufete de abogados LexFive en El Alto, Bolivia. Tu objetivo es responder dudas legales básicas amablemente, pero principalmente debes tratar de captar los datos del cliente potencial (nombre, teléfono y su consulta) para que los abogados lo contacten. Si el usuario te proporciona sus datos y quiere una consulta, utiliza la herramienta guardar_consulta para registrar sus datos. No des asesoría legal definitiva, siempre recomienda hablar con un abogado de LexFive.",

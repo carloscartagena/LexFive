@@ -25,7 +25,7 @@ Devuelve únicamente el texto del memorial en formato Markdown.
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-3.1-pro-preview',
       contents: prompt
     });
 
