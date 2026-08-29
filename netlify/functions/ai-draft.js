@@ -1,5 +1,3 @@
-import { GoogleGenAI } from '@google/genai';
-
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
@@ -7,8 +5,6 @@ export const handler = async (event) => {
     const { tema, contexto } = JSON.parse(event.body);
     if (!tema || !contexto) return { statusCode: 400, body: JSON.stringify({ error: 'Faltan datos' }) };
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    
     const prompt = `
 Actúa como un abogado experto de Bolivia. Redacta un borrador de memorial judicial basado en la siguiente solicitud y contexto.
 El documento debe tener el formato formal legal boliviano. (Encabezado al juez, suma, generales de ley, petitorio, fecha).
@@ -24,15 +20,25 @@ Contexto del caso:
 Devuelve únicamente el texto del memorial en formato Markdown.
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash',
-      contents: prompt
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
     });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return { statusCode: response.status, body: JSON.stringify({ error: JSON.stringify(data) }) };
+    }
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ draft: response.text })
+      body: JSON.stringify({ draft: text })
     };
 
   } catch (error) {
