@@ -9,27 +9,17 @@ import { esc, hoyISO, fmtDate, fmtDateTime, initials } from '@/utils/util.js';
 import { $, content } from '@/utils/dom.js';
 import { toast, tip, initTooltipEngine, loading, openModal, closeModal } from '@/utils/ui.js';
 import { state } from '@/utils/state.js';
-import { renderCategorias } from '@/views/categorias.js';
 import { clienteName } from '@/shared/comunes.js';
 import { renderConsultas, consultaNombre, openConsultaDetail } from '@/views/consultas.js';
 import { loadProfiles } from '@/shared/datos.js';
 import { renderUsuarios, renderAuditoria } from '@/views/admin.js';
-import { renderBlog } from '@/views/blog.js';
-import { renderPlantillas } from '@/views/plantillas.js';
 import { renderModelos } from '@/views/modelos.js';
 import { renderTareas } from '@/views/tareas.js';
 import { renderReportes } from '@/views/reportes.js';
 import { renderFinanzas } from '@/views/finanzas.js';
 import { renderPapelera } from '@/views/papelera.js';
 import { renderAreas } from '@/views/areas.js';
-import { renderSitio } from '@/views/sitio.js';
-import { renderSellos } from '@/views/sellos.js';
-import { renderCredenciales, renderCredGuardadas } from '@/views/credenciales.js';
-import { renderCertificados } from '@/views/certificados.js';
-import { renderTarjetas } from '@/views/tarjetas.js';
-import { renderMembrete } from '@/views/membrete.js';
 import { renderInforme } from '@/views/informe.js';
-import { renderMiOpinion, renderTestimonios } from '@/views/opiniones.js';
 import { renderClientes, clienteForm } from '@/views/clientes.js';
 import { renderProcesos, openProcesoDetail } from '@/views/procesos.js';
 import { renderAgenda } from '@/views/agenda.js';
@@ -53,11 +43,9 @@ const NAV = [
   { key: 'ai-jurisprudencia', label: 'Buscador Legal', icon: ICON.buscar, group: 'Inteligencia Artificial (Gemini)' },
 
   { key: 'modelos', label: 'Modelos', icon: ICON.doc, group: 'Documentos' },
-  { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla, group: 'Documentos' },
   
   { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true, group: 'Administración' },
   { key: 'reportes', label: 'Reportes', icon: ICON.grafico, group: 'Administración' },
-  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true, group: 'Administración' },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true, group: 'Administración' },
   { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true, group: 'Administración' },
   { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true, group: 'Administración' }
@@ -419,35 +407,22 @@ const VIEWS = {
   tareas: { title: 'Tareas y pendientes', render: renderTareas },
   finanzas: { title: 'Honorarios y pagos', render: renderFinanzas },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
-  plantillas: { title: 'Plantillas de memoriales', render: renderPlantillas },
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
   'ai-documentos': { title: 'Análisis de Documentos', render: renderAiDocumentos },
   'ai-jurisprudencia': { title: 'Buscador Legal', render: renderAiJurisprudencia },
-  blog: { title: 'Blog', render: renderBlog },
-  credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
-  credguardadas: { title: 'Credenciales guardadas', render: renderCredGuardadas },
-  sellos: { title: 'Sellos y logos del bufete', render: renderSellos },
-  sitio: { title: 'Sitio web público', render: renderSitio },
   areas: { title: 'Áreas de práctica', render: renderAreas },
-  certificados: { title: 'Certificados y constancias', render: renderCertificados },
-  tarjetas: { title: 'Tarjetas de presentación', render: renderTarjetas },
-  membrete: { title: 'Hoja membretada', render: renderMembrete },
   informe: { title: 'Informe Único de Pasantía', render: renderInforme },
-  testimonios: { title: 'Testimonios', render: renderTestimonios },
-  categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
   papelera: { title: 'Papelera', render: renderPapelera },
   misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
-  novedades: { title: 'Novedades de mis procesos', render: renderNovedades },
-  opinion: { title: 'Mi opinión', render: renderMiOpinion }
+  novedades: { title: 'Novedades de mis procesos', render: renderNovedades }
 };
 
 const CLIENT_NAV = [
   { key: 'misprocesos', label: 'Mis procesos', icon: ICON.procesos },
-  { key: 'novedades', label: 'Novedades', icon: ICON.campana },
-  { key: 'opinion', label: 'Mi opinión', icon: ICON.estrella }
+  { key: 'novedades', label: 'Novedades', icon: ICON.campana }
 ];
 
 export function navigate(key) {
