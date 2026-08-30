@@ -56,7 +56,7 @@
       ],
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina 6-A",
+        "streetAddress": "Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6",
         "addressLocality": "El Alto",
         "addressRegion": "La Paz",
         "addressCountry": "BO"
@@ -106,11 +106,11 @@
             <div class="topbar__contact">
                 <span class="topbar__loc">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-                    Asesor&iacute;a legal en El Alto y La Paz &ndash; Bolivia
+                    Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.
                 </span>
             </div>
             <div class="topbar__hours">
-                <span>Lun &ndash; Vie: 9:00 &ndash; 18:00</span>
+                <span></span>
             </div>
         </div>
     </div>
@@ -152,41 +152,33 @@
                      FOTO real, reemplace este archivo o cambie el src a su imagen. -->
                 <img class="hero__photo" src="assets/hero-derecho-tech.svg" alt="Derecho y tecnología en LexFive" loading="lazy" onerror="this.remove()">
                 <svg class="hero__art" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <!-- conectores de circuito -->
-                <g stroke="#38bdf8" stroke-width="1.6" opacity=".45" stroke-linecap="round">
-                    <path d="M200 205 96 96"/><path d="M200 205 304 96"/>
-                    <path d="M200 205 96 312"/><path d="M200 205 304 312"/>
-                </g>
-                <g fill="#38bdf8" opacity=".7">
-                    <circle cx="200" cy="205" r="3.5"/>
-                    <circle cx="150" cy="160" r="2.6"/><circle cx="252" cy="160" r="2.6"/>
-                    <circle cx="150" cy="258" r="2.6"/><circle cx="252" cy="258" r="2.6"/>
-                </g>
-                <!-- aro central -->
-                <circle cx="200" cy="205" r="96" stroke="#38bdf8" stroke-width="1.5" opacity=".4"/>
-                <!-- balanza (derecho) -->
-                <g stroke="#e0c074" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M200 150v122"/>
-                    <path d="M170 272h60"/>
-                    <path d="M150 168h100"/>
-                    <path d="M150 168 134 208M150 168 166 208"/>
-                    <path d="M250 168 234 208M250 168 266 208"/>
-                    <path d="M128 208a22 9 0 0 0 44 0"/>
-                    <path d="M228 208a22 9 0 0 0 44 0"/>
-                </g>
-                <circle cx="200" cy="150" r="6" fill="#e0c074"/>
-                <!-- satélites: iconos derecho + tecnología -->
-                <g stroke="#7dd3fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="96" cy="96" r="30" stroke="#38bdf8" opacity=".55"/>
-                    <g transform="translate(82 82) scale(1.18)"><path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></g>
-                    <circle cx="304" cy="96" r="30" stroke="#38bdf8" opacity=".55"/>
-                    <g transform="translate(290 82) scale(1.18)"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12"/></g>
-                    <circle cx="96" cy="312" r="30" stroke="#38bdf8" opacity=".55"/>
-                    <g transform="translate(82 298) scale(1.18)"><path d="M14 6 18.5 10.5"/><path d="M9.5 5.5 14 10"/><path d="m11.7 7.8-6.3 6.3a1.5 1.5 0 0 0 2.1 2.1l6.3-6.3"/><path d="M4 21h10"/></g>
-                    <circle cx="304" cy="312" r="30" stroke="#38bdf8" opacity=".55"/>
-                    <g transform="translate(290 298) scale(1.18)"><path d="M3 9h18L12 3 3 9z"/><path d="M5 9v8M10 9v8M14 9v8M19 9v8"/><path d="M3 21h18"/></g>
-                </g>
-            </svg>
+    <!-- Fondo decorativo abstracto -->
+    <circle cx="200" cy="200" r="140" stroke="#d4af37" stroke-width="1" stroke-dasharray="4 8" opacity="0.3"/>
+    <circle cx="200" cy="200" r="100" stroke="#38bdf8" stroke-width="1.5" opacity="0.2"/>
+    <circle cx="200" cy="200" r="180" stroke="#38bdf8" stroke-width="0.5" opacity="0.1"/>
+    
+    <!-- Elementos tecnológicos / nodos externos -->
+    <circle cx="200" cy="60" r="4" fill="#38bdf8" opacity="0.5"/>
+    <circle cx="200" cy="340" r="4" fill="#38bdf8" opacity="0.5"/>
+    <circle cx="60" cy="200" r="4" fill="#d4af37" opacity="0.5"/>
+    <circle cx="340" cy="200" r="4" fill="#d4af37" opacity="0.5"/>
+    <path d="M200 60 L200 100" stroke="#38bdf8" stroke-width="1" opacity="0.3"/>
+    <path d="M200 340 L200 300" stroke="#38bdf8" stroke-width="1" opacity="0.3"/>
+    <path d="M60 200 L100 200" stroke="#d4af37" stroke-width="1" opacity="0.3"/>
+    <path d="M340 200 L300 200" stroke="#d4af37" stroke-width="1" opacity="0.3"/>
+
+    <!-- Ícono Central Elegante (LexFive - L5 / Escudo Justicia Tech) -->
+    <g transform="translate(140, 140) scale(3)">
+        <!-- Escudo base -->
+        <path d="M20 2L4 8V18C4 28 11 36 20 38C29 36 36 28 36 18V8L20 2Z" stroke="#d4af37" stroke-width="1.5" fill="rgba(212, 175, 55, 0.05)"/>
+        <!-- Elemento L y T interno (Legal Tech) -->
+        <path d="M14 14V26H22" stroke="#38bdf8" stroke-width="2" stroke-linecap="square"/>
+        <path d="M26 14V26" stroke="#38bdf8" stroke-width="2" stroke-linecap="square"/>
+        <path d="M18 14H28" stroke="#38bdf8" stroke-width="2" stroke-linecap="square"/>
+        <!-- Equilibrio / Justicia -->
+        <path d="M10 20L30 20" stroke="#d4af37" stroke-width="1" stroke-dasharray="2 2"/>
+    </g>
+</svg>
             </div>
             <div class="container hero__content">
                 <p class="hero__eyebrow">Bufete de abogados &middot; Derecho &amp; Tecnología</p>
@@ -217,51 +209,6 @@
                 <div class="stat">
                     <span class="stat__number" data-target="95">0</span><span class="stat__plus">%</span>
                     <p class="stat__label">Clientes satisfechos</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== Áreas de práctica ===== -->
-        <section class="section areas" id="areas">
-            <div class="container">
-                <header class="section__head">
-                    <p class="section__eyebrow">Lo que hacemos</p>
-                    <h2 class="section__title">Áreas de práctica</h2>
-                    <p class="section__lead">Equipos especializados en cada materia para garantizar la mejor defensa de sus intereses.</p>
-                </header>
-
-                <div class="areas__grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Corporativo y Empresa</h3>
-                        <p class="area-card__text">Constitución de empresas, contratos comerciales, defensa tributaria y asuntos laborales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-4.35-9-8.5A5 5 0 0 1 12 6a5 5 0 0 1 9 6.5C19 16.65 12 21 12 21Z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Civil y de Familia</h3>
-                        <p class="area-card__text">Divorcios, asistencia familiar, sucesiones, contratos civiles y resolución de conflictos patrimoniales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.4 7.7-8 9-4.6-1.3-8-4-8-9V6l8-3z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Penal</h3>
-                        <p class="area-card__text">Defensa penal estratégica en todas las etapas del proceso para proteger su libertad e intereses.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4M9.5 9 7.5 11l2 2M14.5 9l2 2-2 2"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Informático y Legal-Tech</h3>
-                        <p class="area-card__text">Protección de datos, contratos tecnológicos, delitos informáticos y firma digital.</p>
-                    </article>
                 </div>
             </div>
         </section>
@@ -440,99 +387,673 @@
                 </header>
 
                 <div class="team__grid">
-                    <article class="member">
-                        <div class="member__photo member__photo--1" data-initials="ZC">
-                            <!-- Para poner la foto: deja un archivo en assets/equipo/cartagena.jpg (o cambia el src) -->
-                            <img class="member__photo-img" src="assets/equipo/cartagena.jpg" alt="Abg. Zenón Carlos Cartagena Álvarez" onerror="this.remove()">
-                        </div>
-                        <div class="member__info">
-                            <h3 class="member__name">Abg. Zenón Carlos Cartagena Álvarez</h3>
-                            <p class="member__role">Socio Fundador</p>
-                            <p class="member__areas">Derecho Laboral, Informático y Administrativo</p>
-                            <p class="member__bio">Especialista en derecho laboral, informático y administrativo; lidera el equipo de LexFive con compromiso y excelencia jurídica.</p>
-                        </div>
-                    </article>
 
-                    <article class="member">
-                        <div class="member__photo member__photo--2" data-initials="JG">
-                            <img class="member__photo-img" src="assets/equipo/corwin.jpg" alt="Abg. Jose Corwin Gutiérrez Herrera" onerror="this.remove()">
-                        </div>
-                        <div class="member__info">
-                            <h3 class="member__name">Abg. Jose Corwin Gutiérrez Herrera</h3>
-                            <p class="member__role">Socio Fundador</p>
-                            <p class="member__areas">Derecho de Familia, Minero y Agrario</p>
-                            <p class="member__bio">Especialista en asuntos de familia, minería y derecho agrario, con un enfoque cercano y orientado a soluciones.</p>
-                        </div>
-                    </article>
-
-                    <article class="member">
-                        <div class="member__photo member__photo--3" data-initials="JA">
-                            <img class="member__photo-img" src="assets/equipo/antelo.jpg" alt="Abg. Jose Antonio Antelo Acho" onerror="this.remove()">
-                        </div>
-                        <div class="member__info">
-                            <h3 class="member__name">Abg. Jose Antonio Antelo Acho</h3>
-                            <p class="member__role">Socio Fundador</p>
-                            <p class="member__areas">Derecho Penal, Civil y Constitucional</p>
-                            <p class="member__bio">Defensa penal estratégica, con experiencia en materia civil y constitucional en todas las etapas del proceso.</p>
-                        </div>
-                    </article>
-
-                    <article class="member">
-                        <div class="member__photo member__photo--4" data-initials="DC">
-                            <img class="member__photo-img" src="assets/equipo/candia.jpg" alt="Abg. Douglas Yamil Candia Fernández" onerror="this.remove()">
-                        </div>
-                        <div class="member__info">
-                            <h3 class="member__name">Abg. Douglas Yamil Candia Fernández</h3>
-                            <p class="member__role">Socio Fundador</p>
-                            <p class="member__areas">Derecho Penal, Comercial y Tributario</p>
-                            <p class="member__bio">Abogado versátil en materia penal y diversas áreas del derecho, atento a las necesidades de cada cliente.</p>
-                        </div>
-                    </article>
-
-                    <article class="member">
-                        <div class="member__photo member__photo--5" data-initials="HP">
-                            <img class="member__photo-img" src="assets/equipo/payrumani.jpg" alt="Abg. Henry Iván Payrumani" onerror="this.remove()">
-                        </div>
-                        <div class="member__info">
-                            <h3 class="member__name">Abg. Henry Iván Payrumani</h3>
-                            <p class="member__role">Socio Fundador</p>
-                            <p class="member__areas">Derecho Deportivo, Civil y Comercial</p>
-                            <p class="member__bio">Especialista en derecho deportivo, civil y comercial: contratos, transferencias y representación de atletas y clubes.</p>
-                        </div>
-                    </article>
+<div class="card-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+    <div class="card-3d-inner">
+        <!-- CARA FRONTAL -->
+        <div class="card-face card-front">
+            <svg class="card-bg-svg" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#38bdf8" font-family="monospace" font-size="8" opacity="0.3">
+        <text x="15" y="25">01001100 01000101 01011000</text>
+        <text x="15" y="45">1101 0010 1001 1111</text>
+        <text x="260" y="30">01110100 01100101 01100011</text>
+        <text x="310" y="190">1010 1100 0011 0101</text>
+        <text x="25" y="200">01001100 01000101 01111000</text>
+    </g>
+    <g stroke="#38bdf8" stroke-width="0.75" fill="none" opacity="0.4">
+        <path d="M -10,60 L 45,60 L 65,40 L 125,40"/>
+        <circle cx="125" cy="40" r="2" fill="#38bdf8"/>
+        <path d="M 410,130 L 350,130 L 330,150 L 270,150"/>
+        <circle cx="270" cy="150" r="2" fill="#38bdf8"/>
+        <path d="M 40,230 L 40,170 L 70,140 L 130,140"/>
+        <circle cx="130" cy="140" r="2" fill="#38bdf8"/>
+    </g>
+    <g stroke="#bf953f" stroke-width="1.5" fill="none" transform="translate(180, 20)">
+        <circle cx="50" cy="25" r="12" stroke-width="1" fill="#bf953f" fill-opacity="0.1"/>
+        <path d="M 33,25 L 67,27" stroke-width="2"/>
+        <path d="M 39,35 L 10,55" stroke-width="1"/>
+        <path d="M -10,55 L 30,55" stroke-width="1.5"/>
+        <path d="M -10,55 L -25,75 L 5,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 30,55 L 15,75 L 45,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 61,35 L 90,50" stroke-width="1"/>
+        <path d="M 85,40 L 95,60" stroke-width="2"/>
+        <path d="M 90,50 L 75,105" stroke-width="1.5" fill="#bf953f"/>
+        <path d="M 50,37 Q 40,85 20,165 L 80,165 Q 60,85 50,37" stroke-width="1" fill="#bf953f" fill-opacity="0.08"/>
+        <circle cx="-10" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="30" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="75" cy="105" r="1.5" fill="#38bdf8" stroke="none"/>
+    </g>
+</svg>
+            
+            <div class="card-front-content" style="display:flex; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="card-logo-box">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+    <path d="M20 2L4 8V18C4 28 11 36 20 38C29 36 36 28 36 18V8L20 2Z" stroke="#d4af37" stroke-width="2" fill="rgba(212, 175, 55, 0.1)"/>
+    <path d="M14 14V26H22" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M26 14V26" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M18 14H28" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M10 20L30 20" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>
+                    </div>
+                    <div>
+                        <h2 style="font-family:var(--serif); font-size:1.3rem; font-weight:700; letter-spacing:2px; line-height:1;" class="text-gold">LEXFIVE</h2>
+                        <p style="font-size:0.55rem; letter-spacing:0.15em; color:#7dd3fc; text-transform:uppercase; font-weight:600; margin:0;">LegalTech Solutions</p>
+                    </div>
                 </div>
+            </div>
+
+            <div class="card-front-content" style="text-align:center; margin-top:auto; margin-bottom:auto;">
+                <h3 class="card-name">Shun'ei Carlos Cartagena Alvarez</h3>
+                <div class="card-roles"><span style="color: var(--gold)">Abogado</span><span style="width:4px;height:4px;border-radius:50%;background-color:#38bdf8;display:inline-block;"></span><span style="color: #38bdf8">Ing. Sistemas</span></div>
+            </div>
+
+            <div class="card-front-content card-contact">
+                <ul>
+                    <li><span style="color:#d4af37;">📞</span> +591 78360469</li>
+                    <li><span style="color:#d4af37;">✉️</span> alba23meira@gmail.com</li>
+                </ul>
+                <ul class="card-contact-right">
+                    <li>lexfive.netlify.app <span style="color:#38bdf8;">🔗</span></li>
+                    <li style="max-width:180px;">Av. Franco Valle, Ed. Real <span style="color:#38bdf8;">📍</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CARA TRASERA -->
+        <div class="card-face card-back">
+            <div class="card-back-title">Servicios Especializados</div>
+            <div class="card-back-line"></div>
+            
+            <div class="card-back-services">
+                
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Área Legal
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Asesoría en SERECI</li><li><span style="color:#d97706">•</span> Propiedad Intelectual</li><li><span style="color:#d97706">•</span> Redacción de Contratos</li><li><span style="color:#d97706">•</span> Litigios</li><li><span style="color:#d97706">•</span> Derecho Tecnológico</li><li><span style="color:#d97706">•</span> Derecho Laboral</li>
+            </ul>
+        </div>
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#0d9488">✦</span> Área Sistemas
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#0d9488">•</span> Peritaje Digital</li><li><span style="color:#0d9488">•</span> Ciberseguridad</li><li><span style="color:#0d9488">•</span> Desarrollo de Software</li><li><span style="color:#0d9488">•</span> Sistemas ERP/CRM</li><li><span style="color:#0d9488">•</span> Privacidad LegalTech</li><li><span style="color:#0d9488">•</span> Soporte TI</li>
+            </ul>
+        </div>
+            </div>
+
+            <div class="card-back-footer">
+                Innovación técnica con solidez jurídica.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+    <div class="card-3d-inner">
+        <!-- CARA FRONTAL -->
+        <div class="card-face card-front">
+            <svg class="card-bg-svg" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#38bdf8" font-family="monospace" font-size="8" opacity="0.3">
+        <text x="15" y="25">01001100 01000101 01011000</text>
+        <text x="15" y="45">1101 0010 1001 1111</text>
+        <text x="260" y="30">01110100 01100101 01100011</text>
+        <text x="310" y="190">1010 1100 0011 0101</text>
+        <text x="25" y="200">01001100 01000101 01111000</text>
+    </g>
+    <g stroke="#38bdf8" stroke-width="0.75" fill="none" opacity="0.4">
+        <path d="M -10,60 L 45,60 L 65,40 L 125,40"/>
+        <circle cx="125" cy="40" r="2" fill="#38bdf8"/>
+        <path d="M 410,130 L 350,130 L 330,150 L 270,150"/>
+        <circle cx="270" cy="150" r="2" fill="#38bdf8"/>
+        <path d="M 40,230 L 40,170 L 70,140 L 130,140"/>
+        <circle cx="130" cy="140" r="2" fill="#38bdf8"/>
+    </g>
+    <g stroke="#bf953f" stroke-width="1.5" fill="none" transform="translate(180, 20)">
+        <circle cx="50" cy="25" r="12" stroke-width="1" fill="#bf953f" fill-opacity="0.1"/>
+        <path d="M 33,25 L 67,27" stroke-width="2"/>
+        <path d="M 39,35 L 10,55" stroke-width="1"/>
+        <path d="M -10,55 L 30,55" stroke-width="1.5"/>
+        <path d="M -10,55 L -25,75 L 5,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 30,55 L 15,75 L 45,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 61,35 L 90,50" stroke-width="1"/>
+        <path d="M 85,40 L 95,60" stroke-width="2"/>
+        <path d="M 90,50 L 75,105" stroke-width="1.5" fill="#bf953f"/>
+        <path d="M 50,37 Q 40,85 20,165 L 80,165 Q 60,85 50,37" stroke-width="1" fill="#bf953f" fill-opacity="0.08"/>
+        <circle cx="-10" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="30" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="75" cy="105" r="1.5" fill="#38bdf8" stroke="none"/>
+    </g>
+</svg>
+            
+            <div class="card-front-content" style="display:flex; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="card-logo-box">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+    <path d="M20 2L4 8V18C4 28 11 36 20 38C29 36 36 28 36 18V8L20 2Z" stroke="#d4af37" stroke-width="2" fill="rgba(212, 175, 55, 0.1)"/>
+    <path d="M14 14V26H22" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M26 14V26" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M18 14H28" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M10 20L30 20" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>
+                    </div>
+                    <div>
+                        <h2 style="font-family:var(--serif); font-size:1.3rem; font-weight:700; letter-spacing:2px; line-height:1;" class="text-gold">LEXFIVE</h2>
+                        <p style="font-size:0.55rem; letter-spacing:0.15em; color:#7dd3fc; text-transform:uppercase; font-weight:600; margin:0;">LegalTech Solutions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-front-content" style="text-align:center; margin-top:auto; margin-bottom:auto;">
+                <h3 class="card-name">Jose Corwin Gutiérrez Herrera</h3>
+                <div class="card-roles"><span style="color: var(--gold)">Socio Fundador</span></div>
+            </div>
+
+            <div class="card-front-content card-contact">
+                <ul>
+                    <li><span style="color:#d4af37;">📞</span> +591 69915219</li>
+                    <li><span style="color:#d4af37;">✉️</span> contacto@lexfive.com</li>
+                </ul>
+                <ul class="card-contact-right">
+                    <li>lexfive.netlify.app <span style="color:#38bdf8;">🔗</span></li>
+                    <li style="max-width:180px;">Av. Franco Valle, Ed. Real <span style="color:#38bdf8;">📍</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CARA TRASERA -->
+        <div class="card-face card-back">
+            <div class="card-back-title">Servicios Especializados</div>
+            <div class="card-back-line"></div>
+            
+            <div class="card-back-services">
+                
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Derecho de Familia
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Asistencia Familiar</li><li><span style="color:#d97706">•</span> Procesos de Divorcio</li><li><span style="color:#d97706">•</span> Sucesiones y Herencias</li><li><span style="color:#d97706">•</span> Resolución de Conflictos</li><li><span style="color:#d97706">•</span> Guarda y Custodia</li><li><span style="color:#d97706">•</span> Declaratoria de Herederos</li>
+            </ul>
+        </div>
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Derecho Civil & Especial
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Derecho Minero</li><li><span style="color:#d97706">•</span> Derecho Agrario</li><li><span style="color:#d97706">•</span> Contratos Civiles</li><li><span style="color:#d97706">•</span> Derechos Reales</li><li><span style="color:#d97706">•</span> Usucapión</li><li><span style="color:#d97706">•</span> Cobro de Deudas</li>
+            </ul>
+        </div>
+            </div>
+
+            <div class="card-back-footer">
+                Innovación técnica con solidez jurídica.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+    <div class="card-3d-inner">
+        <!-- CARA FRONTAL -->
+        <div class="card-face card-front">
+            <svg class="card-bg-svg" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#38bdf8" font-family="monospace" font-size="8" opacity="0.3">
+        <text x="15" y="25">01001100 01000101 01011000</text>
+        <text x="15" y="45">1101 0010 1001 1111</text>
+        <text x="260" y="30">01110100 01100101 01100011</text>
+        <text x="310" y="190">1010 1100 0011 0101</text>
+        <text x="25" y="200">01001100 01000101 01111000</text>
+    </g>
+    <g stroke="#38bdf8" stroke-width="0.75" fill="none" opacity="0.4">
+        <path d="M -10,60 L 45,60 L 65,40 L 125,40"/>
+        <circle cx="125" cy="40" r="2" fill="#38bdf8"/>
+        <path d="M 410,130 L 350,130 L 330,150 L 270,150"/>
+        <circle cx="270" cy="150" r="2" fill="#38bdf8"/>
+        <path d="M 40,230 L 40,170 L 70,140 L 130,140"/>
+        <circle cx="130" cy="140" r="2" fill="#38bdf8"/>
+    </g>
+    <g stroke="#bf953f" stroke-width="1.5" fill="none" transform="translate(180, 20)">
+        <circle cx="50" cy="25" r="12" stroke-width="1" fill="#bf953f" fill-opacity="0.1"/>
+        <path d="M 33,25 L 67,27" stroke-width="2"/>
+        <path d="M 39,35 L 10,55" stroke-width="1"/>
+        <path d="M -10,55 L 30,55" stroke-width="1.5"/>
+        <path d="M -10,55 L -25,75 L 5,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 30,55 L 15,75 L 45,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 61,35 L 90,50" stroke-width="1"/>
+        <path d="M 85,40 L 95,60" stroke-width="2"/>
+        <path d="M 90,50 L 75,105" stroke-width="1.5" fill="#bf953f"/>
+        <path d="M 50,37 Q 40,85 20,165 L 80,165 Q 60,85 50,37" stroke-width="1" fill="#bf953f" fill-opacity="0.08"/>
+        <circle cx="-10" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="30" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="75" cy="105" r="1.5" fill="#38bdf8" stroke="none"/>
+    </g>
+</svg>
+            
+            <div class="card-front-content" style="display:flex; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="card-logo-box">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+    <path d="M20 2L4 8V18C4 28 11 36 20 38C29 36 36 28 36 18V8L20 2Z" stroke="#d4af37" stroke-width="2" fill="rgba(212, 175, 55, 0.1)"/>
+    <path d="M14 14V26H22" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M26 14V26" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M18 14H28" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M10 20L30 20" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>
+                    </div>
+                    <div>
+                        <h2 style="font-family:var(--serif); font-size:1.3rem; font-weight:700; letter-spacing:2px; line-height:1;" class="text-gold">LEXFIVE</h2>
+                        <p style="font-size:0.55rem; letter-spacing:0.15em; color:#7dd3fc; text-transform:uppercase; font-weight:600; margin:0;">LegalTech Solutions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-front-content" style="text-align:center; margin-top:auto; margin-bottom:auto;">
+                <h3 class="card-name">Jose Antonio Antelo Acho</h3>
+                <div class="card-roles"><span style="color: var(--gold)">Socio Fundador</span></div>
+            </div>
+
+            <div class="card-front-content card-contact">
+                <ul>
+                    <li><span style="color:#d4af37;">📞</span> +591 75216613</li>
+                    <li><span style="color:#d4af37;">✉️</span> contacto@lexfive.com</li>
+                </ul>
+                <ul class="card-contact-right">
+                    <li>lexfive.netlify.app <span style="color:#38bdf8;">🔗</span></li>
+                    <li style="max-width:180px;">Av. Franco Valle, Ed. Real <span style="color:#38bdf8;">📍</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CARA TRASERA -->
+        <div class="card-face card-back">
+            <div class="card-back-title">Servicios Especializados</div>
+            <div class="card-back-line"></div>
+            
+            <div class="card-back-services">
+                
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Derecho Penal
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Defensa Penal</li><li><span style="color:#d97706">•</span> Acciones de Libertad</li><li><span style="color:#d97706">•</span> Querellas y Denuncias</li><li><span style="color:#d97706">•</span> Asistencia en Fiscalía</li><li><span style="color:#d97706">•</span> Delitos Patrimoniales</li><li><span style="color:#d97706">•</span> Medidas Cautelares</li>
+            </ul>
+        </div>
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Constitucional & Civil
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Derecho Constitucional</li><li><span style="color:#d97706">•</span> Acciones de Amparo</li><li><span style="color:#d97706">•</span> Litigios Estratégicos</li><li><span style="color:#d97706">•</span> Derecho Civil</li><li><span style="color:#d97706">•</span> Procesos Ordinarios</li><li><span style="color:#d97706">•</span> Derechos Fundamentales</li>
+            </ul>
+        </div>
+            </div>
+
+            <div class="card-back-footer">
+                Innovación técnica con solidez jurídica.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+    <div class="card-3d-inner">
+        <!-- CARA FRONTAL -->
+        <div class="card-face card-front">
+            <svg class="card-bg-svg" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#38bdf8" font-family="monospace" font-size="8" opacity="0.3">
+        <text x="15" y="25">01001100 01000101 01011000</text>
+        <text x="15" y="45">1101 0010 1001 1111</text>
+        <text x="260" y="30">01110100 01100101 01100011</text>
+        <text x="310" y="190">1010 1100 0011 0101</text>
+        <text x="25" y="200">01001100 01000101 01111000</text>
+    </g>
+    <g stroke="#38bdf8" stroke-width="0.75" fill="none" opacity="0.4">
+        <path d="M -10,60 L 45,60 L 65,40 L 125,40"/>
+        <circle cx="125" cy="40" r="2" fill="#38bdf8"/>
+        <path d="M 410,130 L 350,130 L 330,150 L 270,150"/>
+        <circle cx="270" cy="150" r="2" fill="#38bdf8"/>
+        <path d="M 40,230 L 40,170 L 70,140 L 130,140"/>
+        <circle cx="130" cy="140" r="2" fill="#38bdf8"/>
+    </g>
+    <g stroke="#bf953f" stroke-width="1.5" fill="none" transform="translate(180, 20)">
+        <circle cx="50" cy="25" r="12" stroke-width="1" fill="#bf953f" fill-opacity="0.1"/>
+        <path d="M 33,25 L 67,27" stroke-width="2"/>
+        <path d="M 39,35 L 10,55" stroke-width="1"/>
+        <path d="M -10,55 L 30,55" stroke-width="1.5"/>
+        <path d="M -10,55 L -25,75 L 5,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 30,55 L 15,75 L 45,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 61,35 L 90,50" stroke-width="1"/>
+        <path d="M 85,40 L 95,60" stroke-width="2"/>
+        <path d="M 90,50 L 75,105" stroke-width="1.5" fill="#bf953f"/>
+        <path d="M 50,37 Q 40,85 20,165 L 80,165 Q 60,85 50,37" stroke-width="1" fill="#bf953f" fill-opacity="0.08"/>
+        <circle cx="-10" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="30" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="75" cy="105" r="1.5" fill="#38bdf8" stroke="none"/>
+    </g>
+</svg>
+            
+            <div class="card-front-content" style="display:flex; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="card-logo-box">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+    <path d="M20 2L4 8V18C4 28 11 36 20 38C29 36 36 28 36 18V8L20 2Z" stroke="#d4af37" stroke-width="2" fill="rgba(212, 175, 55, 0.1)"/>
+    <path d="M14 14V26H22" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M26 14V26" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M18 14H28" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M10 20L30 20" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>
+                    </div>
+                    <div>
+                        <h2 style="font-family:var(--serif); font-size:1.3rem; font-weight:700; letter-spacing:2px; line-height:1;" class="text-gold">LEXFIVE</h2>
+                        <p style="font-size:0.55rem; letter-spacing:0.15em; color:#7dd3fc; text-transform:uppercase; font-weight:600; margin:0;">LegalTech Solutions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-front-content" style="text-align:center; margin-top:auto; margin-bottom:auto;">
+                <h3 class="card-name">Douglas Yamil Candia Fernández</h3>
+                <div class="card-roles"><span style="color: var(--gold)">Socio Fundador</span></div>
+            </div>
+
+            <div class="card-front-content card-contact">
+                <ul>
+                    <li><span style="color:#d4af37;">📞</span> +591 68173978</li>
+                    <li><span style="color:#d4af37;">✉️</span> contacto@lexfive.com</li>
+                </ul>
+                <ul class="card-contact-right">
+                    <li>lexfive.netlify.app <span style="color:#38bdf8;">🔗</span></li>
+                    <li style="max-width:180px;">Av. Franco Valle, Ed. Real <span style="color:#38bdf8;">📍</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CARA TRASERA -->
+        <div class="card-face card-back">
+            <div class="card-back-title">Servicios Especializados</div>
+            <div class="card-back-line"></div>
+            
+            <div class="card-back-services">
+                
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Derecho Comercial
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Sociedades Comerciales</li><li><span style="color:#d97706">•</span> Fusión de Empresas</li><li><span style="color:#d97706">•</span> Contratos Comerciales</li><li><span style="color:#d97706">•</span> Auditorías Legales</li><li><span style="color:#d97706">•</span> Marcas y Patentes</li><li><span style="color:#d97706">•</span> Asesoría Empresarial</li>
+            </ul>
+        </div>
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Penal & Administrativo
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Derecho Penal</li><li><span style="color:#d97706">•</span> Derecho Tributario</li><li><span style="color:#d97706">•</span> Planeación Fiscal</li><li><span style="color:#d97706">•</span> Contratación Pública</li><li><span style="color:#d97706">•</span> Derecho Administrativo</li><li><span style="color:#d97706">•</span> Procesos Coactivos</li>
+            </ul>
+        </div>
+            </div>
+
+            <div class="card-back-footer">
+                Innovación técnica con solidez jurídica.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+    <div class="card-3d-inner">
+        <!-- CARA FRONTAL -->
+        <div class="card-face card-front">
+            <svg class="card-bg-svg" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#38bdf8" font-family="monospace" font-size="8" opacity="0.3">
+        <text x="15" y="25">01001100 01000101 01011000</text>
+        <text x="15" y="45">1101 0010 1001 1111</text>
+        <text x="260" y="30">01110100 01100101 01100011</text>
+        <text x="310" y="190">1010 1100 0011 0101</text>
+        <text x="25" y="200">01001100 01000101 01111000</text>
+    </g>
+    <g stroke="#38bdf8" stroke-width="0.75" fill="none" opacity="0.4">
+        <path d="M -10,60 L 45,60 L 65,40 L 125,40"/>
+        <circle cx="125" cy="40" r="2" fill="#38bdf8"/>
+        <path d="M 410,130 L 350,130 L 330,150 L 270,150"/>
+        <circle cx="270" cy="150" r="2" fill="#38bdf8"/>
+        <path d="M 40,230 L 40,170 L 70,140 L 130,140"/>
+        <circle cx="130" cy="140" r="2" fill="#38bdf8"/>
+    </g>
+    <g stroke="#bf953f" stroke-width="1.5" fill="none" transform="translate(180, 20)">
+        <circle cx="50" cy="25" r="12" stroke-width="1" fill="#bf953f" fill-opacity="0.1"/>
+        <path d="M 33,25 L 67,27" stroke-width="2"/>
+        <path d="M 39,35 L 10,55" stroke-width="1"/>
+        <path d="M -10,55 L 30,55" stroke-width="1.5"/>
+        <path d="M -10,55 L -25,75 L 5,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 30,55 L 15,75 L 45,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 61,35 L 90,50" stroke-width="1"/>
+        <path d="M 85,40 L 95,60" stroke-width="2"/>
+        <path d="M 90,50 L 75,105" stroke-width="1.5" fill="#bf953f"/>
+        <path d="M 50,37 Q 40,85 20,165 L 80,165 Q 60,85 50,37" stroke-width="1" fill="#bf953f" fill-opacity="0.08"/>
+        <circle cx="-10" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="30" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="75" cy="105" r="1.5" fill="#38bdf8" stroke="none"/>
+    </g>
+</svg>
+            
+            <div class="card-front-content" style="display:flex; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="card-logo-box">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+    <path d="M20 2L4 8V18C4 28 11 36 20 38C29 36 36 28 36 18V8L20 2Z" stroke="#d4af37" stroke-width="2" fill="rgba(212, 175, 55, 0.1)"/>
+    <path d="M14 14V26H22" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M26 14V26" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M18 14H28" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M10 20L30 20" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>
+                    </div>
+                    <div>
+                        <h2 style="font-family:var(--serif); font-size:1.3rem; font-weight:700; letter-spacing:2px; line-height:1;" class="text-gold">LEXFIVE</h2>
+                        <p style="font-size:0.55rem; letter-spacing:0.15em; color:#7dd3fc; text-transform:uppercase; font-weight:600; margin:0;">LegalTech Solutions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-front-content" style="text-align:center; margin-top:auto; margin-bottom:auto;">
+                <h3 class="card-name">Henry Iván Payrumani</h3>
+                <div class="card-roles"><span style="color: var(--gold)">Socio Fundador</span></div>
+            </div>
+
+            <div class="card-front-content card-contact">
+                <ul>
+                    <li><span style="color:#d4af37;">📞</span> +591 79145231</li>
+                    <li><span style="color:#d4af37;">✉️</span> contacto@lexfive.com</li>
+                </ul>
+                <ul class="card-contact-right">
+                    <li>lexfive.netlify.app <span style="color:#38bdf8;">🔗</span></li>
+                    <li style="max-width:180px;">Av. Franco Valle, Ed. Real <span style="color:#38bdf8;">📍</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CARA TRASERA -->
+        <div class="card-face card-back">
+            <div class="card-back-title">Servicios Especializados</div>
+            <div class="card-back-line"></div>
+            
+            <div class="card-back-services">
+                
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Derecho Deportivo
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Contratos de Atletas</li><li><span style="color:#d97706">•</span> Transferencias Deportivas</li><li><span style="color:#d97706">•</span> Representación de Clubes</li><li><span style="color:#d97706">•</span> Resolución Disputas</li><li><span style="color:#d97706">•</span> Patrocinios Deportivos</li><li><span style="color:#d97706">•</span> Derechos de Imagen</li>
+            </ul>
+        </div>
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Derecho Corporativo
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Derecho Civil</li><li><span style="color:#d97706">•</span> Derecho Comercial</li><li><span style="color:#d97706">•</span> Contratos Empresariales</li><li><span style="color:#d97706">•</span> Litigios Civiles</li><li><span style="color:#d97706">•</span> Gestión de Riesgos</li><li><span style="color:#d97706">•</span> Asesoría Integral</li>
+            </ul>
+        </div>
+            </div>
+
+            <div class="card-back-footer">
+                Innovación técnica con solidez jurídica.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+    <div class="card-3d-inner">
+        <!-- CARA FRONTAL -->
+        <div class="card-face card-front">
+            <svg class="card-bg-svg" viewBox="0 0 400 220" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#38bdf8" font-family="monospace" font-size="8" opacity="0.3">
+        <text x="15" y="25">01001100 01000101 01011000</text>
+        <text x="15" y="45">1101 0010 1001 1111</text>
+        <text x="260" y="30">01110100 01100101 01100011</text>
+        <text x="310" y="190">1010 1100 0011 0101</text>
+        <text x="25" y="200">01001100 01000101 01111000</text>
+    </g>
+    <g stroke="#38bdf8" stroke-width="0.75" fill="none" opacity="0.4">
+        <path d="M -10,60 L 45,60 L 65,40 L 125,40"/>
+        <circle cx="125" cy="40" r="2" fill="#38bdf8"/>
+        <path d="M 410,130 L 350,130 L 330,150 L 270,150"/>
+        <circle cx="270" cy="150" r="2" fill="#38bdf8"/>
+        <path d="M 40,230 L 40,170 L 70,140 L 130,140"/>
+        <circle cx="130" cy="140" r="2" fill="#38bdf8"/>
+    </g>
+    <g stroke="#bf953f" stroke-width="1.5" fill="none" transform="translate(180, 20)">
+        <circle cx="50" cy="25" r="12" stroke-width="1" fill="#bf953f" fill-opacity="0.1"/>
+        <path d="M 33,25 L 67,27" stroke-width="2"/>
+        <path d="M 39,35 L 10,55" stroke-width="1"/>
+        <path d="M -10,55 L 30,55" stroke-width="1.5"/>
+        <path d="M -10,55 L -25,75 L 5,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 30,55 L 15,75 L 45,75 Z" stroke-width="0.75" fill="#bf953f" fill-opacity="0.2"/>
+        <path d="M 61,35 L 90,50" stroke-width="1"/>
+        <path d="M 85,40 L 95,60" stroke-width="2"/>
+        <path d="M 90,50 L 75,105" stroke-width="1.5" fill="#bf953f"/>
+        <path d="M 50,37 Q 40,85 20,165 L 80,165 Q 60,85 50,37" stroke-width="1" fill="#bf953f" fill-opacity="0.08"/>
+        <circle cx="-10" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="30" cy="55" r="1.5" fill="#38bdf8" stroke="none"/>
+        <circle cx="75" cy="105" r="1.5" fill="#38bdf8" stroke="none"/>
+    </g>
+</svg>
+            
+            <div class="card-front-content" style="display:flex; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div class="card-logo-box">
+                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="30">
+    <path d="M20 2L4 8V18C4 28 11 36 20 38C29 36 36 28 36 18V8L20 2Z" stroke="#d4af37" stroke-width="2" fill="rgba(212, 175, 55, 0.1)"/>
+    <path d="M14 14V26H22" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M26 14V26" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M18 14H28" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="square"/>
+    <path d="M10 20L30 20" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>
+                    </div>
+                    <div>
+                        <h2 style="font-family:var(--serif); font-size:1.3rem; font-weight:700; letter-spacing:2px; line-height:1;" class="text-gold">LEXFIVE</h2>
+                        <p style="font-size:0.55rem; letter-spacing:0.15em; color:#7dd3fc; text-transform:uppercase; font-weight:600; margin:0;">LegalTech Solutions</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-front-content" style="text-align:center; margin-top:auto; margin-bottom:auto;">
+                <h3 class="card-name">Paulina Tinta Mamani</h3>
+                <div class="card-roles"><span style="color: var(--gold)">Abogada Asociada</span></div>
+            </div>
+
+            <div class="card-front-content card-contact">
+                <ul>
+                    <li><span style="color:#d4af37;">📞</span> +591 69915219</li>
+                    <li><span style="color:#d4af37;">✉️</span> contacto@lexfive.com</li>
+                </ul>
+                <ul class="card-contact-right">
+                    <li>lexfive.netlify.app <span style="color:#38bdf8;">🔗</span></li>
+                    <li style="max-width:180px;">Av. Franco Valle, Ed. Real <span style="color:#38bdf8;">📍</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CARA TRASERA -->
+        <div class="card-face card-back">
+            <div class="card-back-title">Servicios Especializados</div>
+            <div class="card-back-line"></div>
+            
+            <div class="card-back-services">
+                
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Área Civil & Familia
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Derecho Civil</li><li><span style="color:#d97706">•</span> Derecho de Familia</li><li><span style="color:#d97706">•</span> Asistencia Familiar</li><li><span style="color:#d97706">•</span> Resolución de Conflictos</li><li><span style="color:#d97706">•</span> Sucesiones</li><li><span style="color:#d97706">•</span> Demandas Civiles</li>
+            </ul>
+        </div>
+        <div class="card-services-col">
+            <div class="card-services-head">
+                <span style="color:#d97706">✦</span> Gestión Legal
+            </div>
+            <ul class="card-services-list">
+                <li><span style="color:#d97706">•</span> Trámites Administrativos</li><li><span style="color:#d97706">•</span> Revisión de Contratos</li><li><span style="color:#d97706">•</span> Representación Legal</li><li><span style="color:#d97706">•</span> Gestión Notarial</li><li><span style="color:#d97706">•</span> Conciliación</li><li><span style="color:#d97706">•</span> Asesoramiento</li>
+            </ul>
+        </div>
+            </div>
+
+            <div class="card-back-footer">
+                Innovación técnica con solidez jurídica.
+            </div>
+        </div>
+    </div>
+</div>
+
+            </div>
             </div>
         </section>
 
         <!-- ===== Testimonios ===== -->
         <section class="section testimonials" id="testimonios">
-            <div class="container">
-                <header class="section__head">
-                    <p class="section__eyebrow section__eyebrow--light">Lo que dicen de nosotros</p>
-                    <h2 class="section__title section__title--light">Testimonios de clientes</h2>
-                </header>
-
-                <div class="testimonials__grid">
-                    <figure class="testimonial">
-                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <blockquote>“El acompañamiento durante todo el proceso fue impecable. Me explicaron cada paso y siempre sentí que mis intereses estaban protegidos.”</blockquote>
-                        <figcaption><strong>Carlos J.</strong><span>Caso laboral</span></figcaption>
-                    </figure>
-
-                    <figure class="testimonial">
-                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <blockquote>“Profesionales serios y humanos. Resolvieron un caso familiar muy delicado con discreción y excelentes resultados.”</blockquote>
-                        <figcaption><strong>Laura F.</strong><span>Caso familiar</span></figcaption>
-                    </figure>
-
-                    <figure class="testimonial">
-                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <blockquote>“Su asesoría fue clara y oportuna. Recomiendo ampliamente al equipo de LexFive por su compromiso.”</blockquote>
-                        <figcaption><strong>Mario R.</strong><span>Caso civil</span></figcaption>
-                    </figure>
+    <div class="container">
+        <header class="section__head" style="text-align:center;">
+            <p class="section__eyebrow" style="margin-inline:auto;">Lo que dicen nuestros clientes</p>
+            <h2 class="section__title text-gold">Testimonios</h2>
+            <p class="section__lead" style="margin-inline:auto;">Casos de éxito y opiniones reales de personas y empresas que confiaron en nosotros.</p>
+        </header>
+        
+        <div class="testimonials__grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <article class="testi-card" style="background:#041230; padding:2rem; border-radius:12px; border:1px solid rgba(212,175,55,0.2);">
+                <div class="testi-card__stars" style="color:#d4af37; font-size:1.2rem; margin-bottom:1rem; text-align:center;">★★★★★</div>
+                <p style="color:#f8fafc; font-style:italic; font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem; text-align:center;">"El equipo de LexFive nos brindó una excelente defensa. Son transparentes con los costos y tienen un nivel de compromiso que no habíamos visto en otros bufetes. Absolutamente recomendados."</p>
+                <div class="testi-card__author" style="text-align:center;">
+                    <strong style="color:#d4af37; display:block;">Carlos Mendoza</strong>
+                    <span style="color:#38bdf8; font-size:0.8rem;">Empresario, El Alto</span>
                 </div>
-            </div>
-        </section>
+            </article>
+            <article class="testi-card" style="background:#041230; padding:2rem; border-radius:12px; border:1px solid rgba(212,175,55,0.2);">
+                <div class="testi-card__stars" style="color:#d4af37; font-size:1.2rem; margin-bottom:1rem; text-align:center;">★★★★★</div>
+                <p style="color:#f8fafc; font-style:italic; font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem; text-align:center;">"El conocimiento técnico y legal que tienen es impresionante. Nos ayudaron a redactar contratos de software y a gestionar el registro de marca de una forma súper ágil."</p>
+                <div class="testi-card__author" style="text-align:center;">
+                    <strong style="color:#d4af37; display:block;">Andrea V.</strong>
+                    <span style="color:#38bdf8; font-size:0.8rem;">CEO Startup Tech</span>
+                </div>
+            </article>
+            <article class="testi-card" style="background:#041230; padding:2rem; border-radius:12px; border:1px solid rgba(212,175,55,0.2);">
+                <div class="testi-card__stars" style="color:#d4af37; font-size:1.2rem; margin-bottom:1rem; text-align:center;">★★★★★</div>
+                <p style="color:#f8fafc; font-style:italic; font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem; text-align:center;">"Pasé por un proceso familiar muy complicado, pero LexFive estuvo a mi lado todo el tiempo. Me explicaron cada paso con claridad. Son excelentes abogados y personas."</p>
+                <div class="testi-card__author" style="text-align:center;">
+                    <strong style="color:#d4af37; display:block;">María Elena R.</strong>
+                    <span style="color:#38bdf8; font-size:0.8rem;">Cliente particular</span>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
 
         <!-- ===== Contacto ===== -->
         <section class="section contact" id="contacto">
@@ -547,7 +1068,7 @@
                             <span class="contact__icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
                             </span>
-                            <div><strong>Oficina</strong><br>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina 6-A. El Alto, Bolivia.</div>
+                            <div><strong>Oficina</strong><br>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</div>
                         </li>
                         <li>
                             <span class="contact__icon" aria-hidden="true">
@@ -716,7 +1237,7 @@
             <div class="footer__col">
                 <h4>Contacto</h4>
                 <ul class="footer__contact">
-                    <li>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina 6-A. El Alto, Bolivia.</li>
+                    <li>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</li>
                     <li>Lunes a viernes: 9:00 &ndash; 18:00</li>
                     <li><a href="index.html#contacto">Solicitar una consulta</a></li>
                 </ul>

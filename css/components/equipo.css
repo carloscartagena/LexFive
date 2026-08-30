@@ -1,14 +1,233 @@
-/* ----------  Equipo ---------- */
-.team { background: var(--bg); }
-.team__grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
-.member { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: transform .22s ease, box-shadow .22s ease; }
-.member:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-.member__photo { position: relative; aspect-ratio: 1 / 1.04; background: linear-gradient(150deg, var(--navy), var(--navy-700)); display: grid; place-items: center; }
-.member__photo::after { content: attr(data-initials); font-family: var(--serif); font-size: 2.6rem; font-weight: 700; color: var(--gold-soft); opacity: .85; }
-.member__photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.member__info { padding: 18px 18px 22px; text-align: center; }
-.member__name { font-size: 1.04rem; line-height: 1.25; margin-bottom: 4px; }
-.member__role { font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 10px; }
-.member__areas { font-size: .82rem; color: var(--navy); font-weight: 600; margin-bottom: 8px; }
-.member__bio { font-size: .82rem; color: var(--muted); line-height: 1.55; }
+/* ----------  Equipo - Tarjetas 3D Premium ---------- */
+.team { background: var(--bg); overflow: hidden; }
 
+.team__grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); 
+    gap: 30px; 
+    perspective: 1000px;
+}
+
+/* Contenedor principal de la tarjeta 3D */
+.card-3d-wrapper {
+    width: 100%;
+    aspect-ratio: 1.75 / 1;
+    cursor: pointer;
+    perspective: 1000px;
+    margin: 0 auto;
+    max-width: 600px; /* Para pantallas muy grandes */
+}
+
+.card-3d-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+.card-3d-wrapper.is-flipped .card-3d-inner {
+    transform: rotateY(180deg);
+}
+
+/* Caras de la tarjeta */
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Frente de la Tarjeta */
+.card-front {
+    background-color: #020b1e;
+    background-image: radial-gradient(circle at 50% -20%, #0a2558 0%, transparent 80%);
+    border: 1px solid rgba(14, 27, 44, 0.9);
+    box-shadow: inset 0 0 30px rgba(2, 11, 30, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem;
+}
+
+/* Texto dorado animado */
+.text-gold {
+    background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0px 2px 4px rgba(0,0,0,0.4);
+}
+
+/* Reverso de la Tarjeta */
+.card-back {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transform: rotateY(180deg);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Elementos internos */
+.card-bg-svg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.card-front-content {
+    position: relative;
+    z-index: 10;
+}
+
+.card-logo-box {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: #041230;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.card-name {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: #fff;
+    margin: 12px 0 6px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    line-height: 1.1;
+    text-align: center;
+}
+
+.card-roles {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.card-contact {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 0.65rem;
+    color: #bae6fd;
+}
+
+.card-contact ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-contact li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-contact-right {
+    text-align: right;
+    align-items: flex-end;
+}
+
+/* Estilos de la cara trasera */
+.card-back-title {
+    text-align: center;
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+.card-back-line {
+    width: 3rem;
+    height: 3px;
+    background: linear-gradient(to right, #eab308, #2dd4bf);
+    margin: 0 auto 0.8rem;
+    border-radius: 4px;
+}
+
+.card-back-services {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+}
+
+.card-services-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-services-head {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #1e293b;
+}
+
+.card-services-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.65rem;
+    color: #475569;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.card-services-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    line-height: 1.2;
+}
+
+.card-back-footer {
+    text-align: center;
+    font-size: 0.6rem;
+    color: #94a3b8;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 6px;
+    margin-top: auto;
+}
+
+@media (max-width: 768px) {
+    .team__grid {
+        grid-template-columns: 1fr;
+    }
+    .card-3d-wrapper {
+        aspect-ratio: auto;
+        height: 220px;
+    }
+}

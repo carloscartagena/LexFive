@@ -4,31 +4,32 @@
    ========================================================= */
 
 :root {
-    --bg: #ffffff;
-    --bg-soft: #f7f8fa;
-    --bg-soft2: #f1f3f6;
-    --navy: #0e1b2c;
-    --navy-700: #16273d;
-    --ink: #1b2430;
-    --muted: #5d6b7d;
-    --line: #e8eaef;
-    --gold: #b8923f;
-    --gold-soft: #c8a558;
-    --gold-tint: #f6efe1;
-    /* Acento tecnológico (ingeniería de sistemas): azul/cian. Convive con el
-       dorado jurídico para reflejar "Derecho + Tecnología". */
-    --tech: #2f7bd6;
+    /* Paleta Deep Blue & Gold */
+    --bg: #020b1e;
+    --bg-soft: #041230;
+    --bg-soft2: #0a1f44;
+    --navy: #020b1e;
+    --navy-700: #041230;
+    --ink: #ffffff; /* Texto principal invertido */
+    --muted: #94a3b8; /* Texto secundario claro */
+    --line: rgba(56, 189, 248, 0.2);
+    /* Dorado más elegante, clásico y profesional */
+    --gold: #c5a059;
+    --gold-soft: #dcb873;
+    --gold-tint: rgba(197, 160, 89, 0.15);
+    /* Acento tecnológico */
+    --tech: #38bdf8;
     --tech-cyan: #38bdf8;
-    --tech-deep: #0c2f55;
-    --tech-tint: #eaf3fc;
+    --tech-deep: #0369a1;
+    --tech-tint: rgba(56, 189, 248, 0.1);
     --white: #ffffff;
-    --radius: 16px;
-    --radius-sm: 11px;
-    --shadow-sm: 0 1px 2px rgba(16,27,44,.04), 0 4px 16px rgba(16,27,44,.05);
-    --shadow-md: 0 12px 34px rgba(16,27,44,.10);
-    --shadow-lg: 0 26px 60px rgba(16,27,44,.16);
-    --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-    --sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
     --container: 1200px;
     /* Trama de "circuito" (ingeniería de sistemas) en la paleta del bufete.
        Se usa muy tenue de fondo para unir tecnología + derecho sin recargar. */
