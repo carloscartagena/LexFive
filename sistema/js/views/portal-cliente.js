@@ -15,7 +15,7 @@ import { state } from '@/utils/state.js';
 import { badgeEstado } from '@/shared/comunes.js';
 import { supabase } from '@/api/supabase.js';
 import { openProcesoDetail } from '@/views/procesos.js';
-import { mountOpinion } from '@/views/opiniones.js';
+// Opinion import removed
 
 async function fetchNovedades() {
   const [{ data: procs }, { data: acts }, { data: docs }] = await Promise.all([
@@ -158,7 +158,7 @@ export async function renderMisProcesos() {
     <div class="card" id="opinionDash" style="margin-top:18px"></div>`;
   content().querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => openProcesoDetail(tr.dataset.id, true));
   const bec = $('#btnEstadoCuenta'); if (bec) bec.onclick = () => descargarEstadoCuenta(procesos);
-  mountOpinion($('#opinionDash'));
+  // opinion mount removed
 }
 
 // Genera el estado de cuenta del cliente (honorarios y pagos de sus procesos)

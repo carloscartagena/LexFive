@@ -14,14 +14,15 @@ import { descargarArchivo } from '@/views/exportar.js';
 import { $, content } from '@/utils/dom.js';
 import { paginar, pagerHTML, wirePager, toast, tip, hint, loading, openModal, closeModal } from '@/utils/ui.js';
 import { state } from '@/utils/state.js';
-import { loadCategorias, categoriaOptions, wireCategoriaSelect } from '@/views/categorias.js';
+const CATEGORIAS = ['Civil', 'Penal', 'Familiar', 'Laboral', 'Comercial', 'Administrativo', 'General'];
+const categoriaOptions = (sel) => CATEGORIAS.map(c => `<option ${c===sel?'selected':''}>${esc(c)}</option>`).join('') + '<option value="__new__">+ Crear nueva materia...</option>';
 import { profName, clienteName, badgeEstado, checkboxesProfiles, namesFromIds, optionsClientes } from '@/shared/comunes.js';
 import { loadClientes } from '@/shared/datos.js';
 import { Draft, wireDraft, maybeOfferDraft } from '@/views/draft.js';
 import { subirDocumento, enlaceDocumento } from '@/utils/storage.js';
 import { openHoras } from '@/views/horas.js';
 import { openHonorarios } from '@/views/finanzas.js';
-import { mountOpinion } from '@/views/opiniones.js';
+// Opiniones removed
 import { supabase } from '@/api/supabase.js';
 import { openPlazos } from '@/views/agenda.js';
 
@@ -49,9 +50,9 @@ function procesosToCSV(rows) {
 export async function renderProcesos() {
   loading();
   await loadClientes();
-  await loadCategorias();
-  const { data } = await supabase.from('procesos').select('*').eq('eliminado', false).order('created_at', { ascending: false });
-  const procesos = data || [];
+  state.categorias = CATEGORIAS;
+  const { data: procesos } = await supabase.from('procesos').select('*').eq('eliminado', false).order('created_at', { ascending: false });
+  const procesosList = procesos || [];
 
   content().innerHTML = `
     <div class="toolbar">
@@ -70,14 +71,14 @@ export async function renderProcesos() {
     </div>
     <div class="card"><div class="card__body--flush"><div id="procTable"></div></div></div>`;
 
-  let filtradas = procesos;
+  let filtradas = procesosList;
   let page = 1;
   function paint() {
     const q = ($('#qProc').value || '').toLowerCase();
     const fm = $('#fMateria').value, fe = $('#fEstado').value;
     const fa = $('#fAbogado').value;
     const desde = $('#fDesde').value, hasta = $('#fHasta').value;
-    const rows = procesos.filter(p =>
+    const rows = procesosList.filter(p =>
       (!fm || p.materia === fm) && (!fe || p.estado === fe) &&
       (!fa || (p.abogados_ids || []).includes(fa) || p.abogado_id === fa) &&
       (!desde || (p.proxima_audiencia && p.proxima_audiencia >= desde)) &&
@@ -187,8 +188,19 @@ function procesoForm(proc = null) {
     { label: 'Cancelar', class: 'btn--ghost', onClick: closeModal },
     { label: 'Guardar', class: 'btn--primary', id: 'pf_save', onClick: () => saveProceso(proc) }
   ], true);
-  wireCategoriaSelect($('#pf_materia'));
-
+  // local select handle
+  const selCat = $('#pf_materia');
+  if (selCat) {
+    selCat.onchange = () => {
+      if (selCat.value === '__new__') {
+        const val = prompt('Nueva materia:');
+        if (val) {
+          CATEGORIAS.push(val);
+          selCat.innerHTML = categoriaOptions(val);
+        } else { selCat.value = p.materia || ''; }
+      }
+    };
+  }
   // Autoguardado de borrador (no perder lo escrito si se cierra la sesión)
   const draftName = 'proceso_' + (proc ? proc.id : 'nuevo');
   const fields = ['pf_caratula', 'pf_numero', 'pf_nurej', 'pf_tipo', 'pf_materia', 'pf_estado',
@@ -479,7 +491,7 @@ export async function openProcesoDetail(id, readonly = false) {
   };
 
   // Para el cliente: widget de "Mi opinión" dentro del propio proceso
-  if (state.profile.rol === 'cliente') mountOpinion($('#opinionProc'));
+  // Opinion mount removed
 
   // Autoguardado de la actuación que se está escribiendo (no se pierde el texto)
   if (!readonly && $('#actDesc')) {

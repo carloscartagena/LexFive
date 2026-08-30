@@ -16,7 +16,14 @@ import { ensureImgCache } from '@/utils/media.js';
 import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual, applyWmOpacity, pushBranding } from '@/shared/branding.js';
 import { supabase } from '@/api/supabase.js';
 import { state } from '@/utils/state.js';
-import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membreteDocFluido, PRINT_COLOR_CSS } from '@/views/membrete-base.js';
+const MEMBRETE_MODELOS = [{ id: 'basico', nombre: 'Básico' }];
+let _modelo = 'basico';
+const modeloMembrete = () => _modelo;
+const setModeloMembrete = (m) => { _modelo = m; };
+const PRINT_COLOR_CSS = '* { -webkit-print-color-adjust: exact; print-color-adjust: exact; }';
+const membreteDocFluido = ({ contentHTML }) => {
+  return `<div style="padding:40px; font-family:sans-serif; background:white;">${contentHTML}</div>`;
+};
 
 const PAGES = {
   carta:  { label: 'Carta',  w: '21.6cm', h: '27.9cm', css: '21.6cm 27.9cm' },

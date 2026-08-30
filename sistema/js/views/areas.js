@@ -10,7 +10,7 @@ import { ICON } from '@/utils/icons.js';
 import { $, content } from '@/utils/dom.js';
 import { loading, toast, openModal, closeModal } from '@/utils/ui.js';
 import { subirImagenBranding } from '@/utils/storage.js';
-import { optimizarFotoSitio } from '@/views/imagenes.js';
+// Imagenes handled directly
 
 let _areasCache = [];
 let _areaImgTmp = '';
@@ -101,7 +101,8 @@ function formArea(area) {
     if (!f) return;
     if (f.size > 25 * 1024 * 1024) { toast('La imagen pesa demasiado (máx. 25 MB).', 'error'); return; }
     const reader = new FileReader();
-    reader.onload = () => optimizarFotoSitio(reader.result, 1200, async (peq) => {
+    reader.onload = async () => {
+      const peq = reader.result;
       toast('Subiendo imagen...', 'success');
       let src = null;
       try { src = await subirImagenBranding(peq, 'areas'); } catch (e) {}
@@ -111,7 +112,7 @@ function formArea(area) {
       if (prev) prev.innerHTML = `<img src="${esc(src)}" alt="" style="max-width:100%;border-radius:10px;display:block">`;
       const q = $('#areaQuitar'); if (q) q.hidden = false;
       toast('Imagen lista. No olvide Guardar.', 'success');
-    });
+    };
     reader.onerror = () => toast('No se pudo leer el archivo.', 'error');
     reader.readAsDataURL(f);
   };

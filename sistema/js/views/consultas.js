@@ -118,7 +118,7 @@ export function openConsultaDetail(c) {
           nombre: c.nombre + ' ' + (c.apellido || ''),
           email: c.email || '',
           telefono: c.telefono || '',
-          notas: \`[Viene de consulta web - \${fmtDateTime(c.created_at)}]\\n\\nÁrea: \${c.area || '—'}\\n\\nMensaje: \${c.mensaje || ''}\`
+          notas: "[Viene de consulta web - " + fmtDateTime(c.created_at) + "]\n\nArea: " + (c.area || '—') + "\n\nMensaje: " + (c.mensaje || '')
         });
         // Optionally mark it as attended
         if (c.estado !== 'atendida') setConsultaEstado(c, 'atendida');

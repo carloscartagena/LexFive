@@ -11,16 +11,17 @@ import { ICON } from '@/utils/icons.js';
 import { $, content } from '@/utils/dom.js';
 import { loading, toast, tip } from '@/utils/ui.js';
 import { profName } from '@/shared/comunes.js';
-import { loadCategorias, categoriaOptions, wireCategoriaSelect } from '@/views/categorias.js';
+// Categories handled locally
 import { subirDocumento, enlaceDocumento } from '@/utils/storage.js';
 
 export async function renderModelos() {
   loading();
-  await loadCategorias();
+  const CATEGORIAS = ['Civil', 'Penal', 'Familiar', 'Laboral', 'Comercial', 'Administrativo', 'General'];
+  state.categorias = CATEGORIAS;
   const { data } = await supabase.from('modelos').select('*').order('created_at', { ascending: false });
   const list = data || [];
 
-  // Áreas disponibles para clasificar los modelos (categorías dinámicas)
+  // Áreas disponibles para clasificar los modelos (estáticas)
   const areaOptions = state.categorias.map(m => `<option>${esc(m)}</option>`).join('');
 
   content().innerHTML = `
