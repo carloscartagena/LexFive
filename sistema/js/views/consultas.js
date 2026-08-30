@@ -106,6 +106,26 @@ export function openConsultaDetail(c) {
 
   const buttons = [];
   if (c.estado !== 'atendida') buttons.push({ label: 'Marcar atendida', class: 'btn--navy', onClick: () => setConsultaEstado(c, 'atendida') });
+  
+  // NEW: Convert to Client button
+  buttons.push({ 
+    label: 'Convertir a Cliente', 
+    class: 'btn--ghost', 
+    onClick: () => {
+      import('@/views/clientes.js').then(module => {
+        closeModal();
+        module.clienteForm({
+          nombre: c.nombre + ' ' + (c.apellido || ''),
+          email: c.email || '',
+          telefono: c.telefono || '',
+          notas: \`[Viene de consulta web - \${fmtDateTime(c.created_at)}]\\n\\nÁrea: \${c.area || '—'}\\n\\nMensaje: \${c.mensaje || ''}\`
+        });
+        // Optionally mark it as attended
+        if (c.estado !== 'atendida') setConsultaEstado(c, 'atendida');
+      });
+    }
+  });
+
   if (c.estado !== 'archivada') buttons.push({ label: 'Archivar', class: 'btn--ghost', onClick: () => setConsultaEstado(c, 'archivada') });
   if (c.estado !== 'nueva') buttons.push({ label: 'Marcar nueva', class: 'btn--ghost', onClick: () => setConsultaEstado(c, 'nueva') });
   if (state.profile.rol === 'admin') buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteConsulta(c) });

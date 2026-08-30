@@ -37,30 +37,27 @@ import { renderDashboard } from '@/views/dashboard.js';
 import { updateNovedadesBadge, renderNovedades, renderMisProcesos } from '@/views/portal-cliente.js';
 import { IMG, ensureImgCache } from '@/utils/media.js';
 import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from '@/shared/branding.js';
+import { renderAiDocumentos } from '@/views/ai-documentos.js';
+import { renderAiJurisprudencia } from '@/views/ai-jurisprudencia.js';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard, group: 'Gestión Jurídica' },
-  { key: 'procesos', label: 'Procesos', icon: ICON.procesos, group: 'Gestión Jurídica' },
-  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia, group: 'Gestión Jurídica' },
-  { key: 'tareas', label: 'Tareas', icon: ICON.tareas, group: 'Gestión Jurídica' },
+  { key: 'consultas', label: 'Consultas (Leads)', icon: ICON.consultas, group: 'Gestión Jurídica' },
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes, group: 'Gestión Jurídica' },
-  { key: 'consultas', label: 'Consultas', icon: ICON.consultas, group: 'Gestión Jurídica' },
+  { key: 'procesos', label: 'Procesos (Casos)', icon: ICON.procesos, group: 'Gestión Jurídica' },
+  { key: 'agenda', label: 'Agenda y Plazos', icon: ICON.audiencia, group: 'Gestión Jurídica' },
+  { key: 'tareas', label: 'Tareas', icon: ICON.tareas, group: 'Gestión Jurídica' },
+  
+  // Inteligencia Artificial (Nuevos Módulos)
+  { key: 'ai-documentos', label: 'Análisis de Documentos', icon: ICON.doc, group: 'Inteligencia Artificial (Gemini)' },
+  { key: 'ai-jurisprudencia', label: 'Buscador Legal', icon: ICON.buscar, group: 'Inteligencia Artificial (Gemini)' },
+
   { key: 'modelos', label: 'Modelos', icon: ICON.doc, group: 'Documentos' },
   { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla, group: 'Documentos' },
-  { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true, group: 'Documentos' },
-  { key: 'informe', label: 'Informe de pasantía', icon: ICON.doc, credOnly: true, group: 'Documentos' },
+  
   { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true, group: 'Administración' },
   { key: 'reportes', label: 'Reportes', icon: ICON.grafico, group: 'Administración' },
   { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true, group: 'Administración' },
-  { key: 'credguardadas', label: 'Cred. guardadas', icon: ICON.usuarios, credOnly: true, group: 'Administración' },
-  { key: 'blog', label: 'Blog', icon: ICON.blog, group: 'Administración' },
-  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true, group: 'Administración' },
-  { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true, group: 'Administración' },
-  { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true, group: 'Administración' },
-  { key: 'tarjetas', label: 'Tarjetas', icon: ICON.doc, credOnly: true, group: 'Administración' },
-  { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true, group: 'Administración' },
-  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true, group: 'Administración' },
-  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true, group: 'Administración' },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true, group: 'Administración' },
   { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true, group: 'Administración' },
   { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true, group: 'Administración' }
@@ -425,6 +422,8 @@ const VIEWS = {
   plantillas: { title: 'Plantillas de memoriales', render: renderPlantillas },
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
+  'ai-documentos': { title: 'Análisis de Documentos', render: renderAiDocumentos },
+  'ai-jurisprudencia': { title: 'Buscador Legal', render: renderAiJurisprudencia },
   blog: { title: 'Blog', render: renderBlog },
   credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
   credguardadas: { title: 'Credenciales guardadas', render: renderCredGuardadas },
