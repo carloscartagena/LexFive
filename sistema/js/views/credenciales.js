@@ -198,7 +198,7 @@ export async function renderCredenciales() {
           <datalist id="fraseList">${FRASES.map(f => `<option value="${esc(f)}">`).join('')}</datalist>
           <span class="cell-sub" style="display:block;margin-top:5px">Sugerencias: ${FRASES.map(f => `&ldquo;${esc(f)}&rdquo;`).join(' &middot; ')}</span>
         </div>
-        <div class="field"><label>Base legal de la representación (reverso)</label>
+        <div class="field"><label>Base legal de la representación (reverso) <button class="btn btn--primary btn--sm" id="cr_ia_btn" type="button" style="margin-left:8px; background: linear-gradient(45deg, #1e3c72, #2a5298); border: none; color: white;">✨ Redactar con IA</button></label>
           <textarea id="cr_repre" style="min-height:120px">${esc(datos.representacion)}</textarea>
           <span class="cell-sub" style="display:block;margin-top:5px">Ya viene con la base legal vigente (Ley 387, Ley 439, Ley 603 y Art. 24 CPE). Puede editarla con su criterio profesional.</span>
         </div>
@@ -320,6 +320,39 @@ export async function renderCredenciales() {
   ['cr_nombre', 'cr_cargo', 'cr_ci', 'cr_telpers', 'cr_teloff', 'cr_emision', 'cr_frase', 'cr_repre']
     .forEach(id => { const el = $('#' + id); if (el) { el.addEventListener('input', sync); el.addEventListener('change', sync); } });
   sync();
+  
+  const crIaBtn = $('#cr_ia_btn');
+  if (crIaBtn) {
+    crIaBtn.onclick = async () => {
+      crIaBtn.disabled = true;
+      const originalText = crIaBtn.innerHTML;
+      crIaBtn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:2px;margin-right:6px"></span> Redactando...';
+      try {
+        const res = await fetch('/.netlify/functions/ai-generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tipoDocumento: 'credencial',
+            datos: {
+              cargo: $('#cr_cargo').value
+            }
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error de IA');
+        
+        $('#cr_repre').value = data.text;
+        sync();
+        toast('Base legal generada con IA exitosamente.', 'success');
+      } catch (err) {
+        toast('Error al generar texto con IA.', 'error');
+        console.error(err);
+      } finally {
+        crIaBtn.disabled = false;
+        crIaBtn.innerHTML = originalText;
+      }
+    };
+  }
 
   // Subir / quitar foto del procurador (se recorta cuadrada y se guarda en IndexedDB)
   const fileFoto = $('#fileFoto');

@@ -144,7 +144,7 @@ export async function renderCertificados() {
           <div class="field"><label>Fecha de emisión</label><input id="ce_fecha" type="date" value="${hoyISO()}"></div>
         </div>
         <div class="field" style="margin-top:8px">
-          <label>Texto del certificado <button class="btn btn--ghost btn--sm" id="ce_restaurar" type="button" style="margin-left:8px">Restaurar texto automático</button></label>
+          <label>Texto del certificado <button class="btn btn--ghost btn--sm" id="ce_restaurar" type="button" style="margin-left:8px">Restaurar texto automático</button> <button class="btn btn--primary btn--sm" id="ce_ia_btn" type="button" style="margin-left:8px; background: linear-gradient(45deg, #1e3c72, #2a5298); border: none; color: white;">✨ Generar con IA</button></label>
           <textarea id="ce_cuerpo" rows="8" style="font-family:inherit"></textarea>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
@@ -374,6 +374,50 @@ export async function renderCertificados() {
   $('#ce_fecha').onchange = () => { forkSiNecesario(); pintar(); };
   $('#ce_cuerpo').oninput = () => { forkSiNecesario(); cuerpoEditado = true; pintar(); };
   $('#ce_restaurar').onclick = () => { regenerar(); pintar(); toast('Texto regenerado a partir de los datos.', 'success'); };
+  
+  const ceIaBtn = $('#ce_ia_btn');
+  if (ceIaBtn) {
+    ceIaBtn.onclick = async () => {
+      ceIaBtn.disabled = true;
+      const originalText = ceIaBtn.innerHTML;
+      ceIaBtn.innerHTML = '<span class="spinner" style="width:12px;height:12px;border-width:2px;margin-right:6px"></span> Generando...';
+      try {
+        const res = await fetch('/.netlify/functions/ai-generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tipoDocumento: 'certificado',
+            datos: {
+              tipo: tplActual().titulo,
+              nombre: $('#ce_nombre').value,
+              ci: $('#ce_ci').value,
+              cargo: $('#ce_calidad').value,
+              periodo: $('#ce_periodo').value,
+              universidad: $('#ce_uni').value,
+              carrera: $('#ce_carrera').value,
+              horas: $('#ce_horas').value,
+              destinatario: $('#ce_dest').value
+            }
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error de IA');
+        
+        $('#ce_cuerpo').value = data.text;
+        cuerpoEditado = true;
+        forkSiNecesario();
+        pintar();
+        toast('Texto generado con IA exitosamente.', 'success');
+      } catch (err) {
+        toast('Error al generar texto con IA.', 'error');
+        console.error(err);
+      } finally {
+        ceIaBtn.disabled = false;
+        ceIaBtn.innerHTML = originalText;
+      }
+    };
+  }
+
   const btnNuevo = $('#ce_nuevo'); if (btnNuevo) btnNuevo.onclick = nuevoCert;
   // Control de opacidad de la marca de agua (logo de fondo), igual que en credenciales.
   const wmS = $('#ce_wm'), wmOut = $('#ce_wm_out');
