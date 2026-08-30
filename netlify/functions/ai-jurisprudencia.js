@@ -4,32 +4,27 @@ export const handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
   try {
-    const { query, pais } = JSON.parse(event.body);
+    const { query, texto } = JSON.parse(event.body);
     
-    if (!query) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Falta la consulta' }) };
+    if (!texto && !query) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Falta proporcionar texto o consulta.' }) };
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
-    const prompt = `Actúa como un investigador legal experto en la jurisdicción de ${pais || 'tu país'}.
-El abogado te hace la siguiente consulta jurídica:
-"${query}"
+    const prompt = `Actúa como un abogado experto analista de jurisprudencia.
+Te han proporcionado el siguiente texto legal o extracto de sentencia:
+"${texto || '(No se proporcionó texto explícito)'}"
 
-Por favor, utiliza tu herramienta de búsqueda en Internet para buscar información RECIENTE y JURISPRUDENCIA OFICIAL exclusivamente en estos dos sitios web:
-1. site:jurisprudencia.tsj.bo
-2. site:buscador.tcpbolivia.bo
+Y la instrucción específica del abogado es:
+"${query || 'Analiza este texto, resume los puntos jurídicos más importantes, identifica la ratio decidendi (razón de la decisión) y explica en qué casos futuros aplicaría esta jurisprudencia.'}"
 
-Proporciona:
-1. Una respuesta legal fundamentada y estructurada basada en lo que encontraste en esos portales.
-2. Referencias a leyes, códigos o artículos que apliquen.
-3. Principios jurisprudenciales o doctrina relevante (con número de sentencia si lo encuentras en los sitios).
-Asegúrate de indicar claramente que esta es una sugerencia basada en IA y debe ser verificada con las fuentes oficiales.`;
+Por favor, realiza un análisis profundo, estructurado y claro basado estrictamente en el texto proporcionado (y tu conocimiento general del derecho si se pide contexto). 
+Usa formato Markdown (títulos, negritas, viñetas) para hacer tu respuesta fácil de leer.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-pro',
-      contents: prompt,
-      tools: [{ googleSearch: {} }]
+      model: 'gemini-1.5-flash',
+      contents: prompt
     });
 
     return {

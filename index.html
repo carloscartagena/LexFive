@@ -132,9 +132,7 @@
                     <li><a href="#areas" class="nav__link">Áreas</a></li>
                     <li><a href="#tecnologia" class="nav__link">Tecnología</a></li>
                     <li><a href="#nosotros" class="nav__link">Nosotros</a></li>
-                    <li><a href="casos.html" class="nav__link">Casos de éxito</a></li>
-                    <li><a href="blog.html" class="nav__link">Blog</a></li>
-                    <li><a href="faq.html" class="nav__link">FAQ</a></li>
+                    <li><a href="#testimonios" class="nav__link">Testimonios</a></li>
                     <li class="nav__item--access"><a href="sistema/login.html" class="nav__link">Inicio de sesión</a></li>
                     <li><a href="#contacto" class="nav__link nav__link--cta">Contáctenos</a></li>
                 </ul>
@@ -196,8 +194,8 @@
                 <h1 class="hero__title">Defendemos sus derechos con<br><em>experiencia y compromiso</em></h1>
                 <p class="hero__subtitle">En LexFive ofrecemos soluciones legales claras, estratégicas y a la medida de cada cliente en materia laboral, civil, penal y familiar. Su tranquilidad es nuestra prioridad.</p>
                 <div class="hero__actions">
-                    <a href="#contacto" class="btn btn--primary">Solicitar consulta</a>
-                    <a href="#areas" class="btn btn--ghost">Nuestras áreas</a>
+                    <a href="#contacto" class="btn btn--primary">Solicitar consulta gratis</a>
+                    <a href="javascript:document.getElementById('ai-chatbot-toggle').click();" class="btn btn--ghost">Preguntar a la IA</a>
                 </div>
             </div>
         </section>
@@ -233,21 +231,21 @@
                     <p class="section__lead">Equipos especializados en cada materia para garantizar la mejor defensa de sus intereses.</p>
                 </header>
 
-                <div class="areas__grid">
+                <div class="areas__grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
                     <article class="area-card">
                         <div class="area-card__icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg>
                         </div>
-                        <h3 class="area-card__title">Derecho Laboral</h3>
-                        <p class="area-card__text">Despidos, beneficios sociales, reincorporaciones y conflictos entre empleadores y trabajadores.</p>
+                        <h3 class="area-card__title">Derecho Corporativo y Empresa</h3>
+                        <p class="area-card__text">Constitución de empresas, contratos comerciales, defensa tributaria y asuntos laborales.</p>
                     </article>
 
                     <article class="area-card">
                         <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M5 21V9m4 12V9m6 12V9m4 12V9M2 9l10-6 10 6"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-4.35-9-8.5A5 5 0 0 1 12 6a5 5 0 0 1 9 6.5C19 16.65 12 21 12 21Z"/></svg>
                         </div>
-                        <h3 class="area-card__title">Derecho Civil</h3>
-                        <p class="area-card__text">Contratos, propiedad, responsabilidad civil, arrendamientos y conflictos patrimoniales.</p>
+                        <h3 class="area-card__title">Derecho Civil y de Familia</h3>
+                        <p class="area-card__text">Divorcios, asistencia familiar, sucesiones, contratos civiles y resolución de conflictos patrimoniales.</p>
                     </article>
 
                     <article class="area-card">
@@ -255,111 +253,15 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.4 7.7-8 9-4.6-1.3-8-4-8-9V6l8-3z"/></svg>
                         </div>
                         <h3 class="area-card__title">Derecho Penal</h3>
-                        <p class="area-card__text">Defensa penal estratégica y representación en todas las etapas del proceso.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-4.35-9-8.5A5 5 0 0 1 12 6a5 5 0 0 1 9 6.5C19 16.65 12 21 12 21Z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho de Familia</h3>
-                        <p class="area-card__text">Divorcios, asistencia familiar, custodia, filiación, sucesiones y testamentos.</p>
+                        <p class="area-card__text">Defensa penal estratégica en todas las etapas del proceso para proteger su libertad e intereses.</p>
                     </article>
 
                     <article class="area-card">
                         <div class="area-card__icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4M9.5 9 7.5 11l2 2M14.5 9l2 2-2 2"/></svg>
                         </div>
-                        <h3 class="area-card__title">Derecho Informático</h3>
-                        <p class="area-card__text">Protección de datos, delitos informáticos, contratos tecnológicos, firma y comercio digital.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 20h18L13 6l-3.5 6-2-3L3 20z"/><path d="M11.5 14 13 11"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Minero</h3>
-                        <p class="area-card__text">Concesiones, contratos mineros, regalías y cumplimiento de la normativa sectorial y ambiental.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22V11M12 11c-3 0-5-2-5-5 3 0 5 2 5 5zM12 13c0-3 2-5 6-5 0 4-3 6-6 5z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Agrario</h3>
-                        <p class="area-card__text">Propiedad agraria, saneamiento y titulación de tierras, y resolución de conflictos rurales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 21h8M10 17h4M12 17v-3M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Deportivo</h3>
-                        <p class="area-card__text">Contratos deportivos, transferencias, régimen disciplinario y representación de atletas y clubes.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Constitucional</h3>
-                        <p class="area-card__text">Amparos, acciones de libertad y de protección, y defensa de derechos fundamentales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M9 7h2m-2 4h2m-2 4h2m4-8h.01M15 11h.01M15 15h.01"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Administrativo</h3>
-                        <p class="area-card__text">Trámites ante entidades públicas, procesos administrativos y contrataciones estatales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Tributario</h3>
-                        <p class="area-card__text">Planeación fiscal, defensa ante impuestos, auditorías y cumplimiento de obligaciones.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Comercial</h3>
-                        <p class="area-card__text">Constitución de empresas, contratos mercantiles, sociedades y asesoría a negocios.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 21h10a2 2 0 0 0 2-2V7l-4-4H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"/><path d="M13 3v4h4M9 12h6M9 16h4"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Sucesorio</h3>
-                        <p class="area-card__text">Sucesiones, herencias, testamentos y división de bienes con acompañamiento cercano.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c.5.5 1 1.5 1 2h6c0-.5.5-1.5 1-2a7 7 0 0 0-4-12z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Propiedad Intelectual</h3>
-                        <p class="area-card__text">Registro de marcas, patentes, derechos de autor y protección de la propiedad industrial.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Ambiental</h3>
-                        <p class="area-card__text">Licencias ambientales, cumplimiento normativo y defensa en conflictos ambientales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.4L19 11v6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-6z"/><path d="M5 11h14M7.5 15h.01M16.5 15h.01"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho de Tránsito</h3>
-                        <p class="area-card__text">Accidentes de tránsito, infracciones, responsabilidad y trámites vehiculares.</p>
+                        <h3 class="area-card__title">Derecho Informático y Legal-Tech</h3>
+                        <p class="area-card__text">Protección de datos, contratos tecnológicos, delitos informáticos y firma digital.</p>
                     </article>
                 </div>
             </div>
@@ -809,9 +711,7 @@
                     <li><a href="index.html">Inicio</a></li>
                     <li><a href="#areas">Áreas de práctica</a></li>
                     <li><a href="#nosotros">Nosotros</a></li>
-                    <li><a href="casos.html">Casos de éxito</a></li>
-                    <li><a href="blog.html">Blog</a></li>
-                    <li><a href="faq.html">Preguntas frecuentes</a></li>
+                    <li><a href="#testimonios">Testimonios</a></li>
                 </ul>
             </div>
             <div class="footer__col">
@@ -844,7 +744,6 @@
     <script type="module" src="js/main.js?v=20260624"></script>
     <script type="module" src="js/chatbot.js"></script>
     <script type="module">
-      // Carga dinámica de testimonios aprobados desde el panel (Supabase)
       import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
       import { SUPABASE_URL, SUPABASE_KEY } from './sistema/js/utils/config.js';
       const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -853,20 +752,6 @@
       // en Supabase para que aparezca en la pestaña "Consultas" del panel.
       window.LexFive = window.LexFive || {};
       window.LexFive.guardarConsulta = (consulta) => sb.from('consultas').insert(consulta);
-
-      const grid = document.querySelector('.testimonials__grid');
-      const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-      (async () => {
-        if (!grid) return;
-        const { data, error } = await sb.from('testimonios').select('*').eq('estado', 'aprobado').order('updated_at', { ascending: false }).limit(9);
-        if (error || !data || !data.length) return; // si no hay aprobados, deja los testimonios de ejemplo
-        grid.innerHTML = data.map(t => `
-          <figure class="testimonial">
-            <div class="testimonial__stars" aria-label="${t.calificacion} de 5 estrellas">${'&#9733;'.repeat(t.calificacion)}</div>
-            <blockquote>“${esc(t.texto)}”</blockquote>
-            <figcaption><strong>${esc(t.nombre || 'Cliente')}</strong><span>${esc(t.detalle || 'Cliente')}</span></figcaption>
-          </figure>`).join('');
-      })();
     </script>
 </body>
 </html>
