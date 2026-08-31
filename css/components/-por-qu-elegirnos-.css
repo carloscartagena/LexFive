@@ -31,8 +31,8 @@ html[data-theme="dark"] .about.has-bg-image,
    Modo claro -> panel claro con texto oscuro · Modo oscuro -> panel oscuro con texto claro. */
 .why.has-bg-image .why-card,
 .about.has-bg-image .about__content {
-    background: rgba(255,255,255,.9);
-    border: 1px solid rgba(15,30,52,.08);
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 24px 20px;
     box-shadow: var(--shadow-md);
@@ -41,12 +41,7 @@ html[data-theme="dark"] .about.has-bg-image,
     /* dentro del panel el texto ya contrasta: la sombra estorba, se anula */
     text-shadow: none;
 }
-html[data-theme="dark"] .why.has-bg-image .why-card,
-html[data-theme="dark"] .about.has-bg-image .about__content {
-    background: rgba(12,22,38,.84);
-    border-color: rgba(255,255,255,.14);
-    box-shadow: 0 12px 32px rgba(0,0,0,.5);
-}
+
 /* En el panel claro, los párrafos atenuados (gris) se oscurecen para leerse mejor. */
 .why.has-bg-image .why-card p { color: var(--ink); }
 .why > .container { position: relative; z-index: 1; }

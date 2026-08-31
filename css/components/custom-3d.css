@@ -104,3 +104,8 @@
     color: var(--accent);
     font-weight: bold;
 }
+
+
+.custom-front p {
+    color: #ffffff !important;
+}
