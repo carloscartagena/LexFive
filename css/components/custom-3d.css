@@ -1,0 +1,104 @@
+
+/* --- Custom 3D Cards for Tech & Why Sections --- */
+.custom-3d-wrapper {
+    width: 100%;
+    min-height: 420px;
+    cursor: pointer;
+    perspective: 1000px;
+    margin: 0 auto;
+}
+
+.custom-3d-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+.custom-3d-wrapper.is-flipped .custom-3d-inner {
+    transform: rotateY(180deg);
+}
+
+.custom-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px 20px;
+}
+
+.custom-front {
+    background-color: var(--dark);
+    color: var(--white);
+    align-items: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+/* Overlay to make text readable over the background image */
+.custom-front::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, rgba(2, 11, 30, 0.4) 0%, rgba(2, 11, 30, 0.9) 100%);
+    z-index: 1;
+    border-radius: 12px;
+}
+
+.custom-front > * {
+    z-index: 2;
+    position: relative;
+}
+
+.custom-back {
+    background-color: var(--white);
+    color: var(--text);
+    transform: rotateY(180deg);
+    border: 2px solid var(--accent);
+    align-items: center;
+    text-align: center;
+}
+
+.custom-title {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    color: var(--white);
+}
+
+.custom-back .custom-title {
+    color: var(--dark);
+}
+
+.custom-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    width: 100%;
+}
+
+.custom-list li {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.custom-list li::before {
+    content: '✓';
+    color: var(--accent);
+    font-weight: bold;
+}
