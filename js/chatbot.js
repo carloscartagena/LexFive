@@ -1,3 +1,5 @@
+import lexBotImg from '../assets/lex-bot.jpg';
+
 (function() {
     'use strict';
     
@@ -7,7 +9,7 @@
             <div class="ai-chatbot-toggle-wrapper">
                 <div class="ai-chatbot-tooltip">¿Qué consulta necesitas?</div>
                 <button id="ai-chatbot-toggle" aria-label="Abrir asistente">
-                    <img src="assets/lex-bot.jpg" alt="Lex Bot" class="ai-chatbot-avatar">
+                    <img src="${lexBotImg}" alt="Lex Bot" class="ai-chatbot-avatar">
                 </button>
             </div>
             <div id="ai-chatbot-window">
