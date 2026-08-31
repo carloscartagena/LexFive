@@ -8,26 +8,70 @@
     font-family: var(--font-sans);
 }
 
-/* El boton del WA está a la derecha, ponemos este a la izquierda */
-
-#ai-chatbot-toggle {
-    background-color: var(--navy);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+.ai-chatbot-toggle-wrapper {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, background-color 0.2s;
+}
+
+.ai-chatbot-tooltip {
+    position: absolute;
+    right: calc(100% + 15px);
+    background: white;
+    color: var(--navy);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    opacity: 1;
+    animation: bounce 2s infinite ease-in-out;
+    pointer-events: none;
+}
+
+.ai-chatbot-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    transform: translateY(-50%);
+    border-width: 6px 0 6px 6px;
+    border-style: solid;
+    border-color: transparent transparent transparent white;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.ai-chatbot-open .ai-chatbot-tooltip {
+    display: none;
+}
+
+#ai-chatbot-toggle {
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    padding: 0;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ai-chatbot-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 #ai-chatbot-toggle:hover {
-    transform: scale(1.05);
-    background-color: var(--gold);
+    transform: scale(1.1);
 }
 
 .ai-chatbot-open #ai-chatbot-toggle {
@@ -145,8 +189,24 @@
     justify-content: center;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+    #ai-chatbot-container {
+        right: 20px; /* Over WhatsApp float on mobile or place it on the left */
+        bottom: 80px; /* Above whatsapp button */
+        z-index: 1001; /* Ensure it's above other elements */
+    }
+
     #ai-chatbot-window {
-        width: calc(100vw - 40px);
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+        width: auto;
+        height: 75vh;
+        max-height: none;
+    }
+    
+    .ai-chatbot-tooltip {
+        display: none; /* Hide tooltip on small screens if it takes too much space */
     }
 }

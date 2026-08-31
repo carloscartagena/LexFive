@@ -4,9 +4,12 @@
     // Inyectar HTML del chatbot
     const HTML = `
         <div id="ai-chatbot-container" class="ai-chatbot-closed">
-            <button id="ai-chatbot-toggle" aria-label="Abrir asistente">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 2C6.48 2 2 5.92 2 10.75c0 2.76 1.5 5.22 3.82 6.78l-1.3 3.63a1 1 0 0 0 1.25 1.25l4.23-1.18A11.3 11.3 0 0 0 12 19.5c5.52 0 10-3.92 10-8.75S17.52 2 12 2zm0 15.5c-1.3 0-2.55-.22-3.7-.62a1 1 0 0 0-.74.05l-2.42.67.75-2.07a1 1 0 0 0-.17-.96 7 7 0 0 1-1.72-4.82c0-3.73 3.58-6.75 8-6.75s8 3.02 8 6.75-3.58 6.75-8 6.75z"/></svg>
-            </button>
+            <div class="ai-chatbot-toggle-wrapper">
+                <div class="ai-chatbot-tooltip">¿Qué consulta necesitas?</div>
+                <button id="ai-chatbot-toggle" aria-label="Abrir asistente">
+                    <img src="assets/lex-bot.jpg" alt="Lex Bot" class="ai-chatbot-avatar">
+                </button>
+            </div>
             <div id="ai-chatbot-window">
                 <div id="ai-chatbot-header">
                     <h4>Asistente LexFive</h4>
