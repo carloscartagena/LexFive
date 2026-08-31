@@ -1,5 +1,5 @@
 /* ----------  Formulario ---------- */
-.contact__form { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 34px; box-shadow: var(--shadow-md); }
+.contact__form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 34px; box-shadow: var(--shadow-md); }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .field { margin-bottom: 16px; }
 .field label { display: block; font-size: .82rem; font-weight: 600; color: var(--navy); margin-bottom: 7px; }

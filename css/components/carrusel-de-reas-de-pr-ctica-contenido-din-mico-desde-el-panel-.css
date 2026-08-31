@@ -7,7 +7,7 @@
 .areas-carousel__track::-webkit-scrollbar { height: 8px; }
 .areas-carousel__track::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
 .area-slide {
-  flex: 0 0 300px; scroll-snap-align: start; background: var(--white);
+  flex: 0 0 300px; scroll-snap-align: start; background: var(--surface);
   border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
   box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
   transition: transform .22s ease, box-shadow .22s ease;

@@ -6,8 +6,8 @@
 .contact__details { display: grid; gap: 16px; margin-bottom: 24px; }
 .contact__details li { display: flex; align-items: flex-start; gap: 14px; font-size: .92rem; color: var(--ink); }
 .contact__details strong { color: var(--navy); }
-.contact__icon { flex-shrink: 0; width: 42px; height: 42px; border-radius: 11px; background: var(--white); border: 1px solid var(--line); color: var(--gold); display: grid; place-items: center; }
-.wa-direct { background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 22px; }
+.contact__icon { flex-shrink: 0; width: 42px; height: 42px; border-radius: 11px; background: var(--surface); border: 1px solid var(--line); color: var(--gold); display: grid; place-items: center; }
+.wa-direct { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin-bottom: 22px; }
 .wa-direct__title { font-size: .9rem; color: var(--ink); margin-bottom: 14px; }
 .wa-direct__list { display: flex; flex-wrap: wrap; gap: 9px; }
 .wa-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 999px; background: #f0faf2; color: #1c7a43; border: 1px solid #cdebd6; font-size: .82rem; font-weight: 600; transition: background .15s ease, transform .15s ease; }

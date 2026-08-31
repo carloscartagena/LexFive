@@ -8,6 +8,7 @@ html[data-theme="dark"] {
     --bg-soft: #0d1828;
     --bg-soft2: #102132;
     --white: #0f1d2e;
+    --surface: #102132;
     --ink: #dde6f1;
     --muted: #9fb0c4;
     --line: #213347;
@@ -37,7 +38,7 @@ html[data-theme="dark"] .field textarea { background: #0b1726; color: var(--ink)
 html[data-theme="dark"] .field input:focus,
 html[data-theme="dark"] .field select:focus,
 html[data-theme="dark"] .field textarea:focus { background: #0b1726; }
-html[data-theme="dark"] .wa-menu { background: var(--white); border-color: var(--line); }
+html[data-theme="dark"] .wa-menu { background: var(--surface); border-color: var(--line); }
 html[data-theme="dark"] .wa-menu a { color: var(--ink); }
 html[data-theme="dark"] .page-hero { background: radial-gradient(900px 400px at 80% -20%, rgba(56,189,248,.12), transparent 60%), var(--bg-soft); }
 
