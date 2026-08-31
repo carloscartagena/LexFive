@@ -499,6 +499,7 @@
         apply(currentTheme());
 
         var btn = document.createElement('button');
+      btn.style.display = 'none';
         btn.id = 'modeToggle';
         btn.className = 'mode-toggle';
         btn.type = 'button';
