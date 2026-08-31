@@ -11,13 +11,12 @@ import { ICON } from '@/utils/icons.js';
 import { $, content } from '@/utils/dom.js';
 import { loading, toast, tip } from '@/utils/ui.js';
 import { profName } from '@/shared/comunes.js';
-// Categories handled locally
+import { loadCategorias, categoriaOptions, wireCategoriaSelect } from '@/views/categorias.js';
 import { subirDocumento, enlaceDocumento } from '@/utils/storage.js';
 
 export async function renderModelos() {
   loading();
-  const CATEGORIAS = ['Civil', 'Penal', 'Familiar', 'Laboral', 'Comercial', 'Administrativo', 'General'];
-  state.categorias = CATEGORIAS;
+  await loadCategorias();
   const { data } = await supabase.from('modelos').select('*').order('created_at', { ascending: false });
   const list = data || [];
 

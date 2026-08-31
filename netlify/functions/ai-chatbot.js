@@ -13,27 +13,37 @@ export const handler = async (event, context) => {
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+    const SYSTEM_INSTRUCTION = `Eres el asistente virtual del bufete de abogados LexFive en El Alto, Bolivia. Tu objetivo es responder dudas legales básicas amablemente, pero principalmente debes tratar de captar los datos del cliente potencial (nombre, teléfono y su consulta) para que los abogados lo contacten. Si el usuario te proporciona sus datos y quiere una consulta, utiliza la herramienta guardar_consulta para registrar sus datos. No des asesoría legal definitiva, siempre recomienda hablar con un abogado de LexFive.
+
+    Información de Aranceles (Costos Mínimos en Bolivianos - Bs.):
+    - Civil y Comercial: Procesos Ordinarios 6000 a 10% sobre cuantía; Extraordinarios (Desalojo) 4500; Ejecutivos 4000; Voluntarios (Declaratoria herederos) 3000; Contratos 500 a 1500.
+    - Familiar: Asistencia Familiar 2500; Divorcio Mutuo Acuerdo 3500; Divorcio Contencioso 6000; Guarda y Visitas 3000; Unión Libre 4000.
+    - Penal: Etapa Preliminar/Querella 4000; Preparatoria 6000; Juicio Oral 10000; Asistencia Declaración 1000; Incidentes 2500.
+    - Laboral: Beneficios Sociales (Conciliación) 10%; Proceso Contencioso 15%; Reincorporación 4000.
+    - Consultas: Verbal 200; Escrita/Informe 1000; Asistencia a Conciliación 1500.
+    (Puedes usar esta información si el cliente pregunta por costos estimados, pero aclara que son costos mínimos referenciales).`;
+
+    const functionDeclarations = [{
+      name: 'guardar_consulta',
+      description: 'Guarda los datos de un cliente potencial en la base de datos de consultas de LexFive.',
+      parameters: {
+        type: 'OBJECT',
+        properties: {
+          nombre: { type: 'STRING', description: 'Nombre completo del cliente.' },
+          telefono: { type: 'STRING', description: 'Número de teléfono o WhatsApp.' },
+          mensaje: { type: 'STRING', description: 'Resumen del problema legal.' },
+          area: { type: 'STRING', description: 'Área legal (ej. Laboral, Civil, Penal, Familia)' }
+        },
+        required: ['nombre', 'telefono', 'mensaje']
+      }
+    }];
+
     // The SDK requires messages to be formatted for chat
     const chat = ai.chats.create({
       model: 'gemini-1.5-flash',
       config: {
-        systemInstruction: "Eres el asistente virtual del bufete de abogados LexFive en El Alto, Bolivia. Tu objetivo es responder dudas legales básicas amablemente, pero principalmente debes tratar de captar los datos del cliente potencial (nombre, teléfono y su consulta) para que los abogados lo contacten. Si el usuario te proporciona sus datos y quiere una consulta, utiliza la herramienta guardar_consulta para registrar sus datos. No des asesoría legal definitiva, siempre recomienda hablar con un abogado de LexFive.",
-        tools: [{
-          functionDeclarations: [{
-            name: 'guardar_consulta',
-            description: 'Guarda los datos de un cliente potencial en la base de datos de consultas de LexFive.',
-            parameters: {
-              type: 'OBJECT',
-              properties: {
-                nombre: { type: 'STRING', description: 'Nombre completo del cliente.' },
-                telefono: { type: 'STRING', description: 'Número de teléfono o WhatsApp.' },
-                mensaje: { type: 'STRING', description: 'Resumen del problema legal.' },
-                area: { type: 'STRING', description: 'Área legal (ej. Laboral, Civil, Penal, Familia)' }
-              },
-              required: ['nombre', 'telefono', 'mensaje']
-            }
-          }]
-        }]
+        systemInstruction: SYSTEM_INSTRUCTION,
+        tools: [{ functionDeclarations }]
       }
     });
 
@@ -48,23 +58,8 @@ export const handler = async (event, context) => {
     const chatWithHistory = ai.chats.create({
       model: 'gemini-1.5-flash',
       config: {
-        systemInstruction: "Eres el asistente virtual del bufete de abogados LexFive en El Alto, Bolivia. Tu objetivo es responder dudas legales básicas amablemente, pero principalmente debes tratar de captar los datos del cliente potencial (nombre, teléfono y su consulta) para que los abogados lo contacten. Si el usuario te proporciona sus datos y quiere una consulta, utiliza la herramienta guardar_consulta para registrar sus datos. No des asesoría legal definitiva, siempre recomienda hablar con un abogado de LexFive.",
-        tools: [{
-          functionDeclarations: [{
-            name: 'guardar_consulta',
-            description: 'Guarda los datos de un cliente potencial en la base de datos de consultas de LexFive.',
-            parameters: {
-              type: 'OBJECT',
-              properties: {
-                nombre: { type: 'STRING', description: 'Nombre completo del cliente.' },
-                telefono: { type: 'STRING', description: 'Número de teléfono o WhatsApp.' },
-                mensaje: { type: 'STRING', description: 'Resumen del problema legal.' },
-                area: { type: 'STRING', description: 'Área legal (ej. Laboral, Civil, Penal, Familia)' }
-              },
-              required: ['nombre', 'telefono', 'mensaje']
-            }
-          }]
-        }]
+        systemInstruction: SYSTEM_INSTRUCTION,
+        tools: [{ functionDeclarations }]
       },
       history: history
     });

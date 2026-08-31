@@ -29,6 +29,8 @@ import { IMG, ensureImgCache } from '@/utils/media.js';
 import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from '@/shared/branding.js';
 import { renderAiDocumentos } from '@/views/ai-documentos.js';
 import { renderAiJurisprudencia } from '@/views/ai-jurisprudencia.js';
+import { renderPlantillas } from '@/views/plantillas.js';
+import { renderAranceles } from '@/views/aranceles.js';
 
 const NAV = [
   { key: 'dashboard', label: 'Panel', icon: ICON.dashboard, group: 'Gestión Jurídica' },
@@ -43,8 +45,10 @@ const NAV = [
   { key: 'ai-jurisprudencia', label: 'Buscador Legal', icon: ICON.buscar, group: 'Inteligencia Artificial (Gemini)' },
 
   { key: 'modelos', label: 'Modelos', icon: ICON.doc, group: 'Documentos' },
+  { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla, group: 'Documentos' },
   
   { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true, group: 'Administración' },
+  { key: 'aranceles', label: 'Aranceles (Calculadora)', icon: ICON.dinero, group: 'Administración' },
   { key: 'reportes', label: 'Reportes', icon: ICON.grafico, group: 'Administración' },
   { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true, group: 'Administración' },
   { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true, group: 'Administración' },
@@ -406,7 +410,9 @@ const VIEWS = {
   reportes: { title: 'Reportes', render: renderReportes },
   tareas: { title: 'Tareas y pendientes', render: renderTareas },
   finanzas: { title: 'Honorarios y pagos', render: renderFinanzas },
+  aranceles: { title: 'Aranceles (Calculadora)', render: renderAranceles },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
+  plantillas: { title: 'Plantillas de memoriales', render: renderPlantillas },
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
   'ai-documentos': { title: 'Análisis de Documentos', render: renderAiDocumentos },
@@ -906,7 +912,7 @@ async function arrancarSesion() {
   // Buscador global en la barra superior (solo personal, no clientes).
   if (profile.rol !== 'cliente') {
     const actions = $('#topbarActions');
-    if (actions) {
+    if (actions && !$('#btnBuscarGlobal')) {
       const btn = document.createElement('button');
       btn.className = 'btn btn--ghost btn--sm topbar__search';
       btn.id = 'btnBuscarGlobal';
