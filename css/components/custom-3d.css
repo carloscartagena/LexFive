@@ -36,7 +36,7 @@
 }
 
 .custom-front {
-    background-color: var(--dark);
+    background-color: var(--heading);
     color: var(--white);
     align-items: center;
     text-align: center;
@@ -61,7 +61,7 @@
 }
 
 .custom-back {
-    background-color: var(--white);
+    background-color: var(--surface);
     color: var(--text);
     transform: rotateY(180deg);
     border: 2px solid var(--accent);
@@ -73,11 +73,13 @@
     font-family: var(--serif);
     font-size: 1.4rem;
     margin-bottom: 12px;
-    color: var(--white);
+}
+.custom-front .custom-title {
+    color: #ffffff;
 }
 
 .custom-back .custom-title {
-    color: var(--dark);
+    color: var(--heading);
 }
 
 .custom-list {
