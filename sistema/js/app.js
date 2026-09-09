@@ -1,58 +1,69 @@
 // ============================================================
 //  LexFive — Sistema de Gestión Legal · Lógica principal
 // ============================================================
-import { supabase } from '@/api/supabase.js';
-import { requireAuth, signOut, signOutTo, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from '@/api/auth.js';
-import { ROLES, VAPID_PUBLIC_KEY } from '@/utils/config.js';
-import { ICON } from '@/utils/icons.js';
-import { esc, hoyISO, fmtDate, fmtDateTime, initials } from '@/utils/util.js';
-import { $, content } from '@/utils/dom.js';
-import { toast, tip, initTooltipEngine, loading, openModal, closeModal } from '@/utils/ui.js';
-import { state } from '@/utils/state.js';
-import { clienteName } from '@/shared/comunes.js';
-import { renderConsultas, consultaNombre, openConsultaDetail } from '@/views/consultas.js';
-import { loadProfiles } from '@/shared/datos.js';
-import { renderUsuarios, renderAuditoria } from '@/views/admin.js';
-import { renderModelos } from '@/views/modelos.js';
-import { renderTareas } from '@/views/tareas.js';
-import { renderReportes } from '@/views/reportes.js';
-import { renderFinanzas } from '@/views/finanzas.js';
-import { renderPapelera } from '@/views/papelera.js';
-import { renderAreas } from '@/views/areas.js';
-import { renderInforme } from '@/views/informe.js';
-import { renderClientes, clienteForm } from '@/views/clientes.js';
-import { renderProcesos, openProcesoDetail } from '@/views/procesos.js';
-import { renderAgenda } from '@/views/agenda.js';
-import { renderDashboard } from '@/views/dashboard.js';
-import { updateNovedadesBadge, renderNovedades, renderMisProcesos } from '@/views/portal-cliente.js';
-import { IMG, ensureImgCache } from '@/utils/media.js';
-import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from '@/shared/branding.js';
-import { renderAiDocumentos } from '@/views/ai-documentos.js';
-import { renderAiJurisprudencia } from '@/views/ai-jurisprudencia.js';
-import { renderPlantillas } from '@/views/plantillas.js';
-import { renderAranceles } from '@/views/aranceles.js';
+import { supabase } from './supabase.js';
+import { requireAuth, signOut, signOutTo, withTimeout, mfaFactors, mfaEnroll, mfaVerify, mfaUnenroll } from './auth.js';
+import { ROLES, VAPID_PUBLIC_KEY } from './config.js';
+import { ICON } from './icons.js';
+import { esc, hoyISO, fmtDate, fmtDateTime, initials } from './util.js';
+import { $, content } from './dom.js';
+import { toast, tip, initTooltipEngine, loading, openModal, closeModal } from './ui.js';
+import { state } from './state.js';
+import { renderCategorias } from './categorias.js';
+import { clienteName } from './comunes.js';
+import { renderConsultas, consultaNombre, openConsultaDetail } from './consultas.js';
+import { loadProfiles } from './datos.js';
+import { renderUsuarios, renderAuditoria } from './admin.js';
+import { renderBlog } from './blog.js';
+import { renderPlantillas } from './plantillas.js';
+import { renderModelos } from './modelos.js';
+import { renderTareas } from './tareas.js';
+import { renderReportes } from './reportes.js';
+import { renderFinanzas } from './finanzas.js';
+import { renderPapelera } from './papelera.js';
+import { renderAreas } from './areas.js';
+import { renderSitio } from './sitio.js';
+import { renderSellos } from './sellos.js';
+import { renderCredenciales, renderCredGuardadas } from './credenciales.js';
+import { renderCertificados } from './certificados.js';
+import { renderTarjetas } from './tarjetas.js';
+import { renderMembrete } from './membrete.js';
+import { renderInforme } from './informe.js';
+import { renderMiOpinion, renderTestimonios } from './opiniones.js';
+import { renderClientes, clienteForm } from './clientes.js';
+import { renderProcesos, openProcesoDetail } from './procesos.js';
+import { renderAgenda } from './agenda.js';
+import { renderDashboard } from './dashboard.js';
+import { updateNovedadesBadge, renderNovedades, renderMisProcesos } from './portal-cliente.js';
+import { IMG, ensureImgCache } from './media.js';
+import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from './branding.js';
 
 const NAV = [
-  { key: 'dashboard', label: 'Panel', icon: ICON.dashboard, group: 'Gestión Jurídica' },
-  { key: 'consultas', label: 'Consultas (Leads)', icon: ICON.consultas, group: 'Gestión Jurídica' },
-  { key: 'clientes', label: 'Clientes', icon: ICON.clientes, group: 'Gestión Jurídica' },
-  { key: 'procesos', label: 'Procesos (Casos)', icon: ICON.procesos, group: 'Gestión Jurídica' },
-  { key: 'agenda', label: 'Agenda y Plazos', icon: ICON.audiencia, group: 'Gestión Jurídica' },
-  { key: 'tareas', label: 'Tareas', icon: ICON.tareas, group: 'Gestión Jurídica' },
-  
-  // Inteligencia Artificial (Nuevos Módulos)
-  { key: 'ai-documentos', label: 'Análisis de Documentos', icon: ICON.doc, group: 'Inteligencia Artificial (Gemini)' },
-  { key: 'ai-jurisprudencia', label: 'Buscador Legal', icon: ICON.buscar, group: 'Inteligencia Artificial (Gemini)' },
-
-  { key: 'modelos', label: 'Modelos', icon: ICON.doc, group: 'Documentos' },
-  { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla, group: 'Documentos' },
-  
-  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true, group: 'Administración' },
-  { key: 'aranceles', label: 'Aranceles (Calculadora)', icon: ICON.dinero, group: 'Administración' },
-  { key: 'reportes', label: 'Reportes', icon: ICON.grafico, group: 'Administración' },
-  { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true, group: 'Administración' },
-  { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true, group: 'Administración' },
-  { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true, group: 'Administración' }
+  { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
+  { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
+  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia },
+  { key: 'reportes', label: 'Reportes', icon: ICON.grafico },
+  { key: 'tareas', label: 'Tareas', icon: ICON.tareas },
+  { key: 'modelos', label: 'Modelos', icon: ICON.doc },
+  { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla },
+  { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
+  { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
+  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true },
+  { key: 'blog', label: 'Blog', icon: ICON.blog },
+  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
+  { key: 'credguardadas', label: 'Credenciales guardadas', icon: ICON.usuarios, credOnly: true },
+  { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true },
+  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true },
+  { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true },
+  { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true },
+  { key: 'tarjetas', label: 'Tarjetas de presentación', icon: ICON.doc, credOnly: true },
+  { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true },
+  { key: 'informe', label: 'Informe de pasantía', icon: ICON.doc, credOnly: true },
+  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
+  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
+  { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
+  { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true },
+  { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true }
 ];
 // credOnly = solo administrador y abogado (NO procurador ni cliente)
 
@@ -410,25 +421,34 @@ const VIEWS = {
   reportes: { title: 'Reportes', render: renderReportes },
   tareas: { title: 'Tareas y pendientes', render: renderTareas },
   finanzas: { title: 'Honorarios y pagos', render: renderFinanzas },
-  aranceles: { title: 'Aranceles (Calculadora)', render: renderAranceles },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
   plantillas: { title: 'Plantillas de memoriales', render: renderPlantillas },
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
-  'ai-documentos': { title: 'Análisis de Documentos', render: renderAiDocumentos },
-  'ai-jurisprudencia': { title: 'Buscador Legal', render: renderAiJurisprudencia },
+  blog: { title: 'Blog', render: renderBlog },
+  credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
+  credguardadas: { title: 'Credenciales guardadas', render: renderCredGuardadas },
+  sellos: { title: 'Sellos y logos del bufete', render: renderSellos },
+  sitio: { title: 'Sitio web público', render: renderSitio },
   areas: { title: 'Áreas de práctica', render: renderAreas },
+  certificados: { title: 'Certificados y constancias', render: renderCertificados },
+  tarjetas: { title: 'Tarjetas de presentación', render: renderTarjetas },
+  membrete: { title: 'Hoja membretada', render: renderMembrete },
   informe: { title: 'Informe Único de Pasantía', render: renderInforme },
+  testimonios: { title: 'Testimonios', render: renderTestimonios },
+  categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
   papelera: { title: 'Papelera', render: renderPapelera },
   misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
-  novedades: { title: 'Novedades de mis procesos', render: renderNovedades }
+  novedades: { title: 'Novedades de mis procesos', render: renderNovedades },
+  opinion: { title: 'Mi opinión', render: renderMiOpinion }
 };
 
 const CLIENT_NAV = [
   { key: 'misprocesos', label: 'Mis procesos', icon: ICON.procesos },
-  { key: 'novedades', label: 'Novedades', icon: ICON.campana }
+  { key: 'novedades', label: 'Novedades', icon: ICON.campana },
+  { key: 'opinion', label: 'Mi opinión', icon: ICON.estrella }
 ];
 
 export function navigate(key) {
@@ -451,12 +471,6 @@ export function navigate(key) {
   }
   state.view = key;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
-  
-  // Update bottom nav (if exists)
-  document.querySelectorAll('.bottom-nav__item[data-key]').forEach(n => {
-    n.classList.toggle('active', n.dataset.key === key);
-  });
-  
   $('#pageTitle').textContent = VIEWS[key].title;
   $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show');
   // Render con red de seguridad: si la vista falla o tarda demasiado, en vez de
@@ -464,25 +478,7 @@ export function navigate(key) {
   const cont = content();
   let settled = false;
   Promise.resolve().then(() => VIEWS[key].render())
-    .then(() => { 
-      settled = true; 
-      actualizarBadgesMenu();
-      
-      // Auto-add data-label to tables for mobile responsive view
-      if (cont) {
-        cont.querySelectorAll('table.data').forEach(table => {
-          const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
-          if (headers.length === 0) return;
-          table.querySelectorAll('tbody tr').forEach(tr => {
-            tr.querySelectorAll('td').forEach((td, i) => {
-              if (headers[i] && !td.hasAttribute('data-label')) {
-                td.setAttribute('data-label', headers[i]);
-              }
-            });
-          });
-        });
-      }
-    })
+    .then(() => { settled = true; actualizarBadgesMenu(); })
     .catch((e) => {
       settled = true;
       console.error('Error al cargar la vista «' + key + '»', e);
@@ -511,66 +507,9 @@ function buildSidebar() {
         if (n.finOnly) return rol === 'admin' || rol === 'abogado';
         return true;
       });
-
-  let html = '';
-  
-  if (rol === 'cliente') {
-    items.forEach(n => {
-      html += `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`;
-    });
-  } else {
-    // Agrupar por categoría
-    const groups = {};
-    items.forEach(n => {
-      const g = n.group || 'Otros';
-      if (!groups[g]) groups[g] = [];
-      groups[g].push(n);
-    });
-
-    Object.keys(groups).forEach(g => {
-      const groupItems = groups[g];
-      html += `<div class="sidebar__group">
-                 <button class="sidebar__group-title accordion-btn">
-                   <span>${esc(g)}</span>
-                   <svg class="accordion-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                 </button>
-                 <div class="sidebar__group-content accordion-content">`;
-      groupItems.forEach(n => {
-        html += `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`;
-      });
-      html += `  </div>
-               </div>`;
-    });
-  }
-
-  nav.innerHTML = html;
-  
-  // Accordion logic
-  nav.querySelectorAll('.accordion-btn').forEach(btn => {
-    btn.onclick = (e) => {
-      const g = e.currentTarget.closest('.sidebar__group');
-      g.classList.toggle('open');
-    };
-  });
-  
-  // Default open the first group
-  const firstGroup = nav.querySelector('.sidebar__group');
-  if (firstGroup) firstGroup.classList.add('open');
-
+  nav.innerHTML = items
+    .map(n => `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`).join('');
   nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
-  
-  // Wire up bottom nav buttons
-  const bNavItems = document.querySelectorAll('.bottom-nav__item[data-key]');
-  bNavItems.forEach(b => b.onclick = () => navigate(b.dataset.key));
-  
-  const bMore = $('#btnBottomMore');
-  if (bMore) {
-    bMore.onclick = () => {
-      $('#sidebar').classList.add('open');
-      $('#backdrop').classList.add('show');
-    };
-  }
-
   actualizarBadgesMenu();
 }
 
@@ -912,7 +851,7 @@ async function arrancarSesion() {
   // Buscador global en la barra superior (solo personal, no clientes).
   if (profile.rol !== 'cliente') {
     const actions = $('#topbarActions');
-    if (actions && !$('#btnBuscarGlobal')) {
+    if (actions) {
       const btn = document.createElement('button');
       btn.className = 'btn btn--ghost btn--sm topbar__search';
       btn.id = 'btnBuscarGlobal';
