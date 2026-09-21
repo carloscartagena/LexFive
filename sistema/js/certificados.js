@@ -67,11 +67,9 @@ REF.: ACEPTACIÓN DE LA ASIGNATURA DE PASANTÍA (CJR-410)
 
 De mi mayor consideración:
 
-Mediante la presente, reciba usted un cordial saludo, deseando éxitos en las funciones que desempeña.
+Mediante la presente, reciba usted un cordial saludo, deseando éxitos en las funciones que desempeña en la Dirección de la Carrera de Derecho de la Facultad de Derecho y Ciencias Políticas de la UMSA.
 
-En atención a la solicitud del Univ. ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, bajo las determinaciones del Plan de Estudios de la Carrera de Derecho, en representación del Bufete de Abogados LexFive, tengo a bien expresar mi conformidad y ACEPTACIÓN de la pasantía del(la) universitario(a) en nuestra institución, por el lapso de ${d.periodo || 'dos (2) semanas en tiempo completo'}, que comenzarán a correr a la presentación de la nota remitida por su autoridad, de acuerdo a la normativa universitaria vigente.
-
-Protestando de mi parte otorgar el Visto Bueno en la presentación del informe de pasantía dirigido al Docente Guía, señalo que las prácticas serán en el ámbito estrictamente jurídico legal.
+En atención a la solicitud del Univ. ${d.nombre}, bajo las determinaciones del Plan de Estudios 2017 de la Carrera de Derecho, en representación del Bufete Jurídico "LexFive" de la ciudad de El Alto, tengo a bien expresar mi conformidad y ACEPTACIÓN de la CJR 410 Pasantía I del Univ. ${d.nombre}${d.ci ? ` con C.I. N.º ${d.ci}` : ''}, POR EL LAPSO DE ${d.periodo || 'DOS (2) SEMANAS EN TIEMPO COMPLETO'} que comenzarán a correr a la presentación de la nota remitida por su autoridad, de acuerdo a la normativa universitaria vigente, protestando de mi parte otorgar el Visto Bueno en la presentación del informe de pasantía dirigido al Docente Guía, señalar que las prácticas serán en el ámbito estrictamente jurídico Legal.
 
 Sin otro particular, saludo a usted atentamente.` }
 ];
@@ -162,7 +160,12 @@ export async function renderCertificados() {
           <div class="field"><label>Nombre completo *</label><input id="ce_nombre" placeholder="Nombre y apellidos"></div>
           <div class="field"><label>Cédula de identidad</label><input id="ce_ci" placeholder="Ej: 12345678 LP"></div>
           <div class="field"><label>Cargo / calidad</label><input id="ce_calidad" placeholder="Procurador, Pasante, Asistente legal..."></div>
-          <div class="field"><label>Período</label><input id="ce_periodo" placeholder="marzo a diciembre de 2024"></div>
+          <div class="field"><label>Período / Lapso de tiempo</label><input id="ce_periodo" placeholder="Ej: DOS (2) SEMANAS EN TIEMPO COMPLETO" list="periodo_opciones">
+            <datalist id="periodo_opciones">
+              <option value="DOS (2) SEMANAS EN TIEMPO COMPLETO"></option>
+              <option value="CUATRO (4) SEMANAS A MEDIO TIEMPO"></option>
+            </datalist>
+          </div>
           <div class="field"><label>Universidad (pasantías)</label><input id="ce_uni" placeholder="Ej: U.M.S.A."></div>
           <div class="field"><label>Carrera</label><input id="ce_carrera" placeholder="Ej: Derecho"></div>
           <div class="field"><label>Horas (opcional)</label><input id="ce_horas" type="number" min="0" placeholder="Ej: 240"></div>
