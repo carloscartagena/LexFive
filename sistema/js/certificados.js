@@ -102,16 +102,16 @@ function buildCertDoc(d) {
       : `<h1 style="text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:8px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>`
     }
     ${(hideAQuien || isCarta) ? '' : '<div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>'}
-    <div style="font-size:14px;line-height:1.95;">${parrafos}</div>
+    <div style="font-size:14px;line-height:1.75;">${parrafos}</div>
     ${isCarta ? '' : `<p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>`}
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:54px;gap:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:32px;gap:20px;">
       <div style="text-align:center;flex:1;max-width:58%;">
         <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">${esc(d.abogadoFirma) || 'Firma'}</div>
         <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;">${d.rpaFirma ? `R.P.A. ${esc(d.rpaFirma)}<br>` : ''}LexFive &middot; Bufete de Abogados</div>
       </div>
       ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="width:3.3cm;height:3.3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;transform:rotate(-6deg);">` : ''}
     </div>
-    <div style="flex:1 1 auto;min-height:24px;"></div>
+    <div style="flex:1 1 auto;min-height:16px;"></div>
     <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #d9dce1;padding-top:8px;">
       ${d.qrSrc ? `<img src="${d.qrSrc}" alt="QR de verificación" style="width:2.1cm;height:2.1cm;flex-shrink:0;">` : ''}
       <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;line-height:1.55;">
