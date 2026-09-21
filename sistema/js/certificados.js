@@ -441,7 +441,6 @@ export async function renderCertificados() {
   $('#ce_pdf').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
     registrarCert();
-    
     const generarPDF = () => {
       toast('Generando PDF, por favor espere...', 'info');
       
@@ -452,7 +451,9 @@ export async function renderCertificados() {
       }
       
       const originalShadow = element.style.boxShadow;
+      const originalHeight = element.style.height;
       element.style.boxShadow = 'none';
+      element.style.height = '10.9in'; // Reducir 0.1in para evitar que jsPDF genere una segunda página por decimales
 
       const nombreStr = ($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40);
       const opt = {
@@ -470,9 +471,11 @@ export async function renderCertificados() {
       
       html2pdf().set(opt).from(element).save().then(() => {
         element.style.boxShadow = originalShadow;
+        element.style.height = originalHeight;
         toast('Certificado descargado en PDF.', 'success');
       }).catch((e) => {
         element.style.boxShadow = originalShadow;
+        element.style.height = originalHeight;
         console.error(e);
         toast('Error al generar el PDF.', 'error');
       });
