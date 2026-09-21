@@ -446,6 +446,9 @@ export async function renderCertificados() {
         return;
       }
       
+      const originalShadow = element.style.boxShadow;
+      element.style.boxShadow = 'none';
+
       const nombreStr = ($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40);
       const opt = {
         margin:       0,
@@ -461,8 +464,10 @@ export async function renderCertificados() {
       };
       
       html2pdf().set(opt).from(element).save().then(() => {
+        element.style.boxShadow = originalShadow;
         toast('Certificado descargado en PDF.', 'success');
       }).catch((e) => {
+        element.style.boxShadow = originalShadow;
         console.error(e);
         toast('Error al generar el PDF.', 'error');
       });
