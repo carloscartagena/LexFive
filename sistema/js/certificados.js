@@ -437,19 +437,30 @@ export async function renderCertificados() {
     const generarPDF = () => {
       toast('Generando PDF, por favor espere...', 'info');
       
+      const element = $('#certPreview').firstElementChild;
+      if (!element) {
+        toast('No hay vista previa para exportar.', 'error');
+        return;
+      }
+      
       const nombreStr = ($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40);
       const opt = {
-        margin:       [0, 0, 0, 0],
+        margin:       0,
         filename:     `certificado-${nombreStr}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
+        html2canvas:  { 
+          scale: 2, 
+          useCORS: true, 
+          scrollY: 0,
+          backgroundColor: '#ffffff',
+          onclone: (doc, clonedElement) => {
+            clonedElement.style.boxShadow = 'none';
+          }
+        },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
       
-      // html2pdf can take an HTML string directly, which avoids the -9999px bounding box issue
-      const contentHtml = `<div style="background:#ffffff; color:#0e1b2c; width:816px; padding:0; margin:0;">${docActual()}</div>`;
-      
-      html2pdf().set(opt).from(contentHtml).save().then(() => {
+      html2pdf().set(opt).from(element).save().then(() => {
         toast('Certificado descargado en PDF.', 'success');
       }).catch((e) => {
         console.error(e);
