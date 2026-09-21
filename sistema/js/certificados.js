@@ -126,7 +126,12 @@ function abrirImpresionCert(titulo, docHTML) {
   const w = window.open('', '_blank');
   if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
   w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title>
-    <style>@page{size:letter;margin:0;} html,body{margin:0;background:#fff;} ${PRINT_COLOR_CSS}</style></head><body>${docHTML}
+    <style>
+      @page { size: letter; margin: 0; }
+      html, body { margin: 0; padding: 0; background: #fff; width: 100%; height: 100%; overflow: hidden; }
+      body > div { width: 100% !important; height: 100vh !important; max-height: 100vh !important; box-sizing: border-box; overflow: hidden; }
+      ${PRINT_COLOR_CSS}
+    </style></head><body>${docHTML}
     <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},400);});<\/script></body></html>`);
   w.document.close();
 }
