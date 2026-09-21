@@ -452,10 +452,7 @@ export async function renderCertificados() {
           scale: 2, 
           useCORS: true, 
           scrollY: 0,
-          backgroundColor: '#ffffff',
-          onclone: (doc, clonedElement) => {
-            clonedElement.style.boxShadow = 'none';
-          }
+          backgroundColor: '#ffffff'
         },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
