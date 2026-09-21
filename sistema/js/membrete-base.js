@@ -100,7 +100,7 @@ function watermark(logoSrc, wmOp) {
 // (p. ej. el QR) justo encima del pie.
 export function membretePagina({ model, logoSrc, pageW, pageH, contentHTML, wmOp }) {
   return `
-  <div style="display:flex;flex-direction:column;width:${pageW};min-height:${pageH};margin:0 auto;background:#fff;color:#101820;font-family:'Times New Roman',Georgia,serif;font-size:12.5px;line-height:1.55;box-sizing:border-box;overflow:hidden;">
+  <div style="display:flex;flex-direction:column;width:${pageW};height:${pageH};margin:0 auto;background:#fff;color:#101820;font-family:'Times New Roman',Georgia,serif;font-size:12.5px;line-height:1.55;box-sizing:border-box;overflow:hidden;">
     ${membreteHeader(model, logoSrc)}
     <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:18px 2cm 14px;">
       ${watermark(logoSrc, wmOp)}

@@ -118,7 +118,7 @@ function buildCertDoc(d) {
         <strong style="color:#0e1b2c;">Verificación:</strong> escanee el código QR para confirmar la autenticidad de este documento y la vinculación de la persona con el Bufete LexFive.
       </div>
     </div>`;
-  return membretePagina({ model: d.model, logoSrc: d.logoSrc, pageW: '21.6cm', pageH: '27.9cm', wmOp: wmOpacityActual() / 100, contentHTML });
+  return membretePagina({ model: d.model, logoSrc: d.logoSrc, pageW: '8.5in', pageH: '11in', wmOp: wmOpacityActual() / 100, contentHTML });
 }
 
 // Abre una ventana de impresión (tamaño carta) con un documento de certificado.
