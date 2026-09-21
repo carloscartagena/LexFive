@@ -59,9 +59,11 @@ const CERT_PLANTILLAS = [
   { id: 'servicios', nombre: 'Constancia de servicios prestados', titulo: 'CONSTANCIA DE SERVICIOS PRESTADOS',
     cuerpo: d => `Se hace constar que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, prestó servicios profesionales en el Bufete de Abogados LexFive en calidad de ${d.calidad || '—'}, durante el período ${d.periodo}.\n\nSe extiende la presente a solicitud del(la) interesado(a), para los fines que estime convenientes.` },
   { id: 'aceptacion_pasantia', nombre: 'Aceptación de pasantía (UMSA u otras)', titulo: 'ACEPTACIÓN DE ASIGNATURA DE PASANTÍA',
-    cuerpo: d => `Señor(a):
-${d.destinatario || 'Abg. Erick San Miguel R.\\nRESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS\\nCARRERA DE DERECHO - UMSA'}
-Presente.-
+    cuerpo: d => `Señor:
+${d.destinatario || 'Abg. Erick San Miguel R.\nRESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS\nCARRERA DE DERECHO - UMSA'}
+Presente.
+
+REF.: ACEPTACIÓN DE LA ASIGNATURA DE PASANTÍA (CJR-410)
 
 De mi mayor consideración:
 
@@ -84,17 +86,26 @@ function buildCertDoc(d) {
     if (ciEsc) h = h.split(ciEsc).join('<strong>' + ciEsc + '</strong>');
     return h;
   };
-  const parrafos = (d.cuerpoTexto || '').split(/\n\s*\n/).map(p =>
-    `<p style="margin:0 0 13px;text-align:justify;">${resaltar(esc(p).replace(/\n/g, '<br>'))}</p>`).join('');
+  const parrafos = (d.cuerpoTexto || '').split(/\n\s*\n/).map(p => {
+    let html = resaltar(esc(p).replace(/\n/g, '<br>'));
+    if (p.trim().toUpperCase().startsWith('REF.:') || p.trim().toUpperCase().startsWith('REF:')) {
+      return `<p style="margin:0 0 15px;text-align:right;font-weight:bold;padding-left:30%;">${html}</p>`;
+    }
+    return `<p style="margin:0 0 13px;text-align:justify;">${html}</p>`;
+  }).join('');
   // Marca de agua del logo: usa la intensidad configurable del branding (por
   // defecto 15%), para que SÍ se note. Antes estaba fija en 5% y casi no se veía.
   const hideAQuien = (d.cuerpoTexto || '').match(/Presente\.?-?/i);
+  const isCarta = d.titulo === 'ACEPTACIÓN DE ASIGNATURA DE PASANTÍA';
   const contentHTML = `
     <div style="text-align:right;font-size:10px;color:#5c6675;font-family:Arial,sans-serif;">Ref. N.º ${esc(d.ref || '')}</div>
-    <h1 style="text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:8px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>
-    ${hideAQuien ? '' : '<div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>'}
+    ${isCarta 
+      ? `<div style="text-align:right;font-size:13px;margin:10px 0 30px;">La Paz, ${esc(d.fechaTxt)}</div>`
+      : `<h1 style="text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:8px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>`
+    }
+    ${(hideAQuien || isCarta) ? '' : '<div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>'}
     <div style="font-size:14px;line-height:1.95;">${parrafos}</div>
-    <p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>
+    ${isCarta ? '' : `<p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>`}
     <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:54px;gap:20px;">
       <div style="text-align:center;flex:1;max-width:58%;">
         <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">Firma y Sello</div>
