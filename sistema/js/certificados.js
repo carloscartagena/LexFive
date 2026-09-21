@@ -464,7 +464,7 @@ export async function renderCertificados() {
     if (typeof window.html2pdf === 'undefined') {
       toast('Cargando módulo PDF...', 'info');
       const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      script.src = 'js/html2pdf.bundle.min.js';
       script.onload = generarPDF;
       script.onerror = () => toast('Error al cargar módulo PDF. Revise su conexión.', 'error');
       document.head.appendChild(script);
