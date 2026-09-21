@@ -57,7 +57,21 @@ const CERT_PLANTILLAS = [
   { id: 'desempeno', nombre: 'Constancia de desempeño / conducta', titulo: 'CONSTANCIA DE DESEMPEÑO',
     cuerpo: d => `Se hace constar que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, durante su permanencia en el Bufete de Abogados LexFive como ${d.calidad || '—'} (período ${d.periodo}), observó una conducta intachable y un desempeño sobresaliente, demostrando ética, disciplina y compromiso con la institución.\n\nSe extiende la presente a solicitud del(la) interesado(a).` },
   { id: 'servicios', nombre: 'Constancia de servicios prestados', titulo: 'CONSTANCIA DE SERVICIOS PRESTADOS',
-    cuerpo: d => `Se hace constar que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, prestó servicios profesionales en el Bufete de Abogados LexFive en calidad de ${d.calidad || '—'}, durante el período ${d.periodo}.\n\nSe extiende la presente a solicitud del(la) interesado(a), para los fines que estime convenientes.` }
+    cuerpo: d => `Se hace constar que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, prestó servicios profesionales en el Bufete de Abogados LexFive en calidad de ${d.calidad || '—'}, durante el período ${d.periodo}.\n\nSe extiende la presente a solicitud del(la) interesado(a), para los fines que estime convenientes.` },
+  { id: 'aceptacion_pasantia', nombre: 'Aceptación de pasantía (UMSA u otras)', titulo: 'ACEPTACIÓN DE ASIGNATURA DE PASANTÍA',
+    cuerpo: d => `Señor(a):
+${d.destinatario || 'Abg. Erick San Miguel R.\\nRESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS\\nCARRERA DE DERECHO - UMSA'}
+Presente.-
+
+De mi mayor consideración:
+
+Mediante la presente, reciba usted un cordial saludo, deseando éxitos en las funciones que desempeña.
+
+En atención a la solicitud del Univ. ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, bajo las determinaciones del Plan de Estudios de la Carrera de Derecho, en representación del Bufete de Abogados LexFive, tengo a bien expresar mi conformidad y ACEPTACIÓN de la pasantía del(la) universitario(a) en nuestra institución, por el lapso de ${d.periodo || 'dos (2) semanas en tiempo completo'}, que comenzarán a correr a la presentación de la nota remitida por su autoridad, de acuerdo a la normativa universitaria vigente.
+
+Protestando de mi parte otorgar el Visto Bueno en la presentación del informe de pasantía dirigido al Docente Guía, señalo que las prácticas serán en el ámbito estrictamente jurídico legal.
+
+Sin otro particular, saludo a usted atentamente.` }
 ];
 
 // Documento del certificado con estilos EN LÍNEA (autocontenido): sirve para la
@@ -74,10 +88,11 @@ function buildCertDoc(d) {
     `<p style="margin:0 0 13px;text-align:justify;">${resaltar(esc(p).replace(/\n/g, '<br>'))}</p>`).join('');
   // Marca de agua del logo: usa la intensidad configurable del branding (por
   // defecto 15%), para que SÍ se note. Antes estaba fija en 5% y casi no se veía.
+  const hideAQuien = (d.cuerpoTexto || '').match(/Presente\.?-?/i);
   const contentHTML = `
     <div style="text-align:right;font-size:10px;color:#5c6675;font-family:Arial,sans-serif;">Ref. N.º ${esc(d.ref || '')}</div>
     <h1 style="text-align:center;font-size:20px;letter-spacing:1.5px;color:#0e1b2c;margin:8px 0 4px;text-transform:uppercase;">${esc(d.titulo)}</h1>
-    <div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>
+    ${hideAQuien ? '' : '<div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>'}
     <div style="font-size:14px;line-height:1.95;">${parrafos}</div>
     <p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>
     <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:54px;gap:20px;">
