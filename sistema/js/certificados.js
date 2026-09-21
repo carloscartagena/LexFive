@@ -436,27 +436,23 @@ export async function renderCertificados() {
     
     const generarPDF = () => {
       toast('Generando PDF, por favor espere...', 'info');
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = `<style>${PRINT_COLOR_CSS}</style><div style="background:#fff;width:21.6cm;">${docActual()}</div>`;
-      document.body.appendChild(tempDiv);
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      tempDiv.style.top = '0';
       
       const nombreStr = ($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40);
       const opt = {
-        margin:       0,
+        margin:       [0, 0, 0, 0],
         filename:     `certificado-${nombreStr}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };
       
-      html2pdf().set(opt).from(tempDiv.lastChild).save().then(() => {
-        document.body.removeChild(tempDiv);
+      // html2pdf can take an HTML string directly, which avoids the -9999px bounding box issue
+      const contentHtml = `<div style="background:#ffffff; color:#0e1b2c; width:816px; padding:0; margin:0;">${docActual()}</div>`;
+      
+      html2pdf().set(opt).from(contentHtml).save().then(() => {
         toast('Certificado descargado en PDF.', 'success');
-      }).catch(() => {
-        document.body.removeChild(tempDiv);
+      }).catch((e) => {
+        console.error(e);
         toast('Error al generar el PDF.', 'error');
       });
     };
