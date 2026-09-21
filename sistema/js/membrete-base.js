@@ -27,7 +27,7 @@ export function setModeloMembrete(id) {
 
 // Datos fijos del bufete que aparecen en el encabezado/pie.
 const NAVY = '#0e1b2c', NAVY2 = '#16273d', GOLD = '#c2a25a', GOLD2 = '#e7d3a1';
-const DIRECCION = 'Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina 6-A — El Alto, Bolivia';
+const DIRECCION = 'Av. Alfredo Franco Valle 708-51, Edificio Real<br>Planta baja, oficina A-6 &mdash; El Alto, Bolivia';
 const TEL = 'Tel/WhatsApp: +591 78360469';
 const WEB = 'lexfive.netlify.app';
 
@@ -43,7 +43,7 @@ export function membreteHeader(model, logoSrc) {
       ${logoSrc ? `<img src="${logoSrc}" alt="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;display:block;margin:0 auto 6px;box-shadow:0 0 0 2px ${GOLD};">` : ''}
       <div style="font-size:28px;font-weight:700;color:${NAVY};letter-spacing:1px;font-family:Georgia,serif;">Lex<span style="color:${GOLD}">Five</span></div>
       <div style="font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div>
-      <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;line-height:1.5;">${esc(DIRECCION)}</div>
+      <div style="font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;margin-top:5px;line-height:1.5;">${DIRECCION}</div>
     </div>`;
   }
   if (model === 'minimal') {
@@ -53,7 +53,7 @@ export function membreteHeader(model, logoSrc) {
         <div><div style="font-size:24px;font-weight:700;color:${NAVY};font-family:Georgia,serif;line-height:1;">Lex<span style="color:${GOLD}">Five</span></div>
         <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;">Bufete de Abogados</div></div>
       </div>
-      <div style="text-align:right;font-size:8.5px;color:#5c6675;font-family:Arial,sans-serif;max-width:7.5cm;line-height:1.45;">${esc(DIRECCION)}</div>
+      <div style="text-align:right;font-size:8.5px;color:#5c6675;font-family:Arial,sans-serif;max-width:7.5cm;line-height:1.45;">${DIRECCION}</div>
     </div>`;
   }
   // banda (predeterminado)
