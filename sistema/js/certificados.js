@@ -108,8 +108,8 @@ function buildCertDoc(d) {
     ${isCarta ? '' : `<p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>`}
     <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:54px;gap:20px;">
       <div style="text-align:center;flex:1;max-width:58%;">
-        <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">Firma y Sello</div>
-        <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;">LexFive &middot; Bufete de Abogados</div>
+        <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">${esc(d.abogadoFirma) || 'Firma'}</div>
+        <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;">${d.rpaFirma ? `R.P.A. ${esc(d.rpaFirma)}<br>` : ''}LexFive &middot; Bufete de Abogados</div>
       </div>
       ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="width:3.3cm;height:3.3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;transform:rotate(-6deg);">` : ''}
     </div>
@@ -168,6 +168,9 @@ export async function renderCertificados() {
           <div class="field"><label>Horas (opcional)</label><input id="ce_horas" type="number" min="0" placeholder="Ej: 240"></div>
           <div class="field"><label>Dirigido a (opcional)</label><input id="ce_dest" placeholder="A quien corresponda"></div>
           <div class="field"><label>Fecha de emisión</label><input id="ce_fecha" type="date" value="${hoyISO()}"></div>
+          <div class="field" style="grid-column: 1 / -1;"><hr style="border:0;border-top:1px solid #e0e4e8;margin:8px 0;"></div>
+          <div class="field"><label>Firma: Nombre del Abogado(a)</label><input id="ce_abogado_firma" placeholder="Ej: Abg. Carlos Cartagena"></div>
+          <div class="field"><label>Firma: R.P.A.</label><input id="ce_rpa" placeholder="Ej: 1234567"></div>
         </div>
         <div class="field" style="margin-top:8px">
           <label>Texto del certificado <button class="btn btn--ghost btn--sm" id="ce_restaurar" type="button" style="margin-left:8px">Restaurar texto automático</button></label>
@@ -242,6 +245,8 @@ export async function renderCertificados() {
       fechaTxt: fechaLarga(fecha),
       ref: refActual,
       qrSrc: qrURL(qrCertificado({ nombre, ci, cargo: cargo || 'Colaborador', tipo: tplActual().titulo, ref: refActual, fecha })),
+      abogadoFirma: $('#ce_abogado_firma') ? $('#ce_abogado_firma').value : '',
+      rpaFirma: $('#ce_rpa') ? $('#ce_rpa').value : '',
       logoSrc, selloSrc: selloActivo(), model: modeloMembrete()
     });
   };
@@ -331,6 +336,8 @@ export async function renderCertificados() {
       titulo: c.tipo || 'CERTIFICADO', cuerpoTexto: cuerpo, nombre: c.nombre, ci: c.ci || '',
       fechaTxt: fechaLarga(c.fecha_emision), ref: c.ref,
       qrSrc: qrURL(qrCertificado({ nombre: c.nombre, ci: c.ci, cargo: c.cargo, tipo: c.tipo, ref: c.ref, fecha: c.fecha_emision })),
+      abogadoFirma: $('#ce_abogado_firma') ? $('#ce_abogado_firma').value : '',
+      rpaFirma: $('#ce_rpa') ? $('#ce_rpa').value : '',
       logoSrc, selloSrc: selloActivo(), model: modeloMembrete()
     });
     abrirImpresionCert(c.tipo || 'Certificado', doc);
@@ -434,6 +441,17 @@ export async function renderCertificados() {
   const bce = $('#ce_buscar'); if (bce) bce.oninput = pintarEmitidos;
   const bfd = $('#ce_fdesde'); if (bfd) bfd.onchange = pintarEmitidos;
   const bfh = $('#ce_fhasta'); if (bfh) bfh.onchange = pintarEmitidos;
+
+  const ce_abogado_firma = $('#ce_abogado_firma');
+  const ce_rpa = $('#ce_rpa');
+  if (ce_abogado_firma) {
+    ce_abogado_firma.value = localStorage.getItem('lexfive_cert_abogado') || '';
+    ce_abogado_firma.oninput = () => { localStorage.setItem('lexfive_cert_abogado', ce_abogado_firma.value); pintar(); };
+  }
+  if (ce_rpa) {
+    ce_rpa.value = localStorage.getItem('lexfive_cert_rpa') || '';
+    ce_rpa.oninput = () => { localStorage.setItem('lexfive_cert_rpa', ce_rpa.value); pintar(); };
+  }
 
   regenerar();
   pintar();
