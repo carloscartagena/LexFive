@@ -178,7 +178,8 @@ export async function renderCertificados() {
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
           <button class="btn btn--primary" id="ce_guardar">Guardar</button>
-          <button class="btn btn--ghost" id="ce_print">${ICON.doc} Imprimir / Guardar PDF</button>
+          <button class="btn btn--ghost" id="ce_print">${ICON.doc} Imprimir</button>
+          <button class="btn btn--ghost" id="ce_pdf">Descargar PDF</button>
           <button class="btn btn--ghost" id="ce_word">Descargar Word</button>
         </div>
         <div class="field" style="margin-top:16px;max-width:440px"><label>Modelo de hoja membretada</label>
@@ -428,6 +429,48 @@ export async function renderCertificados() {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
     registrarCert();
     abrirImpresionCert(tplActual().titulo, docActual());
+  };
+  $('#ce_pdf').onclick = () => {
+    if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+    registrarCert();
+    
+    const generarPDF = () => {
+      toast('Generando PDF, por favor espere...', 'info');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = `<style>${PRINT_COLOR_CSS}</style><div style="background:#fff;width:21.6cm;">${docActual()}</div>`;
+      document.body.appendChild(tempDiv);
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      
+      const nombreStr = ($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40);
+      const opt = {
+        margin:       0,
+        filename:     `certificado-${nombreStr}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(tempDiv.lastChild).save().then(() => {
+        document.body.removeChild(tempDiv);
+        toast('Certificado descargado en PDF.', 'success');
+      }).catch(() => {
+        document.body.removeChild(tempDiv);
+        toast('Error al generar el PDF.', 'error');
+      });
+    };
+
+    if (typeof window.html2pdf === 'undefined') {
+      toast('Cargando módulo PDF...', 'info');
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      script.onload = generarPDF;
+      script.onerror = () => toast('Error al cargar módulo PDF. Revise su conexión.', 'error');
+      document.head.appendChild(script);
+    } else {
+      generarPDF();
+    }
   };
   $('#ce_word').onclick = () => {
     if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
