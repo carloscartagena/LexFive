@@ -1,4 +1,4 @@
-import { $, dom } from './dom.js';
+import { $ } from './dom.js';
 import { toast, openModal, closeModal } from './ui.js';
 
 const STORAGE_KEY = 'lexfive_gemini_key';
