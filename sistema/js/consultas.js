@@ -10,6 +10,7 @@ import { esc, fmtDateTime } from './util.js';
 import { ICON } from './icons.js';
 import { $, content } from './dom.js';
 import { loading, toast, openModal, closeModal, hint, paginar, pagerHTML, wirePager } from './ui.js';
+import { generateContent } from './ai.js';
 
 // Nombre completo de quien envió la consulta (o "—").
 export function consultaNombre(c) {
@@ -99,9 +100,14 @@ export function openConsultaDetail(c) {
       <div class="detail-item"><label>Recibida</label><span>${fmtDateTime(c.created_at)}</span></div>
     </div>
     <div class="detail-item" style="margin-top:14px"><label>Mensaje</label><span style="white-space:pre-wrap">${esc(c.mensaje || '')}</span></div>
+    <div id="aiStrategyContainer" style="margin-top:12px; display:none;">
+      <label style="color:var(--primary); font-weight:600;">✨ Sugerencia Estratégica (IA)</label>
+      <div id="aiStrategyResult" style="padding:10px; background:var(--bg); border-radius:6px; font-size:0.9rem; white-space:pre-wrap; border:1px solid var(--primary-alpha);"></div>
+    </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
       ${wa ? `<a class="btn btn--sm" style="background:#25d366;color:#fff;border-color:#25d366" target="_blank" rel="noopener" href="${wa}">${ICON.whatsapp} Responder por WhatsApp</a>` : ''}
       ${mailHref ? `<a class="btn btn--ghost btn--sm" href="${mailHref}">Responder por correo</a>` : ''}
+      <button class="btn btn--ghost btn--sm" id="btnSugerirEstrategia" style="color:var(--primary); font-weight:600;">✨ Sugerir Estrategia</button>
     </div>`;
 
   const buttons = [];
@@ -112,6 +118,22 @@ export function openConsultaDetail(c) {
   buttons.push({ label: 'Cerrar', class: 'btn--primary', onClick: closeModal });
 
   openModal('Consulta de ' + consultaNombre(c), body, buttons, true);
+
+  const btnIA = $('#btnSugerirEstrategia');
+  if (btnIA) {
+    btnIA.onclick = async () => {
+      btnIA.disabled = true;
+      btnIA.textContent = 'Analizando...';
+      const prompt = `Analiza el siguiente caso/consulta legal en Bolivia: Área: ${c.area || 'General'}, Mensaje: "${c.mensaje || ''}". Sugiere una estrategia legal breve, documentos a pedir al cliente y los posibles riesgos.`;
+      const res = await generateContent(prompt);
+      btnIA.disabled = false;
+      btnIA.textContent = '✨ Sugerir Estrategia';
+      if (res) {
+        $('#aiStrategyContainer').style.display = 'block';
+        $('#aiStrategyResult').textContent = res;
+      }
+    };
+  }
 }
 
 async function setConsultaEstado(c, estado) {

@@ -13,6 +13,7 @@ import { esc, hoyISO, fmtDate, fmtDateTime } from './util.js';
 import { descargarArchivo } from './exportar.js';
 import { $, content } from './dom.js';
 import { paginar, pagerHTML, wirePager, toast, tip, hint, loading, openModal, closeModal } from './ui.js';
+import { generateContent } from './ai.js';
 import { state } from './state.js';
 import { loadCategorias, categoriaOptions, wireCategoriaSelect } from './categorias.js';
 import { profName, clienteName, badgeEstado, checkboxesProfiles, namesFromIds, optionsClientes } from './comunes.js';
@@ -282,6 +283,10 @@ export async function openProcesoDetail(id, readonly = false) {
       <div class="detail-item"><label>Próxima audiencia / plazo</label><span>${fmtDateTime(p.proxima_audiencia)}</span></div>
     </div>
     ${p.descripcion ? `<div class="detail-item" style="margin-top:14px"><label>Descripción</label><span>${esc(p.descripcion)}</span></div>` : ''}
+    <div id="aiSummaryContainer" style="margin-top:12px; display:none;">
+      <label style="color:var(--primary); font-weight:600;">✨ Resumen del Expediente (IA)</label>
+      <div id="aiSummaryResult" style="padding:10px; background:var(--bg); border-radius:6px; font-size:0.9rem; white-space:pre-wrap; border:1px solid var(--primary-alpha);"></div>
+    </div>
 
     <h4 class="section-title">Memoriales y documentos${tip('Documentos generales del caso (poder, carátula, anexos). Para la respuesta del juzgado y el nuevo memorial, mejor adjúntelos en el paso correspondiente del historial de abajo.')}</h4>
     ${readonly ? '' : `<div class="field" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
@@ -318,6 +323,22 @@ export async function openProcesoDetail(id, readonly = false) {
     if (can(state.profile, 'delete_proceso')) {
       buttons.push({ label: 'Eliminar', class: 'btn--danger', onClick: () => deleteProceso(p) });
     }
+    buttons.push({
+      label: '✨ Resumir (IA)', class: 'btn--ghost', onClick: async (e) => {
+        const btn = e.target;
+        btn.disabled = true;
+        btn.textContent = 'Analizando...';
+        const actuacionesText = (acts || []).map(a => `${a.fecha}: ${a.descripcion}`).join('\n');
+        const prompt = `Resume el siguiente expediente legal. Carátula: ${p.caratula}. Materia: ${p.materia || 'General'}. Estado: ${p.estado}. Descripción: ${p.descripcion || 'Sin descripción'}. Actuaciones: \n${actuacionesText}\n\nProporciona un resumen ejecutivo del estado actual del caso.`;
+        const res = await generateContent(prompt);
+        btn.disabled = false;
+        btn.textContent = '✨ Resumir (IA)';
+        if (res) {
+          $('#aiSummaryContainer').style.display = 'block';
+          $('#aiSummaryResult').textContent = res;
+        }
+      }
+    });
   }
   buttons.push({ label: 'Cerrar', class: 'btn--primary', onClick: closeModal });
 

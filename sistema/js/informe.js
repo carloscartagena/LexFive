@@ -17,6 +17,7 @@ import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSe
 import { supabase } from './supabase.js';
 import { state } from './state.js';
 import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membreteDocFluido, PRINT_COLOR_CSS } from './membrete-base.js';
+import { generateContent } from './ai.js';
 
 const PAGES = {
   carta:  { label: 'Carta',  w: '21.6cm', h: '27.9cm', css: '21.6cm 27.9cm' },
@@ -289,7 +290,10 @@ export async function renderInforme() {
 
     <div class="card">
       <div class="card__head"><h3>Cuerpo del informe</h3>
-        <button class="btn btn--ghost btn--sm" id="in_restaurar" type="button">Restaurar modelo</button>
+        <div>
+          <button class="btn btn--ghost btn--sm" id="in_btn_ia" type="button" style="color:var(--primary); font-weight:600; margin-right:8px;">✨ Generar con IA</button>
+          <button class="btn btn--ghost btn--sm" id="in_restaurar" type="button">Restaurar modelo</button>
+        </div>
       </div>
       <div class="card__body">
         ${campoArea('in_cuerpo', 'Antecedentes, detalle de funciones y conclusiones', V.in_cuerpo, 16)}
@@ -405,6 +409,22 @@ export async function renderInforme() {
   };
   $('#in_add_semana').onclick = () => { const t = (prompt('Título de la semana:', 'PRIMERA SEMANA (del __ al __)') || '').trim(); if (t) insertarEnCuerpo('\n' + t); };
   $('#in_add_dia').onclick = () => { const d = (prompt('Día:', 'Lunes') || '').trim(); if (d) insertarEnCuerpo(d.replace(/:+$/, '') + ':'); };
+  
+  if ($('#in_btn_ia')) {
+    $('#in_btn_ia').onclick = async () => {
+      const p = prompt('¿Sobre qué trata el informe? (Ej: Resumen de actividades de revisión de expedientes civiles, o pega apuntes sueltos)');
+      if (!p) return;
+      toast('Redactando informe con IA...', 'info');
+      const res = await generateContent(`Escribe el cuerpo de un Informe de Pasantía Legal basado en estos apuntes: ${p}. 
+Debe tener un tono muy formal, primera persona, estructurado en Antecedentes, Desarrollo y Conclusiones. No incluyas fechas ni firmas, solo el cuerpo del texto.`);
+      if (res) {
+        toast('Informe generado con éxito.', 'success');
+        const ta = $('#in_cuerpo');
+        ta.value = res;
+        pintar();
+      }
+    };
+  }
 
   // Guarda el borrador del informe en este equipo (para no perder lo escrito).
   const FIELD_IDS = ['in_a', 'in_acargo', 'in_de', 'in_desub', 'in_ref', 'in_lugar', 'in_fecha', 'in_dur', 'in_inst', 'in_sup', 'in_cuerpo', 'in_f1', 'in_f1sub', 'in_f2', 'in_f2sub'];

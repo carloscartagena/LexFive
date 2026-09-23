@@ -13,6 +13,7 @@ import { $, content } from './dom.js';
 import { loading, toast, openModal, closeModal } from './ui.js';
 import { profName, namesFromIds } from './comunes.js';
 import { descargarArchivo } from './exportar.js';
+import { generateContent } from './ai.js';
 
 // Campos disponibles para usar en las plantillas con la forma {{campo}}.
 function placeholdersDisponibles() {
@@ -82,7 +83,7 @@ export async function renderPlantillas() {
   content().innerHTML = `
     <div class="toolbar">
       <input type="search" id="qPlant" placeholder="Buscar plantilla...">
-      <div class="spacer"></div>
+      <button class="btn btn--ghost" id="btnIAPlant" style="color:var(--primary); font-weight: 600;">✨ Redactar con IA</button>
       <button class="btn btn--primary" id="btnNuevaPlant">${ICON.plus} Nueva plantilla</button>
     </div>
     <p class="cell-sub" style="margin:-4px 2px 12px">Cree memoriales modelo con campos como <code>{{cliente}}</code>, <code>{{nurej}}</code>, <code>{{caratula}}</code>… Al usarlos, el sistema los rellena con los datos del proceso elegido.</p>
@@ -110,6 +111,17 @@ export async function renderPlantillas() {
   paint();
   $('#qPlant').oninput = paint;
   $('#btnNuevaPlant').onclick = () => plantillaForm();
+  $('#btnIAPlant').onclick = async () => {
+    const p = prompt('¿Qué tipo de plantilla legal deseas que la IA redacte? (Ej: Memorial de apersonamiento, Contrato de alquiler)');
+    if (!p) return;
+    toast('Generando con IA, por favor espere...', 'info');
+    const res = await generateContent(`Redacta un documento legal modelo para el siguiente caso: ${p}. 
+Usa formato formal boliviano. Puedes usar variables entre llaves dobles como {{cliente}}, {{juzgado}}, {{nurej}}, {{caratula}} donde sea apropiado.`);
+    if (res) {
+      toast('Plantilla generada con éxito.', 'success');
+      plantillaForm({ titulo: p, cuerpo: res, categoria: 'Generado por IA' });
+    }
+  };
 }
 
 function plantillaForm(pl = null) {
