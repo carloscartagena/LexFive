@@ -20,6 +20,7 @@ import { renderModelos } from './modelos.js';
 import { renderTareas } from './tareas.js';
 import { renderReportes } from './reportes.js';
 import { renderFinanzas } from './finanzas.js';
+import { renderAranceles } from './aranceles.js';
 import { renderPapelera } from './papelera.js';
 import { renderAreas } from './areas.js';
 import { renderSitio } from './sitio.js';
@@ -48,6 +49,7 @@ const NAV = [
   { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla },
   { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
   { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
+  { key: 'aranceles', label: 'Aranceles', icon: ICON.dinero, finOnly: true },
   { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true },
   { key: 'blog', label: 'Blog', icon: ICON.blog },
   { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
@@ -425,6 +427,7 @@ const VIEWS = {
   plantillas: { title: 'Plantillas de memoriales', render: renderPlantillas },
   clientes: { title: 'Clientes', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
+  aranceles: { title: 'Calculadora de Aranceles', render: renderAranceles },
   blog: { title: 'Blog', render: renderBlog },
   credenciales: { title: 'Credenciales y accesos', render: renderCredenciales },
   credguardadas: { title: 'Credenciales guardadas', render: renderCredGuardadas },
@@ -467,6 +470,7 @@ export function navigate(key) {
     if (key === 'tarjetas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'membrete' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'informe' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
+    if (key === 'aranceles' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
     if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
   }
   state.view = key;

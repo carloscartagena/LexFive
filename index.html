@@ -85,9 +85,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css?v=20260624">
+    <link rel="stylesheet" href="css/chatbot.css">
     <link rel="manifest" href="sistema/manifest.webmanifest">
     <meta name="theme-color" content="#0e1b2c">
     <link rel="apple-touch-icon" href="assets/pwa/icon-192.png">
+    <link rel="stylesheet" href="css/custom-3d.css">
     <script>(function(){try{var t=localStorage.getItem('lexfive_theme')||'dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 </head>
 <!-- Para cambiar la paleta de color, añade una clase al body:
@@ -128,14 +130,10 @@
             <nav class="nav" id="nav" aria-label="Navegación principal">
                 <ul class="nav__list">
                     <li><a href="#inicio" class="nav__link">Inicio</a></li>
-                    <li><a href="#areas" class="nav__link">Áreas</a></li>
-                    <li><a href="#tecnologia" class="nav__link">Tecnología</a></li>
-                    <li><a href="#nosotros" class="nav__link">Nosotros</a></li>
-                    <li><a href="casos.html" class="nav__link">Casos de éxito</a></li>
-                    <li><a href="blog.html" class="nav__link">Blog</a></li>
-                    <li><a href="faq.html" class="nav__link">FAQ</a></li>
-                    <li class="nav__item--access"><a href="sistema/login.html" class="nav__link">Inicio de sesión</a></li>
-                    <li><a href="#contacto" class="nav__link nav__link--cta">Contáctenos</a></li>
+                    <li><a href="#servicios" class="nav__link">Servicios</a></li>
+                    <li><a href="#equipo" class="nav__link">Equipo</a></li>
+                    <li class="nav__item--access"><a href="sistema/login.html" class="nav__link">Panel de Clientes</a></li>
+                    <li><a href="#contacto" class="nav__link nav__link--cta">Contratar</a></li>
                 </ul>
             </nav>
 
@@ -201,329 +199,92 @@
             </div>
         </section>
 
-        <!-- ===== Indicadores / Stats ===== -->
-        <section class="stats">
-            <div class="container stats__grid">
-                <div class="stat">
-                    <span class="stat__number" data-target="1">0</span>
-                    <p class="stat__label">Año de experiencia</p>
-                </div>
-                <div class="stat">
-                    <span class="stat__number" data-target="5">0</span>
-                    <p class="stat__label">Abogados especialistas</p>
-                </div>
-                <div class="stat">
-                    <span class="stat__number" data-target="16">0</span>
-                    <p class="stat__label">Áreas de práctica</p>
-                </div>
-                <div class="stat">
-                    <span class="stat__number" data-target="95">0</span><span class="stat__plus">%</span>
-                    <p class="stat__label">Clientes satisfechos</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== Áreas de práctica ===== -->
-        <section class="section areas" id="areas">
+        <!-- ===== Servicios Estilo E-commerce ===== -->
+        <section class="section techlaw" id="servicios">
             <div class="container">
                 <header class="section__head">
-                    <p class="section__eyebrow">Lo que hacemos</p>
-                    <h2 class="section__title">Áreas de práctica</h2>
-                    <p class="section__lead">Equipos especializados en cada materia para garantizar la mejor defensa de sus intereses.</p>
+                    <p class="section__eyebrow section__eyebrow--tech">Soluciones Rápidas y Directas</p>
+                    <h2 class="section__title">Nuestros Servicios Destacados</h2>
+                    <p class="section__lead">Contrate nuestros servicios directamente o solicite una evaluación de su caso.</p>
                 </header>
-
-                <div class="areas__grid">
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm13 10v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg>
+                
+                <div class="techlaw__grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-top: 40px;">
+                    
+                    <!-- Servicio 1 -->
+                    <div class="custom-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+                        <div class="custom-3d-inner">
+                            <div class="custom-face custom-front" style="background-color: var(--card-bg); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; border-radius: 12px;">
+                                <div style="color: var(--primary); margin-bottom: 20px;">
+                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <h3 class="custom-title" style="font-size: 1.5rem; text-align: center;">Asesoría Legal Integral</h3>
+                                <p style="color: var(--accent); font-weight: 600; margin-top: 10px; font-size: 1.2rem;">Bs. 150</p>
+                                <p style="font-size:0.9rem; opacity:0.7; margin-top:15px; background: rgba(56, 189, 248, 0.1); padding: 5px 15px; border-radius: 20px;">Ver detalles ⤻</p>
+                            </div>
+                            <div class="custom-face custom-back" style="background-color: var(--card-bg); border: 1px solid var(--primary); padding: 30px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h3 class="custom-title" style="color: var(--accent); margin-bottom: 15px; font-size: 1.2rem;">Asesoría Integral</h3>
+                                    <ul class="custom-list" style="font-size: 0.95rem; line-height: 1.6;">
+                                        <li>Análisis completo de su caso</li>
+                                        <li>Revisión de documentos</li>
+                                        <li>Ruta legal sugerida</li>
+                                    </ul>
+                                </div>
+                                <a href="https://wa.me/59178360469?text=Hola,%20deseo%20contratar%20una%20Asesoría%20Legal%20Integral." target="_blank" class="btn btn--primary" style="width: 100%; text-align: center; margin-top: 20px;" onclick="event.stopPropagation()">Contratar Ahora</a>
+                            </div>
                         </div>
-                        <h3 class="area-card__title">Derecho Laboral</h3>
-                        <p class="area-card__text">Despidos, beneficios sociales, reincorporaciones y conflictos entre empleadores y trabajadores.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M5 21V9m4 12V9m6 12V9m4 12V9M2 9l10-6 10 6"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Civil</h3>
-                        <p class="area-card__text">Contratos, propiedad, responsabilidad civil, arrendamientos y conflictos patrimoniales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.4 7.7-8 9-4.6-1.3-8-4-8-9V6l8-3z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Penal</h3>
-                        <p class="area-card__text">Defensa penal estratégica y representación en todas las etapas del proceso.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-4.35-9-8.5A5 5 0 0 1 12 6a5 5 0 0 1 9 6.5C19 16.65 12 21 12 21Z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho de Familia</h3>
-                        <p class="area-card__text">Divorcios, asistencia familiar, custodia, filiación, sucesiones y testamentos.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4M9.5 9 7.5 11l2 2M14.5 9l2 2-2 2"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Informático</h3>
-                        <p class="area-card__text">Protección de datos, delitos informáticos, contratos tecnológicos, firma y comercio digital.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 20h18L13 6l-3.5 6-2-3L3 20z"/><path d="M11.5 14 13 11"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Minero</h3>
-                        <p class="area-card__text">Concesiones, contratos mineros, regalías y cumplimiento de la normativa sectorial y ambiental.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22V11M12 11c-3 0-5-2-5-5 3 0 5 2 5 5zM12 13c0-3 2-5 6-5 0 4-3 6-6 5z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Agrario</h3>
-                        <p class="area-card__text">Propiedad agraria, saneamiento y titulación de tierras, y resolución de conflictos rurales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 21h8M10 17h4M12 17v-3M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Deportivo</h3>
-                        <p class="area-card__text">Contratos deportivos, transferencias, régimen disciplinario y representación de atletas y clubes.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Constitucional</h3>
-                        <p class="area-card__text">Amparos, acciones de libertad y de protección, y defensa de derechos fundamentales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M9 7h2m-2 4h2m-2 4h2m4-8h.01M15 11h.01M15 15h.01"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Administrativo</h3>
-                        <p class="area-card__text">Trámites ante entidades públicas, procesos administrativos y contrataciones estatales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2m4 0h2M8 14h2m4 0h2M8 18h2m4 0h2"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Tributario</h3>
-                        <p class="area-card__text">Planeación fiscal, defensa ante impuestos, auditorías y cumplimiento de obligaciones.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 13h20"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Comercial</h3>
-                        <p class="area-card__text">Constitución de empresas, contratos mercantiles, sociedades y asesoría a negocios.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 21h10a2 2 0 0 0 2-2V7l-4-4H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"/><path d="M13 3v4h4M9 12h6M9 16h4"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Sucesorio</h3>
-                        <p class="area-card__text">Sucesiones, herencias, testamentos y división de bienes con acompañamiento cercano.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c.5.5 1 1.5 1 2h6c0-.5.5-1.5 1-2a7 7 0 0 0-4-12z"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Propiedad Intelectual</h3>
-                        <p class="area-card__text">Registro de marcas, patentes, derechos de autor y protección de la propiedad industrial.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho Ambiental</h3>
-                        <p class="area-card__text">Licencias ambientales, cumplimiento normativo y defensa en conflictos ambientales.</p>
-                    </article>
-
-                    <article class="area-card">
-                        <div class="area-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.4L19 11v6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-6z"/><path d="M5 11h14M7.5 15h.01M16.5 15h.01"/></svg>
-                        </div>
-                        <h3 class="area-card__title">Derecho de Tránsito</h3>
-                        <p class="area-card__text">Accidentes de tránsito, infracciones, responsabilidad y trámites vehiculares.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== Derecho + Tecnología ===== -->
-        <section class="section techlaw" id="tecnologia">
-            <div class="container">
-                <header class="section__head">
-                    <p class="section__eyebrow section__eyebrow--tech">Derecho + Tecnología</p>
-                    <h2 class="section__title">Soluciones legales potenciadas por la ingeniería de sistemas</h2>
-                    <p class="section__lead">Somos abogados e ingenieros en sistemas. Unimos el derecho con el desarrollo de software para crear soluciones modernas para personas, empresas e instituciones.</p>
-                </header>
-                <div class="techlaw__grid">
-                    <article class="tech-card">
-                        <div class="tech-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m8 9-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12"/></svg>
-                        </div>
-                        <h3>Desarrollo de software a la medida</h3>
-                        <p>Sistemas y aplicaciones web a medida para estudios jurídicos, empresas e instituciones.</p>
-                    </article>
-                    <article class="tech-card">
-                        <div class="tech-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
-                        </div>
-                        <h3>Automatización de procesos</h3>
-                        <p>Digitalización y automatización de trámites, expedientes y flujos de trabajo legales.</p>
-                    </article>
-                    <article class="tech-card">
-                        <div class="tech-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 7.7 8 9 4.6-1.3 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
-                        </div>
-                        <h3>Datos y ciberseguridad</h3>
-                        <p>Protección de datos personales, seguridad de la información y peritaje informático.</p>
-                    </article>
-                    <article class="tech-card">
-                        <div class="tech-card__icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3M7 8h6M7 11h4"/></svg>
-                        </div>
-                        <h3>Asesoría legal-tech</h3>
-                        <p>Contratos tecnológicos, firma digital, comercio electrónico y propiedad intelectual del software.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== ¿Por qué elegirnos? ===== -->
-        <section class="section why" id="porque">
-            <div class="container">
-                <header class="section__head">
-                    <p class="section__eyebrow">Por qué LexFive</p>
-                    <h2 class="section__title">Razones para confiar en nosotros</h2>
-                    <p class="section__lead">Un bufete cercano, transparente y orientado a resultados, que pone a cada cliente en el centro.</p>
-                </header>
-                <div class="why__grid">
-                    <article class="why-card">
-                        <div class="why-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V5l-8-3z"/><path d="m9 12 2 2 4-4"/></svg></div>
-                        <h3>Experiencia y rigor</h3>
-                        <p>Equipo multidisciplinario con dominio de cada materia para defender mejor sus intereses.</p>
-                    </article>
-                    <article class="why-card">
-                        <div class="why-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-                        <h3>Atención personalizada</h3>
-                        <p>Comunicación clara y constante: usted siempre sabe en qué etapa está su caso.</p>
-                    </article>
-                    <article class="why-card">
-                        <div class="why-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                        <h3>Honorarios transparentes</h3>
-                        <p>Condiciones claras desde el inicio, sin sorpresas ni costos ocultos.</p>
-                    </article>
-                    <article class="why-card">
-                        <div class="why-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg></div>
-                        <h3>Compromiso con resultados</h3>
-                        <p>Estrategias diseñadas para alcanzar la mejor solución posible en cada situación.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- ===== Cómo trabajamos / Proceso ===== -->
-        <section class="section process" id="proceso">
-            <div class="container">
-                <header class="section__head">
-                    <p class="section__eyebrow">Cómo trabajamos</p>
-                    <h2 class="section__title">Nuestro proceso, paso a paso</h2>
-                    <p class="section__lead">Un método claro y ordenado para acompañarle desde la primera consulta hasta la resolución.</p>
-                </header>
-                <div class="process__grid">
-                    <article class="step">
-                        <div class="step__num">1</div>
-                        <h3 class="step__title">Consulta inicial</h3>
-                        <p class="step__text">Escuchamos su caso y hacemos una primera valoración, sin compromiso.</p>
-                    </article>
-                    <article class="step">
-                        <div class="step__num">2</div>
-                        <h3 class="step__title">Análisis y estrategia</h3>
-                        <p class="step__text">Estudiamos su situación a fondo y diseñamos un plan de acción a su medida.</p>
-                    </article>
-                    <article class="step">
-                        <div class="step__num">3</div>
-                        <h3 class="step__title">Representación</h3>
-                        <p class="step__text">Lo acompañamos en cada trámite, gestión y audiencia con dedicación.</p>
-                    </article>
-                    <article class="step">
-                        <div class="step__num">4</div>
-                        <h3 class="step__title">Resolución</h3>
-                        <p class="step__text">Buscamos el mejor resultado y le mantenemos informado en todo momento.</p>
-                    </article>
-                </div>
-                <div style="text-align:center;margin-top:44px"><a href="#contacto" class="btn btn--primary">Iniciar mi consulta</a></div>
-            </div>
-        </section>
-
-        <!-- ===== Sobre nosotros ===== -->
-        <section class="section about" id="nosotros">
-            <div class="container about__grid">
-                <div class="about__media">
-                    <div class="about__image" role="img" aria-label="Derecho e ingeniería de sistemas">
-                        <!-- Para usar una foto real, suba el archivo a assets/sobre-bufete.jpg
-                             (si no existe, se muestra la ilustración de abajo). -->
-                        <img class="about__photo" src="assets/sobre-bufete.jpg" alt="" loading="lazy" onerror="this.remove()">
-                        <svg class="about__illu" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <g stroke="#38bdf8" stroke-width="2" stroke-linecap="round" opacity=".55">
-                                <path d="M22 58h32v38"/>
-                                <path d="M218 68h-38v32"/>
-                                <path d="M30 192h42v-26"/>
-                                <path d="M212 196h-44v-28"/>
-                            </g>
-                            <g fill="#38bdf8" opacity=".75">
-                                <circle cx="22" cy="58" r="4"/><circle cx="218" cy="68" r="4"/>
-                                <circle cx="30" cy="192" r="4"/><circle cx="212" cy="196" r="4"/>
-                                <circle cx="54" cy="96" r="3"/><circle cx="180" cy="100" r="3"/>
-                            </g>
-                            <g stroke="#d8b76a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
-                                <path d="M120 58v126"/>
-                                <path d="M94 186h52"/>
-                                <path d="M60 72h120"/>
-                                <path d="M60 72 46 110M60 72 74 110"/>
-                                <path d="M180 72 166 110M180 72 194 110"/>
-                                <path d="M38 110a22 9 0 0 0 44 0"/>
-                                <path d="M158 110a22 9 0 0 0 44 0"/>
-                            </g>
-                            <circle cx="120" cy="58" r="6" fill="#d8b76a"/>
-                            <g stroke="#7dd3fc" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
-                                <path d="M108 150l-13 11 13 11"/>
-                                <path d="M132 150l13 11-13 11"/>
-                            </g>
-                        </svg>
                     </div>
-                    <div class="about__badge">
-                        <strong>1</strong>
-                        <span>año defendiendo<br>la justicia</span>
+
+                    <!-- Servicio 2 -->
+                    <div class="custom-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+                        <div class="custom-3d-inner">
+                            <div class="custom-face custom-front" style="background-color: var(--card-bg); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; border-radius: 12px;">
+                                <div style="color: var(--primary); margin-bottom: 20px;">
+                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+                                </div>
+                                <h3 class="custom-title" style="font-size: 1.5rem; text-align: center;">Redacción de Contratos</h3>
+                                <p style="color: var(--accent); font-weight: 600; margin-top: 10px; font-size: 1.2rem;">Desde Bs. 300</p>
+                                <p style="font-size:0.9rem; opacity:0.7; margin-top:15px; background: rgba(56, 189, 248, 0.1); padding: 5px 15px; border-radius: 20px;">Ver detalles ⤻</p>
+                            </div>
+                            <div class="custom-face custom-back" style="background-color: var(--card-bg); border: 1px solid var(--primary); padding: 30px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h3 class="custom-title" style="color: var(--accent); margin-bottom: 15px; font-size: 1.2rem;">Contratos Seguros</h3>
+                                    <ul class="custom-list" style="font-size: 0.95rem; line-height: 1.6;">
+                                        <li>Alquiler, compraventa, servicios</li>
+                                        <li>Cláusulas blindadas</li>
+                                        <li>Acuerdos de confidencialidad (NDA)</li>
+                                    </ul>
+                                </div>
+                                <a href="https://wa.me/59178360469?text=Hola,%20necesito%20la%20redacción%20de%20un%20contrato." target="_blank" class="btn btn--primary" style="width: 100%; text-align: center; margin-top: 20px;" onclick="event.stopPropagation()">Solicitar</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="about__content">
-                    <p class="section__eyebrow">Sobre el bufete</p>
-                    <h2 class="section__title">Un equipo comprometido con la excelencia jurídica</h2>
-                    <p>En <strong>LexFive</strong> creemos que cada cliente merece una atención personalizada y una defensa rigurosa. Acompañamos a personas y empresas de El Alto y La Paz en los momentos legales más decisivos, siempre con transparencia y ética profesional. Además, unimos el ejercicio del <strong>derecho</strong> con la <strong>ingeniería de sistemas</strong> y el desarrollo de software, para ofrecer soluciones modernas y a la medida.</p>
-                    <ul class="about__list">
-                        <li><span class="check" aria-hidden="true"></span> Atención personalizada y comunicación constante</li>
-                        <li><span class="check" aria-hidden="true"></span> Estrategias legales orientadas a resultados</li>
-                        <li><span class="check" aria-hidden="true"></span> Soluciones que unen el derecho con la tecnología</li>
-                        <li><span class="check" aria-hidden="true"></span> Confidencialidad absoluta en cada caso</li>
-                    </ul>
-                    <a href="#equipo" class="btn btn--primary">Conozca al equipo</a>
+
+                    <!-- Servicio 3 -->
+                    <div class="custom-3d-wrapper" onclick="this.classList.toggle('is-flipped')">
+                        <div class="custom-3d-inner">
+                            <div class="custom-face custom-front" style="background-color: var(--card-bg); border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; border-radius: 12px;">
+                                <div style="color: var(--primary); margin-bottom: 20px;">
+                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                </div>
+                                <h3 class="custom-title" style="font-size: 1.5rem; text-align: center;">Legal Tech & Sistemas</h3>
+                                <p style="color: var(--accent); font-weight: 600; margin-top: 10px; font-size: 1.2rem;">Previa cotización</p>
+                                <p style="font-size:0.9rem; opacity:0.7; margin-top:15px; background: rgba(56, 189, 248, 0.1); padding: 5px 15px; border-radius: 20px;">Ver detalles ⤻</p>
+                            </div>
+                            <div class="custom-face custom-back" style="background-color: var(--card-bg); border: 1px solid var(--primary); padding: 30px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h3 class="custom-title" style="color: var(--accent); margin-bottom: 15px; font-size: 1.2rem;">Abogados + Ingenieros</h3>
+                                    <ul class="custom-list" style="font-size: 0.95rem; line-height: 1.6;">
+                                        <li>Términos y condiciones web</li>
+                                        <li>Software a medida</li>
+                                        <li>Peritaje informático</li>
+                                    </ul>
+                                </div>
+                                <a href="https://wa.me/59178360469?text=Hola,%20me%20interesan%20sus%20servicios%20de%20Legal%20Tech." target="_blank" class="btn btn--primary" style="width: 100%; text-align: center; margin-top: 20px;" onclick="event.stopPropagation()">Cotizar</a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -602,35 +363,6 @@
             </div>
         </section>
 
-        <!-- ===== Testimonios ===== -->
-        <section class="section testimonials" id="testimonios">
-            <div class="container">
-                <header class="section__head">
-                    <p class="section__eyebrow section__eyebrow--light">Lo que dicen de nosotros</p>
-                    <h2 class="section__title section__title--light">Testimonios de clientes</h2>
-                </header>
-
-                <div class="testimonials__grid">
-                    <figure class="testimonial">
-                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <blockquote>“El acompañamiento durante todo el proceso fue impecable. Me explicaron cada paso y siempre sentí que mis intereses estaban protegidos.”</blockquote>
-                        <figcaption><strong>Carlos J.</strong><span>Caso laboral</span></figcaption>
-                    </figure>
-
-                    <figure class="testimonial">
-                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <blockquote>“Profesionales serios y humanos. Resolvieron un caso familiar muy delicado con discreción y excelentes resultados.”</blockquote>
-                        <figcaption><strong>Laura F.</strong><span>Caso familiar</span></figcaption>
-                    </figure>
-
-                    <figure class="testimonial">
-                        <div class="testimonial__stars" aria-label="5 de 5 estrellas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <blockquote>“Su asesoría fue clara y oportuna. Recomiendo ampliamente al equipo de LexFive por su compromiso.”</blockquote>
-                        <figcaption><strong>Mario R.</strong><span>Caso civil</span></figcaption>
-                    </figure>
-                </div>
-            </div>
-        </section>
 
         <!-- ===== Contacto ===== -->
         <section class="section contact" id="contacto">
@@ -841,6 +573,7 @@
     </button>
 
     <script src="js/main.js?v=20260624"></script>
+    <script type="module" src="js/chatbot.js"></script>
     <script type="module">
       // Carga dinámica de testimonios aprobados desde el panel (Supabase)
       import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
