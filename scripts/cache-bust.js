@@ -21,8 +21,8 @@
  *  Por eso nunca tienes que editar versiones manualmente.
  * ============================================================ */
 'use strict';
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const version = (process.env.COMMIT_REF || '').slice(0, 8) || String(Date.now());
 
