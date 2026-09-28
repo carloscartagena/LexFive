@@ -13,7 +13,7 @@ import { loading, toast, tip } from './ui.js';
 import { profName } from './comunes.js';
 import { loadCategorias, categoriaOptions, wireCategoriaSelect } from './categorias.js';
 import { subirDocumento, enlaceDocumento } from './storage.js';
-
+import { generateContent } from './ai.js';
 export async function renderModelos() {
   loading();
   await loadCategorias();
@@ -49,7 +49,13 @@ export async function renderModelos() {
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <button class="btn btn--primary" id="md_subir">Subir al área seleccionada</button>
+          <button class="btn btn--ghost" id="md_btn_ia" style="color:var(--primary); font-weight:600;">✨ Redactar con IA</button>
           <span class="cell-sub" id="md_progreso"></span>
+        </div>
+        <div id="aiWriteContainer" style="display:none; margin-top:20px; padding:15px; background:var(--bg-alt); border-radius:8px; border:1px solid var(--border);">
+          <h4 style="margin-bottom:10px; color:var(--primary);">Borrador generado por IA</h4>
+          <textarea id="aiWriteResult" class="input" style="height:250px; margin-bottom:10px;"></textarea>
+          <button class="btn btn--sm btn--primary" id="aiCopyBtn">Copiar al portapapeles</button>
         </div>
       </div>
     </div>
@@ -116,6 +122,31 @@ export async function renderModelos() {
   $('#md_q').oninput = paint;
   $('#md_farea').onchange = paint;
   wireCategoriaSelect($('#md_area'));
+
+  if ($('#md_btn_ia')) {
+    $('#md_btn_ia').onclick = async () => {
+      const pText = prompt('¿Qué tipo de memorial o documento necesitas? (Ej: Redacta un memorial solicitando arraigo por asistencia familiar para El Alto)');
+      if (!pText) return;
+      $('#md_btn_ia').disabled = true;
+      $('#md_btn_ia').textContent = 'Redactando...';
+      toast('Redactando documento con IA...', 'info');
+      const res = await generateContent(`Redacta un documento o memorial legal para Bolivia con el siguiente objetivo: ${pText}`);
+      $('#md_btn_ia').disabled = false;
+      $('#md_btn_ia').textContent = '✨ Redactar con IA';
+      if (res) {
+        toast('Documento generado con éxito.', 'success');
+        $('#aiWriteContainer').style.display = 'block';
+        $('#aiWriteResult').value = res;
+      }
+    };
+  }
+
+  if ($('#aiCopyBtn')) {
+    $('#aiCopyBtn').onclick = () => {
+      navigator.clipboard.writeText($('#aiWriteResult').value);
+      toast('Copiado al portapapeles', 'success');
+    };
+  }
 
   $('#md_subir').onclick = async () => {
     const area = $('#md_area').value;
