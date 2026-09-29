@@ -295,21 +295,47 @@ export async function openProcesoDetail(id, readonly = false) {
       <button class="btn btn--navy" id="btnUpload">Subir</button>
       <span class="cell-sub" id="docPreview"></span>
     </div>`}
-    <div id="docList">${renderDocs((docs || []).filter(d => !d.actuacion_id), readonly)}</div>
+    
+    <div class="table-wrap" style="margin-top:10px; border-radius:8px; overflow:hidden; border: 1px solid var(--line);">
+      <table class="data" style="width:100%; margin:0;">
+        <thead style="background: rgba(0,0,0,0.2);">
+          <tr>
+            <th>Documento</th>
+            <th>Fecha de subida</th>
+            <th>Subido por</th>
+            <th style="text-align:right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="docList">${renderDocs((docs || []).filter(d => !d.actuacion_id), readonly)}</tbody>
+      </table>
+    </div>
 
-    <h4 class="section-title">Historial de actuaciones${tip('Cada paso del caso en orden. Registre el avance (ej: "Respuesta del juzgado") y adjunte los archivos: la respuesta recibida y el nuevo memorial a presentar. El cliente verá esto y podrá descargarlo.')}</h4>
-    ${readonly ? '' : `<div class="act-form">
+    <h4 class="section-title" style="margin-top:24px;">Historial de actividades del caso${tip('Cada paso del caso en orden. Registre el avance (ej: "Respuesta del juzgado") y adjunte los archivos correspondientes.')}</h4>
+    ${readonly ? '' : `<div class="act-form" style="background: rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--line);">
       <div class="field-row" style="margin-bottom:8px">
-        <input type="date" id="actFecha" value="${new Date().toISOString().slice(0,10)}" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
-        <input id="actDesc" placeholder="Describa el paso (ej: Respuesta del juzgado, Nuevo memorial...)" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;">
+        <input type="date" id="actFecha" value="${new Date().toISOString().slice(0,10)}" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)">
+        <input id="actDesc" placeholder="Descripción de la actividad (ej: Respuesta del juzgado, Nuevo memorial...)" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)">
       </div>
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
-        <div style="flex-grow:1;min-width:200px;"><label style="font-size:.8rem;color:var(--muted)">Adjuntar archivos (opcional, máx. 10 MB c/u): respuesta del juzgado, nuevo memorial, etc.</label><input type="file" id="actFiles" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.txt,.png,.jpg,.jpeg,.webp,.gif,.svg" multiple><span class="cell-sub" id="actFilesPreview" style="display:block;margin-top:4px"></span></div>
-        <button class="btn btn--navy" id="btnActuacion">Agregar al historial</button>
+        <div style="flex-grow:1;min-width:200px;"><label style="font-size:.8rem;color:var(--muted)">Documentos de respaldo (opcional, máx. 10 MB c/u)</label><input type="file" id="actFiles" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.txt,.png,.jpg,.jpeg,.webp,.gif,.svg" multiple><span class="cell-sub" id="actFilesPreview" style="display:block;margin-top:4px"></span></div>
+        <button class="btn btn--navy" id="btnActuacion">Agregar actividad</button>
       </div>
       <span class="cell-sub" id="actProgreso"></span>
     </div>`}
-    <ul class="timeline" id="actList">${renderActs(acts || [], docs || [])}</ul>
+    
+    <div class="table-wrap" style="border-radius:8px; overflow:hidden; border: 1px solid var(--line);">
+      <table class="data" style="width:100%; margin:0;">
+        <thead style="background: rgba(0,0,0,0.2);">
+          <tr>
+            <th>Fecha</th>
+            <th>Descripción de la Actividad</th>
+            <th>Documentos / Archivos</th>
+            <th>Registrado por</th>
+          </tr>
+        </thead>
+        <tbody id="actList">${renderActs(acts || [], docs || [])}</tbody>
+      </table>
+    </div>
     ${state.profile.rol === 'cliente' ? `<div class="card" id="opinionProc" style="margin-top:18px"></div>` : ''}`;
 
   const buttons = [];
@@ -479,17 +505,17 @@ export async function openProcesoDetail(id, readonly = false) {
 }
 
 function renderDocs(docs, readonly = false) {
-  if (!docs.length) return '<p class="cell-sub" style="padding:6px 0">Aún no hay documentos cargados.</p>';
+  if (!docs.length) return '<tr><td colspan="4" class="cell-sub" style="text-align:center;padding:20px;">Aún no hay documentos cargados.</td></tr>';
   return docs.map(d => `
-    <div class="doc-row" data-path="${esc(d.storage_path)}" data-id="${d.id}">
-      <div class="doc-row__info"><div class="doc-row__icon">${ICON.doc}</div>
-        <div><div class="cell-strong">${esc(d.nombre)}</div><div class="cell-sub">${fmtDate(d.created_at)} · ${esc(profName(d.subido_por))}</div></div>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn--ghost btn--sm js-dl">Descargar</button>
-        ${(!readonly && (d.subido_por === state.profile.id || state.profile.rol === 'admin')) ? '<button class="btn btn--danger btn--sm js-del">Eliminar</button>' : ''}
-      </div>
-    </div>`).join('');
+    <tr class="doc-row" data-path="${esc(d.storage_path)}" data-id="${d.id}" style="border-bottom: 1px solid var(--line);">
+      <td style="font-weight:500; font-size:0.95rem;">📄 ${esc(d.nombre)}</td>
+      <td style="font-size:0.9rem; white-space:nowrap;">${fmtDate(d.created_at)}</td>
+      <td style="font-size:0.9rem; color:var(--muted);">${esc(profName(d.subido_por))}</td>
+      <td style="text-align:right; white-space:nowrap;">
+        <button class="btn btn--ghost btn--sm js-dl" title="Ver / Descargar">Ver</button>
+        ${(!readonly && (d.subido_por === state.profile.id || state.profile.rol === 'admin')) ? '<button class="btn btn--danger btn--sm js-del" style="margin-left:4px;">Eliminar</button>' : ''}
+      </td>
+    </tr>`).join('');
 }
 function wireDocs(procId) {
   content(); // no-op safety
@@ -514,17 +540,21 @@ function wireDocs(procId) {
   });
 }
 function renderActs(acts, docs = []) {
-  if (!acts.length) return '<li class="cell-sub" style="border:none">Sin actuaciones registradas.</li>';
+  if (!acts.length) return '<tr><td colspan="4" class="cell-sub" style="text-align:center;padding:20px;">Sin actividades registradas.</td></tr>';
   return acts.map(a => {
     const adjuntos = docs.filter(d => d.actuacion_id === a.id);
-    const filesHtml = adjuntos.length ? `<div class="act-files">${adjuntos.map(d => `
-      <div class="act-file" data-path="${esc(d.storage_path)}" data-id="${d.id}">
-        <span class="act-file__icon">${ICON.doc}</span>
-        <span class="act-file__name">${esc(d.nombre)}</span>
-        <button class="btn btn--ghost btn--sm js-tl-dl">Descargar</button>
-        ${(state.profile.rol !== 'cliente' && (d.subido_por === state.profile.id || state.profile.rol === 'admin')) ? '<button class="btn btn--danger btn--sm js-tl-del">Eliminar</button>' : ''}
-      </div>`).join('')}</div>` : '';
-    return `<li><div class="t-date">${fmtDate(a.fecha)} · ${esc(profName(a.created_by))}</div><div>${esc(a.descripcion)}</div>${filesHtml}</li>`;
+    const filesHtml = adjuntos.length ? `<div style="display:flex;flex-direction:column;gap:6px;">${adjuntos.map(d => `
+      <div class="act-file" data-path="${esc(d.storage_path)}" data-id="${d.id}" style="display:flex;align-items:center;gap:6px; background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px;">
+        <button class="btn btn--ghost js-tl-dl" title="Ver documento" style="padding:4px 8px; font-size:0.8rem; border-radius:4px; display:flex; align-items:center; gap:4px;">📄 Ver</button>
+        <span style="font-size:0.85rem; flex-grow:1;" class="act-file__name">${esc(d.nombre)}</span>
+        ${(state.profile.rol !== 'cliente' && (d.subido_por === state.profile.id || state.profile.rol === 'admin')) ? `<button class="js-tl-del" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1.2rem;padding:0 4px;" title="Eliminar archivo">&times;</button>` : ''}
+      </div>`).join('')}</div>` : '<span class="cell-sub" style="font-size:0.85rem;">Ninguno</span>';
+    return `<tr style="border-bottom:1px solid var(--line);">
+      <td style="white-space:nowrap;font-size:0.9rem;">${fmtDate(a.fecha)}</td>
+      <td style="font-size:0.95rem;font-weight:500;">${esc(a.descripcion)}</td>
+      <td style="min-width:250px;">${filesHtml}</td>
+      <td style="font-size:0.85rem;color:var(--muted);white-space:nowrap;">${esc(profName(a.created_by))}</td>
+    </tr>`;
   }).join('');
 }
 
