@@ -159,7 +159,8 @@ async function savePlantilla(pl) {
   $('#pl_save').disabled = true;
   const payload = { titulo, categoria: $('#pl_categoria').value.trim() || null, cuerpo };
   let error;
-  if (pl) {
+  const isUpdate = pl && pl.id;
+  if (isUpdate) {
     payload.updated_at = new Date().toISOString();
     ({ error } = await supabase.from('plantillas').update(payload).eq('id', pl.id));
   } else {
@@ -167,8 +168,8 @@ async function savePlantilla(pl) {
     ({ error } = await supabase.from('plantillas').insert(payload));
   }
   if (error) { toast('Error al guardar: ' + error.message, 'error'); $('#pl_save').disabled = false; return; }
-  await logAccion(pl ? 'editar' : 'crear', 'plantilla', pl ? pl.id : titulo, titulo);
-  closeModal(); toast(pl ? 'Plantilla actualizada.' : 'Plantilla creada.', 'success');
+  await logAccion(isUpdate ? 'editar' : 'crear', 'plantilla', isUpdate ? pl.id : titulo, titulo);
+  closeModal(); toast(isUpdate ? 'Plantilla actualizada.' : 'Plantilla creada.', 'success');
   renderPlantillas();
 }
 
