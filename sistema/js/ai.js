@@ -11,7 +11,7 @@ const DEFAULT_API_KEY = part1 + part2 + part3;
 export async function generateContent(promptText, systemInstruction = "Eres un asistente legal experto de Bolivia. Redacta de forma profesional, clara y precisa en formato legal.") {
   const apiKey = DEFAULT_API_KEY;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
   
   const payload = {
     contents: [{ parts: [{ text: promptText }] }],
@@ -41,6 +41,7 @@ export async function generateContent(promptText, systemInstruction = "Eres un a
   } catch (error) {
     console.error('Gemini API Error:', error);
     toast('Error en IA: ' + error.message, 'error');
+    alert('Error en IA (Por favor avisa a soporte):\n' + error.message);
     return null;
   }
 }
