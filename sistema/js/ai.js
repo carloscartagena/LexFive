@@ -11,7 +11,7 @@ const DEFAULT_API_KEY = part1 + part2 + part3;
 export async function generateContent(promptText, systemInstruction = "Eres un asistente legal experto de Bolivia. Redacta de forma profesional, clara y precisa en formato legal.") {
   const apiKey = DEFAULT_API_KEY;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
   
   const payload = {
     contents: [{ parts: [{ text: promptText }] }],
@@ -40,8 +40,12 @@ export async function generateContent(promptText, systemInstruction = "Eres un a
     return null;
   } catch (error) {
     console.error('Gemini API Error:', error);
-    toast('Error en IA: ' + error.message, 'error');
-    alert('Error en IA (Por favor avisa a soporte):\n' + error.message);
+    let msg = error.message;
+    if (msg === 'Failed to fetch') {
+      msg = 'No se pudo conectar a la IA. Los servidores de Google están saturados o tu navegador está bloqueando la conexión.';
+    }
+    toast('Error en IA: ' + msg, 'error');
+    alert('Error en IA:\n' + msg);
     return null;
   }
 }
