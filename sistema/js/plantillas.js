@@ -13,7 +13,7 @@ import { $, content } from './dom.js';
 import { loading, toast, openModal, closeModal } from './ui.js';
 import { profName, namesFromIds } from './comunes.js';
 import { descargarArchivo } from './exportar.js';
-import { generateContent } from './ai.js';
+import { generateContent, generateContentStream } from './ai.js';
 
 // Campos disponibles para usar en las plantillas con la forma {{campo}}.
 function placeholdersDisponibles() {
@@ -114,12 +114,31 @@ export async function renderPlantillas() {
   $('#btnIAPlant').onclick = async () => {
     const p = prompt('¿Qué tipo de plantilla legal deseas que la IA redacte? (Ej: Memorial de apersonamiento, Contrato de alquiler)');
     if (!p) return;
-    toast('Generando con IA, por favor espere...', 'info');
-    const res = await generateContent(`Redacta un documento legal modelo para el siguiente caso: ${p}. 
-Usa formato formal boliviano. Puedes usar variables entre llaves dobles como {{cliente}}, {{juzgado}}, {{nurej}}, {{caratula}} donde sea apropiado.`);
-    if (res) {
+    
+    // Abrimos el form vacío
+    plantillaForm({ titulo: p, cuerpo: '', categoria: 'Generado por IA' });
+    const ta = $('#pl_cuerpo');
+    const saveBtn = $('#pl_save');
+    ta.disabled = true;
+    saveBtn.disabled = true;
+    ta.placeholder = "La Inteligencia Artificial está redactando...";
+    toast('Iniciando redacción con IA, por favor espere...', 'info');
+
+    try {
+      await generateContentStream(
+        `Redacta un documento legal modelo para el siguiente caso: ${p}. Usa formato formal boliviano. Puedes usar variables entre llaves dobles como {{cliente}}, {{juzgado}}, {{nurej}}, {{caratula}} donde sea apropiado.`,
+        (chunk) => {
+          ta.value += chunk;
+          ta.scrollTop = ta.scrollHeight;
+        }
+      );
       toast('Plantilla generada con éxito.', 'success');
-      plantillaForm({ titulo: p, cuerpo: res, categoria: 'Generado por IA' });
+    } catch (e) {
+      // El error ya se muestra en generateContentStream
+    } finally {
+      ta.disabled = false;
+      saveBtn.disabled = false;
+      ta.placeholder = "";
     }
   };
 }

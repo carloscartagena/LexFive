@@ -13,7 +13,7 @@ import { esc, hoyISO, fmtDate, fmtDateTime } from './util.js';
 import { descargarArchivo } from './exportar.js';
 import { $, content } from './dom.js';
 import { paginar, pagerHTML, wirePager, toast, tip, hint, loading, openModal, closeModal } from './ui.js';
-import { generateContent } from './ai.js';
+import { generateContent, generateContentStream } from './ai.js';
 import { state } from './state.js';
 import { loadCategorias, categoriaOptions, wireCategoriaSelect } from './categorias.js';
 import { profName, clienteName, badgeEstado, checkboxesProfiles, namesFromIds, optionsClientes } from './comunes.js';
@@ -330,12 +330,20 @@ export async function openProcesoDetail(id, readonly = false) {
         btn.textContent = 'Analizando...';
         const actuacionesText = (acts || []).map(a => `${a.fecha}: ${a.descripcion}`).join('\n');
         const prompt = `Resume el siguiente expediente legal. Carátula: ${p.caratula}. Materia: ${p.materia || 'General'}. Estado: ${p.estado}. Descripción: ${p.descripcion || 'Sin descripción'}. Actuaciones: \n${actuacionesText}\n\nProporciona un resumen ejecutivo del estado actual del caso.`;
-        const res = await generateContent(prompt);
-        btn.disabled = false;
-        btn.textContent = '✨ Resumir (IA)';
-        if (res) {
-          $('#aiSummaryContainer').style.display = 'block';
-          $('#aiSummaryResult').textContent = res;
+        
+        $('#aiSummaryContainer').style.display = 'block';
+        $('#aiSummaryResult').textContent = '';
+        
+        try {
+          await generateContentStream(prompt, (chunk) => {
+            $('#aiSummaryResult').textContent += chunk;
+          });
+        } catch (err) {
+          // El error se maneja en la función de stream con un toast
+          $('#aiSummaryResult').textContent = 'Error al generar el resumen.';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = '✨ Resumir (IA)';
         }
       }
     });
