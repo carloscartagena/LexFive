@@ -176,6 +176,7 @@ table.data tr.no-hover:hover { background: transparent; cursor: default; }
 .badge-estado { background: #eef7f1; color: var(--green); }
 .badge-estado.archivado, .badge-estado.concluido { background: #eef0f3; color: var(--muted); }
 .badge-estado.suspendido { background: #fdf3e6; color: var(--amber); }
+.badge-estado.con_resolucion { background: #eef4fb; color: #2a5b8f; }
 .badge-on { background: #eef7f1; color: var(--green); }
 .badge-off { background: #fbecec; color: var(--red); }
 .badge-borrador { background: #fdf3e6; color: var(--amber); }
@@ -763,8 +764,8 @@ html[data-theme="dark"] .logo-upload { background: #fcfaf4; }
 
 /* ---------- Plantillas de memoriales ---------- */
 .plant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
-.plant-card { background: #fff; border: 1px solid var(--line, #e6e8ec); border-radius: 11px; padding: 14px; display: flex; flex-direction: column; gap: 7px; }
-.plant-card__title { font-weight: 700; color: var(--navy, #0e1b2c); font-size: 1rem; }
+.plant-card { background: var(--white); border: 1px solid var(--line); border-radius: 11px; padding: 14px; display: flex; flex-direction: column; gap: 7px; }
+.plant-card__title { font-weight: 700; color: var(--navy); font-size: 1rem; }
 .plant-card__preview { flex: 1; line-height: 1.5; }
 .plant-card__actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .campos-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
@@ -864,6 +865,7 @@ html[data-theme="dark"] table.data tbody tr:hover { background: rgba(255,255,255
 /* Textos que usaban azul marino (ilegible sobre fondo oscuro) */
 html[data-theme="dark"] .topbar h1,
 html[data-theme="dark"] .card__head h3,
+html[data-theme="dark"] .plant-card__title,
 html[data-theme="dark"] .metric__num,
 html[data-theme="dark"] .section-title,
 html[data-theme="dark"] .intro-title,
@@ -876,6 +878,17 @@ html[data-theme="dark"] .act-file__icon { color: var(--gold-light); }
 
 /* Insignia de materia y botones */
 html[data-theme="dark"] .badge-mat { background: rgba(194,162,90,.16); color: var(--gold-light); }
+html[data-theme="dark"] .badge-estado { background: rgba(39,174,96,.15); color: #58d68d; }
+html[data-theme="dark"] .badge-estado.archivado, 
+html[data-theme="dark"] .badge-estado.concluido { background: rgba(255,255,255,.1); color: var(--muted); }
+html[data-theme="dark"] .badge-estado.suspendido { background: rgba(243,156,18,.15); color: #f5b041; }
+html[data-theme="dark"] .badge-estado.con_resolucion { background: rgba(41,128,185,.15); color: #5dade2; }
+html[data-theme="dark"] .badge-on, html[data-theme="dark"] .badge-publicado { background: rgba(39,174,96,.15); color: #58d68d; }
+html[data-theme="dark"] .badge-off, html[data-theme="dark"] .badge-rol-admin { background: rgba(192,57,43,.15); color: #e74c3c; }
+html[data-theme="dark"] .badge-borrador { background: rgba(243,156,18,.15); color: #f5b041; }
+html[data-theme="dark"] .badge-rol-procurador { background: rgba(41,128,185,.15); color: #5dade2; }
+html[data-theme="dark"] .badge-rol-cliente { background: rgba(39,174,96,.15); color: #58d68d; }
+html[data-theme="dark"] .badge-rol-abogado { background: rgba(194,162,90,.15); color: var(--gold-light); }
 html[data-theme="dark"] .btn--danger { background: transparent; }
 html[data-theme="dark"] .btn--ghost:hover { background: rgba(255,255,255,.06); }
 
