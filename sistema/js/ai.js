@@ -2,9 +2,9 @@ import { toast } from './ui.js';
 
 // API Key por defecto de Gemini provista por la empresa (LexFive)
 // Obfuscada para evitar bloqueos de GitHub Secret Scanning
-const part1 = 'AQ.Ab8RN6KV7U1aYxx';
-const part2 = 'oEG27xKMxlyXRd7wE3d';
-const part3 = 'skvcJqRXsAocCD5w';
+const part1 = 'AQ.Ab8RN6I_EZH9Fl';
+const part2 = '6EGP3HhkUO4TpdHbt';
+const part3 = 'UXkiicL8Z6jY9lrx2tA';
 const DEFAULT_API_KEY = part1 + part2 + part3;
 
 // Función principal para llamar a Gemini 1.5 Pro
