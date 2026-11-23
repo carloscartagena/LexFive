@@ -18,6 +18,8 @@ import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSe
 import { supabase } from './supabase.js';
 import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membretePagina, PRINT_COLOR_CSS } from './membrete-base.js';
 import { navigate } from './app.js';
+import { calcularJornadasHabilesBolivia } from './calendario-bo.js';
+import { generarCronogramaPasantia } from './pasantia-ai.js';
 
 export { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, calcularJornadasPasantia, extraerHoras, fechaLarga };
 
@@ -140,7 +142,7 @@ function extraerHoras(horarioStr, modalidadStr) {
   return { ingreso: ing, salida: sal, horas: hrs };
 }
 
-function calcularJornadasPasantia(fechaInicioStr, fechaFinStr, modalidadStr) {
+function calcularJornadasPasantia(fechaInicioStr, fechaFinStr, modalidadStr, feriadosExtraStr = '', customTareas = null) {
   const modLower = (modalidadStr || '').toLowerCase();
   let numJornadas = 20;
   if (modLower.includes('2 semanas') || modLower.includes('dos (2) semanas') || (modLower.includes('tiempo completo') && !modLower.includes('4 semanas'))) {
@@ -151,47 +153,19 @@ function calcularJornadasPasantia(fechaInicioStr, fechaFinStr, modalidadStr) {
     return Array.from({ length: numJornadas }, (_, i) => ({
       numero: i + 1,
       fecha: '',
-      tarea: PASANTIA_CRONOGRAMA_BASE[i] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' }
+      tarea: (customTareas && customTareas[i]) ? customTareas[i] : (PASANTIA_CRONOGRAMA_BASE[i] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' })
     }));
   }
 
-  const partes = fechaInicioStr.split('-');
-  let cur = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
-  let finDate = null;
-  if (fechaFinStr) {
-    const fPartes = fechaFinStr.split('-');
-    finDate = new Date(Number(fPartes[0]), Number(fPartes[1]) - 1, Number(fPartes[2]));
-  }
-
-  const jornadas = [];
-  let iter = 0;
-  while (jornadas.length < numJornadas && iter < 60) {
-    const day = cur.getDay();
-    if (day !== 0 && day !== 6) { // Lunes a Viernes
-      const dd = String(cur.getDate()).padStart(2, '0');
-      const mm = String(cur.getMonth() + 1).padStart(2, '0');
-      const yyyy = cur.getFullYear();
-      jornadas.push({
-        numero: jornadas.length + 1,
-        fecha: `${dd}/${mm}/${yyyy}`,
-        fechaRaw: `${yyyy}-${mm}-${dd}`,
-        tarea: PASANTIA_CRONOGRAMA_BASE[jornadas.length] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' }
-      });
-      if (finDate && cur >= finDate && jornadas.length >= 10) break;
-    }
-    cur.setDate(cur.getDate() + 1);
-    iter++;
-  }
-
-  while (jornadas.length < numJornadas) {
-    jornadas.push({
-      numero: jornadas.length + 1,
-      fecha: '',
-      tarea: PASANTIA_CRONOGRAMA_BASE[jornadas.length] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' }
-    });
-  }
-
-  return jornadas;
+  const calc = calcularJornadasHabilesBolivia(fechaInicioStr, numJornadas, feriadosExtraStr);
+  return calc.jornadas.map((jh, i) => ({
+    numero: jh.num,
+    fecha: jh.fechaCorta,
+    fechaRaw: jh.iso,
+    diaSemana: jh.diaSemana,
+    semanaIdx: jh.semanaIdx,
+    tarea: (customTareas && customTareas[i]) ? customTareas[i] : (PASANTIA_CRONOGRAMA_BASE[i] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' })
+  }));
 }
 
 const CERT_PLANTILLAS = [
@@ -351,7 +325,7 @@ function buildHojaAsistenciaHTML(d, logoSrc, model) {
   const horario = esc(d.horario || '14:00 a 18:00');
   const prellenar = d.prellenar_asistencia !== false;
 
-  const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad);
+  const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad, d.feriados_extra, d.customTareas);
   const infoHoras = extraerHoras(d.horario, d.modalidad);
 
   const totalJornadas = jornadas.length;
@@ -499,7 +473,7 @@ function buildInformeWordHTML(d) {
   const periodo = esc(d.periodo || ((d.fecha_inicio && d.fecha_fin) ? `del ${fmtDate(d.fecha_inicio)} al ${fmtDate(d.fecha_fin)}` : 'el período indicado'));
   const fechaDoc = fechaLarga(d.fecha_emision || d.fecha);
   const ref = esc(d.ref || 'LF-2026-00000');
-  const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad);
+  const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad, d.feriados_extra, d.customTareas);
   const totalJornadas = jornadas.length;
 
   const tareasSem1 = PASANTIA_CRONOGRAMA_BASE.filter(t => t.semana === 1).map(t => `<li>${esc(t.detalle)}</li>`).join('');
@@ -770,16 +744,37 @@ export async function renderCertificados() {
                 <div class="field"><label>N.º de Nota de Designación</label><input id="ce_nota_desig" placeholder="Ej: IIST-CA-003/2026 (opcional)"></div>
                 <div class="field"><label>Fecha de Nota</label><input id="ce_fecha_nota" type="date"></div>
                 <div class="field"><label>Fecha de inicio</label><input id="ce_fecha_inicio" type="date"></div>
-                <div class="field"><label>Fecha de finalización</label><input id="ce_fecha_fin" type="date"></div>
+                <div class="field"><label>Fecha de finalización (autocalculada)</label><input id="ce_fecha_fin" type="date"></div>
                 <div class="field"><label>Modalidad</label>
                   <select id="ce_modalidad">
-                    <option value="4 semanas a medio tiempo (4 horas diarias)">4 semanas a medio tiempo (4 h/día)</option>
-                    <option value="2 semanas a tiempo completo (8 horas diarias)">2 semanas a tiempo completo (8 h/día)</option>
+                    <option value="4 semanas a medio tiempo (4 horas diarias)">4 semanas a medio tiempo (4 h/día - 20 días hábiles)</option>
+                    <option value="2 semanas a tiempo completo (8 horas diarias)">2 semanas a tiempo completo (8 h/día - 10 días hábiles)</option>
                     <option value="">Personalizada (edite el texto)</option>
                   </select></div>
                 <div class="field"><label>Horario</label><input id="ce_horario" placeholder="Ej: 14:00 a 18:00"></div>
+                <div class="field" style="grid-column:1/-1;">
+                  <label>Feriados extra / tolerancias (opcional, YYYY-MM-DD separados por coma)</label>
+                  <input id="ce_feriados_extra" placeholder="Ej: 2026-11-03, 2026-11-10">
+                  <p class="cell-sub" id="ce_feriados_info" style="margin-top:2px;font-size:.78rem;color:var(--gold, #a8853c);display:none;"></p>
+                </div>
+                <div class="field" style="grid-column:1/-1;border-top:1px dashed var(--line);padding-top:8px;">
+                  <label style="font-weight:600;">Áreas de práctica forense para actividades</label>
+                  <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;margin-top:4px;">
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="civil" checked> Civil</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="familiar" checked> Familiar</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="laboral"> Laboral</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="penal"> Penal</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="administrativo"> Administrativo (GAMEA)</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="notarial" checked> DDRR / Notarial</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="legaltech" checked> Gestión Digital</label>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                    <input id="ce_enfoque" placeholder="Enfoque especial del pasante (ej. asistencia familiar y Derechos Reales)..." style="flex:1;">
+                    <button class="btn btn--ghost btn--sm" id="ce_btn_ia_cronograma" type="button" style="color:var(--primary, #c2a25a);font-weight:600;">✨ Generar actividades con IA</button>
+                  </div>
+                </div>
                 <label class="cell-sub" style="display:flex;align-items:center;gap:6px;grid-column:1/-1;margin-top:4px;">
-                  <input type="checkbox" id="ce_prellenar_asistencia" checked> Prellenar fechas hábiles y 20 tareas jurídicas en Hoja de Asistencia
+                  <input type="checkbox" id="ce_prellenar_asistencia" checked> Prellenar fechas hábiles reales y actividades en Hoja de Asistencia
                 </label>
               </div>
             </div>
@@ -853,6 +848,31 @@ export async function renderCertificados() {
   const val = (id) => { const el = $('#' + id); return el ? (el.value || '').trim() : ''; };
   const nuevoRef = () => 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
   let refActual = nuevoRef();
+  let cronogramaPersonalizado = null;
+
+  // Autocalcula fecha de finalización descartando feriados y fines de semana
+  const autocalcularFechaFin = () => {
+    const fIni = val('ce_fecha_inicio');
+    if (!fIni) return;
+    const mod = val('ce_modalidad') || '4 semanas a medio tiempo (4 horas diarias)';
+    const numDias = (mod.includes('2 semanas') || mod.includes('tiempo completo')) ? 10 : 20;
+    const feriadosExtra = val('ce_feriados_extra');
+    const calc = calcularJornadasHabilesBolivia(fIni, numDias, feriadosExtra);
+    if (calc.fechaFin && $('#ce_fecha_fin')) {
+      $('#ce_fecha_fin').value = calc.fechaFin;
+    }
+    const infoEl = $('#ce_feriados_info');
+    if (infoEl) {
+      if (calc.feriadosOmitidos && calc.feriadosOmitidos.length) {
+        infoEl.style.display = 'block';
+        infoEl.textContent = `Se omitieron ${calc.feriadosOmitidos.length} feriado(s) oficial(es): ` + calc.feriadosOmitidos.map(f => `${f.fechaCorta} (${f.nombre})`).join(', ');
+      } else {
+        infoEl.style.display = 'none';
+        infoEl.textContent = '';
+      }
+    }
+  };
+
   const datos = () => ({
     ref: refActual,
     nombre: val('ce_nombre') || '___________________',
@@ -873,10 +893,12 @@ export async function renderCertificados() {
     fecha_nota_designacion: val('ce_fecha_nota') ? fechaLarga(val('ce_fecha_nota')) : '',
     modalidad: val('ce_modalidad'),
     horario: val('ce_horario'),
+    feriados_extra: val('ce_feriados_extra'),
     fecha_inicio: val('ce_fecha_inicio'),
     fecha_fin: val('ce_fecha_fin'),
     fecha_inicio_larga: val('ce_fecha_inicio') ? fechaLarga(val('ce_fecha_inicio')) : '',
     fecha_fin_larga: val('ce_fecha_fin') ? fechaLarga(val('ce_fecha_fin')) : '',
+    customTareas: cronogramaPersonalizado,
     abogadoFirma: val('ce_abogado_firma'),
     rpaFirma: val('ce_rpa')
   });
@@ -1189,12 +1211,64 @@ export async function renderCertificados() {
     const el = $('#' + id); if (!el) return;
     el.oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
-  ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero'].forEach(id => {
+  ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero', 'ce_feriados_extra'].forEach(id => {
     const el = $('#' + id); if (!el) return;
-    const handler = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
+    const handler = () => {
+      forkSiNecesario();
+      if (id === 'ce_fecha_inicio' || id === 'ce_modalidad' || id === 'ce_feriados_extra') {
+        autocalcularFechaFin();
+      }
+      if (!cuerpoEditado) regenerar();
+      pintar();
+    };
     el.onchange = handler;
     el.oninput = handler;
   });
+
+  const btnIA = $('#ce_btn_ia_cronograma');
+  if (btnIA) {
+    btnIA.onclick = async () => {
+      const fIni = val('ce_fecha_inicio');
+      if (!fIni) { toast('Seleccione la fecha de inicio primero.', 'error'); return; }
+      autocalcularFechaFin();
+      const mod = val('ce_modalidad') || '4 semanas a medio tiempo (4 horas diarias)';
+      const numDias = (mod.includes('2 semanas') || mod.includes('tiempo completo')) ? 10 : 20;
+      const feriadosExtra = val('ce_feriados_extra');
+      const calc = calcularJornadasHabilesBolivia(fIni, numDias, feriadosExtra);
+      
+      const areas = Array.from(content().querySelectorAll('.ce_area:checked')).map(c => c.value);
+      const enfoque = val('ce_enfoque');
+      const nombre = val('ce_nombre');
+
+      btnIA.disabled = true;
+      btnIA.textContent = '⏳ Generando con IA...';
+      toast('Generando actividades exclusivas con IA...', 'info');
+
+      try {
+        const crono = await generarCronogramaPasantia({
+          jornadas: calc.jornadas,
+          areas,
+          enfoque,
+          nombrePasante: nombre,
+          usarIA: true
+        });
+
+        if (crono && crono.length) {
+          cronogramaPersonalizado = crono.map(item => ({
+            resumen: item.resumen,
+            detalle: item.actividades ? item.actividades.join(' ') : item.resumen
+          }));
+          toast('¡Cronograma único generado con éxito!', 'success');
+          pintar();
+        }
+      } catch (err) {
+        toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
+      } finally {
+        btnIA.disabled = false;
+        btnIA.textContent = '✨ Generar actividades con IA';
+      }
+    };
+  }
   const chkAsis = $('#ce_prellenar_asistencia');
   if (chkAsis) chkAsis.onchange = () => { forkSiNecesario(); };
   const ceTipoCert = $('#ce_tipo_cert');

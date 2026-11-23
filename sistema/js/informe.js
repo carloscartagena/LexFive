@@ -2,9 +2,9 @@
 //  VISTA: INFORME ÚNICO DE PASANTÍA (UMSA Y OTRAS UNIVERSIDADES)
 //  Documento oficial multipágina sobre HOJA MEMBRETADA institucional de LexFive
 //  (encabezado, marca de agua, pie y numeración "Página X de Y" en cada hoja).
-//  Soporta importación automática desde Certificados de Pasantía, cronograma
-//  extenso día por día (20 o 10 jornadas), 3 conclusiones desarrolladas, firmas
-//  en 2 columnas, lista de anexos y cargador de fotografías (2 por hoja).
+//  Soporta importación automática desde Certificados de Pasantía, calendario hábil
+//  de Bolivia (descarte automático de feriados), generación de tareas con IA y
+//  fallback determinista, firmas institucionales, lista de anexos y fotos.
 //  Exportable a PDF (html2pdf), Impresión y Word (.doc editable multipágina).
 // ============================================================
 import { withTimeout } from './auth.js';
@@ -19,32 +19,13 @@ import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSe
 import { supabase } from './supabase.js';
 import { state } from './state.js';
 import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membreteHeader, membreteFooter, PRINT_COLOR_CSS } from './membrete-base.js';
-import { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, calcularJornadasPasantia, fechaLarga } from './certificados.js';
+import { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, fechaLarga } from './certificados.js';
+import { calcularJornadasHabilesBolivia } from './calendario-bo.js';
+import { generarCronogramaPasantia } from './pasantia-ai.js';
 
 function urlAbs(src) {
   if (!src) return '';
   return src.indexOf('data:') === 0 ? src : new URL(src, location.href).href;
-}
-
-const TAREAS_KEY = 'lexfive_informe_tareas';
-function tareasLocales() {
-  try { const a = JSON.parse(localStorage.getItem(TAREAS_KEY) || 'null'); return Array.isArray(a) ? a : null; }
-  catch (e) { return null; }
-}
-async function cargarTareas() {
-  try {
-    const { data } = await withTimeout(
-      supabase.from('configuracion').select('valor').eq('clave', 'informe_tareas').maybeSingle(), 6000, 'tareas');
-    if (data && Array.isArray(data.valor) && data.valor.length) {
-      try { localStorage.setItem(TAREAS_KEY, JSON.stringify(data.valor)); } catch (e) {}
-      return data.valor.slice();
-    }
-  } catch (e) {}
-  return tareasLocales() || PASANTIA_CRONOGRAMA_BASE.map(t => t.detalle);
-}
-async function guardarTareas(arr) {
-  try { localStorage.setItem(TAREAS_KEY, JSON.stringify(arr)); } catch (e) {}
-  try { await supabase.from('configuracion').upsert({ clave: 'informe_tareas', valor: arr, updated_at: new Date().toISOString() }); } catch (e) {}
 }
 
 const INFORMES_CACHE = 'lexfive_informes_cache';
@@ -74,70 +55,59 @@ async function fetchCertificadosPasantia() {
   return [];
 }
 
-// Genera el texto extendido día por día (3 actividades jurídicas por jornada)
-function generarActividadesTexto(fechaInicio, fechaFin, modalidad) {
-  const jornadas = calcularJornadasPasantia(fechaInicio, fechaFin, modalidad);
-  const total = jornadas.length;
-  let out = '';
-  let curSem = 0;
-  const numSemRoman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
-  const semNombres = ['PRIMERA', 'SEGUNDA', 'TERCERA', 'CUARTA', 'QUINTA', 'SEXTA'];
-
-  for (let i = 0; i < total; i++) {
-    const sem = Math.floor(i / 5) + 1;
-    if (sem !== curSem) {
-      curSem = sem;
-      const jIni = jornadas[i];
-      const jFin = jornadas[Math.min(i + 4, total - 1)];
-      const lapso = (jIni.fecha && jFin.fecha) ? ` (del ${jIni.fecha} al ${jFin.fecha})` : '';
-      const semNom = semNombres[curSem - 1] || `${curSem}ª`;
-      out += `\n${numSemRoman[curSem - 1] || curSem}. ${semNom} SEMANA${lapso}:\n`;
-    }
-
-    const j = jornadas[i];
-    const baseTarea = j.tarea || { resumen: 'Práctica jurídica forense.', detalle: 'Práctica forense en despacho.' };
-    const fLabel = j.fecha ? `${j.fecha}` : `Día ${j.numero}`;
-    out += `\n• ${fLabel} — ${baseTarea.resumen}\n`;
-    out += `  a) ${baseTarea.detalle}\n`;
-    out += `  b) Registro, digitalización y actualización del estado procesal en el sistema informático interno del bufete LexFive.\n`;
-    out += `  c) Compulsa normativa del Código Procesal aplicable, doctrina jurídica y control de plazos perentorios bajo supervisión.\n`;
-  }
-  return out.trim();
-}
-
 // Estructura de conclusiones institucionales
 function generarConclusionesTexto(genero) {
   const t = obtenerTratamiento(genero);
-  return `1. EFICIENCIA Y PROACTIVIDAD EN EL DESEMPEÑO:
-${t.mencionado} ha desarrollado a cabalidad cada una de las labores asignadas por el cuerpo de abogados patrocinantes del Bufete LexFive, demostrando alto grado de diligencia, proactividad y rigor técnico en la investigación forense, manejo de cuadernos procesales y redacción de borradores.
+  return `1. EJE ACADÉMICO Y JURÍDICO (EFICIENCIA EN EL DESEMPEÑO):
+${t.mencionado} ha desarrollado a cabalidad cada una de las labores asignadas por el cuerpo de abogados patrocinantes del Bufete LexFive, demostrando alto grado de diligencia, proactividad y rigor técnico en la investigación forense, manejo de cuadernos procesales y redacción de memoriales en materias Civil, Familiar, Laboral y Penal.
 
-2. COMPROMISO ÉTICO, DEONTOLÓGICO Y LEALTAD PROFESIONAL:
+2. EJE ÉTICO, DEONTOLÓGICO Y LEALTAD PROFESIONAL:
 Todas las funciones forenses y administrativas fueron desempeñadas en estricta observancia a la Ley N.º 387 del Ejercicio de la Abogacía y el Código de Ética Profesional, preservando el deber de reserva, secreto profesional y custodia responsable de la documentación confidencial del despacho y de los patrocinados.
 
-3. APLICACIÓN PRÁCTICA Y FORTALECIMIENTO DE HABILIDADES JURÍDICAS:
-La pasantía jurídica permitió articular satisfactoriamente la formación teórica adquirida en las aulas universitarias con la praxis judicial cotidiana, consolidando criterios de argumentación, celeridad procesal y resolución de controversias en materia Civil, Familiar, Laboral y Penal.`;
+3. EJE PRÁCTICO Y FORTALECIMIENTO DE HABILIDADES FORENSES:
+La pasantía jurídica permitió articular satisfactoriamente la formación teórica adquirida en las aulas universitarias con la praxis judicial cotidiana, consolidando criterios de argumentación, celeridad procesal y resolución de controversias en estrados judiciales y oficinas registrales.`;
 }
 
 // Divide el documento en páginas tamaño Carta estructuradas
-function renderPaginaHoja({ model, logoSrc, numPag, totalPags, contentHTML, wmOp }) {
-  const foot = membreteFooter(model).replace('</div>', `
-    <span style="position:relative;z-index:2;font-weight:bold;color:#c2a25a;margin-left:14px;white-space:nowrap;">Página ${numPag} de ${totalPags}</span>
-  </div>`);
+function renderPaginaHoja({ model, logoSrc, numPag, totalPags, contentHTML, wmOp, modoPresentacion }) {
+  const isAcademico = modoPresentacion === 'umsa';
+  let headHTML = '';
+  let footHTML = '';
 
-  const wmHTML = (logoSrc && wmOp) ? `
+  if (isAcademico) {
+    headHTML = `
+      <div style="border-bottom:2px solid #0e1b2c;padding:12px 2.1cm 8px;text-align:center;font-family:Georgia,serif;">
+        <div style="font-size:12px;font-weight:bold;color:#0e1b2c;letter-spacing:1px;text-transform:uppercase;">UNIVERSIDAD MAYOR DE SAN ANDRÉS · FACULTAD DE DERECHO Y CIENCIAS POLÍTICAS</div>
+        <div style="font-size:9.5px;color:#a8853c;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST) · PLAN DE ESTUDIOS 2017</div>
+      </div>
+    `;
+    footHTML = `
+      <div style="border-top:1px solid #d9dce1;padding:8px 2.1cm 12px;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#5c6675;font-family:Arial,sans-serif;">
+        <span>LexFive Bufete de Abogados · Sede Central El Alto - La Paz</span>
+        <span style="font-weight:bold;color:#0e1b2c;">Página ${numPag} de ${totalPags}</span>
+      </div>
+    `;
+  } else {
+    headHTML = membreteHeader(model, logoSrc);
+    footHTML = membreteFooter(model).replace('</div>', `
+      <span style="position:relative;z-index:2;font-weight:bold;color:#c2a25a;margin-left:14px;white-space:nowrap;">Página ${numPag} de ${totalPags}</span>
+    </div>`);
+  }
+
+  const wmHTML = (logoSrc && wmOp && !isAcademico) ? `
     <img src="${logoSrc}" alt="" style="position:absolute;top:50%;left:50%;width:11.5cm;height:11.5cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${Number(wmOp).toFixed(2)};pointer-events:none;z-index:0;">
   ` : '';
 
   return `
   <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;min-height:27.94cm;max-height:27.94cm;height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:'Times New Roman',Georgia,serif;font-size:12px;line-height:1.45;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
-    ${membreteHeader(model, logoSrc)}
+    ${headHTML}
     <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:16px 2.1cm 12px;overflow:hidden;">
       ${wmHTML}
       <div style="position:relative;z-index:1;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;">
         ${contentHTML}
       </div>
     </div>
-    ${foot}
+    ${footHTML}
   </div>`;
 }
 
@@ -162,6 +132,7 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
   const actividades = d.actividades || '';
   const conclusiones = esc(d.conclusiones || generarConclusionesTexto(d.genero));
   const fotos = Array.isArray(d.fotos) ? d.fotos : [];
+  const modo = d.modo_presentacion || 'lexfive';
 
   // PÁGINA 1: Portada institucional, datos y antecedentes
   const pag1HTML = `
@@ -198,7 +169,8 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
     <div style="background:#f8f9fb;border:1px solid #d9dce1;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;">
       <div style="margin-bottom:3px;"><strong>• Institución Receptora:</strong> Bufete de Abogados LexFive (Área de Litigio, Asesoría Jurídica y Diligenciamiento Procesal).</div>
       <div style="margin-bottom:3px;"><strong>• Duración y Modalidad:</strong> ${duracion} (${modalidad} · Horario: ${horario}).</div>
-      <div><strong>• Supervisión Forense:</strong> ${supervision}.</div>
+      <div style="margin-bottom:3px;"><strong>• Supervisión Forense:</strong> ${supervision}.</div>
+      <div><strong>• Ubicación del Despacho:</strong> Av. Alfredo Franco Valle N.º 708-51, Edif. Real, Planta Baja Of. A-6, Ciudad de El Alto - Bolivia.</div>
     </div>
 
     <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:4px;border-bottom:1px solid #d9dce1;padding-bottom:2px;">I. ANTECEDENTES Y MARCO NORMATIVO</div>
@@ -211,24 +183,23 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
 
   if (!semanasBlocks.length) {
     paginasActividades.push(`
-      <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;">II. DETALLE DE FUNCIONES REALIZADAS</div>
+      <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">II. DETALLE DE FUNCIONES REALIZADAS</div>
       <p style="margin:0 0 10px;text-align:justify;">A continuación se describen las funciones asignadas y ejecutadas:</p>
       <div style="white-space:pre-line;font-size:11px;line-height:1.4;">${esc(actividades)}</div>
     `);
   } else {
-    // Si hay semanas, agrupamos de forma equilibrada (1 o 2 semanas por página)
     for (let idx = 0; idx < semanasBlocks.length; idx++) {
       const semContent = semanasBlocks[idx];
       paginasActividades.push(`
-        <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;">${idx === 0 ? 'II. DETALLE DE FUNCIONES REALIZADAS' : 'II. DETALLE DE FUNCIONES REALIZADAS (Continuación)'}</div>
+        <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">${idx === 0 ? 'II. DETALLE CRONOLÓGICO DE FUNCIONES REALIZADAS' : 'II. DETALLE CRONOLÓGICO DE FUNCIONES REALIZADAS (Continuación)'}</div>
         <div style="white-space:pre-line;font-size:10.5px;line-height:1.4;text-align:justify;">${esc(semContent)}</div>
       `);
     }
   }
 
-  // PÁGINA DE CONCLUSIONES Y VISTO BUENO
+  // PÁGINA DE CONCLUSIONES Y VISTO BUENO (Termina con firmas, NUNCA con anexos)
   const pagConclusionesHTML = `
-    <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;">III. CONCLUSIONES Y VISTO BUENO</div>
+    <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">III. CONCLUSIONES Y VISTO BUENO INSTITUCIONAL</div>
     <p style="margin:0 0 10px;text-align:justify;text-indent:18px;">
       Habiendo concluido satisfactoriamente el ciclo programado de prácticas pre-profesionales, se establecen las siguientes conclusiones institucionales y valorativas:
     </p>
@@ -239,16 +210,16 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
       Es cuanto tengo a bien informar a su autoridad en honor a la verdad, para los fines académicos consiguientes.
     </p>
 
-    <div style="margin-top:auto;border:1px solid #d9dce1;border-radius:6px;padding:10px 14px;background:#fafbfc;">
-      <div style="text-align:center;font-size:9px;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin-bottom:8px;">CONFORMIDAD INSTITUCIONAL Y VISTO BUENO</div>
+    <div style="margin-top:auto;border:1px solid #d9dce1;border-radius:6px;padding:12px 16px;background:#fafbfc;">
+      <div style="text-align:center;font-size:9px;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin-bottom:8px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;">
         <div style="text-align:center;flex:1;">
-          <div style="min-height:50px;"></div>
+          <div style="min-height:55px;"></div>
           <div style="border-top:1.2px solid #0e1b2c;padding-top:4px;font-size:10px;font-weight:bold;color:#0e1b2c;">Univ. ${nombre}</div>
           <div style="font-size:8.5px;color:#5c6675;">Estudiante Pasante<br>R.U. ${ru} · C.I. ${ci}</div>
         </div>
         <div style="text-align:center;flex:1;">
-          <div style="min-height:50px;"></div>
+          <div style="min-height:55px;"></div>
           <div style="border-top:1.2px solid #0e1b2c;padding-top:4px;font-size:10px;font-weight:bold;color:#0e1b2c;">V.º B.º Abogado(a) Patrocinante / Dirección</div>
           <div style="font-size:8.5px;color:#5c6675;">LexFive · Bufete de Abogados</div>
         </div>
@@ -256,9 +227,9 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
     </div>
   `;
 
-  // PÁGINA DE ANEXOS
+  // PÁGINA DE ANEXOS (Siempre inicia en hoja nueva limpia)
   const pagAnexosHTML = `
-    <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;">IV. ÍNDICE DE ANEXOS Y CONSTANCIAS DE RESPALDO</div>
+    <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">IV. ÍNDICE DE ANEXOS Y CONSTANCIAS DE RESPALDO</div>
     <p style="margin:0 0 12px;text-align:justify;text-indent:18px;">
       En calidad de respaldo fáctico y documental de las funciones desarrolladas, se acompañan los siguientes instrumentos forenses y acreditaciones oficiales:
     </p>
@@ -285,12 +256,12 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
         <tr>
           <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">3</td>
           <td style="padding:6px;border:1px solid #d9dce1;"><strong>Certificado Oficial de Pasantía Jurídica</strong> refrendado por LexFive con QR verificable.</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">Ref. ${esc(d.ref || 'Emitido')}</td>
+          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">Ref. ${esc(d.ref || 'Verificable')}</td>
         </tr>
         <tr style="background:#f8f9fb;">
           <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">4</td>
-          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Hoja de Control de Asistencia y Permanencia</strong> con registro diario rubricado.</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">20 jornadas / 100%</td>
+          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Hoja de Control de Asistencia y Permanencia</strong> debidamente validada por el Bufete de Abogados LexFive.</td>
+          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">Asistencia 100%</td>
         </tr>
         <tr>
           <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">5</td>
@@ -328,7 +299,7 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
       `;
 
       paginasFotos.push(`
-        <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;">ANEXO: REGISTRO FOTOGRÁFICO DE ACTIVIDADES</div>
+        <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">ANEXO: REGISTRO FOTOGRÁFICO DE ACTIVIDADES</div>
         ${itemFoto(f1, f + 1)}
         ${f2 ? itemFoto(f2, f + 2) : ''}
       `);
@@ -344,12 +315,13 @@ function buildPaginasInforme(d, logoSrc, model, wmOp) {
     numPag: i + 1,
     totalPags: total,
     contentHTML: html,
-    wmOp
+    wmOp,
+    modoPresentacion: modo
   })).join('');
 }
 
 // Genera el documento Word (.doc) multipágina con encabezado y pie de página de Microsoft Word
-function buildInformeWordDocument(d, logoSrc) {
+export function buildInformeWordDocument(d, logoSrc) {
   const nombre = esc(d.nombre || '___________________');
   const ci = esc(d.ci || '—');
   const ru = esc(d.ru || d.registro_universitario || '—');
@@ -397,13 +369,13 @@ function buildInformeWordDocument(d, logoSrc) {
   table#footerTable { width: 100%; border-top: 1.5pt solid #c2a25a; font-family: Arial, sans-serif; font-size: 8.5pt; color: #555; }
   body { font-family: 'Times New Roman', Georgia, serif; font-size: 12pt; line-height: 1.45; color: #000; }
   h1 { font-size: 15pt; text-align: center; color: #0e1b2c; margin: 0 0 4pt; text-transform: uppercase; }
-  h2 { font-size: 12pt; font-weight: bold; color: #0e1b2c; border-bottom: 1pt solid #d9dce1; padding-bottom: 3pt; margin: 16pt 0 6pt; }
+  h2 { font-size: 12pt; font-weight: bold; color: #0e1b2c; border-bottom: 1pt solid #d9dce1; padding-bottom: 3pt; margin: 16pt 0 6pt; page-break-after: avoid; break-after: avoid; }
   p { margin: 0 0 8pt; text-align: justify; text-indent: 18pt; }
   .p-noint { margin: 0 0 8pt; text-align: justify; text-indent: 0; }
   .table-data { width: 100%; border-collapse: collapse; margin: 8pt 0 14pt; }
   .table-data th, .table-data td { border: 1pt solid #444; padding: 5pt 7pt; font-size: 10pt; text-align: left; }
   .table-data th { background: #f2f2f2; font-weight: bold; }
-  .page-break { page-break-before: always; }
+  .page-break { page-break-before: always; break-before: page; }
 </style>
 </head>
 <body>
@@ -448,6 +420,7 @@ function buildInformeWordDocument(d, logoSrc) {
   <tr><th style="width:28%;">Institución Receptora:</th><td>Bufete de Abogados "LexFive" (Área de Litigio y Asesoría Jurídica)</td></tr>
   <tr><th>Duración y Modalidad:</th><td>${duracion} (${modalidad} · Horario: ${horario})</td></tr>
   <tr><th>Supervisión Forense:</th><td>${supervision}</td></tr>
+  <tr><th>Ubicación del Despacho:</th><td>Av. Alfredo Franco Valle 708-51, Edif. Real Of. A-6, El Alto - Bolivia</td></tr>
 </table>
 
 <h2>I. ANTECEDENTES Y MARCO NORMATIVO</h2>
@@ -455,7 +428,7 @@ function buildInformeWordDocument(d, logoSrc) {
 
 <div class="page-break"></div>
 
-<h2>II. DETALLE DE FUNCIONES Y ACTIVIDADES REALIZADAS</h2>
+<h2>II. DETALLE CRONOLÓGICO DE FUNCIONES Y ACTIVIDADES REALIZADAS</h2>
 <p class="p-noint">Las funciones forenses se ejecutaron de lunes a viernes bajo el cronograma oficial coordinado con el despacho:</p>
 <div style="white-space:pre-line;font-size:10.5pt;line-height:1.4;">${esc(actividades)}</div>
 
@@ -490,7 +463,7 @@ function buildInformeWordDocument(d, logoSrc) {
   <tr><td>1</td><td>Nota Oficial de Designación de Pasantía</td><td>N.º ${notaDesig}</td></tr>
   <tr><td>2</td><td>Carta de Aceptación de Pasantía de LexFive</td><td>Original adjunto</td></tr>
   <tr><td>3</td><td>Certificado Oficial de Pasantía Jurídica LexFive</td><td>Ref. ${esc(d.ref || 'Verificable por QR')}</td></tr>
-  <tr><td>4</td><td>Hoja de Control de Asistencia y Permanencia</td><td>Registro completo de 20 jornadas</td></tr>
+  <tr><td>4</td><td>Hoja de Control de Asistencia y Permanencia</td><td>Debidamente validada por LexFive</td></tr>
   <tr><td>5</td><td>Muestrario de Actuaciones Forenses</td><td>Compulsa adjunta</td></tr>
   <tr><td>6</td><td>Registro Fotográfico de Prácticas Forenses</td><td>${fotos.length ? `${fotos.length} fotografías adjuntas` : 'Anexo fotográfico'}</td></tr>
 </table>
@@ -546,6 +519,8 @@ export async function renderInforme() {
     in_fecha_fin: hoyISO(),
     in_modalidad: '4 semanas a medio tiempo (4 horas diarias)',
     in_horario: '14:00 a 18:00',
+    in_feriados_extra: '',
+    in_enfoque: '',
     in_docente: 'Dr. Franklin Rubén Pareja Aliaga',
     in_docente_cargo: 'Docente de la Carrera de Derecho – Guía de la Materia de Pasantía',
     in_supervision: 'Abogado(a) Patrocinante – LexFive Bufete de Abogados',
@@ -553,6 +528,7 @@ export async function renderInforme() {
     in_antecedentes: `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía N.º IIST-001/2026 de fecha ${fechaLarga(hoyISO())}.`,
     in_actividades: '',
     in_conclusiones: '',
+    in_modo_pres: 'lexfive',
     in_fotos: []
   }, sv);
 
@@ -571,12 +547,6 @@ export async function renderInforme() {
     V.in_modalidad = precargado.modalidad || V.in_modalidad;
     V.in_horario = precargado.horario || V.in_horario;
     V.in_ref = precargado.ref || '';
-    V.in_actividades = generarActividadesTexto(V.in_fecha_inicio, V.in_fecha_fin, V.in_modalidad);
-    V.in_conclusiones = generarConclusionesTexto(V.in_genero);
-  } else if (!V.in_actividades) {
-    V.in_actividades = generarActividadesTexto(V.in_fecha_inicio, V.in_fecha_fin, V.in_modalidad);
-  }
-  if (!V.in_conclusiones) {
     V.in_conclusiones = generarConclusionesTexto(V.in_genero);
   }
 
@@ -629,15 +599,20 @@ export async function renderInforme() {
           ${campo('in_nota_desig', 'N.º Nota de Designación', V.in_nota_desig)}
           <div class="field"><label>Fecha de Nota de Designación</label><input id="in_fecha_nota" type="date" value="${esc(V.in_fecha_nota)}"></div>
           <div class="field"><label>Fecha de inicio</label><input id="in_fecha_inicio" type="date" value="${esc(V.in_fecha_inicio)}"></div>
-          <div class="field"><label>Fecha de finalización</label><input id="in_fecha_fin" type="date" value="${esc(V.in_fecha_fin)}"></div>
+          <div class="field"><label>Fecha de finalización (autocalculada)</label><input id="in_fecha_fin" type="date" value="${esc(V.in_fecha_fin)}"></div>
           <div class="field"><label>Modalidad</label>
             <select id="in_modalidad">
-              <option value="4 semanas a medio tiempo (4 horas diarias)" ${V.in_modalidad.includes('4 semanas') ? 'selected' : ''}>4 semanas a medio tiempo (4 h/día - 20 días)</option>
-              <option value="2 semanas a tiempo completo (8 horas diarias)" ${V.in_modalidad.includes('2 semanas') ? 'selected' : ''}>2 semanas a tiempo completo (8 h/día - 10 días)</option>
+              <option value="4 semanas a medio tiempo (4 horas diarias)" ${V.in_modalidad.includes('4 semanas') ? 'selected' : ''}>4 semanas a medio tiempo (4 h/día - 20 días hábiles)</option>
+              <option value="2 semanas a tiempo completo (8 horas diarias)" ${V.in_modalidad.includes('2 semanas') ? 'selected' : ''}>2 semanas a tiempo completo (8 h/día - 10 días hábiles)</option>
             </select>
           </div>
           ${campo('in_horario', 'Horario', V.in_horario)}
           ${campo('in_ref_cert', 'N.º Referencia del Certificado (Anexo 3)', V.in_ref || 'LF-2026-00000')}
+          <div class="field" style="grid-column:1/-1;">
+            <label>Feriados extra / tolerancias (opcional, YYYY-MM-DD separados por coma)</label>
+            <input id="in_feriados_extra" value="${esc(V.in_feriados_extra || '')}" placeholder="Ej: 2026-11-03, 2026-11-10">
+            <p class="cell-sub" id="in_feriados_info" style="margin-top:2px;font-size:.78rem;color:var(--gold, #a8853c);display:none;"></p>
+          </div>
         </div>
       </div>
     </div>
@@ -656,13 +631,30 @@ export async function renderInforme() {
       </div>
     </div>
 
-    <!-- 4. ACTIVIDADES DÍA POR DÍA -->
+    <!-- 4. GENERACIÓN DE ACTIVIDADES CON IA -->
     <div class="card">
       <div class="card__head">
         <h3>📅 Detalle de Actividades (Día por Día)</h3>
-        <button class="btn btn--ghost btn--sm" id="in_btn_regen_act" type="button">🔄 Regenerar actividades automáticas</button>
       </div>
       <div class="card__body">
+        <div style="background:var(--card-bg, rgba(255,255,255,0.03));border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px;">
+          <label style="font-weight:600;display:block;margin-bottom:6px;">Áreas de práctica jurídica desarrolladas:</label>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;margin-bottom:8px;">
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="civil" checked> Civil</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="familiar" checked> Familiar</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="laboral"> Laboral</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="penal"> Penal</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="administrativo"> Administrativo (GAMEA)</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="notarial" checked> DDRR / Notarial</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="legaltech" checked> LegalTech</label>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input id="in_enfoque" value="${esc(V.in_enfoque || '')}" placeholder="Enfoque especial del pasante (ej. asistencia familiar, procesos monitorios en El Alto)..." style="flex:1;min-width:240px;">
+            <button class="btn btn--primary btn--sm" id="in_btn_ia_cronograma" type="button">✨ Generar actividades únicas con IA</button>
+            <button class="btn btn--ghost btn--sm" id="in_btn_regen_act" type="button">🔄 Restaurar predeterminadas</button>
+          </div>
+        </div>
+
         <p class="cell-sub" style="margin-bottom:8px;">Actividades cronológicas agrupadas por semana con 3 funciones forenses por día sincronizadas con el plan oficial UMSA. Puede modificarlas libremente:</p>
         ${campoArea('in_actividades', 'Actividades por semana y día', V.in_actividades, 16)}
       </div>
@@ -694,7 +686,13 @@ export async function renderInforme() {
     <!-- BARRA DE ACCIONES Y DESCARGAS -->
     <div class="card"><div class="card__body">
       <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
-        <div class="field" style="margin:0;min-width:230px"><label>Modelo de hoja membretada</label>
+        <div class="field" style="margin:0;min-width:230px"><label>Presentación del documento</label>
+          <select id="in_modo_pres">
+            <option value="lexfive" ${V.in_modo_pres !== 'umsa' ? 'selected' : ''}>Hoja Membretada LexFive (recomendado)</option>
+            <option value="umsa" ${V.in_modo_pres === 'umsa' ? 'selected' : ''}>Encabezado Académico UMSA</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0;min-width:210px"><label>Modelo de membrete</label>
           <select id="in_modelo">${MEMBRETE_MODELOS.map(m => `<option value="${m.id}">${esc(m.nombre)}</option>`).join('')}</select>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -730,6 +728,76 @@ export async function renderInforme() {
   `;
 
   const val = id => ($('#' + id) ? $('#' + id).value : '');
+
+  // Autocalcula fecha de finalización
+  const autocalcularFechaFin = () => {
+    const fIni = val('in_fecha_inicio');
+    if (!fIni) return;
+    const mod = val('in_modalidad') || '4 semanas a medio tiempo (4 horas diarias)';
+    const numDias = (mod.includes('2 semanas') || mod.includes('tiempo completo')) ? 10 : 20;
+    const feriadosExtra = val('in_feriados_extra');
+    const calc = calcularJornadasHabilesBolivia(fIni, numDias, feriadosExtra);
+    if (calc.fechaFin && $('#in_fecha_fin')) {
+      $('#in_fecha_fin').value = calc.fechaFin;
+    }
+    const infoEl = $('#in_feriados_info');
+    if (infoEl) {
+      if (calc.feriadosOmitidos && calc.feriadosOmitidos.length) {
+        infoEl.style.display = 'block';
+        infoEl.textContent = `Se omitieron ${calc.feriadosOmitidos.length} feriado(s) oficial(es): ` + calc.feriadosOmitidos.map(f => `${f.fechaCorta} (${f.nombre})`).join(', ');
+      } else {
+        infoEl.style.display = 'none';
+        infoEl.textContent = '';
+      }
+    }
+    return calc;
+  };
+
+  const formatearCronogramaTexto = (crono) => {
+    let out = '';
+    let curSem = 0;
+    const numSemRoman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+    const semNombres = ['PRIMERA', 'SEGUNDA', 'TERCERA', 'CUARTA', 'QUINTA', 'SEXTA'];
+
+    crono.forEach(item => {
+      if (item.semanaIdx !== curSem) {
+        curSem = item.semanaIdx;
+        const semNom = semNombres[curSem - 1] || `${curSem}ª`;
+        out += `\n${numSemRoman[curSem - 1] || curSem}. ${semNom} SEMANA:\n`;
+      }
+      out += `\n• ${item.diaSemana || ''}, ${item.fecha} — ${item.resumen}\n`;
+      if (Array.isArray(item.actividades)) {
+        item.actividades.forEach((act, idx) => {
+          const ltr = ['a', 'b', 'c', 'd'][idx] || '-';
+          out += `  ${ltr}) ${act}\n`;
+        });
+      }
+    });
+    return out.trim();
+  };
+
+  // Genera actividades iniciales si no existen
+  if (!V.in_actividades) {
+    const calc = autocalcularFechaFin() || calcularJornadasHabilesBolivia(val('in_fecha_inicio') || hoyISO(), 20, '');
+    const crono = calc.jornadas.map((j, i) => {
+      const base = PASANTIA_CRONOGRAMA_BASE[i] || { resumen: 'Práctica forense en despacho.', detalle: 'Práctica jurídica forense.' };
+      return {
+        num: j.num,
+        fecha: j.fechaCorta,
+        diaSemana: j.diaSemana,
+        semanaIdx: j.semanaIdx,
+        resumen: base.resumen,
+        actividades: [
+          base.detalle,
+          'Registro, digitalización y actualización del estado procesal en el sistema informático interno del bufete LexFive.',
+          'Compulsa normativa del Código Procesal aplicable, doctrina jurídica y control de plazos perentorios bajo supervisión.'
+        ]
+      };
+    });
+    V.in_actividades = formatearCronogramaTexto(crono);
+    if ($('#in_actividades')) $('#in_actividades').value = V.in_actividades;
+  }
+
   const recolectar = () => ({
     nombre: val('in_nombre'),
     ci: val('in_ci'),
@@ -745,6 +813,8 @@ export async function renderInforme() {
     modalidad: val('in_modalidad'),
     horario: val('in_horario'),
     ref: val('in_ref_cert'),
+    feriados_extra: val('in_feriados_extra'),
+    enfoque: val('in_enfoque'),
     docente_guia: val('in_docente'),
     docente_cargo: val('in_docente_cargo'),
     supervision: val('in_supervision'),
@@ -752,6 +822,7 @@ export async function renderInforme() {
     antecedentes: val('in_antecedentes'),
     actividades: val('in_actividades'),
     conclusiones: val('in_conclusiones'),
+    modo_presentacion: val('in_modo_pres') || 'lexfive',
     fotos: fotosArray
   });
 
@@ -824,6 +895,8 @@ export async function renderInforme() {
       in_modalidad: val('in_modalidad'),
       in_horario: val('in_horario'),
       in_ref: val('in_ref_cert'),
+      in_feriados_extra: val('in_feriados_extra'),
+      in_enfoque: val('in_enfoque'),
       in_docente: val('in_docente'),
       in_docente_cargo: val('in_docente_cargo'),
       in_supervision: val('in_supervision'),
@@ -831,6 +904,7 @@ export async function renderInforme() {
       in_antecedentes: val('in_antecedentes'),
       in_actividades: val('in_actividades'),
       in_conclusiones: val('in_conclusiones'),
+      in_modo_pres: val('in_modo_pres'),
       in_fotos: fotosArray
     });
   }
@@ -839,20 +913,20 @@ export async function renderInforme() {
   [
     'in_nombre', 'in_ci', 'in_ru', 'in_uni', 'in_carrera', 'in_asignatura',
     'in_nota_desig', 'in_horario', 'in_ref_cert', 'in_docente',
-    'in_docente_cargo', 'in_supervision'
+    'in_docente_cargo', 'in_supervision', 'in_enfoque'
   ].forEach(id => {
     const el = $('#' + id); if (el) el.oninput = () => { pintar(); saveDraft(); };
   });
 
-  ['in_genero', 'in_fecha_nota', 'in_fecha_inicio', 'in_fecha_fin', 'in_modalidad', 'in_fecha_pres'].forEach(id => {
+  ['in_genero', 'in_fecha_nota', 'in_fecha_inicio', 'in_fecha_fin', 'in_modalidad', 'in_fecha_pres', 'in_feriados_extra', 'in_modo_pres'].forEach(id => {
     const el = $('#' + id);
     if (el) {
       el.onchange = () => {
         if (id === 'in_genero') {
           $('#in_conclusiones').value = generarConclusionesTexto(val('in_genero'));
         }
-        if (id === 'in_fecha_inicio' || id === 'in_fecha_fin' || id === 'in_modalidad') {
-          $('#in_actividades').value = generarActividadesTexto(val('in_fecha_inicio'), val('in_fecha_fin'), val('in_modalidad'));
+        if (id === 'in_fecha_inicio' || id === 'in_modalidad' || id === 'in_feriados_extra') {
+          autocalcularFechaFin();
         }
         pintar();
         saveDraft();
@@ -885,8 +959,8 @@ export async function renderInforme() {
       if ($('#in_horario')) $('#in_horario').value = c.horario || '14:00 a 18:00';
       if ($('#in_ref_cert')) $('#in_ref_cert').value = c.ref || '';
 
+      autocalcularFechaFin();
       $('#in_antecedentes').value = `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía N.º ${c.nota_designacion || 'IIST-001/2026'} de fecha ${fechaLarga(c.fecha_nota_designacion || c.fecha_emision)}.`;
-      $('#in_actividades').value = generarActividadesTexto(val('in_fecha_inicio'), val('in_fecha_fin'), val('in_modalidad'));
       $('#in_conclusiones').value = generarConclusionesTexto(val('in_genero'));
 
       pintar();
@@ -895,12 +969,68 @@ export async function renderInforme() {
     };
   }
 
-  // Botones de regeneración
+  // Generador de actividades únicas con IA
+  const btnIA = $('#in_btn_ia_cronograma');
+  if (btnIA) {
+    btnIA.onclick = async () => {
+      const fIni = val('in_fecha_inicio');
+      if (!fIni) { toast('Seleccione la fecha de inicio primero.', 'error'); return; }
+      const calc = autocalcularFechaFin();
+      const areas = Array.from(content().querySelectorAll('.in_area:checked')).map(c => c.value);
+      const enfoque = val('in_enfoque');
+      const nombre = val('in_nombre');
+
+      btnIA.disabled = true;
+      btnIA.textContent = '⏳ Generando con IA...';
+      toast('Generando actividades exclusivas con IA...', 'info');
+
+      try {
+        const crono = await generarCronogramaPasantia({
+          jornadas: calc.jornadas,
+          areas,
+          enfoque,
+          nombrePasante: nombre,
+          usarIA: true
+        });
+
+        if (crono && crono.length) {
+          const txt = formatearCronogramaTexto(crono);
+          $('#in_actividades').value = txt;
+          pintar();
+          saveDraft();
+          toast('¡Cronograma único generado con IA!', 'success');
+        }
+      } catch (err) {
+        toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
+      } finally {
+        btnIA.disabled = false;
+        btnIA.textContent = '✨ Generar actividades únicas con IA';
+      }
+    };
+  }
+
+  // Botón restaurar predeterminadas
   $('#in_btn_regen_act').onclick = () => {
-    $('#in_actividades').value = generarActividadesTexto(val('in_fecha_inicio'), val('in_fecha_fin'), val('in_modalidad'));
+    const calc = autocalcularFechaFin() || calcularJornadasHabilesBolivia(val('in_fecha_inicio') || hoyISO(), 20, '');
+    const crono = calc.jornadas.map((j, i) => {
+      const base = PASANTIA_CRONOGRAMA_BASE[i] || { resumen: 'Práctica forense en despacho.', detalle: 'Práctica jurídica forense.' };
+      return {
+        num: j.num,
+        fecha: j.fechaCorta,
+        diaSemana: j.diaSemana,
+        semanaIdx: j.semanaIdx,
+        resumen: base.resumen,
+        actividades: [
+          base.detalle,
+          'Registro, digitalización y actualización del estado procesal en el sistema informático interno del bufete LexFive.',
+          'Compulsa normativa del Código Procesal aplicable, doctrina jurídica y control de plazos perentorios bajo supervisión.'
+        ]
+      };
+    });
+    $('#in_actividades').value = formatearCronogramaTexto(crono);
     pintar();
     saveDraft();
-    toast('Actividades cronológicas regeneradas.', 'success');
+    toast('Actividades cronológicas restauradas.', 'success');
   };
 
   $('#in_btn_regen_conc').onclick = () => {
@@ -1084,6 +1214,7 @@ export async function renderInforme() {
     pintarInformes();
   }
 
+  autocalcularFechaFin();
   pintarFotosGrid();
   pintar();
   cargarInformes();
