@@ -699,14 +699,6 @@ function buildInformeWordHTML(d) {
 </html>`;
 }
 
-<p style="margin-top:30pt;text-align:center;font-size:10pt;color:#666;">
-  LexFive Bufete de Abogados · El Alto — La Paz, Bolivia · Tel/WhatsApp: +591 78360469 · https://lexfive.netlify.app
-</p>
-
-</body>
-</html>`;
-}
-
 function descargarInformePasantiaWord(d) {
   toast('Generando Informe Único de Pasantía en Word (.doc)...', 'info');
   const html = buildInformeWordHTML(d);
