@@ -51,6 +51,146 @@ function qrCertificado(d) {
   return url;
 }
 
+// Catálogo base de 20 jornadas de práctica forense y actividades jurídicas (sincronizadas entre Asistencia e Informe Word)
+const PASANTIA_CRONOGRAMA_BASE = [
+  // SEMANA 1: Inducción, Deontología y Manejo de Expedientes
+  { dia: 1, semana: 1, resumen: 'Inducción institucional, normativa deontológica, confidencialidad y protocolos de despacho.', detalle: 'Inducción institucional sobre normas deontológicas del ejercicio de la abogacía, protocolos de reserva, confidencialidad profesional y funcionamiento orgánico del bufete LexFive.' },
+  { dia: 2, semana: 1, resumen: 'Revisión, organización física y foliado correlativo de cuadernos procesales civiles y familiares.', detalle: 'Revisión, organización física y foliado correlativo de cuadernos procesales en materias Civil, Comercial y Familiar.' },
+  { dia: 3, semana: 1, resumen: 'Clasificación de resoluciones, autos interlocutorios y notificaciones judiciales.', detalle: 'Clasificación y archivo cronológico de actuaciones judiciales, resoluciones, providencias y notificaciones judiciales.' },
+  { dia: 4, semana: 1, resumen: 'Capacitación y registro de causas activas en el sistema informático interno del despacho.', detalle: 'Capacitación en el uso y registro del sistema informático interno del despacho para control de plazos procesales y estado de causas.' },
+  { dia: 5, semana: 1, resumen: 'Auditoría de términos y vencimiento de plazos perentorios en procesos ejecutivos y ordinarios.', detalle: 'Auditoría procesal y elaboración del rol de vencimiento de términos y plazos perentorios en procesos ejecutivos y ordinarios.' },
+
+  // SEMANA 2: Diligenciamiento Judicial y Procuraduría Forense
+  { dia: 6, semana: 2, resumen: 'Verificación de expedientes en juzgados públicos civiles y comerciales de El Alto.', detalle: 'Seguimiento y verificación de causas en juzgados públicos en materia civil y comercial del Tribunal Departamental de Justicia en El Alto.' },
+  { dia: 7, semana: 2, resumen: 'Revisión de cuadernos de control jurisdiccional e investigaciones en materia penal.', detalle: 'Revisión de cuadernos procesales y de control jurisdiccional en juzgados de instrucción penal y fiscalías corporativas.' },
+  { dia: 8, semana: 2, resumen: 'Diligenciamiento de órdenes judiciales, citaciones y emplazamientos a partes demandadas.', detalle: 'Diligenciamiento de mandamientos, órdenes judiciales, citaciones y emplazamientos a través de oficiales de diligencias.' },
+  { dia: 9, semana: 2, resumen: 'Seguimiento a buzón judicial electrónico y notificaciones en sistema digital Hermes/Thor.', detalle: 'Revisión y compulsa de notificaciones en el buzón judicial electrónico y plataforma digital del Tribunal Supremo de Justicia.' },
+  { dia: 10, semana: 2, resumen: 'Elaboración de fichas síntesis del estado procesal de causas asignadas para informe de cartera.', detalle: 'Elaboración de fichas síntesis de estado procesal de cada caso asignado con alerta de vencimiento de plazos y memoriales pendientes.' },
+
+  // SEMANA 3: Redacción Jurídica, Borradores de Memoriales y Doctrina
+  { dia: 11, semana: 3, resumen: 'Redacción de borradores de memoriales de apersonamiento y copias legalizadas.', detalle: 'Redacción de borradores de memoriales procesales de mero trámite: apersonamientos, solicitudes de fotocopias legalizadas y desarchivo de causas.' },
+  { dia: 12, semana: 3, resumen: 'Redacción de borradores de señalamiento de audiencias y peticiones de conminatoria.', detalle: 'Elaboración de borradores de solicitudes de señalamiento de audiencia de juicio, conminatorias y liquidaciones procesales.' },
+  { dia: 13, semana: 3, resumen: 'Apoyo en elaboración de contestaciones de demanda y planteamiento de excepciones previas.', detalle: 'Elaboración de borradores de contestaciones de demanda, incidentes y excepciones previas bajo la revisión del abogado patrocinante.' },
+  { dia: 14, semana: 3, resumen: 'Búsqueda y compulsa de jurisprudencia y sentencias constitucionales en el portal del TCP.', detalle: 'Búsqueda y compulsa de jurisprudencia constitucional relevante en el portal del Tribunal Constitucional Plurinacional (TCP).' },
+  { dia: 15, semana: 3, resumen: 'Redacción preliminar de contratos privados, minutas de transferencia y reconocimientos de firmas.', detalle: 'Apoyo técnico en la redacción de contratos privados, minutas de transferencia de bienes inmuebles, compromisos y acuerdos transaccionales.' },
+
+  // SEMANA 4: Trámites Administrativos, Derechos Reales y Cierre
+  { dia: 16, semana: 4, resumen: 'Diligencias de verificación de folios reales, gravámenes e hipotecas ante Derechos Reales (DDRR).', detalle: 'Diligencias de ingreso, verificación y retiro de trámites de registro de folios reales, gravámenes e hipotecas ante las oficinas de Derechos Reales.' },
+  { dia: 17, semana: 4, resumen: 'Tramitación de certificados de estado civil y partidas registrales ante SERECI y SEGIP.', detalle: 'Tramitación de certificaciones de estado civil, partidas de matrimonio/defunción y saneamiento registral ante SERECI y trámites de filiación ante SEGIP.' },
+  { dia: 18, semana: 4, resumen: 'Gestiones ante dependencias municipales (GAMEA) sobre catastro e impuestos de inmuebles litigiosos.', detalle: 'Gestiones administrativas ante dependencias del Gobierno Autónomo Municipal de El Alto (GAMEA) relacionadas a catastro y tributación de inmuebles en litigio.' },
+  { dia: 19, semana: 4, resumen: 'Consolidación de cuadernos de seguimiento, digitalización de actuaciones y entrega de casos.', detalle: 'Consolidación final del archivo digital de causas, escaneo de actuaciones forenses y entrega de fichas de seguimiento a los abogados patrocinantes.' },
+  { dia: 20, semana: 4, resumen: 'Cierre de pasantía, consolidación de la hoja de asistencia y preparación del Informe Único.', detalle: 'Consolidación del registro de asistencias y actividades cumplidas, recopilación del muestrario de actuaciones y redacción del Informe Único de Pasantía.' }
+];
+
+function obtenerTratamiento(genero) {
+  if (genero === 'femenino') {
+    return {
+      artUniv: 'la universitaria',
+      designado: 'designada',
+      artPasante: 'la pasante',
+      mencionado: 'La mencionada universitaria',
+      interesado: 'la interesada',
+      delInteresado: 'de la interesada',
+      univAbrev: 'la Univ.',
+      estudiante: 'la estudiante'
+    };
+  } else if (genero === 'masculino') {
+    return {
+      artUniv: 'el universitario',
+      designado: 'designado',
+      artPasante: 'el pasante',
+      mencionado: 'El mencionado universitario',
+      interesado: 'el interesado',
+      delInteresado: 'del interesado',
+      univAbrev: 'el Univ.',
+      estudiante: 'el estudiante'
+    };
+  }
+  return {
+    artUniv: 'el(la) universitario(a)',
+    designado: 'designado(a)',
+    artPasante: 'el(la) pasante',
+    mencionado: 'El(la) mencionado(a) universitario(a)',
+    interesado: 'el/la interesado/a',
+    delInteresado: 'del/de la interesado/a',
+    univAbrev: 'el(la) Univ.',
+    estudiante: 'el(la) estudiante'
+  };
+}
+
+function extraerHoras(horarioStr, modalidadStr) {
+  const modLower = (modalidadStr || '').toLowerCase();
+  const defHrs = (modLower.includes('8 horas') || modLower.includes('tiempo completo')) ? 8 : 4;
+  const defIngreso = defHrs === 8 ? '08:30' : '14:00';
+  const defSalida = defHrs === 8 ? '16:30' : '18:00';
+  
+  if (!horarioStr) return { ingreso: defIngreso, salida: defSalida, horas: defHrs };
+  const m = horarioStr.match(/(\d{1,2}:\d{2})\s*(?:a|-|al|hasta)\s*(\d{1,2}:\d{2})/i);
+  if (!m) return { ingreso: defIngreso, salida: defSalida, horas: defHrs };
+
+  const ing = m[1];
+  const sal = m[2];
+  const [h1, min1] = ing.split(':').map(Number);
+  const [h2, min2] = sal.split(':').map(Number);
+  const diff = (h2 + min2 / 60) - (h1 + min1 / 60);
+  const hrs = (diff > 0 && diff <= 12) ? Math.round(diff) : defHrs;
+  return { ingreso: ing, salida: sal, horas: hrs };
+}
+
+function calcularJornadasPasantia(fechaInicioStr, fechaFinStr, modalidadStr) {
+  const modLower = (modalidadStr || '').toLowerCase();
+  let numJornadas = 20;
+  if (modLower.includes('2 semanas') || modLower.includes('dos (2) semanas') || (modLower.includes('tiempo completo') && !modLower.includes('4 semanas'))) {
+    numJornadas = 10;
+  }
+  
+  if (!fechaInicioStr) {
+    return Array.from({ length: numJornadas }, (_, i) => ({
+      numero: i + 1,
+      fecha: '',
+      tarea: PASANTIA_CRONOGRAMA_BASE[i] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' }
+    }));
+  }
+
+  const partes = fechaInicioStr.split('-');
+  let cur = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+  let finDate = null;
+  if (fechaFinStr) {
+    const fPartes = fechaFinStr.split('-');
+    finDate = new Date(Number(fPartes[0]), Number(fPartes[1]) - 1, Number(fPartes[2]));
+  }
+
+  const jornadas = [];
+  let iter = 0;
+  while (jornadas.length < numJornadas && iter < 60) {
+    const day = cur.getDay();
+    if (day !== 0 && day !== 6) { // Lunes a Viernes
+      const dd = String(cur.getDate()).padStart(2, '0');
+      const mm = String(cur.getMonth() + 1).padStart(2, '0');
+      const yyyy = cur.getFullYear();
+      jornadas.push({
+        numero: jornadas.length + 1,
+        fecha: `${dd}/${mm}/${yyyy}`,
+        fechaRaw: `${yyyy}-${mm}-${dd}`,
+        tarea: PASANTIA_CRONOGRAMA_BASE[jornadas.length] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' }
+      });
+      if (finDate && cur >= finDate && jornadas.length >= 10) break;
+    }
+    cur.setDate(cur.getDate() + 1);
+    iter++;
+  }
+
+  while (jornadas.length < numJornadas) {
+    jornadas.push({
+      numero: jornadas.length + 1,
+      fecha: '',
+      tarea: PASANTIA_CRONOGRAMA_BASE[jornadas.length] || { resumen: 'Actividades de apoyo jurídico forense.', detalle: 'Apoyo jurídico forense.' }
+    });
+  }
+
+  return jornadas;
+}
+
 const CERT_PLANTILLAS = [
   { id: 'trabajo_proc', nombre: 'Certificado de trabajo (Procurador)', titulo: 'CERTIFICADO DE TRABAJO',
     cuerpo: d => {
@@ -78,6 +218,7 @@ const CERT_PLANTILLAS = [
     cuerpo: d => `Se hace constar que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, prestó servicios profesionales en el Bufete de Abogados LexFive en calidad de ${d.calidad || '—'}, durante el período ${d.periodo}.\n\nSe extiende la presente a solicitud del(la) interesado(a), para los fines que estime convenientes.` },
   { id: 'aceptacion_pasantia', nombre: 'Carta de Aceptación de Pasantía (UMSA u otras)', titulo: 'ACEPTACIÓN DE ASIGNATURA DE PASANTÍA',
     cuerpo: d => {
+      const gen = obtenerTratamiento(d.genero);
       const dest = d.destinatario || 'Abg. Erick San Miguel R.\nRESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS\nCARRERA DE DERECHO - UMSA';
       const ruTxt = d.registro_universitario ? `, con R.U. N.º ${d.registro_universitario}` : '';
       const ciTxt = d.ci ? ` y C.I. N.º ${d.ci}` : '';
@@ -86,20 +227,23 @@ const CERT_PLANTILLAS = [
       const hor = d.horario ? ` en el horario de ${d.horario}` : '';
       const uni = d.universidad || 'Universidad Mayor de San Andrés (UMSA)';
       const car = d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017';
-      return `Señor:\n${dest}\nPresente.\n\nREF.: ACEPTACIÓN DE LA ASIGNATURA DE PASANTÍA (${asig})\n\nDe mi mayor consideración:\n\nMediante la presente, reciba usted un cordial saludo, deseando éxitos en las funciones que desempeña en la Dirección de la Carrera de Derecho de la Facultad de Derecho y Ciencias Políticas de la ${uni}.\n\nEn atención a la solicitud del(la) Univ. ${d.nombre}${ciTxt}${ruTxt}, estudiante de la ${car}, en representación del Bufete Jurídico "LexFive" de la ciudad de El Alto, tengo a bien expresar mi conformidad y formal ACEPTACIÓN del estudiante para la realización de sus prácticas correspondientes a la asignatura ${asig}, bajo la modalidad de ${mod}${hor}, las cuales se desarrollarán en el ámbito estrictamente jurídico-legal de nuestra institución.\n\nAsimismo, comprometo mi participación en supervisar el desempeño del pasante, orientar sus labores forenses y otorgar el correspondiente Visto Bueno en la presentación del Informe Único de Pasantía dirigido al Docente Guía.\n\nSin otro particular, saludo a usted atentamente.`;
+      const univEst = d.genero === 'femenino' ? `de la Univ. ${d.nombre}` : (d.genero === 'masculino' ? `del Univ. ${d.nombre}` : `del(la) Univ. ${d.nombre}`);
+      const delEst = d.genero === 'femenino' ? 'de la estudiante' : (d.genero === 'masculino' ? 'del estudiante' : 'del(la) estudiante');
+      const delPas = d.genero === 'femenino' ? 'de la pasante' : (d.genero === 'masculino' ? 'del pasante' : 'del(la) pasante');
+
+      return `Señor:\n${dest}\nPresente.\n\nREF.: ACEPTACIÓN DE LA ASIGNATURA DE PASANTÍA (${asig})\n\nDe mi mayor consideración:\n\nMediante la presente, reciba usted un cordial saludo, deseando éxitos en las funciones que desempeña en la Dirección de la Carrera de Derecho de la Facultad de Derecho y Ciencias Políticas de la ${uni}.\n\nEn atención a la solicitud ${univEst}${ciTxt}${ruTxt}, estudiante de la ${car}, el Bufete Jurídico "LexFive" de la ciudad de El Alto tiene a bien expresar su formal ACEPTACIÓN ${delEst} para la realización de sus prácticas correspondientes a la asignatura ${asig}, bajo la modalidad de ${mod}${hor}, las cuales se desarrollarán en el ámbito estrictamente jurídico-legal de nuestra institución.\n\nAsimismo, el bufete asume el compromiso institucional de supervisar el desempeño ${delPas}, orientar sus labores forenses y otorgar el correspondiente Visto Bueno en la presentación del Informe Único de Pasantía dirigido al Docente Guía.\n\nSin otro particular, saludamos a usted atentamente.`;
     }
   },
   { id: 'pasantia_universitaria', nombre: 'Certificado de Pasantía Universitaria', titulo: 'CERTIFICADO DE PASANTÍA',
     cuerpo: d => {
-      const director = d.abogadoFirma || 'El Director';
-      const rpa = d.rpaFirma ? `, con R.P.A. N.º ${d.rpaFirma}` : '';
-      const intro = `${director}${rpa}, en su calidad de Director del Bufete de Abogados LexFive, en uso de sus legítimas atribuciones:`;
+      const gen = obtenerTratamiento(d.genero);
+      const intro = `El BUFETE DE ABOGADOS LEXFIVE, a través de su Dirección y cuerpo de abogados patrocinantes, en uso de sus legítimas atribuciones:`;
       const desig = (d.nota_designacion && d.fecha_nota_designacion) 
-        ? `, designado(a) mediante ${d.nota_designacion} de fecha ${d.fecha_nota_designacion}, correspondiente a la asignatura ${d.asignatura || 'CJR-410 Pasantía I'}` 
+        ? `, ${gen.designado} mediante ${d.nota_designacion} de fecha ${d.fecha_nota_designacion}, correspondiente a la asignatura ${d.asignatura || 'CJR-410 Pasantía I'}` 
         : (d.asignatura ? `, correspondiente a la asignatura ${d.asignatura}` : '');
       const ruTxt = d.registro_universitario ? ` y Registro Universitario N.º ${d.registro_universitario}` : '';
       const ciTxt = d.ci ? `, con Cédula de Identidad N.º ${d.ci}` : '';
-      const p1 = `CERTIFICA que el(la) universitario(a) ${d.nombre}${ciTxt}${ruTxt}, estudiante de la ${d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017'} de la ${d.universidad || 'Universidad Mayor de San Andrés (UMSA)'}${desig}, realizó su pasantía jurídica en calidad de PASANTE en las oficinas del Bufete de Abogados LexFive.`;
+      const p1 = `CERTIFICA que ${gen.artUniv} ${d.nombre}${ciTxt}${ruTxt}, estudiante de la ${d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017'} de la ${d.universidad || 'Universidad Mayor de San Andrés (UMSA)'}${desig}, realizó su pasantía jurídica en calidad de PASANTE en las oficinas del Bufete de Abogados LexFive.`;
       
       let lapso = '';
       if (d.fecha_inicio_larga && d.fecha_fin_larga) {
@@ -109,11 +253,11 @@ const CERT_PLANTILLAS = [
       }
       const modTxt = d.modalidad ? `, bajo la modalidad de ${d.modalidad}` : '';
       const horTxt = d.horario ? `, en el horario de ${d.horario}` : '';
-      const p2 = `El(la) mencionado(a) universitario(a) cumplió el período de pasantía${lapso}${modTxt}${horTxt}.`;
+      const p2 = `${gen.mencionado} cumplió el período de pasantía${lapso}${modTxt}${horTxt}.`;
       
-      const p3 = `Durante su permanencia, el(la) pasante participó activamente en labores de apoyo jurídico: seguimiento de procesos judiciales, organización y foliado de expedientes, elaboración de borradores de memoriales y contratos, diligencias ante estrados judiciales e instituciones públicas y registro en el sistema interno del despacho; demostrando solvencia, ética profesional, puntualidad y un alto grado de compromiso en el cumplimiento de sus labores.`;
+      const p3 = `Durante su permanencia, ${gen.artPasante} participó activamente en labores de apoyo jurídico: seguimiento de procesos judiciales, organización y foliado de expedientes, elaboración de borradores de memoriales y contratos, diligencias ante estrados judiciales e instituciones públicas y registro en el sistema interno del despacho; demostrando solvencia, ética profesional, puntualidad y un alto grado de compromiso en el cumplimiento de sus labores.`;
       
-      const p4 = `Es cuanto se certifica en honor a la verdad y para fines académicos y consiguientes del/de la interesado/a.`;
+      const p4 = `Es cuanto se certifica en honor a la verdad y para fines académicos y consiguientes ${gen.delInteresado}.`;
       
       return `${intro}\n\n${p1}\n\n${p2}\n\n${p3}\n\n${p4}`;
     }
@@ -141,6 +285,19 @@ function buildCertDoc(d) {
   // defecto 15%), para que SÍ se note. Antes estaba fija en 5% y casi no se veía.
   const hideAQuien = (d.cuerpoTexto || '').match(/Presente\.?-?/i);
   const isCarta = d.titulo === 'ACEPTACIÓN DE ASIGNATURA DE PASANTÍA';
+  const isPasantiaDoc = d.titulo === 'CERTIFICADO DE PASANTÍA' || isCarta;
+
+  const firmaHTML = isPasantiaDoc ? `
+    <div style="text-align:center;flex:${d.selloSrc ? '1' : '0 1 340px'};max-width:${d.selloSrc ? '58%' : '340px'};margin:${d.selloSrc ? '0' : '0 auto'};">
+      <div style="min-height:55px;"></div>
+      <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:11.5px;font-weight:700;color:#0e1b2c;letter-spacing:0.5px;">ABOGADO(A) PATROCINANTE / DIRECCIÓN</div>
+      <div style="font-size:10px;color:#5c6675;font-family:Arial,sans-serif;margin-top:2px;">LexFive &middot; Bufete de Abogados</div>
+    </div>` : `
+    <div style="text-align:center;flex:${d.selloSrc ? '1' : '0 1 340px'};max-width:${d.selloSrc ? '58%' : '340px'};margin:${d.selloSrc ? '0' : '0 auto'};">
+      <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">${esc(d.abogadoFirma) || 'Firma'}</div>
+      <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;">${d.rpaFirma ? `R.P.A. ${esc(d.rpaFirma)}<br>` : ''}LexFive &middot; Bufete de Abogados</div>
+    </div>`;
+
   const contentHTML = `
     <div style="text-align:right;font-size:10px;color:#5c6675;font-family:Arial,sans-serif;">Ref. N.º ${esc(d.ref || '')}</div>
     ${isCarta 
@@ -150,11 +307,8 @@ function buildCertDoc(d) {
     ${(hideAQuien || isCarta) ? '' : '<div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>'}
     <div style="font-size:14px;line-height:1.75;">${parrafos}</div>
     ${isCarta ? '' : `<p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>`}
-    <div style="display:flex;justify-content:${d.selloSrc ? 'space-between' : 'center'};align-items:flex-end;margin-top:${d.selloSrc ? '32' : '45'}px;gap:20px;">
-      <div style="text-align:center;flex:${d.selloSrc ? '1' : '0 1 340px'};max-width:${d.selloSrc ? '58%' : '340px'};margin:${d.selloSrc ? '0' : '0 auto'};">
-        <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">${esc(d.abogadoFirma) || 'Firma'}</div>
-        <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;">${d.rpaFirma ? `R.P.A. ${esc(d.rpaFirma)}<br>` : ''}LexFive &middot; Bufete de Abogados</div>
-      </div>
+    <div style="display:flex;justify-content:${d.selloSrc ? 'space-between' : 'center'};align-items:flex-end;margin-top:${d.selloSrc ? '28' : '38'}px;gap:20px;">
+      ${firmaHTML}
       ${d.selloSrc ? `<img src="${d.selloSrc}" alt="" style="width:3.3cm;height:3.3cm;object-fit:contain;mix-blend-mode:multiply;filter:contrast(1.3) brightness(1.1);opacity:.95;transform:rotate(-6deg);">` : ''}
     </div>
     <div style="flex:1 1 auto;min-height:16px;"></div>
@@ -192,70 +346,91 @@ function buildHojaAsistenciaHTML(d, logoSrc, model) {
   const asignatura = esc(d.asignatura || 'CJR-410 Pasantía I');
   const modalidad = esc(d.modalidad || '4 semanas a medio tiempo (4 horas diarias)');
   const horario = esc(d.horario || '14:00 a 18:00');
-  const director = esc(d.abogadoFirma || 'Abg. Zenón Carlos Cartagena Álvarez');
-  const rpa = esc(d.rpaFirma || '6059319 ZCCA');
+  const prellenar = d.prellenar_asistencia !== false;
+
+  const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad);
+  const infoHoras = extraerHoras(d.horario, d.modalidad);
+
+  const totalJornadas = jornadas.length;
+  const totalHoras = totalJornadas * infoHoras.horas;
 
   let rows = '';
-  for (let i = 1; i <= 20; i++) {
+  for (let i = 0; i < totalJornadas; i++) {
+    const j = jornadas[i];
+    const fecha = prellenar ? (j.fecha || '') : '';
+    const ing = prellenar ? infoHoras.ingreso : '';
+    const sal = prellenar ? infoHoras.salida : '';
+    const act = prellenar ? esc(j.tarea.resumen) : '';
+    const hrs = prellenar ? infoHoras.horas : '';
+
     rows += `
-      <tr style="height:21px;">
-        <td style="text-align:center;font-weight:bold;color:#444;font-size:8.5px;padding:2px 3px;border:1px solid #d9dce1;">${i}</td>
-        <td style="padding:2px 4px;font-size:8.5px;border:1px solid #d9dce1;"></td>
-        <td style="padding:2px 4px;font-size:8.5px;text-align:center;border:1px solid #d9dce1;"></td>
-        <td style="padding:2px 4px;font-size:8.5px;text-align:center;border:1px solid #d9dce1;"></td>
-        <td style="padding:2px 6px;font-size:8px;color:#333;border:1px solid #d9dce1;"></td>
-        <td style="padding:2px 4px;border:1px solid #d9dce1;"></td>
-        <td style="padding:2px 4px;border:1px solid #d9dce1;"></td>
+      <tr style="height:19px;">
+        <td style="text-align:center;font-weight:bold;color:#444;font-size:8px;padding:2px 3px;border:1px solid #d9dce1;">${j.numero}</td>
+        <td style="padding:2px 3px;font-size:8px;text-align:center;border:1px solid #d9dce1;white-space:nowrap;">${fecha}</td>
+        <td style="padding:2px 3px;font-size:8px;text-align:center;border:1px solid #d9dce1;">${ing}</td>
+        <td style="padding:2px 3px;font-size:8px;text-align:center;border:1px solid #d9dce1;">${sal}</td>
+        <td style="padding:2px 5px;font-size:7.5px;color:#222;border:1px solid #d9dce1;line-height:1.25;">${act}</td>
+        <td style="padding:2px 3px;font-size:8px;text-align:center;border:1px solid #d9dce1;font-weight:600;">${hrs}</td>
       </tr>`;
   }
 
   const contentHTML = `
     <div style="text-align:right;font-size:9.5px;color:#5c6675;font-family:Arial,sans-serif;margin-bottom:2px;">Ref. N.º ${esc(d.ref || '')} · Hoja de Asistencia</div>
-    <h1 style="text-align:center;font-size:15px;letter-spacing:1px;color:#0e1b2c;margin:2px 0 2px;text-transform:uppercase;">HOJA DE CONTROL DE ASISTENCIA Y PERMANENCIA</h1>
-    <div style="text-align:center;font-size:9.5px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:1.5px;margin-bottom:8px;font-weight:bold;">PRÁCTICA PRE-PROFESIONAL / PASANTÍA JURÍDICA</div>
+    <h1 style="text-align:center;font-size:14.5px;letter-spacing:1px;color:#0e1b2c;margin:2px 0 1px;text-transform:uppercase;">HOJA DE CONTROL DE ASISTENCIA Y PERMANENCIA</h1>
+    <div style="text-align:center;font-size:9px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:1.5px;margin-bottom:6px;font-weight:bold;">PRÁCTICA PRE-PROFESIONAL / PASANTÍA JURÍDICA</div>
 
-    <div style="background:#f8f9fb;border:1px solid #d9dce1;border-radius:6px;padding:6px 10px;margin-bottom:8px;font-size:9px;line-height:1.4;color:#1a2332;">
+    <div style="background:#f8f9fb;border:1px solid #d9dce1;border-radius:6px;padding:5px 8px;margin-bottom:6px;font-size:8.5px;line-height:1.35;color:#1a2332;">
       <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:4px;">
         <div><strong>Estudiante / Pasante:</strong> ${nombre}</div>
         <div><strong>C.I.:</strong> ${ci}</div>
         <div><strong>R.U.:</strong> ${ru}</div>
       </div>
-      <div style="display:grid;grid-template-columns:2fr 2fr;gap:4px;margin-top:3px;">
+      <div style="display:grid;grid-template-columns:2fr 2fr;gap:4px;margin-top:2px;">
         <div><strong>Universidad:</strong> ${uni}</div>
         <div><strong>Carrera:</strong> ${carrera}</div>
       </div>
-      <div style="display:grid;grid-template-columns:1.5fr 1.5fr 1fr;gap:4px;margin-top:3px;">
+      <div style="display:grid;grid-template-columns:1.5fr 1.5fr 1fr;gap:4px;margin-top:2px;">
         <div><strong>Asignatura:</strong> ${asignatura}</div>
         <div><strong>Modalidad:</strong> ${modalidad}</div>
         <div><strong>Horario:</strong> ${horario}</div>
       </div>
     </div>
 
-    <table style="width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:8.5px;margin-bottom:8px;">
+    <table style="width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:8px;margin-bottom:6px;">
       <thead>
         <tr style="background:#0e1b2c;color:#fff;">
-          <th style="padding:4px 3px;width:24px;border:1px solid #0e1b2c;text-align:center;">N.º</th>
-          <th style="padding:4px 4px;width:70px;border:1px solid #0e1b2c;text-align:center;">Fecha</th>
-          <th style="padding:4px 4px;width:55px;border:1px solid #0e1b2c;text-align:center;">Entrada</th>
-          <th style="padding:4px 4px;width:55px;border:1px solid #0e1b2c;text-align:center;">Salida</th>
-          <th style="padding:4px 6px;border:1px solid #0e1b2c;text-align:left;">Actividades y Tareas Jurídicas Desarrolladas</th>
-          <th style="padding:4px 4px;width:75px;border:1px solid #0e1b2c;text-align:center;">Firma Pasante</th>
-          <th style="padding:4px 4px;width:75px;border:1px solid #0e1b2c;text-align:center;">V.º B.º Tutor</th>
+          <th style="padding:3px 2px;width:24px;border:1px solid #0e1b2c;text-align:center;">N.º</th>
+          <th style="padding:3px 2px;width:65px;border:1px solid #0e1b2c;text-align:center;">Fecha</th>
+          <th style="padding:3px 2px;width:48px;border:1px solid #0e1b2c;text-align:center;">Ingreso</th>
+          <th style="padding:3px 2px;width:48px;border:1px solid #0e1b2c;text-align:center;">Salida</th>
+          <th style="padding:3px 5px;border:1px solid #0e1b2c;text-align:left;">Actividades y Tareas Jurídicas Desarrolladas</th>
+          <th style="padding:3px 2px;width:34px;border:1px solid #0e1b2c;text-align:center;">Hrs.</th>
         </tr>
       </thead>
       <tbody>
         ${rows}
+        <tr style="background:#f0f2f5;font-weight:bold;font-size:8px;border-top:1.5px solid #0e1b2c;">
+          <td colspan="5" style="padding:3px 6px;text-align:left;border:1px solid #d9dce1;color:#0e1b2c;">
+            TOTAL DE JORNADAS CUMPLIDAS: ${totalJornadas} DÍAS &nbsp;|&nbsp; CARGA HORARIA TOTAL: ${prellenar ? totalHoras : '___'} HORAS &nbsp;|&nbsp; ASISTENCIA: 100 %
+          </td>
+          <td style="padding:3px 2px;text-align:center;border:1px solid #d9dce1;font-weight:bold;">${prellenar ? totalHoras : ''}</td>
+        </tr>
       </tbody>
     </table>
 
-    <div style="display:flex;justify-content:space-around;align-items:flex-end;margin-top:14px;gap:20px;padding:0 20px;">
-      <div style="text-align:center;flex:1;max-width:240px;">
-        <div style="border-top:1.5px solid #0e1b2c;padding-top:4px;font-size:9.5px;font-weight:700;color:#0e1b2c;">${nombre}</div>
-        <div style="font-size:8.5px;color:#5c6675;font-family:Arial,sans-serif;">Firma del(la) Pasante<br>R.U. ${ru} · C.I. ${ci}</div>
-      </div>
-      <div style="text-align:center;flex:1;max-width:240px;">
-        <div style="border-top:1.5px solid #0e1b2c;padding-top:4px;font-size:9.5px;font-weight:700;color:#0e1b2c;">${director}</div>
-        <div style="font-size:8.5px;color:#5c6675;font-family:Arial,sans-serif;">Director / Supervisor Institucional<br>R.P.A. ${rpa} · Bufete LexFive</div>
+    <div style="border:1px solid #d9dce1;border-radius:5px;padding:6px 10px;background:#fafbfc;">
+      <div style="text-align:center;font-size:8.5px;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin-bottom:4px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding:0 15px;">
+        <div style="text-align:center;flex:1;max-width:230px;">
+          <div style="min-height:48px;"></div>
+          <div style="border-top:1.2px solid #0e1b2c;padding-top:3px;font-size:8.5px;font-weight:bold;color:#0e1b2c;">${nombre}</div>
+          <div style="font-size:8px;color:#5c6675;font-family:Arial,sans-serif;">Firma · Pasante Universitario(a)<br>R.U. ${ru} · C.I. ${ci}</div>
+        </div>
+        <div style="text-align:center;flex:1;max-width:230px;">
+          <div style="min-height:48px;"></div>
+          <div style="border-top:1.2px solid #0e1b2c;padding-top:3px;font-size:8.5px;font-weight:bold;color:#0e1b2c;">Sello y Firma · Abogado(a) Patrocinante</div>
+          <div style="font-size:8px;color:#5c6675;font-family:Arial,sans-serif;">LexFive · Bufete de Abogados</div>
+        </div>
       </div>
     </div>`;
 
@@ -326,8 +501,13 @@ function buildInformeWordHTML(d) {
   const periodo = esc(d.periodo || ((d.fecha_inicio && d.fecha_fin) ? `del ${fmtDate(d.fecha_inicio)} al ${fmtDate(d.fecha_fin)}` : 'el período indicado'));
   const fechaDoc = fechaLarga(d.fecha_emision || d.fecha);
   const ref = esc(d.ref || 'LF-2026-00000');
-  const director = esc(d.abogadoFirma || 'Abg. Zenón Carlos Cartagena Álvarez');
-  const rpa = esc(d.rpaFirma || '6059319 ZCCA');
+  const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad);
+  const totalJornadas = jornadas.length;
+
+  const tareasSem1 = PASANTIA_CRONOGRAMA_BASE.filter(t => t.semana === 1).map(t => `<li>${esc(t.detalle)}</li>`).join('');
+  const tareasSem2 = PASANTIA_CRONOGRAMA_BASE.filter(t => t.semana === 2).map(t => `<li>${esc(t.detalle)}</li>`).join('');
+  const tareasSem3 = PASANTIA_CRONOGRAMA_BASE.filter(t => t.semana === 3).map(t => `<li>${esc(t.detalle)}</li>`).join('');
+  const tareasSem4 = PASANTIA_CRONOGRAMA_BASE.filter(t => t.semana === 4).map(t => `<li>${esc(t.detalle)}</li>`).join('');
 
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head>
@@ -390,8 +570,8 @@ function buildInformeWordHTML(d) {
     <td><strong>Bufete de Abogados "LexFive"</strong> (Área de Litigio, Asesoría Jurídica y Diligenciamiento Procesal)</td>
   </tr>
   <tr>
-    <th>Director y Supervisor:</th>
-    <td><strong>${director}</strong> (R.P.A. ${rpa}) · Director del Despacho Jurídico</td>
+    <th>Supervisión Institucional:</th>
+    <td><strong>Abogado(a) Patrocinante – LexFive Bufete de Abogados</strong></td>
   </tr>
   <tr>
     <th>Asignatura y Plan:</th>
@@ -413,41 +593,29 @@ function buildInformeWordHTML(d) {
 
 <h2>II. ANTECEDENTES Y MARCO NORMATIVO</h2>
 <p>El presente informe se suscribe en estricto cumplimiento a la <strong>Resolución del Honorable Consejo Universitario N.º 104/2016</strong>, que aprueba e implementa el Plan de Estudios 2017 de la Carrera de Derecho de la Facultad de Derecho y Ciencias Políticas de la UMSA, el cual instituye la modalidad de Pasantías / Prácticas Pre-Profesionales como requisito académico sustancial para vincular el conocimiento teórico con la práctica jurídica en estrados judiciales y foros profesionales.</p>
-<p>Asimismo, tiene como antecedente formal la <strong>Nota de Designación N.º ${notaDesig}</strong>, de fecha ${fechaNota}, emitida por el Instituto de Investigaciones, Seminarios y Tesis (IIST), mediante la cual se me autorizó el desarrollo de la pasantía jurídica bajo la supervisión directa del Director del Bufete LexFive.</p>
+<p>Asimismo, tiene como antecedente formal la <strong>Nota de Designación N.º ${notaDesig}</strong>, de fecha ${fechaNota}, emitida por el Instituto de Investigaciones, Seminarios y Tesis (IIST), mediante la cual se me autorizó el desarrollo de la pasantía jurídica bajo la supervisión directa del cuerpo de abogados patrocinantes del Bufete LexFive.</p>
 
 <h2>III. DETALLE CRONOLÓGICO DE FUNCIONES Y ACTIVIDADES REALIZADAS</h2>
-<p>Durante el período de permanencia en el bufete LexFive, las labores se ejecutaron de manera planificada y progresiva de lunes a viernes en el horario asignado, bajo el siguiente esquema semanal:</p>
+<p>Durante el período de permanencia en el bufete LexFive, las labores se ejecutaron de manera planificada y progresiva de lunes a viernes en el horario asignado, bajo el siguiente esquema sincronizado con la Hoja de Control de Asistencia:</p>
 
 <h3>PRIMERA SEMANA: Inducción Institucional, Manejo de Despacho y Organización Procesal</h3>
 <ul>
-  <li>Inducción sobre las normas deontológicas del ejercicio de la abogacía, protocolos de reserva, confidencialidad profesional y funcionamiento del bufete LexFive.</li>
-  <li>Revisión, organización física y foliado correlativo de cuadernos procesales en las materias Civil, Comercial, Familiar y Penal.</li>
-  <li>Clasificación y archivo cronológico de actuaciones judiciales, resoluciones, providencias y notificaciones judiciales.</li>
-  <li>Capacitación en el uso y registro del sistema informático interno del despacho para control de plazos procesales y estado de causas.</li>
+  ${tareasSem1}
 </ul>
 
 <h3>SEGUNDA SEMANA: Diligenciamiento Judicial y Procuraduría ante Estrados Judiciales</h3>
 <ul>
-  <li>Seguimiento y verificación de causas en el Tribunal Departamental de Justicia de La Paz y oficinas judiciales de la ciudad de El Alto.</li>
-  <li>Revisión de cuadernos procesales en secretaría de juzgados públicos en materia civil, comercial y juzgados de instrucción penal.</li>
-  <li>Diligenciamiento de órdenes judiciales, citaciones, emplazamientos y seguimiento de notificaciones a través del sistema Hermes y buzón judicial electrónico.</li>
-  <li>Elaboración de fichas síntesis de estado procesal de cada caso asignado con alerta de vencimiento de términos y plazos perentorios.</li>
+  ${tareasSem2}
 </ul>
 
 <h3>TERCERA SEMANA: Apoyo en Redacción Jurídica, Borradores de Memoriales y Contratos</h3>
 <ul>
-  <li>Redacción de borradores de memoriales procesales de mero trámite: apersonamientos, solicitudes de fotocopias legalizadas, peticiones de señalamiento de audiencia y desarchivo de causas.</li>
-  <li>Elaboración de borradores de contestaciones de demanda, reposiciones y excepciones previas bajo la revisión y corrección del abogado director.</li>
-  <li>Apoyo técnico en la redacción de contratos privados, minutas de transferencia de bienes inmuebles, compromisos de pago y reconocimientos de firmas y rúbricas.</li>
-  <li>Búsqueda y compulsa de jurisprudencia constitucional relevante en el portal del Tribunal Constitucional Plurinacional (TCP) aplicable a causas activas del despacho.</li>
+  ${tareasSem3}
 </ul>
 
 <h3>CUARTA SEMANA: Diligencias Administrativas Externas, Derechos Reales y Cierre</h3>
 <ul>
-  <li>Diligencias de registro y seguimiento de folios reales, gravámenes e hipotecas ante las oficinas de Derechos Reales (DDRR).</li>
-  <li>Tramitación de certificaciones de estado civil y partidas de nacimiento ante el Servicio de Registro Cívico (SERECI) y trámites ante SEGIP.</li>
-  <li>Gestiones administrativas ante dependencias municipales (Gobierno Autónomo Municipal de El Alto) relacionadas a catastro y tributación de inmuebles en litigio.</li>
-  <li>Consolidación del registro informático de actuaciones realizadas y elaboración del borrador del presente Informe Único de Pasantía.</li>
+  ${tareasSem4}
 </ul>
 
 <h2>IV. CONCLUSIONES Y RECOMENDACIONES (VISTO BUENO)</h2>
@@ -463,13 +631,13 @@ function buildInformeWordHTML(d) {
     <td>
       <div class="firma-line">
         Univ. ${nombre}<br>
-        <span class="firma-sub">Estudiante Pasante<br>R.U. ${ru} · C.I. ${ci}<br>Carrera de Derecho - UMSA</span>
+        <span class="firma-sub">Estudiante Pasante<br>R.U. ${ru} · C.I. ${ci}<br>${carrera} · ${uni}</span>
       </div>
     </td>
     <td>
       <div class="firma-line">
-        ${director}<br>
-        <span class="firma-sub">Director / Supervisor del Bufete<br>R.P.A. ${rpa}<br>LexFive Bufete de Abogados<br>Cel/WhatsApp: +591 78360469</span>
+        V.º B.º Abogado(a) Patrocinante<br>
+        <span class="firma-sub">LexFive Bufete de Abogados<br>Área de Litigio y Práctica Forense<br>El Alto — La Paz, Bolivia</span>
       </div>
     </td>
   </tr>
@@ -512,7 +680,7 @@ function buildInformeWordHTML(d) {
     </tr>
     <tr>
       <td style="text-align:center;font-weight:bold;">4</td>
-      <td><strong>Hoja de Control de Asistencia y Permanencia</strong> (20 jornadas hábiles) debidamente rubricada por el pasante y el tutor supervisor.</td>
+      <td><strong>Hoja de Control de Asistencia y Permanencia</strong> (${totalJornadas} jornadas hábiles) debidamente rubricada por el pasante y el abogado(a) patrocinante supervisor.</td>
       <td style="text-align:center;">Registro completo</td>
     </tr>
     <tr>
@@ -522,6 +690,14 @@ function buildInformeWordHTML(d) {
     </tr>
   </tbody>
 </table>
+
+<p style="margin-top:30pt;text-align:center;font-size:10pt;color:#666;">
+  LexFive Bufete de Abogados · El Alto — La Paz, Bolivia · Tel/WhatsApp: +591 78360469 · https://lexfive.netlify.app
+</p>
+
+</body>
+</html>`;
+}
 
 <p style="margin-top:30pt;text-align:center;font-size:10pt;color:#666;">
   LexFive Bufete de Abogados · El Alto — La Paz, Bolivia · Tel/WhatsApp: +591 78360469 · https://lexfive.netlify.app
@@ -590,6 +766,13 @@ export async function renderCertificados() {
             <div style="border:1px solid #d9dce1;border-radius:8px;padding:14px 14px 6px;background:#f8f9fb;margin-bottom:8px">
               <div style="margin-bottom:10px"><strong style="color:#0e1b2c;font-size:.88rem">📋 Datos de Pasantía Universitaria</strong></div>
               <div class="cert-form">
+                <div class="field"><label>Tratamiento / Género</label>
+                  <select id="ce_genero">
+                    <option value="femenino">Femenino (la universitaria / la pasante)</option>
+                    <option value="masculino">Masculino (el universitario / el pasante)</option>
+                    <option value="neutro">Neutro / General (el(la) universitario(a))</option>
+                  </select>
+                </div>
                 <div class="field"><label>Registro Universitario (R.U.)</label><input id="ce_ru" placeholder="Ej: 20150001"></div>
                 <div class="field"><label>Universidad</label><input id="ce_uni_pas" value="Universidad Mayor de San Andrés (UMSA)"></div>
                 <div class="field"><label>Carrera y Plan de Estudios</label><input id="ce_carrera_plan" value="Carrera de Derecho – Plan de Estudios 2017"></div>
@@ -605,13 +788,18 @@ export async function renderCertificados() {
                     <option value="">Personalizada (edite el texto)</option>
                   </select></div>
                 <div class="field"><label>Horario</label><input id="ce_horario" placeholder="Ej: 14:00 a 18:00"></div>
+                <label class="cell-sub" style="display:flex;align-items:center;gap:6px;grid-column:1/-1;margin-top:4px;">
+                  <input type="checkbox" id="ce_prellenar_asistencia" checked> Prellenar fechas hábiles y 20 tareas jurídicas en Hoja de Asistencia
+                </label>
               </div>
             </div>
           </div>
           <div class="field"><label>Fecha de emisión</label><input id="ce_fecha" type="date" value="${hoyISO()}"></div>
-          <div class="field" style="grid-column: 1 / -1;"><hr style="border:0;border-top:1px solid #e0e4e8;margin:8px 0;"></div>
-          <div class="field"><label>Firma: Nombre del Abogado(a)</label><input id="ce_abogado_firma" placeholder="Ej: Abg. Carlos Cartagena"></div>
-          <div class="field"><label>Firma: R.P.A.</label><input id="ce_rpa" placeholder="Ej: 1234567"></div>
+          <div id="ce_firma_fields" style="display:contents">
+            <div class="field" style="grid-column: 1 / -1;"><hr style="border:0;border-top:1px solid #e0e4e8;margin:8px 0;"></div>
+            <div class="field"><label>Firma: Nombre del Abogado(a)</label><input id="ce_abogado_firma" placeholder="Ej: Abg. Carlos Cartagena"></div>
+            <div class="field"><label>Firma: R.P.A.</label><input id="ce_rpa" placeholder="Ej: 1234567"></div>
+          </div>
         </div>
         <div class="field" style="margin-top:8px">
           <label>Texto del certificado <button class="btn btn--ghost btn--sm" id="ce_restaurar" type="button" style="margin-left:8px">Restaurar texto automático</button></label>
@@ -683,6 +871,8 @@ export async function renderCertificados() {
     horas: val('ce_horas'),
     destinatario: val('ce_dest'),
     // Pasantía universitaria
+    genero: val('ce_genero') || 'femenino',
+    prellenar_asistencia: $('#ce_prellenar_asistencia') ? $('#ce_prellenar_asistencia').checked : true,
     registro_universitario: val('ce_ru'),
     carrera_plan: val('ce_carrera_plan') || 'Carrera de Derecho – Plan de Estudios 2017',
     asignatura: val('ce_asignatura') || 'CJR-410 Pasantía I',
@@ -704,7 +894,11 @@ export async function renderCertificados() {
     const pas = esPasantia();
     const ft = $('#ce_trabajo_fields'); if (ft) ft.style.display = pas ? 'none' : 'contents';
     const fp = $('#ce_pasantia_fields'); if (fp) fp.style.display = pas ? '' : 'none';
-    const hint = $('#ce_sello_hint'); if (hint) hint.style.display = pas ? '' : 'none';
+    const ff = $('#ce_firma_fields'); if (ff) ff.style.display = pas ? 'none' : 'contents';
+    const hint = $('#ce_sello_hint'); if (hint) {
+      hint.style.display = pas ? '' : 'none';
+      hint.textContent = 'En pasantías se recomienda dejar sin sello digital para firmar y sellar con sello húmedo original.';
+    }
 
     // Botones de acción específicos de pasantía
     const btnAsis = $('#ce_asistencia'); if (btnAsis) btnAsis.style.display = pas ? '' : 'none';
@@ -933,6 +1127,7 @@ export async function renderCertificados() {
     $('#ce_calidad').value = c.cargo || '';
     $('#ce_periodo').value = c.periodo || '';
     $('#ce_fecha').value = (c.fecha_emision || hoyISO()).slice(0, 10);
+    if (c.genero && $('#ce_genero')) $('#ce_genero').value = c.genero;
     if (c.registro_universitario && $('#ce_ru')) $('#ce_ru').value = c.registro_universitario;
     if (c.universidad && $('#ce_uni_pas')) $('#ce_uni_pas').value = c.universidad;
     if (c.carrera_plan && $('#ce_carrera_plan')) $('#ce_carrera_plan').value = c.carrera_plan;
@@ -963,6 +1158,8 @@ export async function renderCertificados() {
     cuerpoEditado = false;
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
      'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+    if ($('#ce_genero')) $('#ce_genero').value = 'femenino';
+    if ($('#ce_prellenar_asistencia')) $('#ce_prellenar_asistencia').checked = true;
     if ($('#ce_uni_pas')) $('#ce_uni_pas').value = 'Universidad Mayor de San Andrés (UMSA)';
     if ($('#ce_carrera_plan')) $('#ce_carrera_plan').value = 'Carrera de Derecho – Plan de Estudios 2017';
     if ($('#ce_asignatura')) $('#ce_asignatura').value = 'CJR-410 Pasantía I';
@@ -993,10 +1190,12 @@ export async function renderCertificados() {
     const el = $('#' + id); if (!el) return;
     el.oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
-  ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad'].forEach(id => {
+  ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero'].forEach(id => {
     const el = $('#' + id); if (!el) return;
     el.onchange = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
+  const chkAsis = $('#ce_prellenar_asistencia');
+  if (chkAsis) chkAsis.onchange = () => { forkSiNecesario(); };
   const ceTipoCert = $('#ce_tipo_cert');
   if (ceTipoCert) ceTipoCert.onchange = () => { forkSiNecesario(); aplicarTipoCert(true); };
   $('#ce_tipo').onchange = () => {
