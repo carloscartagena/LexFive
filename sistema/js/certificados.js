@@ -35,19 +35,37 @@ function fechaLarga(d) {
 // Enlace que codifica el QR del certificado: abre la página de verificación de
 // CERTIFICADOS del bufete con los datos del documento emitido.
 function qrCertificado(d) {
-  return SITIO_URL + 'verificar-certificado.html?n=' + encodeURIComponent(d.nombre || '') +
+  let url = SITIO_URL + 'verificar-certificado.html?n=' + encodeURIComponent(d.nombre || '') +
     '&ci=' + encodeURIComponent(d.ci || '') +
     '&cargo=' + encodeURIComponent(d.cargo || '') +
     '&tipo=' + encodeURIComponent(d.tipo || '') +
     '&ref=' + encodeURIComponent(d.ref || '') +
     '&fecha=' + encodeURIComponent(d.fecha || '');
+  if (d.ru) url += '&ru=' + encodeURIComponent(d.ru);
+  if (d.universidad) url += '&uni=' + encodeURIComponent(d.universidad);
+  if (d.carrera_plan) url += '&plan=' + encodeURIComponent(d.carrera_plan);
+  if (d.asignatura) url += '&asig=' + encodeURIComponent(d.asignatura);
+  if (d.modalidad) url += '&mod=' + encodeURIComponent(d.modalidad);
+  if (d.periodo) url += '&per=' + encodeURIComponent(d.periodo);
+  if (d.tipo_certificado) url += '&t=' + encodeURIComponent(d.tipo_certificado);
+  return url;
 }
 
 const CERT_PLANTILLAS = [
   { id: 'trabajo_proc', nombre: 'Certificado de trabajo (Procurador)', titulo: 'CERTIFICADO DE TRABAJO',
-    cuerpo: d => `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con Cédula de Identidad N.º ${d.ci}` : ''}, prestó sus servicios en el Bufete de Abogados LexFive en calidad de PROCURADOR(A), durante el período ${d.periodo}, desempeñando con responsabilidad funciones de gestión, seguimiento y diligenciamiento de procesos judiciales y trámites administrativos ante estrados judiciales, oficinas públicas y privadas.\n\nDurante su permanencia demostró ética profesional, puntualidad, compromiso y un adecuado desempeño en las tareas encomendadas.\n\nSe extiende el presente certificado a solicitud del(la) interesado(a), para los fines que estime convenientes.` },
+    cuerpo: d => {
+      const per = (d.periodo || '').trim();
+      const perTxt = per ? (per.toLowerCase().startsWith('el período') || per.toLowerCase().startsWith('el periodo') ? per.slice(10).trim() : (per.toLowerCase().startsWith('durante el período') ? per.slice(18).trim() : per)) : 'indicado';
+      return `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con Cédula de Identidad N.º ${d.ci}` : ''}, prestó sus servicios en el Bufete de Abogados LexFive en calidad de PROCURADOR(A), durante el período ${perTxt}, desempeñando con responsabilidad funciones de gestión, seguimiento y diligenciamiento de procesos judiciales y trámites administrativos ante estrados judiciales, oficinas públicas y privadas.\n\nDurante su permanencia demostró ética profesional, puntualidad, compromiso y un adecuado desempeño en las tareas encomendadas.\n\nSe extiende el presente certificado a solicitud del(la) interesado(a), para los fines que estime convenientes.`;
+    }
+  },
   { id: 'trabajo_gen', nombre: 'Certificado de trabajo (general)', titulo: 'CERTIFICADO DE TRABAJO',
-    cuerpo: d => `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, trabajó en el Bufete de Abogados LexFive en el cargo de ${d.calidad || '—'}, durante el período ${d.periodo}, cumpliendo satisfactoriamente las funciones propias de su cargo.\n\nSe extiende el presente a solicitud del(la) interesado(a), para los fines que vea por conveniente.` },
+    cuerpo: d => {
+      const per = (d.periodo || '').trim();
+      const perTxt = per ? (per.toLowerCase().startsWith('el período') || per.toLowerCase().startsWith('el periodo') ? per.slice(10).trim() : (per.toLowerCase().startsWith('durante el período') ? per.slice(18).trim() : per)) : 'indicado';
+      return `Se CERTIFICA que el(la) Sr(a). ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, trabajó en el Bufete de Abogados LexFive en el cargo de ${d.calidad || '—'}, durante el período ${perTxt}, cumpliendo satisfactoriamente las funciones propias de su cargo.\n\nSe extiende el presente a solicitud del(la) interesado(a), para los fines que vea por conveniente.`;
+    }
+  },
   { id: 'pasantia', nombre: 'Constancia de pasantía universitaria', titulo: 'CONSTANCIA DE PASANTÍA',
     cuerpo: d => `Se hace constar que el(la) universitario(a) ${d.nombre}${d.ci ? `, con C.I. N.º ${d.ci}` : ''}, estudiante de la carrera de ${d.carrera || '—'} de la ${d.universidad || '—'}, realizó su PASANTÍA / PRÁCTICA PRE-PROFESIONAL en el Bufete de Abogados LexFive durante el período ${d.periodo}${d.horas ? `, completando un total de ${d.horas} horas` : ''}.\n\nDurante la pasantía participó en labores de apoyo jurídico, revisión de expedientes, elaboración de memoriales y acompañamiento en diligencias, demostrando dedicación y responsabilidad.\n\nSe extiende la presente constancia a solicitud del(la) interesado(a), para fines académicos y los que estime convenientes.` },
   { id: 'horas', nombre: 'Certificado de horas de práctica', titulo: 'CERTIFICADO DE HORAS DE PRÁCTICA',
@@ -71,7 +89,36 @@ Mediante la presente, reciba usted un cordial saludo, deseando éxitos en las fu
 
 En atención a la solicitud del Univ. ${d.nombre}, bajo las determinaciones del Plan de Estudios 2017 de la Carrera de Derecho, en representación del Bufete Jurídico "LexFive" de la ciudad de El Alto, tengo a bien expresar mi conformidad y ACEPTACIÓN de la CJR 410 Pasantía I del Univ. ${d.nombre}${d.ci ? ` con C.I. N.º ${d.ci}` : ''}, POR EL LAPSO DE ${d.periodo || 'DOS (2) SEMANAS EN TIEMPO COMPLETO'} que comenzarán a correr a la presentación de la nota remitida por su autoridad, de acuerdo a la normativa universitaria vigente, protestando de mi parte otorgar el Visto Bueno en la presentación del informe de pasantía dirigido al Docente Guía, señalar que las prácticas serán en el ámbito estrictamente jurídico Legal.
 
-Sin otro particular, saludo a usted atentamente.` }
+Sin otro particular, saludo a usted atentamente.` },
+  { id: 'pasantia_universitaria', nombre: 'Certificado de Pasantía Universitaria', titulo: 'CERTIFICADO DE PASANTÍA',
+    cuerpo: d => {
+      const director = d.abogadoFirma || 'El Director';
+      const rpa = d.rpaFirma ? `, con R.P.A. N.º ${d.rpaFirma}` : '';
+      const intro = `${director}${rpa}, en su calidad de Director del Bufete de Abogados LexFive, en uso de sus legítimas atribuciones:`;
+      const desig = (d.nota_designacion && d.fecha_nota_designacion) 
+        ? `, designado(a) mediante ${d.nota_designacion} de fecha ${d.fecha_nota_designacion}, correspondiente a la asignatura ${d.asignatura || 'CJR-410 Pasantía I'}` 
+        : (d.asignatura ? `, correspondiente a la asignatura ${d.asignatura}` : '');
+      const ruTxt = d.registro_universitario ? ` y Registro Universitario N.º ${d.registro_universitario}` : '';
+      const ciTxt = d.ci ? `, con Cédula de Identidad N.º ${d.ci}` : '';
+      const p1 = `CERTIFICA que el(la) universitario(a) ${d.nombre}${ciTxt}${ruTxt}, estudiante de la ${d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017'} de la ${d.universidad || 'Universidad Mayor de San Andrés (UMSA)'}${desig}, realizó su pasantía jurídica en calidad de PASANTE en las oficinas del Bufete de Abogados LexFive.`;
+      
+      let lapso = '';
+      if (d.fecha_inicio_larga && d.fecha_fin_larga) {
+        lapso = ` desde el ${d.fecha_inicio_larga} hasta el ${d.fecha_fin_larga}`;
+      } else if (d.periodo && d.periodo !== 'correspondiente') {
+        lapso = ` durante el período ${d.periodo}`;
+      }
+      const modTxt = d.modalidad ? `, bajo la modalidad de ${d.modalidad}` : '';
+      const horTxt = d.horario ? `, en el horario de ${d.horario}` : '';
+      const p2 = `El(la) mencionado(a) universitario(a) cumplió el período de pasantía${lapso}${modTxt}${horTxt}.`;
+      
+      const p3 = `Durante su permanencia, el(la) pasante participó activamente en labores de apoyo jurídico: seguimiento de procesos judiciales, organización y foliado de expedientes, elaboración de borradores de memoriales y contratos, diligencias ante estrados judiciales e instituciones públicas y registro en el sistema interno del despacho; demostrando solvencia, ética profesional, puntualidad y un alto grado de compromiso en el cumplimiento de sus labores.`;
+      
+      const p4 = `Es cuanto se certifica en honor a la verdad y para fines académicos y consiguientes del/de la interesado/a.`;
+      
+      return `${intro}\n\n${p1}\n\n${p2}\n\n${p3}\n\n${p4}`;
+    }
+  }
 ];
 
 // Documento del certificado con estilos EN LÍNEA (autocontenido): sirve para la
@@ -104,8 +151,8 @@ function buildCertDoc(d) {
     ${(hideAQuien || isCarta) ? '' : '<div style="text-align:center;font-size:11px;color:#a8853c;font-family:Arial,sans-serif;letter-spacing:2px;margin-bottom:22px;">A QUIEN CORRESPONDA</div>'}
     <div style="font-size:14px;line-height:1.75;">${parrafos}</div>
     ${isCarta ? '' : `<p style="margin:22px 0 0;font-size:13px;">El Alto - Bolivia, ${esc(d.fechaTxt)}.</p>`}
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:32px;gap:20px;">
-      <div style="text-align:center;flex:1;max-width:58%;">
+    <div style="display:flex;justify-content:${d.selloSrc ? 'space-between' : 'center'};align-items:flex-end;margin-top:${d.selloSrc ? '32' : '45'}px;gap:20px;">
+      <div style="text-align:center;flex:${d.selloSrc ? '1' : '0 1 340px'};max-width:${d.selloSrc ? '58%' : '340px'};margin:${d.selloSrc ? '0' : '0 auto'};">
         <div style="border-top:1.5px solid #0e1b2c;padding-top:6px;font-size:12px;font-weight:700;color:#0e1b2c;">${esc(d.abogadoFirma) || 'Firma'}</div>
         <div style="font-size:10.5px;color:#5c6675;font-family:Arial,sans-serif;">${d.rpaFirma ? `R.P.A. ${esc(d.rpaFirma)}<br>` : ''}LexFive &middot; Bufete de Abogados</div>
       </div>
@@ -159,11 +206,17 @@ export async function renderCertificados() {
         <div id="ce_editbanner" style="display:none;background:var(--gold-tint);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:.85rem">
           Editando el certificado <strong id="ce_editref"></strong>. Los cambios se guardarán sobre el mismo registro al imprimir o descargar. <button class="btn btn--ghost btn--sm" id="ce_nuevo" type="button" style="margin-left:6px">Empezar uno nuevo</button>
         </div>
-        <div class="field"><label>Tipo de certificado</label>
+        <div class="field"><label>Categoría del certificado</label>
+          <select id="ce_tipo_cert">
+            <option value="trabajo">Certificado de Trabajo (Procuraduría)</option>
+            <option value="pasantia">Certificado de Pasantía Universitaria</option>
+          </select></div>
+        <div class="field"><label>Tipo / variante</label>
           <select id="ce_tipo">${CERT_PLANTILLAS.map(t => `<option value="${t.id}">${esc(t.nombre)}</option>`).join('')}</select></div>
         <div class="cert-form">
           <div class="field"><label>Nombre completo *</label><input id="ce_nombre" placeholder="Nombre y apellidos"></div>
           <div class="field"><label>Cédula de identidad</label><input id="ce_ci" placeholder="Ej: 12345678 LP"></div>
+          <div id="ce_trabajo_fields" style="display:contents">
           <div class="field"><label>Cargo / calidad</label><input id="ce_calidad" placeholder="Procurador, Pasante, Asistente legal..."></div>
           <div class="field"><label>Período / Lapso de tiempo</label><input id="ce_periodo" placeholder="Ej: DOS (2) SEMANAS EN TIEMPO COMPLETO" list="periodo_opciones">
             <datalist id="periodo_opciones">
@@ -175,6 +228,29 @@ export async function renderCertificados() {
           <div class="field"><label>Carrera</label><input id="ce_carrera" placeholder="Ej: Derecho"></div>
           <div class="field"><label>Horas (opcional)</label><input id="ce_horas" type="number" min="0" placeholder="Ej: 240"></div>
           <div class="field"><label>Dirigido a (opcional)</label><input id="ce_dest" placeholder="A quien corresponda"></div>
+          </div>
+          <div id="ce_pasantia_fields" style="display:none;grid-column:1/-1">
+            <div style="border:1px solid #d9dce1;border-radius:8px;padding:14px 14px 6px;background:#f8f9fb;margin-bottom:8px">
+              <div style="margin-bottom:10px"><strong style="color:#0e1b2c;font-size:.88rem">📋 Datos de Pasantía Universitaria</strong></div>
+              <div class="cert-form">
+                <div class="field"><label>Registro Universitario (R.U.)</label><input id="ce_ru" placeholder="Ej: 20150001"></div>
+                <div class="field"><label>Universidad</label><input id="ce_uni_pas" value="Universidad Mayor de San Andrés (UMSA)"></div>
+                <div class="field"><label>Carrera y Plan de Estudios</label><input id="ce_carrera_plan" value="Carrera de Derecho – Plan de Estudios 2017"></div>
+                <div class="field"><label>Asignatura</label><input id="ce_asignatura" value="CJR-410 Pasantía I"></div>
+                <div class="field"><label>N.º de Nota de Designación</label><input id="ce_nota_desig" placeholder="Ej: IIST-CA-003/2026 (opcional)"></div>
+                <div class="field"><label>Fecha de Nota</label><input id="ce_fecha_nota" type="date"></div>
+                <div class="field"><label>Fecha de inicio</label><input id="ce_fecha_inicio" type="date"></div>
+                <div class="field"><label>Fecha de finalización</label><input id="ce_fecha_fin" type="date"></div>
+                <div class="field"><label>Modalidad</label>
+                  <select id="ce_modalidad">
+                    <option value="4 semanas a medio tiempo (4 horas diarias)">4 semanas a medio tiempo (4 h/día)</option>
+                    <option value="2 semanas a tiempo completo (8 horas diarias)">2 semanas a tiempo completo (8 h/día)</option>
+                    <option value="">Personalizada (edite el texto)</option>
+                  </select></div>
+                <div class="field"><label>Horario</label><input id="ce_horario" placeholder="Ej: 14:00 a 18:00"></div>
+              </div>
+            </div>
+          </div>
           <div class="field"><label>Fecha de emisión</label><input id="ce_fecha" type="date" value="${hoyISO()}"></div>
           <div class="field" style="grid-column: 1 / -1;"><hr style="border:0;border-top:1px solid #e0e4e8;margin:8px 0;"></div>
           <div class="field"><label>Firma: Nombre del Abogado(a)</label><input id="ce_abogado_firma" placeholder="Ej: Abg. Carlos Cartagena"></div>
@@ -202,7 +278,8 @@ export async function renderCertificados() {
           </div>
           <p class="cell-sub" style="margin:4px 0 0">Hacia la derecha = marca de agua más oscura. Es el logo del bufete de fondo. (Se aplica igual a las credenciales.)</p>
         </div>
-        <label class="cell-sub" style="display:flex;align-items:center;gap:6px;margin-top:12px"><input type="checkbox" id="ce_sello" checked> Incluir el sello del bufete</label>
+        <label class="cell-sub" style="display:flex;align-items:center;gap:6px;margin-top:12px"><input type="checkbox" id="ce_sello" checked> Incluir sello digital en el PDF</label>
+        <p class="cell-sub" id="ce_sello_hint" style="display:none;margin:2px 0 0;font-size:.78rem;color:#6b7280">En pasantías se recomienda dejar sin sello digital para firmar y sellar a mano.</p>
       </div>
     </div>
 
@@ -224,17 +301,48 @@ export async function renderCertificados() {
 
   let cuerpoEditado = false;
   const tplActual = () => CERT_PLANTILLAS.find(t => t.id === $('#ce_tipo').value) || CERT_PLANTILLAS[0];
+  const esPasantia = () => $('#ce_tipo_cert') && $('#ce_tipo_cert').value === 'pasantia';
+  const val = (id) => { const el = $('#' + id); return el ? (el.value || '').trim() : ''; };
   const datos = () => ({
-    nombre: ($('#ce_nombre').value || '').trim() || '___________________',
-    ci: ($('#ce_ci').value || '').trim(),
-    calidad: ($('#ce_calidad').value || '').trim(),
-    periodo: ($('#ce_periodo').value || '').trim() || 'el período indicado',
-    universidad: ($('#ce_uni').value || '').trim(),
-    carrera: ($('#ce_carrera').value || '').trim(),
-    horas: ($('#ce_horas').value || '').trim(),
-    destinatario: ($('#ce_dest').value || '').trim()
+    nombre: val('ce_nombre') || '___________________',
+    ci: val('ce_ci'),
+    calidad: val('ce_calidad'),
+    periodo: val('ce_periodo') || 'correspondiente',
+    universidad: esPasantia() ? (val('ce_uni_pas') || 'Universidad Mayor de San Andrés (UMSA)') : val('ce_uni'),
+    carrera: val('ce_carrera'),
+    horas: val('ce_horas'),
+    destinatario: val('ce_dest'),
+    // Pasantía universitaria
+    registro_universitario: val('ce_ru'),
+    carrera_plan: val('ce_carrera_plan') || 'Carrera de Derecho – Plan de Estudios 2017',
+    asignatura: val('ce_asignatura') || 'CJR-410 Pasantía I',
+    nota_designacion: val('ce_nota_desig'),
+    fecha_nota_designacion: val('ce_fecha_nota') ? fechaLarga(val('ce_fecha_nota')) : '',
+    modalidad: val('ce_modalidad'),
+    horario: val('ce_horario'),
+    fecha_inicio: val('ce_fecha_inicio'),
+    fecha_fin: val('ce_fecha_fin'),
+    fecha_inicio_larga: val('ce_fecha_inicio') ? fechaLarga(val('ce_fecha_inicio')) : '',
+    fecha_fin_larga: val('ce_fecha_fin') ? fechaLarga(val('ce_fecha_fin')) : '',
+    abogadoFirma: val('ce_abogado_firma'),
+    rpaFirma: val('ce_rpa')
   });
   const regenerar = () => { $('#ce_cuerpo').value = tplActual().cuerpo(datos()); cuerpoEditado = false; };
+  // Muestra/oculta campos según la categoría de certificado (Trabajo / Pasantía).
+  const aplicarTipoCert = (autoTemplate) => {
+    const pas = esPasantia();
+    const ft = $('#ce_trabajo_fields'); if (ft) ft.style.display = pas ? 'none' : 'contents';
+    const fp = $('#ce_pasantia_fields'); if (fp) fp.style.display = pas ? '' : 'none';
+    const hint = $('#ce_sello_hint'); if (hint) hint.style.display = pas ? '' : 'none';
+    if (autoTemplate) {
+      const sel = $('#ce_tipo');
+      if (sel) sel.value = pas ? 'pasantia_universitaria' : 'trabajo_proc';
+      const sello = $('#ce_sello');
+      if (sello) sello.checked = !pas;
+    }
+    if (!cuerpoEditado) regenerar();
+    pintar();
+  };
   const nuevoRef = () => 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
   let refActual = nuevoRef();
   let editando = false;
@@ -247,13 +355,31 @@ export async function renderCertificados() {
     const ci = ($('#ce_ci').value || '').trim();
     const cargo = ($('#ce_calidad').value || '').trim();
     const fecha = $('#ce_fecha').value;
+    const esPas = esPasantia();
+    const periodoPas = (val('ce_fecha_inicio') && val('ce_fecha_fin'))
+      ? `Del ${fmtDate(val('ce_fecha_inicio'))} al ${fmtDate(val('ce_fecha_fin'))}`
+      : val('ce_periodo');
     return buildCertDoc({
       titulo: tplActual().titulo,
       cuerpoTexto: $('#ce_cuerpo').value,
       nombre, ci,
       fechaTxt: fechaLarga(fecha),
       ref: refActual,
-      qrSrc: qrURL(qrCertificado({ nombre, ci, cargo: cargo || 'Colaborador', tipo: tplActual().titulo, ref: refActual, fecha })),
+      qrSrc: qrURL(qrCertificado({
+        nombre,
+        ci,
+        cargo: esPas ? 'Pasante Universitario' : (cargo || 'Colaborador'),
+        tipo: tplActual().titulo,
+        ref: refActual,
+        fecha,
+        ru: esPas ? val('ce_ru') : '',
+        universidad: esPas ? (val('ce_uni_pas') || 'Universidad Mayor de San Andrés (UMSA)') : '',
+        carrera_plan: esPas ? val('ce_carrera_plan') : '',
+        asignatura: esPas ? val('ce_asignatura') : '',
+        modalidad: esPas ? val('ce_modalidad') : '',
+        periodo: esPas ? periodoPas : val('ce_periodo'),
+        tipo_certificado: esPas ? 'pasantia' : 'trabajo'
+      })),
       abogadoFirma: $('#ce_abogado_firma') ? $('#ce_abogado_firma').value : '',
       rpaFirma: $('#ce_rpa') ? $('#ce_rpa').value : '',
       logoSrc, selloSrc: selloActivo(), model: modeloMembrete()
@@ -265,15 +391,29 @@ export async function renderCertificados() {
   // por su N.º de referencia. Si la tabla aún no existe (db/25), no pasa nada.
   const registrarCert = () => {
     try {
+      const tipoCert = esPasantia() ? 'pasantia' : 'trabajo';
       const row = {
         ref: refActual,
         tipo: tplActual().titulo,
-        nombre: ($('#ce_nombre').value || '').trim(),
-        ci: ($('#ce_ci').value || '').trim() || null,
-        cargo: ($('#ce_calidad').value || '').trim() || null,
-        periodo: ($('#ce_periodo').value || '').trim() || null,
+        tipo_certificado: tipoCert,
+        nombre: val('ce_nombre') || null,
+        ci: val('ce_ci') || null,
+        cargo: val('ce_calidad') || null,
+        periodo: val('ce_periodo') || null,
         cuerpo: $('#ce_cuerpo').value || null,
-        fecha_emision: $('#ce_fecha').value || null
+        fecha_emision: val('ce_fecha') || null,
+        // Pasantía
+        registro_universitario: val('ce_ru') || null,
+        universidad: esPasantia() ? (val('ce_uni_pas') || null) : (val('ce_uni') || null),
+        carrera_plan: val('ce_carrera_plan') || null,
+        asignatura: val('ce_asignatura') || null,
+        nota_designacion: val('ce_nota_desig') || null,
+        fecha_nota_designacion: val('ce_fecha_nota') || null,
+        modalidad: val('ce_modalidad') || null,
+        horario: val('ce_horario') || null,
+        fecha_inicio: val('ce_fecha_inicio') || null,
+        fecha_fin: val('ce_fecha_fin') || null,
+        incluir_sello_digital: $('#ce_sello') ? $('#ce_sello').checked : true
       };
       // Solo al crear uno nuevo se fija el autor; al editar se conserva el original.
       if (!editando) row.created_by = state.profile.id;
@@ -339,12 +479,30 @@ export async function renderCertificados() {
     let cuerpo = await fetchCuerpo(c);
     if (!cuerpo) {
       const tpl = CERT_PLANTILLAS.find(t => t.titulo === c.tipo) || CERT_PLANTILLAS[0];
-      cuerpo = tpl.cuerpo({ nombre: c.nombre, ci: c.ci, calidad: c.cargo, periodo: c.periodo || 'el período indicado', universidad: '', carrera: '', horas: '', destinatario: '' });
+      cuerpo = tpl.cuerpo({ nombre: c.nombre, ci: c.ci, calidad: c.cargo, periodo: c.periodo || 'indicado', universidad: c.universidad || '', carrera: c.carrera_plan || '', horas: '', destinatario: '', registro_universitario: c.registro_universitario, carrera_plan: c.carrera_plan, asignatura: c.asignatura, nota_designacion: c.nota_designacion, fecha_nota_designacion: c.fecha_nota_designacion ? fechaLarga(c.fecha_nota_designacion) : '', modalidad: c.modalidad, horario: c.horario, fecha_inicio_larga: c.fecha_inicio ? fechaLarga(c.fecha_inicio) : '', fecha_fin_larga: c.fecha_fin ? fechaLarga(c.fecha_fin) : '' });
     }
+    const esPas = (c.tipo_certificado === 'pasantia') || (c.tipo === 'CERTIFICADO DE PASANTÍA');
+    const periodoPas = (c.fecha_inicio && c.fecha_fin)
+      ? `Del ${fmtDate(c.fecha_inicio)} al ${fmtDate(c.fecha_fin)}`
+      : (c.periodo || '');
     const doc = buildCertDoc({
       titulo: c.tipo || 'CERTIFICADO', cuerpoTexto: cuerpo, nombre: c.nombre, ci: c.ci || '',
       fechaTxt: fechaLarga(c.fecha_emision), ref: c.ref,
-      qrSrc: qrURL(qrCertificado({ nombre: c.nombre, ci: c.ci, cargo: c.cargo, tipo: c.tipo, ref: c.ref, fecha: c.fecha_emision })),
+      qrSrc: qrURL(qrCertificado({
+        nombre: c.nombre,
+        ci: c.ci,
+        cargo: c.cargo || (esPas ? 'Pasante Universitario' : 'Colaborador'),
+        tipo: c.tipo,
+        ref: c.ref,
+        fecha: c.fecha_emision,
+        ru: c.registro_universitario || '',
+        universidad: c.universidad || '',
+        carrera_plan: c.carrera_plan || '',
+        asignatura: c.asignatura || '',
+        modalidad: c.modalidad || '',
+        periodo: esPas ? periodoPas : (c.periodo || ''),
+        tipo_certificado: esPas ? 'pasantia' : 'trabajo'
+      })),
       abogadoFirma: $('#ce_abogado_firma') ? $('#ce_abogado_firma').value : '',
       rpaFirma: $('#ce_rpa') ? $('#ce_rpa').value : '',
       logoSrc, selloSrc: selloActivo(), model: modeloMembrete()
@@ -357,13 +515,27 @@ export async function renderCertificados() {
   async function editarCert(c) {
     const tpl = CERT_PLANTILLAS.find(t => t.titulo === c.tipo) || CERT_PLANTILLAS[0];
     const cuerpoGuardado = await fetchCuerpo(c);
+    const esPas = (c.tipo_certificado === 'pasantia') || (tpl.id === 'pasantia_universitaria');
+    if ($('#ce_tipo_cert')) $('#ce_tipo_cert').value = esPas ? 'pasantia' : 'trabajo';
     $('#ce_tipo').value = tpl.id;
+    aplicarTipoCert(false);
     $('#ce_nombre').value = c.nombre || '';
     $('#ce_ci').value = c.ci || '';
     $('#ce_calidad').value = c.cargo || '';
     $('#ce_periodo').value = c.periodo || '';
     $('#ce_fecha').value = (c.fecha_emision || hoyISO()).slice(0, 10);
-    $('#ce_cuerpo').value = cuerpoGuardado || tpl.cuerpo({ nombre: c.nombre || '', ci: c.ci || '', calidad: c.cargo || '', periodo: c.periodo || 'el período indicado', universidad: '', carrera: '', horas: '', destinatario: '' });
+    if (c.registro_universitario && $('#ce_ru')) $('#ce_ru').value = c.registro_universitario;
+    if (c.universidad && $('#ce_uni_pas')) $('#ce_uni_pas').value = c.universidad;
+    if (c.carrera_plan && $('#ce_carrera_plan')) $('#ce_carrera_plan').value = c.carrera_plan;
+    if (c.asignatura && $('#ce_asignatura')) $('#ce_asignatura').value = c.asignatura;
+    if (c.nota_designacion && $('#ce_nota_desig')) $('#ce_nota_desig').value = c.nota_designacion;
+    if (c.fecha_nota_designacion && $('#ce_fecha_nota')) $('#ce_fecha_nota').value = (c.fecha_nota_designacion || '').slice(0, 10);
+    if (c.fecha_inicio && $('#ce_fecha_inicio')) $('#ce_fecha_inicio').value = (c.fecha_inicio || '').slice(0, 10);
+    if (c.fecha_fin && $('#ce_fecha_fin')) $('#ce_fecha_fin').value = (c.fecha_fin || '').slice(0, 10);
+    if (c.modalidad && $('#ce_modalidad')) $('#ce_modalidad').value = c.modalidad;
+    if (c.horario && $('#ce_horario')) $('#ce_horario').value = c.horario;
+    if (typeof c.incluir_sello_digital === 'boolean' && $('#ce_sello')) $('#ce_sello').checked = c.incluir_sello_digital;
+    $('#ce_cuerpo').value = cuerpoGuardado || tpl.cuerpo(datos());
     cuerpoEditado = true;
     refActual = c.ref;
     editando = true;
@@ -380,11 +552,15 @@ export async function renderCertificados() {
     guardadoActual = false;
     refActual = nuevoRef();
     cuerpoEditado = false;
-    ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+    ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
+     'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+    if ($('#ce_uni_pas')) $('#ce_uni_pas').value = 'Universidad Mayor de San Andrés (UMSA)';
+    if ($('#ce_carrera_plan')) $('#ce_carrera_plan').value = 'Carrera de Derecho – Plan de Estudios 2017';
+    if ($('#ce_asignatura')) $('#ce_asignatura').value = 'CJR-410 Pasantía I';
+    if ($('#ce_modalidad')) $('#ce_modalidad').value = '4 semanas a medio tiempo (4 horas diarias)';
     $('#ce_fecha').value = hoyISO();
     const banner = $('#ce_editbanner'); if (banner) banner.style.display = 'none';
-    regenerar();
-    pintar();
+    aplicarTipoCert(false);
   }
 
   // Carga los DATOS de una persona (de un certificado emitido) en un certificado
@@ -403,9 +579,17 @@ export async function renderCertificados() {
   }
 
   // Campos que, si el texto no fue editado a mano, regeneran el borrador.
-  ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest'].forEach(id => {
-    $('#' + id).oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
+  ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
+   'ce_ru', 'ce_uni_pas', 'ce_carrera_plan', 'ce_asignatura', 'ce_nota_desig', 'ce_horario'].forEach(id => {
+    const el = $('#' + id); if (!el) return;
+    el.oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
+  ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad'].forEach(id => {
+    const el = $('#' + id); if (!el) return;
+    el.onchange = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
+  });
+  const ceTipoCert = $('#ce_tipo_cert');
+  if (ceTipoCert) ceTipoCert.onchange = () => { forkSiNecesario(); aplicarTipoCert(true); };
   $('#ce_tipo').onchange = () => {
     // Cambiar el TIPO nunca debe reemplazar un certificado ya guardado: se crea
     // uno nuevo conservando los datos de la persona.
@@ -516,7 +700,6 @@ export async function renderCertificados() {
     ce_rpa.oninput = () => { localStorage.setItem('lexfive_cert_rpa', ce_rpa.value); pintar(); };
   }
 
-  regenerar();
-  pintar();
+  aplicarTipoCert(false);
   cargarEmitidos();
 }
