@@ -420,15 +420,10 @@ function buildHojaAsistenciaHTML(d, logoSrc, model) {
 
     <div style="border:1px solid #d9dce1;border-radius:5px;padding:6px 10px;background:#fafbfc;">
       <div style="text-align:center;font-size:8.5px;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin-bottom:4px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding:0 15px;">
-        <div style="text-align:center;flex:1;max-width:230px;">
-          <div style="min-height:48px;"></div>
-          <div style="border-top:1.2px solid #0e1b2c;padding-top:3px;font-size:8.5px;font-weight:bold;color:#0e1b2c;">${nombre}</div>
-          <div style="font-size:8px;color:#5c6675;font-family:Arial,sans-serif;">Firma · Pasante Universitario(a)<br>R.U. ${ru} · C.I. ${ci}</div>
-        </div>
-        <div style="text-align:center;flex:1;max-width:230px;">
-          <div style="min-height:48px;"></div>
-          <div style="border-top:1.2px solid #0e1b2c;padding-top:3px;font-size:8.5px;font-weight:bold;color:#0e1b2c;">Sello y Firma · Abogado(a) Patrocinante</div>
+      <div style="display:flex;justify-content:center;align-items:flex-end;padding:0 15px;">
+        <div style="text-align:center;width:100%;max-width:280px;">
+          <div style="min-height:52px;"></div>
+          <div style="border-top:1.2px solid #0e1b2c;padding-top:4px;font-size:9px;font-weight:bold;color:#0e1b2c;">Sello y Firma · Abogado(a) Patrocinante</div>
           <div style="font-size:8px;color:#5c6675;font-family:Arial,sans-serif;">LexFive · Bufete de Abogados</div>
         </div>
       </div>
@@ -853,7 +848,10 @@ export async function renderCertificados() {
   const catActual = () => ($('#ce_tipo_cert') && $('#ce_tipo_cert').value) || 'trabajo';
   const esPasantia = () => catActual() === 'pasantia' || catActual() === 'aceptacion';
   const val = (id) => { const el = $('#' + id); return el ? (el.value || '').trim() : ''; };
+  const nuevoRef = () => 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
+  let refActual = nuevoRef();
   const datos = () => ({
+    ref: refActual,
     nombre: val('ce_nombre') || '___________________',
     ci: val('ce_ci'),
     calidad: val('ce_calidad'),
@@ -909,8 +907,6 @@ export async function renderCertificados() {
     if (!cuerpoEditado) regenerar();
     pintar();
   };
-  const nuevoRef = () => 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
-  let refActual = nuevoRef();
   let editando = false;
   let guardadoActual = false; // true cuando el certificado actual ya se emitió: el siguiente cambio crea uno nuevo
   // Si ya se emitió/guardó este certificado, el próximo cambio de datos genera
@@ -1184,7 +1180,9 @@ export async function renderCertificados() {
   });
   ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero'].forEach(id => {
     const el = $('#' + id); if (!el) return;
-    el.onchange = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
+    const handler = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
+    el.onchange = handler;
+    el.oninput = handler;
   });
   const chkAsis = $('#ce_prellenar_asistencia');
   if (chkAsis) chkAsis.onchange = () => { forkSiNecesario(); };
