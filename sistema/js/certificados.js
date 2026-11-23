@@ -17,6 +17,9 @@ import { ensureImgCache } from './media.js';
 import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSelloSrc, wmOpacityActual, applyWmOpacity, pushBranding } from './branding.js';
 import { supabase } from './supabase.js';
 import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membretePagina, PRINT_COLOR_CSS } from './membrete-base.js';
+import { navigate } from './app.js';
+
+export { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, calcularJornadasPasantia, extraerHoras, fechaLarga };
 
 function urlAbs(src) {
   if (!src) return '';
@@ -1043,6 +1046,7 @@ export async function renderCertificados() {
           ${esPas ? `
             <button class="btn btn--ghost btn--sm js-asistenciacert" data-id="${c.id}" title="Hoja de Control de Asistencia (PDF)">Asistencia (PDF)</button>
             <button class="btn btn--ghost btn--sm js-informecert" data-id="${c.id}" title="Borrador del Informe Único en Word (.doc)">Informe Word</button>
+            <button class="btn btn--primary btn--sm js-abririnforme" data-id="${c.id}" title="Abrir y editar en el módulo de Informe Único">Abrir en Informe</button>
           ` : ''}
           <button class="btn btn--danger btn--sm js-delcert" data-id="${c.id}" title="Eliminar registro">&times;</button>
         </td>
@@ -1058,6 +1062,13 @@ export async function renderCertificados() {
     cont.querySelectorAll('.js-informecert').forEach(b => b.onclick = () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id);
       if (c) descargarInformePasantiaWord(c);
+    });
+    cont.querySelectorAll('.js-abririnforme').forEach(b => b.onclick = () => {
+      const c = EMITIDOS.find(x => x.id === b.dataset.id);
+      if (c) {
+        try { localStorage.setItem('lexfive_precargar_pasantia', JSON.stringify(c)); } catch (e) {}
+        navigate('informe');
+      }
     });
     cont.querySelectorAll('.js-delcert').forEach(b => b.onclick = async () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id); if (!c) return;
