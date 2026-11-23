@@ -107,19 +107,49 @@
             var checkEl = document.querySelector('.vf-check');
 
             function pintar(cert, verificadoDB) {
-                lead.innerHTML = verificadoDB
-                    ? 'Documento <strong>verificado</strong> en los registros oficiales del bufete <strong>LexFive</strong>.'
-                    : 'Datos del documento emitido por el bufete <strong>LexFive</strong>.';
-                var rows = '';
-                rows += row('Nombre', cert.nombre);
-                if (cert.ci) rows += row('Carnet de identidad', cert.ci);
-                if (cert.cargo) rows += row('Calidad / cargo', cert.cargo);
-                if (cert.tipo) rows += row('Tipo de documento', cert.tipo);
-                if (cert.ref) rows += row('N.º de referencia', cert.ref);
-                var f = cert.fecha_emision || cert.fecha;
-                if (f) rows += row('Fecha de emisión', f);
-                rows += row('Emisor', 'LexFive Abogados · El Alto — La Paz, Bolivia');
-                data.innerHTML = rows;
+                var tipoNorm = (cert.tipo || '').toUpperCase();
+                var esPas = (cert.tipo_certificado === 'pasantia') || tipoNorm.includes('PASANTÍA') || tipoNorm.includes('PASANTIA');
+
+                if (esPas) {
+                    titleEl.textContent = 'Certificado de Pasantía Verificado';
+                    lead.innerHTML = verificadoDB
+                        ? 'Pasantía universitaria <strong>verificada</strong> en los registros oficiales del bufete <strong>LexFive</strong>.'
+                        : 'Certificado de pasantía universitaria emitido por el bufete <strong>LexFive</strong>.';
+                    var rows = '';
+                    rows += row('Pasante', cert.nombre);
+                    if (cert.ci) rows += row('Cédula de identidad', cert.ci);
+                    if (cert.ru) rows += row('Registro Universitario (R.U.)', cert.ru);
+                    if (cert.universidad) rows += row('Universidad', cert.universidad);
+                    if (cert.carrera_plan) rows += row('Carrera / Plan', cert.carrera_plan);
+                    if (cert.asignatura) rows += row('Asignatura', cert.asignatura);
+                    if (cert.modalidad) rows += row('Modalidad', cert.modalidad);
+                    var per = cert.periodo;
+                    if (!per && cert.fecha_inicio && cert.fecha_fin) {
+                        per = 'Del ' + cert.fecha_inicio + ' al ' + cert.fecha_fin;
+                    }
+                    if (per) rows += row('Período', per);
+                    rows += row('Tipo de documento', cert.tipo || 'CERTIFICADO DE PASANTÍA');
+                    if (cert.ref) rows += row('N.º de referencia', cert.ref);
+                    var f = cert.fecha_emision || cert.fecha;
+                    if (f) rows += row('Fecha de emisión', f);
+                    rows += row('Emisor', 'LexFive Abogados · El Alto — La Paz, Bolivia');
+                    data.innerHTML = rows;
+                } else {
+                    titleEl.textContent = 'Certificado verificado';
+                    lead.innerHTML = verificadoDB
+                        ? 'Documento <strong>verificado</strong> en los registros oficiales del bufete <strong>LexFive</strong>.'
+                        : 'Datos del documento emitido por el bufete <strong>LexFive</strong>.';
+                    var rows = '';
+                    rows += row('Nombre', cert.nombre);
+                    if (cert.ci) rows += row('Carnet de identidad', cert.ci);
+                    if (cert.cargo) rows += row('Calidad / cargo', cert.cargo);
+                    if (cert.tipo) rows += row('Tipo de documento', cert.tipo);
+                    if (cert.ref) rows += row('N.º de referencia', cert.ref);
+                    var f = cert.fecha_emision || cert.fecha;
+                    if (f) rows += row('Fecha de emisión', f);
+                    rows += row('Emisor', 'LexFive Abogados · El Alto — La Paz, Bolivia');
+                    data.innerHTML = rows;
+                }
             }
 
             function noEncontrado() {
@@ -141,8 +171,36 @@
                         if (res && res.data && res.data.length) cert = res.data[0];
                     } catch (e) { /* sin conexión o BD no configurada: usamos el respaldo */ }
                 }
-                if (cert) { pintar(cert, true); return; }
-                if ((p.n || '').trim()) { pintar({ nombre: p.n, ci: p.ci, cargo: p.cargo, tipo: p.tipo, ref: p.ref, fecha: p.fecha }, false); return; }
+                if (cert) {
+                    if (!cert.ru && p.ru) cert.ru = p.ru;
+                    if (!cert.universidad && p.uni) cert.universidad = p.uni;
+                    if (!cert.carrera_plan && p.plan) cert.carrera_plan = p.plan;
+                    if (!cert.asignatura && p.asig) cert.asignatura = p.asig;
+                    if (!cert.modalidad && p.mod) cert.modalidad = p.mod;
+                    if (!cert.periodo && p.per) cert.periodo = p.per;
+                    pintar(cert, true);
+                    return;
+                }
+                if ((p.n || '').trim()) {
+                    var periodoVal = p.per || '';
+                    if (!periodoVal && p.fini && p.ffin) periodoVal = 'Del ' + p.fini + ' al ' + p.ffin;
+                    pintar({
+                        nombre: p.n,
+                        ci: p.ci,
+                        cargo: p.cargo,
+                        tipo: p.tipo,
+                        ref: p.ref,
+                        fecha: p.fecha,
+                        ru: p.ru,
+                        universidad: p.uni,
+                        carrera_plan: p.plan,
+                        asignatura: p.asig,
+                        modalidad: p.mod,
+                        periodo: periodoVal,
+                        tipo_certificado: p.t
+                    }, false);
+                    return;
+                }
                 if (ref) { noEncontrado(); return; }
                 lead.innerHTML = 'Página oficial de verificación de <strong>certificados</strong> del bufete <strong>LexFive</strong>. Escanee el código QR de un certificado para ver sus datos.';
             })();
