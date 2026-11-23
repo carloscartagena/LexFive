@@ -735,7 +735,7 @@ export async function renderCertificados() {
     <div class="card">
       <div class="card__head"><h3>Datos</h3></div>
       <div class="card__body">
-        <div id="ce_editbanner" style="display:none;background:var(--gold-tint);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:.85rem">
+        <div id="ce_editbanner" style="display:none;background:var(--gold-tint);border:1px solid var(--gold);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:.85rem;color:var(--ink);">
           Editando el certificado <strong id="ce_editref"></strong>. Los cambios se guardarán sobre el mismo registro al imprimir o descargar. <button class="btn btn--ghost btn--sm" id="ce_nuevo" type="button" style="margin-left:6px">Empezar uno nuevo</button>
         </div>
         <div class="field"><label>Categoría del certificado</label>
@@ -763,8 +763,8 @@ export async function renderCertificados() {
           <div class="field"><label>Dirigido a (opcional)</label><input id="ce_dest" placeholder="A quien corresponda"></div>
           </div>
           <div id="ce_pasantia_fields" style="display:none;grid-column:1/-1">
-            <div style="border:1px solid #d9dce1;border-radius:8px;padding:14px 14px 6px;background:#f8f9fb;margin-bottom:8px">
-              <div style="margin-bottom:10px"><strong style="color:#0e1b2c;font-size:.88rem">📋 Datos de Pasantía Universitaria</strong></div>
+            <div class="form-subbox">
+              <div class="form-subbox__title">📋 Datos de Pasantía Universitaria</div>
               <div class="cert-form">
                 <div class="field"><label>Tratamiento / Género</label>
                   <select id="ce_genero">
@@ -796,7 +796,7 @@ export async function renderCertificados() {
           </div>
           <div class="field"><label>Fecha de emisión</label><input id="ce_fecha" type="date" value="${hoyISO()}"></div>
           <div id="ce_firma_fields" style="display:contents">
-            <div class="field" style="grid-column: 1 / -1;"><hr style="border:0;border-top:1px solid #e0e4e8;margin:8px 0;"></div>
+            <div class="field" style="grid-column: 1 / -1;"><hr style="border:0;border-top:1px solid var(--line);margin:8px 0;"></div>
             <div class="field"><label>Firma: Nombre del Abogado(a)</label><input id="ce_abogado_firma" placeholder="Ej: Abg. Carlos Cartagena"></div>
             <div class="field"><label>Firma: R.P.A.</label><input id="ce_rpa" placeholder="Ej: 1234567"></div>
           </div>
@@ -826,7 +826,7 @@ export async function renderCertificados() {
           <p class="cell-sub" style="margin:4px 0 0">Hacia la derecha = marca de agua más oscura. Es el logo del bufete de fondo. (Se aplica igual a las credenciales.)</p>
         </div>
         <label class="cell-sub" style="display:flex;align-items:center;gap:6px;margin-top:12px"><input type="checkbox" id="ce_sello" checked> Incluir sello digital en el PDF</label>
-        <p class="cell-sub" id="ce_sello_hint" style="display:none;margin:2px 0 0;font-size:.78rem;color:#6b7280">En pasantías se recomienda dejar sin sello digital para firmar y sellar a mano.</p>
+        <p class="cell-sub" id="ce_sello_hint" style="display:none;margin:2px 0 0;font-size:.78rem;">En pasantías se recomienda dejar sin sello digital para firmar y sellar a mano.</p>
       </div>
     </div>
 
