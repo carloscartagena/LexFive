@@ -525,31 +525,55 @@ export async function renderCertificados() {
   let vistaPasantiaTab = 'cert'; // 'cert' | 'asistencia' | 'informe'
 
   const pintar = () => {
-    const prevTabs = $('#ce_preview_tabs');
-    const infActions = $('#ce_informe_actions');
-    const pas = esPasantia();
+    try {
+      const prevTabs = $('#ce_preview_tabs');
+      const infActions = $('#ce_informe_actions');
+      const previewEl = $('#certPreview');
+      if (!previewEl) return;
+      const pas = esPasantia();
 
-    if (pas) {
-      if (prevTabs) prevTabs.style.display = 'flex';
-      content().querySelectorAll('.js-prev-tab').forEach(b => {
-        const tab = b.dataset.tab;
-        b.className = (tab === vistaPasantiaTab) ? 'btn btn--sm btn--primary js-prev-tab' : 'btn btn--sm btn--ghost js-prev-tab';
-      });
+      if (pas) {
+        if (prevTabs) {
+          prevTabs.style.display = 'flex';
+          prevTabs.querySelectorAll('.js-prev-tab').forEach(b => {
+            const isActive = (b.dataset.tab === vistaPasantiaTab);
+            b.className = isActive ? 'btn btn--sm btn--primary js-prev-tab' : 'btn btn--sm btn--ghost js-prev-tab';
+            if (isActive) {
+              b.style.fontWeight = 'bold';
+              b.style.outline = '2px solid var(--gold, #c2a25a)';
+              b.style.outlineOffset = '1px';
+            } else {
+              b.style.fontWeight = 'normal';
+              b.style.outline = 'none';
+            }
+          });
+        }
 
-      if (vistaPasantiaTab === 'asistencia') {
-        if (infActions) infActions.style.display = 'none';
-        $('#certPreview').innerHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete());
-      } else if (vistaPasantiaTab === 'informe') {
-        if (infActions) infActions.style.display = 'flex';
-        $('#certPreview').innerHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+        if (vistaPasantiaTab === 'asistencia') {
+          if (infActions) infActions.style.display = 'none';
+          previewEl.innerHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete());
+        } else if (vistaPasantiaTab === 'informe') {
+          if (infActions) infActions.style.display = 'flex';
+          previewEl.innerHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+        } else {
+          if (infActions) infActions.style.display = 'none';
+          previewEl.innerHTML = docActual();
+        }
       } else {
+        if (prevTabs) prevTabs.style.display = 'none';
         if (infActions) infActions.style.display = 'none';
-        $('#certPreview').innerHTML = docActual();
+        previewEl.innerHTML = docActual();
       }
-    } else {
-      if (prevTabs) prevTabs.style.display = 'none';
-      if (infActions) infActions.style.display = 'none';
-      $('#certPreview').innerHTML = docActual();
+    } catch (err) {
+      console.error('Error renderizando vista previa en Certificados:', err);
+      toast('Error al renderizar vista previa: ' + err.message, 'error');
+      const previewEl = $('#certPreview');
+      if (previewEl) {
+        previewEl.innerHTML = `<div style="padding:24px;text-align:center;color:#e11d48;font-family:sans-serif;">
+          <p style="font-weight:bold;margin-bottom:8px;">Error al renderizar vista previa:</p>
+          <pre style="font-size:12px;background:rgba(0,0,0,0.05);padding:10px;border-radius:6px;overflow-x:auto;">${esc(err.message)}</pre>
+        </div>`;
+      }
     }
   };
 
@@ -807,7 +831,93 @@ export async function renderCertificados() {
     el.oninput = handler;
   });
 
+    // ---- Pestañas de Vista Previa (Delegación de eventos sobre el contenedor) ----
+  const tabsContainer = $('#ce_preview_tabs');
+  if (tabsContainer) {
+    tabsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.js-prev-tab');
+      if (!btn) return;
+      e.preventDefault();
+      const nuevaTab = btn.dataset.tab;
+      if (nuevaTab && ['cert', 'asistencia', 'informe'].includes(nuevaTab)) {
+        vistaPasantiaTab = nuevaTab;
+        pintar();
+      }
+    });
+  }
+
+  // Botones de acción del informe en la barra de vista previa
+  const btnPrevInfPdf = $('#ce_btn_descargar_informe_pdf');
+  if (btnPrevInfPdf) btnPrevInfPdf.onclick = () => descargarInformePDF(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+
+  const btnPrevInfPrint = $('#ce_btn_imprimir_informe');
+  if (btnPrevInfPrint) btnPrevInfPrint.onclick = () => imprimirInformeDocumento(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+
+  const btnPrevInfWord = $('#ce_btn_descargar_informe_word');
+  if (btnPrevInfWord) btnPrevInfWord.onclick = () => descargarInformeWordDoc(datos(), logoSrc);
+
+  const btnAsisBottom = $('#ce_asistencia');
+  if (btnAsisBottom) btnAsisBottom.onclick = () => descargarHojaAsistenciaPDF(datos(), logoSrc, modeloMembrete());
+
+  const btnInfWordBottom = $('#ce_informe_word');
+  if (btnInfWordBottom) btnInfWordBottom.onclick = () => descargarInformeWordDoc(datos(), logoSrc);
+
+  // Editor plegable de actividades generadas
+  const editorWrap = $('#ce_jornadas_editor_wrap');
+  const pintarEditorJornadas = () => {
+    if (!editorWrap || !cronogramaPersonalizado || !cronogramaPersonalizado.length) return;
+    editorWrap.style.display = 'block';
+    editorWrap.innerHTML = `
+      <details style="border:1px solid var(--line);border-radius:6px;padding:8px 12px;background:var(--card-sub-bg, transparent);" open>
+        <summary style="cursor:pointer;font-weight:600;font-size:.85rem;color:var(--primary, #c2a25a);display:flex;align-items:center;justify-content:space-between;">
+          <span>🗓️ Retocar actividades por jornada (${cronogramaPersonalizado.length} días hábiles)</span>
+          <span style="font-size:.75rem;opacity:.7;">Plegar/Desplegar</span>
+        </summary>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;max-height:360px;overflow-y:auto;padding-right:4px;">
+          ${cronogramaPersonalizado.map((j, idx) => `
+            <div style="border-bottom:1px dashed var(--line);padding-bottom:8px;" data-jornada-idx="${idx}">
+              <div style="display:flex;justify-content:space-between;font-size:.8rem;font-weight:600;margin-bottom:3px;">
+                <span>Día ${j.num || (idx + 1)} · ${j.diaSemana || ''} ${j.fecha || ''}</span>
+                <span style="opacity:.6;font-size:.75rem;">Semana ${j.semanaIdx || Math.floor(idx/5)+1}</span>
+              </div>
+              <div style="margin-bottom:4px;">
+                <label style="font-size:.72rem;opacity:.75;display:block;">Resumen (Asistencia):</label>
+                <input class="js-jornada-resumen" data-idx="${idx}" value="${esc(j.resumen || '')}" style="width:100%;font-size:.8rem;padding:3px 6px;">
+              </div>
+              <div>
+                <label style="font-size:.72rem;opacity:.75;display:block;">Detalle de actividades (Informe Único, 1 a 3 puntos separados por salto de línea):</label>
+                <textarea class="js-jornada-acts" data-idx="${idx}" rows="2" style="width:100%;font-size:.78rem;padding:3px 6px;font-family:inherit;">${esc(Array.isArray(j.actividades) ? j.actividades.join('\n') : (j.detalle || ''))}</textarea>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </details>
+    `;
+
+    editorWrap.querySelectorAll('.js-jornada-resumen').forEach(inp => {
+      inp.oninput = () => {
+        const idx = parseInt(inp.dataset.idx, 10);
+        if (cronogramaPersonalizado && cronogramaPersonalizado[idx]) {
+          cronogramaPersonalizado[idx].resumen = inp.value;
+          pintar();
+        }
+      };
+    });
+    editorWrap.querySelectorAll('.js-jornada-acts').forEach(txt => {
+      txt.oninput = () => {
+        const idx = parseInt(txt.dataset.idx, 10);
+        if (cronogramaPersonalizado && cronogramaPersonalizado[idx]) {
+          cronogramaPersonalizado[idx].actividades = txt.value.split('\n').map(s => s.trim()).filter(Boolean);
+          cronogramaPersonalizado[idx].detalle = txt.value;
+          pintar();
+        }
+      };
+    });
+  };
+
   const btnIA = $('#ce_btn_ia_cronograma');
+  const badgeIA = $('#ce_ia_badge');
+
   if (btnIA) {
     btnIA.onclick = async () => {
       const fIni = val('ce_fecha_inicio');
@@ -817,7 +927,7 @@ export async function renderCertificados() {
       const numDias = (mod.includes('2 semanas') || mod.includes('tiempo completo')) ? 10 : 20;
       const feriadosExtra = val('ce_feriados_extra');
       const calc = calcularJornadasHabilesBolivia(fIni, numDias, feriadosExtra);
-      
+
       const areas = Array.from(content().querySelectorAll('.ce_area:checked')).map(c => c.value);
       const enfoque = val('ce_enfoque');
       const nombre = val('ce_nombre');
@@ -836,14 +946,30 @@ export async function renderCertificados() {
         });
 
         if (crono && crono.length) {
-          cronogramaPersonalizado = crono.map(item => ({
-            resumen: item.resumen,
-            detalle: item.actividades ? item.actividades.join(' ') : item.resumen
-          }));
-          toast('¡Cronograma único generado con éxito!', 'success');
+          cronogramaPersonalizado = crono;
+          if (badgeIA) {
+            badgeIA.style.display = 'inline-block';
+            if (crono.origen === 'ia') {
+              badgeIA.style.background = 'rgba(34,197,94,0.15)';
+              badgeIA.style.color = '#16a34a';
+              badgeIA.style.border = '1px solid rgba(34,197,94,0.3)';
+              badgeIA.textContent = '✓ Generado con IA';
+              badgeIA.title = 'Actividades generadas exitosamente con Google Gemini';
+              toast('¡Actividades únicas generadas con IA!', 'success');
+            } else {
+              badgeIA.style.background = 'rgba(234,179,8,0.15)';
+              badgeIA.style.color = '#ca8a04';
+              badgeIA.style.border = '1px solid rgba(234,179,8,0.3)';
+              badgeIA.textContent = '⚠️ Generado con banco local';
+              badgeIA.title = crono.motivo ? `Motivo: ${crono.motivo}` : 'Banco normativo local';
+              toast('Actividades generadas mediante banco normativo institucional.', 'info');
+            }
+          }
+          pintarEditorJornadas();
           pintar();
         }
       } catch (err) {
+        console.error('Error al generar con IA:', err);
         toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
       } finally {
         btnIA.disabled = false;
