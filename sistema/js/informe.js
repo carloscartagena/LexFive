@@ -247,7 +247,7 @@ export async function renderInforme() {
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <input id="in_enfoque" value="${esc(V.in_enfoque || '')}" placeholder="Enfoque especial del pasante (ej. asistencia familiar, procesos monitorios en El Alto)..." style="flex:1;min-width:240px;">
-            <button class="btn btn--primary btn--sm" id="in_btn_ia_cronograma" type="button">✨ Generar actividades únicas con IA</button>
+            <button class="btn btn--primary btn--sm" id="in_btn_ia_cronograma" type="button">✨ Generar nuevo cronograma único (IA)</button>
             <span id="in_ia_badge" style="display:none;padding:3px 8px;border-radius:12px;font-size:.78rem;font-weight:600;"></span>
             <button class="btn btn--ghost btn--sm" id="in_btn_regen_act" type="button">🔄 Restaurar predeterminadas</button>
           </div>
@@ -613,7 +613,7 @@ export async function renderInforme() {
         toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
       } finally {
         btnIA.disabled = false;
-        btnIA.textContent = '✨ Generar actividades únicas con IA';
+        btnIA.textContent = '✨ Generar nuevo cronograma único (IA)';
       }
     };
   }

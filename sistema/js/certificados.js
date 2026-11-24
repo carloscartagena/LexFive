@@ -126,9 +126,8 @@ const CERT_PLANTILLAS = [
       } else if (d.periodo && d.periodo !== 'correspondiente') {
         lapso = ` durante el período ${d.periodo}`;
       }
-      const modTxt = d.modalidad ? `, bajo la modalidad de ${d.modalidad}` : '';
-      const horTxt = d.horario ? `, en el horario de ${d.horario}` : '';
-      const p2 = `${gen.mencionado} cumplió el período de pasantía${lapso}${modTxt}${horTxt}.`;
+      const modHor = d.modalidad ? `, bajo la modalidad de ${formatearModalidadYHorario(d.modalidad, d.horario)}` : (d.horario ? `, en el horario de ${d.horario}` : '');
+      const p2 = `${gen.mencionado} cumplió el período de pasantía${lapso}${modHor}.`;
       
       const p3 = `Durante su permanencia, ${gen.artPasante} participó activamente en labores de apoyo jurídico: seguimiento de procesos judiciales, organización y foliado de expedientes, elaboración de borradores de memoriales y contratos, diligencias ante estrados judiciales e instituciones públicas y registro en el sistema interno del despacho; demostrando solvencia, ética profesional, puntualidad y un alto grado de compromiso en el cumplimiento de sus labores.`;
       
@@ -308,7 +307,7 @@ export async function renderCertificados() {
                   </div>
                   <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;">
                     <input id="ce_enfoque" placeholder="Enfoque especial del pasante (ej. asistencia familiar y Derechos Reales)..." style="flex:1;min-width:220px;">
-                    <button class="btn btn--ghost btn--sm" id="ce_btn_ia_cronograma" type="button" style="color:var(--primary, #c2a25a);font-weight:600;">✨ Generar actividades con IA</button>
+                    <button class="btn btn--ghost btn--sm" id="ce_btn_ia_cronograma" type="button" style="color:var(--primary, #c2a25a);font-weight:600;">✨ Generar nuevo cronograma único (IA)</button>
                     <span id="ce_ia_badge" style="display:none;padding:3px 8px;border-radius:12px;font-size:.78rem;font-weight:600;"></span>
                   </div>
                   <div id="ce_jornadas_editor_wrap" style="display:none;margin-top:10px;width:100%;"></div>
@@ -558,7 +557,7 @@ export async function renderCertificados() {
 
         if (vistaPasantiaTab === 'asistencia') {
           if (infActions) infActions.style.display = 'none';
-          previewEl.innerHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete());
+          previewEl.innerHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
         } else if (vistaPasantiaTab === 'informe') {
           if (infActions) infActions.style.display = 'flex';
           previewEl.innerHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
@@ -689,7 +688,7 @@ export async function renderCertificados() {
     cont.querySelectorAll('.js-dupcert').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) nuevoConDatos(c); });
     cont.querySelectorAll('.js-asistenciacert').forEach(b => b.onclick = () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id);
-      if (c) descargarHojaAsistenciaPDF(c, logoSrc, modeloMembrete());
+      if (c) descargarHojaAsistenciaPDF(c, logoSrc, modeloMembrete(), wmOpacityActual() / 100);
     });
     cont.querySelectorAll('.js-informecert').forEach(b => b.onclick = () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id);
@@ -864,7 +863,7 @@ export async function renderCertificados() {
   if (btnPrevInfWord) btnPrevInfWord.onclick = () => descargarInformeWordDoc(datos(), logoSrc);
 
   const btnAsisBottom = $('#ce_asistencia');
-  if (btnAsisBottom) btnAsisBottom.onclick = () => descargarHojaAsistenciaPDF(datos(), logoSrc, modeloMembrete());
+  if (btnAsisBottom) btnAsisBottom.onclick = () => descargarHojaAsistenciaPDF(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
 
   const btnInfWordBottom = $('#ce_informe_word');
   if (btnInfWordBottom) btnInfWordBottom.onclick = () => descargarInformeWordDoc(datos(), logoSrc);
@@ -990,7 +989,7 @@ export async function renderCertificados() {
         toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
       } finally {
         btnIA.disabled = false;
-        btnIA.textContent = '✨ Generar actividades con IA';
+        btnIA.textContent = '✨ Generar nuevo cronograma único (IA)';
       }
     };
   }
@@ -1098,7 +1097,7 @@ export async function renderCertificados() {
     btnAsistencia.onclick = () => {
       if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
       registrarCert();
-      descargarHojaAsistenciaPDF(datos(), logoSrc, modeloMembrete());
+      descargarHojaAsistenciaPDF(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
     };
   }
 
