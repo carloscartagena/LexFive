@@ -40,7 +40,9 @@ import {
   buildExperienciaHTML,
   buildRecomendacionHTML,
   descargarExperienciaWordDoc,
-  descargarRecomendacionWordDoc
+  descargarRecomendacionWordDoc,
+  extraerImagenesDeDocx,
+  optimizarImagenBlob
 } from './pasantia-docs.js';
 
 export { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, calcularJornadasPasantia, extraerHoras, fechaLarga };
@@ -244,10 +246,27 @@ function abrirImpresionVectorial(tituloDoc, docHTML) {
     </style></head><body>${docHTML}
     <script>
       window.addEventListener('load', function() {
-        setTimeout(function() {
-          window.focus();
-          window.print();
-        }, 350);
+        var imgs = Array.from(document.images);
+        var pending = imgs.filter(function(img) { return !img.complete; });
+        function disparar() {
+          setTimeout(function() {
+            window.focus();
+            window.print();
+          }, 350);
+        }
+        if (pending.length === 0) {
+          disparar();
+        } else {
+          var loaded = 0;
+          pending.forEach(function(img) {
+            img.addEventListener('load', check);
+            img.addEventListener('error', check);
+          });
+          function check() {
+            loaded++;
+            if (loaded >= pending.length) disparar();
+          }
+        }
       });
     <\/script></body></html>`);
   w.document.close();
@@ -373,6 +392,43 @@ export async function renderCertificados() {
                     </div>
                   </details>
                 </div>
+                <!-- ANEXO FOTOGRÁFICO (EVIDENCIA DE PASANTÍA) -->
+                <div style="grid-column:1/-1;margin-top:10px;">
+                  <div class="card" style="margin:0;border:1px solid var(--line);background:var(--card-bg, rgba(255,255,255,0.03));border-radius:8px;">
+                    <div class="card__head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 14px;">
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:1.15rem;">📷</span>
+                        <strong style="font-size:.9rem;color:var(--text, #101820);">Anexo Fotográfico (Evidencia de Pasantía)</strong>
+                        <span id="ce_fotos_badge" style="font-size:.75rem;padding:2px 8px;border-radius:12px;background:rgba(184,148,70,0.15);color:#b89446;font-weight:600;display:none;">0 fotos</span>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <label style="font-size:.78rem;display:flex;align-items:center;gap:4px;">
+                          <span>Distribución:</span>
+                          <select id="ce_fotos_layout" style="font-size:.78rem;padding:3px 6px;border-radius:4px;">
+                            <option value="4" selected>4 fotos por hoja (2×2 — recomendado)</option>
+                            <option value="2">2 fotos grandes por hoja (vertical)</option>
+                          </select>
+                        </label>
+                        <button class="btn btn--ghost btn--sm" id="ce_btn_vaciar_fotos" type="button" style="font-size:.75rem;padding:2px 8px;display:none;color:#e11d48;">🗑️ Vaciar fotos</button>
+                      </div>
+                    </div>
+                    <div class="card__body" style="padding:10px 14px;">
+                      <!-- Zona de carga múltiple (dropzone + file input) -->
+                      <div id="ce_fotos_dropzone" style="border:2px dashed var(--line);border-radius:6px;padding:16px;text-align:center;cursor:pointer;background:var(--card-sub-bg, rgba(255,255,255,0.02));transition:border-color .2s, background .2s;">
+                        <input type="file" id="ce_file_fotos" multiple accept="image/*,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+                        <div style="font-size:1.8rem;margin-bottom:4px;">📂 📸</div>
+                        <div style="font-weight:600;font-size:.85rem;color:var(--primary, #b89446);">
+                          Arrastra aquí tus fotos o archivo Word (.docx), o haz clic para explorar
+                        </div>
+                        <p class="cell-sub" style="margin:4px 0 0;font-size:.78rem;">
+                          Puedes subir fotos JPG/PNG o directamente el archivo Word (.docx) con las fotos pegadas; el sistema las extrae automáticamente.
+                        </p>
+                      </div>
+                      <!-- Miniaturas de fotos cargadas -->
+                      <div id="ce_fotos_grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));gap:10px;margin-top:12px;"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -458,6 +514,7 @@ export async function renderCertificados() {
   const nuevoRef = () => 'LF-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
   let refActual = nuevoRef();
   let cronogramaPersonalizado = null;
+  let fotosPasantiaArray = [];
 
   // Autocalcula fecha de finalización descartando feriados y fines de semana
   const autocalcularFechaFin = () => {
@@ -514,6 +571,8 @@ export async function renderCertificados() {
     fecha_fin_larga: val('ce_fecha_fin') ? fechaLarga(val('ce_fecha_fin')) : '',
     customTareas: cronogramaPersonalizado,
     observacion_rec: val('ce_observacion_rec'),
+    fotos: fotosPasantiaArray,
+    fotos_layout: ($('#ce_fotos_layout') ? $('#ce_fotos_layout').value : '4'),
     abogadoFirma: val('ce_abogado_firma'),
     rpaFirma: val('ce_rpa')
   });
@@ -673,7 +732,9 @@ export async function renderCertificados() {
           tutor_nombre: tutNom,
           tutor_rpa: tutRpa,
           genero: genVal,
-          observacion_rec: val('ce_observacion_rec')
+          observacion_rec: val('ce_observacion_rec'),
+          fotos: fotosPasantiaArray,
+          fotos_layout: ($('#ce_fotos_layout') ? $('#ce_fotos_layout').value : '4')
         };
         localStorage.setItem('lexfive_cert_extra_' + refActual, JSON.stringify(extraPayload));
       } catch (_) {}
@@ -903,6 +964,9 @@ export async function renderCertificados() {
     if ($('#ce_tutor_rpa')) $('#ce_tutor_rpa').value = tutRpaVal;
     if ($('#ce_genero')) $('#ce_genero').value = generoVal;
     if ($('#ce_observacion_rec')) $('#ce_observacion_rec').value = obsRecVal;
+    if ($('#ce_fotos_layout')) $('#ce_fotos_layout').value = localExtra.fotos_layout || c.fotos_layout || '4';
+    fotosPasantiaArray = Array.isArray(localExtra.fotos) ? localExtra.fotos : (Array.isArray(c.fotos) ? c.fotos : []);
+    pintarFotosGrid();
     if (typeof c.incluir_sello_digital === 'boolean' && $('#ce_sello')) $('#ce_sello').checked = c.incluir_sello_digital;
     $('#ce_cuerpo').value = cuerpoGuardado || tpl.cuerpo(datos());
     cuerpoEditado = true;
@@ -932,6 +996,9 @@ export async function renderCertificados() {
     cronogramaPersonalizado = null;
     const editorWrap = $('#ce_jornadas_editor_wrap');
     if (editorWrap) editorWrap.style.display = 'none';
+    fotosPasantiaArray = [];
+    if ($('#ce_fotos_layout')) $('#ce_fotos_layout').value = '4';
+    pintarFotosGrid();
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
      'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario',
      'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
@@ -998,6 +1065,199 @@ export async function renderCertificados() {
   }
 
 
+
+  // ---- Gestión visual de fotos y extracción .docx ----
+  const pintarFotosGrid = () => {
+    const grid = $('#ce_fotos_grid');
+    const badge = $('#ce_fotos_badge');
+    const btnVaciar = $('#ce_btn_vaciar_fotos');
+    if (!grid) return;
+
+    if (!fotosPasantiaArray.length) {
+      grid.innerHTML = '<p class="cell-sub" style="grid-column:1/-1;margin:0;font-size:.8rem;opacity:.7;">No hay fotos cargadas aún.</p>';
+      if (badge) badge.style.display = 'none';
+      if (btnVaciar) btnVaciar.style.display = 'none';
+      return;
+    }
+
+    if (badge) {
+      badge.style.display = 'inline-block';
+      badge.textContent = `${fotosPasantiaArray.length} foto${fotosPasantiaArray.length > 1 ? 's' : ''}`;
+    }
+    if (btnVaciar) btnVaciar.style.display = 'inline-block';
+
+    grid.innerHTML = fotosPasantiaArray.map((f, i) => `
+      <div style="border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--card-sub-bg, rgba(255,255,255,0.03));position:relative;display:flex;flex-direction:column;">
+        <div style="position:relative;width:100%;height:115px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;">
+          <img src="${f.src}" style="max-width:100%;max-height:100%;object-fit:cover;" alt="">
+          <span style="position:absolute;top:4px;left:4px;background:rgba(14,27,44,0.75);color:#fff;font-size:10px;padding:1px 5px;border-radius:3px;font-weight:600;">N.º ${i + 1}</span>
+          <button class="btn btn--danger btn--sm js-ce-foto-del" data-idx="${i}" style="position:absolute;top:4px;right:4px;padding:2px 6px;line-height:1;font-size:11px;" type="button" title="Eliminar foto">&times;</button>
+        </div>
+        <input class="js-ce-foto-pie" data-idx="${i}" value="${esc(f.pie || '')}" placeholder="Pie de foto..." style="width:100%;font-size:.75rem;margin-top:6px;padding:3px 6px;box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+          <button class="btn btn--ghost btn--sm js-ce-foto-prev" data-idx="${i}" type="button" style="padding:1px 6px;font-size:11px;" ${i === 0 ? 'disabled' : ''} title="Mover a la izquierda">◀</button>
+          <span style="font-size:10px;color:var(--text-muted, #888);">${i + 1}/${fotosPasantiaArray.length}</span>
+          <button class="btn btn--ghost btn--sm js-ce-foto-next" data-idx="${i}" type="button" style="padding:1px 6px;font-size:11px;" ${i === fotosPasantiaArray.length - 1 ? 'disabled' : ''} title="Mover a la derecha">▶</button>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.js-ce-foto-pie').forEach(inp => {
+      inp.oninput = () => {
+        const idx = Number(inp.dataset.idx);
+        if (fotosPasantiaArray[idx]) {
+          fotosPasantiaArray[idx].pie = inp.value;
+          pintar();
+        }
+      };
+    });
+
+    grid.querySelectorAll('.js-ce-foto-del').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.idx);
+        fotosPasantiaArray.splice(idx, 1);
+        pintarFotosGrid();
+        pintar();
+      };
+    });
+
+    grid.querySelectorAll('.js-ce-foto-prev').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.idx);
+        if (idx > 0) {
+          const item = fotosPasantiaArray.splice(idx, 1)[0];
+          fotosPasantiaArray.splice(idx - 1, 0, item);
+          pintarFotosGrid();
+          pintar();
+        }
+      };
+    });
+
+    grid.querySelectorAll('.js-ce-foto-next').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.idx);
+        if (idx < fotosPasantiaArray.length - 1) {
+          const item = fotosPasantiaArray.splice(idx, 1)[0];
+          fotosPasantiaArray.splice(idx + 1, 0, item);
+          pintarFotosGrid();
+          pintar();
+        }
+      };
+    });
+  };
+
+  const agregarArchivosFotos = async (files) => {
+    if (!files || !files.length) return;
+    toast('Procesando archivos...', 'info');
+    let fotosNuevas = 0;
+    for (const file of files) {
+      const isDocx = file.name.toLowerCase().endsWith('.docx') || file.type.includes('wordprocessingml');
+      if (isDocx) {
+        try {
+          const extraidas = await extraerImagenesDeDocx(file);
+          if (extraidas && extraidas.length) {
+            extraidas.forEach((f, idx) => {
+              fotosPasantiaArray.push({
+                src: f.src,
+                pie: f.pie || ''
+              });
+            });
+            fotosNuevas += extraidas.length;
+            toast(`Se extrajeron ${extraidas.length} fotografías del archivo Word.`, 'success');
+          } else {
+            toast(`No se encontraron imágenes en ${file.name}.`, 'warning');
+          }
+        } catch (err) {
+          console.error('Error al extraer imágenes del .docx:', err);
+          toast(`Error al leer archivo Word: ${err.message}`, 'error');
+        }
+      } else if (file.type.startsWith('image/')) {
+        try {
+          const dataUrl = await optimizarImagenBlob(file, 1200, 0.85);
+          fotosPasantiaArray.push({
+            src: dataUrl,
+            pie: ''
+          });
+          fotosNuevas++;
+        } catch (err) {
+          console.warn('Error al procesar imagen:', err);
+        }
+      }
+    }
+    if (fotosNuevas > 0) {
+      pintarFotosGrid();
+      pintar();
+      toast(`${fotosNuevas} fotografía(s) agregada(s) correctamente.`, 'success');
+    }
+  };
+
+  const dropzone = $('#ce_fotos_dropzone');
+  const fileInputFotos = $('#ce_file_fotos');
+  if (dropzone && fileInputFotos) {
+    dropzone.onclick = () => fileInputFotos.click();
+
+    dropzone.ondragover = (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--gold, #b89446)';
+      dropzone.style.background = 'rgba(184,148,70,0.08)';
+    };
+
+    dropzone.ondragleave = (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--line)';
+      dropzone.style.background = 'var(--card-sub-bg, rgba(255,255,255,0.02))';
+    };
+
+    dropzone.ondrop = async (e) => {
+      e.preventDefault();
+      dropzone.style.borderColor = 'var(--line)';
+      dropzone.style.background = 'var(--card-sub-bg, rgba(255,255,255,0.02))';
+      const files = Array.from(e.dataTransfer.files || []);
+      await agregarArchivosFotos(files);
+    };
+
+    fileInputFotos.onchange = async (e) => {
+      const files = Array.from(e.target.files || []);
+      await agregarArchivosFotos(files);
+      fileInputFotos.value = '';
+    };
+  }
+
+  const btnVaciarFotos = $('#ce_btn_vaciar_fotos');
+  if (btnVaciarFotos) {
+    btnVaciarFotos.onclick = () => {
+      if (!fotosPasantiaArray.length) return;
+      fotosPasantiaArray = [];
+      pintarFotosGrid();
+      pintar();
+      toast('Fotos eliminadas.', 'info');
+    };
+  }
+
+  const selLayout = $('#ce_fotos_layout');
+  if (selLayout) {
+    selLayout.onchange = () => {
+      pintar();
+    };
+  }
+
+  // Pegar imágenes con Ctrl + V
+  document.addEventListener('paste', async (e) => {
+    if (!esPasantia()) return;
+    const items = (e.clipboardData || window.clipboardData)?.items;
+    if (!items) return;
+    const imgFiles = [];
+    for (const item of items) {
+      if (item.type.indexOf('image') !== -1) {
+        const file = item.getAsFile();
+        if (file) imgFiles.push(file);
+      }
+    }
+    if (imgFiles.length) {
+      e.preventDefault();
+      await agregarArchivosFotos(imgFiles);
+    }
+  });
 
   // Editor plegable de actividades generadas
   const editorWrap = $('#ce_jornadas_editor_wrap');
