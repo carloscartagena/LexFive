@@ -118,7 +118,7 @@ export function obtenerTratamiento(genero) {
 export function normalizarNotaDesig(nota) {
   const n = (nota || '').trim();
   if (!n) return '';
-  if (/^(nota|n[°º.]|nro)/i.test(n)) return n;
+  if (/(nota|n[°º.]|nro)/i.test(n)) return n;
   return `N.º ${n}`;
 }
 
@@ -177,9 +177,153 @@ export function extraerHoras(horarioStr, modalidadStr) {
   return { horas, ingreso, salida };
 }
 
+// Catálogo extendido de actividades forenses bolivianas detalladas (3 actividades reales por día, 18-30 palabras cada una)
+const ACTIVIDADES_BOLIVIA_POR_DIA = [
+  // Jornada 1
+  [
+    'Inducción institucional sobre normas deontológicas de la abogacía, deberes de probidad, confidencialidad profesional y funcionamiento orgánico del bufete LexFive.',
+    'Estudio del protocolo interno de atención al usuario, custodia de credenciales de plataformas informáticas y régimen de reserva de expedientes litigiosos.',
+    'Familiarización con los sistemas de registro físico y nomenclatura archivística para cuadernos de control jurisdiccional y carpetas de clientes.'
+  ],
+  // Jornada 2
+  [
+    'Revisión, organización física y foliado correlativo de cuadernos procesales en materias Civil, Comercial y Familiar conforme a las exigencias de la Ley 439 y Ley 603.',
+    'Verificación de la foliatura de demandas principales, excepciones previas, contestaciones y actas de audiencia preliminar para evitar reposiciones procesales.',
+    'Digitalización e indexación de memoriales y providencias judiciales en las carpetas virtuales del servidor institucional de LexFive.'
+  ],
+  // Jornada 3
+  [
+    'Clasificación y archivo cronológico de actuaciones judiciales, resoluciones de mero trámite, autos interlocutorios simples y definitivos notificados en estrados.',
+    'Control y compulsa de cédulas de notificación física recabadas en juzgados públicos civiles y comerciales de la ciudad de La Paz y El Alto.',
+    'Registro de plazos fatales y perentorios en la pizarra de control y agenda jurídica institucional del despacho para su seguimiento oportuno.'
+  ],
+  // Jornada 4
+  [
+    'Capacitación técnica en el uso y registro de causas en el sistema informático interno del bufete para seguimiento en tiempo real.',
+    'Verificación y actualización del estado procesal de procesos ejecutivos, coactivos civiles y procesos ordinarios de usucapión decenal y reivindicación.',
+    'Elaboración de fichas informativas de clientes con detalle de pretensiones, jueces asignados, número de NURIS y memoriales pendientes de proveído.'
+  ],
+  // Jornada 5
+  [
+    'Auditoría procesal y elaboración del rol semanal de vencimiento de términos probatorios y plazos para interposición de recursos ordinarios según el CPC.',
+    'Revisión minuciosa de plazos de apelación en efecto devolutivo y suspensivo contra autos interlocutorios que rechazan medidas cautelares patrimoniales.',
+    'Reunión de balance semanal con el abogado tutor para la asignación y planificación de diligencias de estrado de la siguiente semana.'
+  ],
+  // Jornada 6
+  [
+    'Diligenciamiento y seguimiento de expedientes en juzgados públicos civiles y comerciales del Tribunal Departamental de Justicia en la ciudad de El Alto.',
+    'Entrevista con secretarios de juzgado para la búsqueda y remisión a despacho de cuadernos procesales pendientes de admisión de demanda y autos de intimación.',
+    'Revisión en estrados judiciales de listas de despacho y cuadernos de control de notificaciones de juzgados de familia.'
+  ],
+  // Jornada 7
+  [
+    'Revisión de cuadernos de control jurisdiccional e investigaciones en fiscalías corporativas y juzgados de instrucción penal cautelar.',
+    'Seguimiento y compulsa del cuaderno de investigaciones en la plataforma digital Justicia Libre 2.0 (JL2) del Ministerio Público.',
+    'Verificación de plazos de la etapa preliminar y etapa preparatoria, verificando la emisión de requerimientos conclusivos de imputación o sobreseimiento.'
+  ],
+  // Jornada 8
+  [
+    'Diligenciamiento de mandamientos judiciales, órdenes instruidas, citaciones y emplazamientos coordinando con oficiales de diligencias en estrados.',
+    'Acompañamiento a la central de notificaciones para la verificación de entrega de cédulas a partes demandadas en procesos familiares y civiles.',
+    'Redacción de representaciones y actas de representación formal cuando los domicilios procesales o reales se encuentran cerrados o deshabitados.'
+  ],
+  // Jornada 9
+  [
+    'Revisión diaria del buzón judicial electrónico y notificaciones digitales en las plataformas del Órgano Judicial Hermes y Thor.',
+    'Descarga, cotejo y archivo digital de notificaciones electrónicas verificando el cómputo de plazos a partir de su recepción formal.',
+    'Alerta inmediata a los abogados patrocinantes sobre resoluciones con plazo fatal para interposición de recursos de reposición o apelación.'
+  ],
+  // Jornada 10
+  [
+    'Elaboración de fichas síntesis del estado procesal de causas asignadas para el informe quincenal de cartera y auditoría legal.',
+    'Verificación de medidas cautelares patrimoniales trabadas, tales como anotaciones preventivas en DDRR y retención de fondos ante la ASFI.',
+    'Revisión y actualización de los estados de cuenta procesales y liquidaciones preliminares de asistencia familiar devengada conforme a la Ley 603.'
+  ],
+  // Jornada 11
+  [
+    'Redacción de borradores de memoriales de mero trámite: apersonamientos formales, solicitudes de copias legalizadas y desarchivo de expedientes.',
+    'Elaboración de solicitudes de desglose de documentos originales previa presentación de fotocopias legalizadas de respaldo conforme al art. 85 del CPC.',
+    'Revisión de fundamentación procesal y formalidades de patrocinio profesional junto al abogado guía del bufete.'
+  ],
+  // Jornada 12
+  [
+    'Redacción de borradores de memoriales solicitando señalamiento de audiencia preliminar, audiencia de juicio y liquidación de pensiones de asistencia familiar.',
+    'Elaboración de liquidaciones periciales de asistencia familiar conforme al Código de las Familias y del Proceso Familiar (Ley 603).',
+    'Solicitud de mandamientos de apremio corporal y arraigo nacional en causas de asistencia familiar con liquidación debidamente aprobada.'
+  ],
+  // Jornada 13
+  [
+    'Apoyo en la redacción preliminar de memoriales de contestación de demanda, allanamiento o reconvención en procesos ordinarios y extraordinarios.',
+    'Planteamiento estructurado de excepciones previas de incompetencia, litispendencia y cosa juzgada conforme a los arts. 127 y 128 del Código Procesal Civil.',
+    'Recopilación y ofrecimiento de prueba documental, testifical e inspección judicial adjunta a los memoriales de contestación.'
+  ],
+  // Jornada 14
+  [
+    'Búsqueda, sistematización y compulsa de jurisprudencia y sentencias constitucionales plurinacionales en el portal del Tribunal Constitucional Plurinacional (TCP).',
+    'Análisis de precedentes constitucionales vinculantes sobre debido proceso, valoración razonable de la prueba y tutela judicial efectiva.',
+    'Extracción de ratio decidendi y elaboración de citas jurisprudenciales aplicables a memoriales de apelación y amparos constitucionales.'
+  ],
+  // Jornada 15
+  [
+    'Redacción de borradores de contratos privados de compraventa de inmuebles, minutas de transferencia definitiva y compromisos de pago transaccionales.',
+    'Elaboración de cláusulas de evicción y saneamiento, pacto comisorio y reconocimiento judicial y notarial de firmas y rúbricas conforme al Código Civil.',
+    'Asesoramiento a clientes del bufete sobre los requisitos de visado colegial y protocolización ante notarías de fe pública.'
+  ],
+  // Jornada 16
+  [
+    'Diligencias en Derechos Reales (DDRR): tramitación, seguimiento y retiro de certificaciones decenales y treintañales para saneamiento de títulos.',
+    'Ingreso de formularios de registro de propiedad, cancelación de gravámenes, hipotecas voluntarias y subinscripciones de datos de identidad en DDRR.',
+    'Verificación de antecedentes dominiales y tradición hereditaria en oficinas de Derechos Reales de La Paz y El Alto.'
+  ],
+  // Jornada 17
+  [
+    'Tramitación de certificados de estado civil, partidas de nacimiento, matrimonio y defunción ante el Servicio de Registro Cívico (SERECI).',
+    'Gestión de certificaciones de filiación, duplicados de cédula de identidad y saneamiento de datos biométricos ante las oficinas del SEGIP.',
+    'Acompañamiento a clientes en trámites administrativos de rectificación de partidas registrales por errores u omisiones en nombres y apellidos.'
+  ],
+  // Jornada 18
+  [
+    'Gestiones administrativas ante dependencias del Gobierno Autónomo Municipal de El Alto (GAMEA) para catastro, visado de planos y tributación.',
+    'Tramitación de certificaciones catastrales, pago de impuestos a la transferencia inmobiliaria (IMT) y liquidación de patentes municipales.',
+    'Verificación de resoluciones administrativas de regularización técnica de lotes y construcciones en oficinas de Ordenamiento Territorial.'
+  ],
+  // Jornada 19
+  [
+    'Consolidación final de cuadernos de seguimiento, digitalización de actuaciones forenses y entrega formal de carteras de procesos a la dirección jurídica.',
+    'Organización de carpetas de pruebas documentales para audiencias orales señaladas para las próximas semanas.',
+    'Revisión final del inventario de causas patrocinadas por el despacho, constatando que no existan plazos vencidos ni peticiones sin respuesta.'
+  ],
+  // Jornada 20
+  [
+    'Cierre de pasantía, consolidación y firma de la Hoja de Control de Asistencia y Permanencia con detalle de horas y fechas hábiles cumplidas.',
+    'Recopilación y foliado del muestrario de actuaciones forenses, memoriales redactados y providencias judiciales obtenidas durante la práctica.',
+    'Redacción final, revisión institucional y presentación formal del Informe Único de Pasantía dirigido al Docente Guía de la Carrera de Derecho UMSA.'
+  ]
+];
+
 export function calcularJornadasPasantia(fechaInicioStr, fechaFinStr, modalidadStr, feriadosExtraStr, customTareas) {
   const modLower = (modalidadStr || '').toLowerCase();
   const numJornadas = (modLower.includes('2 semanas') || modLower.includes('tiempo completo')) ? 10 : 20;
+
+  const resolverActividades = (custom, idx) => {
+    const defaultActs = ACTIVIDADES_BOLIVIA_POR_DIA[idx % ACTIVIDADES_BOLIVIA_POR_DIA.length];
+    if (!custom) return defaultActs;
+    if (Array.isArray(custom.actividades) && custom.actividades.length >= 3) {
+      return custom.actividades.map(a => String(a || '').trim()).filter(Boolean);
+    }
+    const arr = [];
+    if (Array.isArray(custom.actividades) && custom.actividades.length > 0) {
+      arr.push(...custom.actividades.map(a => String(a || '').trim()).filter(Boolean));
+    } else if (custom.detalle) {
+      arr.push(custom.detalle.trim());
+    }
+    // Completar hasta 3 con tareas institucionales únicas del día correspondiente
+    for (const actDef of defaultActs) {
+      if (arr.length >= 3) break;
+      if (!arr.includes(actDef)) arr.push(actDef);
+    }
+    return arr;
+  };
 
   if (!fechaInicioStr) {
     return Array.from({ length: numJornadas }, (_, i) => {
@@ -192,18 +336,9 @@ export function calcularJornadasPasantia(fechaInicioStr, fechaFinStr, modalidadS
         fechaRaw: '',
         diaSemana: '',
         semanaIdx: Math.floor(i / 5) + 1,
-        tarea: custom ? {
-          resumen: custom.resumen || base.resumen,
-          actividades: Array.isArray(custom.actividades) && custom.actividades.length
-            ? custom.actividades
-            : [custom.detalle || base.detalle]
-        } : {
-          resumen: base.resumen,
-          actividades: [
-            base.detalle,
-            'Compulsa de normativa procesal boliviana aplicable.',
-            'Diligenciamiento y control de plazos perentorios en despacho.'
-          ]
+        tarea: {
+          resumen: (custom && custom.resumen) || base.resumen,
+          actividades: resolverActividades(custom, i)
         }
       };
     });
@@ -220,18 +355,9 @@ export function calcularJornadasPasantia(fechaInicioStr, fechaFinStr, modalidadS
       fechaRaw: jh.iso,
       diaSemana: jh.diaSemana,
       semanaIdx: jh.semanaIdx,
-      tarea: custom ? {
-        resumen: custom.resumen || base.resumen,
-        actividades: Array.isArray(custom.actividades) && custom.actividades.length
-          ? custom.actividades
-          : [custom.detalle || base.detalle]
-      } : {
-        resumen: base.resumen,
-        actividades: [
-          base.detalle,
-          'Compulsa de jurisprudencia y normativa procesal aplicable.',
-          'Diligenciamiento y control de plazos perentorios en despacho.'
-        ]
+      tarea: {
+        resumen: (custom && custom.resumen) || base.resumen,
+        actividades: resolverActividades(custom, i)
       }
     };
   });
@@ -241,7 +367,7 @@ export function generarConclusionesTexto(genero, nombrePasante = '') {
   const t = obtenerTratamiento(genero);
   return `1) En el aspecto técnico-jurídico, ${t.pasanteArticulo} demostró sólida solvencia en la compulsa de expedientes, interpretación de doctrina y aplicación práctica del Código Procesal Civil (Ley 439), Código de las Familias (Ley 603) y normativa conexa, elaborando memoriales con fundamentación idónea.\n\n` +
     `2) En el ámbito ético y deontológico, su desempeño se caracterizó por la puntualidad, confidencialidad, lealtad procesal y probidad en la atención a patrocinados y custodia del archivo forense, consolidando las competencias prácticas exigidas por la Carrera de Derecho.\n\n` +
-    `3) Por lo expuesto, se otorga plena CONFORMIDAD y VISTO BUENO institucional al período de prácticas pre-profesionales, recomendando la acreditación de la materia de Pasantía al haber cumplido satisfactoriamente con la totalidad de horas y objetivos formativos previstos.`;
+    `3) Por lo expuesto, se otorga plena CONFORMIDAD Y VISTO BUENO institucional al período de prácticas pre-profesionales, recomendando la acreditación de la materia de Pasantía al haber cumplido satisfactoriamente con la totalidad de horas y objetivos formativos previstos.`;
 }
 
 // ----------------------------------------------------------------------
@@ -313,7 +439,7 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   // Tutor / Supervisión Forense
   const sup = formatearSupervision(d.tutor_nombre, d.tutor_rpa);
 
-  const antecedentes = esc(d.antecedentes || `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía ${notaDesig} de fecha ${fechaNota}.`);
+  const antecedentes = esc(d.antecedentes || `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía: ${notaDesig} de fecha ${fechaNota}.`);
   const conclusiones = esc(d.conclusiones || generarConclusionesTexto(d.genero, nombre));
   const fotos = Array.isArray(d.fotos) ? d.fotos : [];
   const modo = d.modo_presentacion || 'lexfive';
@@ -361,71 +487,108 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
     <div style="white-space:pre-line;text-align:justify;font-size:12pt !important;line-height:1.45 !important;">${antecedentes}</div>
   `;
 
-  // --- CRONOGRAMA DE ACTIVIDADES EN ARIAL 12 CON 3 JORNADAS POR HOJA ---
+  // --- CRONOGRAMA DE ACTIVIDADES EN ARIAL 12 CON PAGINACIÓN SECUENCIAL SIN HUECOS ---
   const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad, d.feriados_extra, d.customTareas);
   const paginasActividades = [];
 
-  // Agrupar jornadas por semanas naturales (5 jornadas por semana) para títulos formales
   const nombresSemanas = ['PRIMERA SEMANA', 'SEGUNDA SEMANA', 'TERCERA SEMANA', 'CUARTA SEMANA', 'QUINTA SEMANA'];
   const numerosRomanos = ['I', 'II', 'III', 'IV', 'V'];
 
   if (jornadas.length) {
-    const jornadasPorPagina = 3; // 3 jornadas por hoja Carta llena cómodamente la página
-    let semanaAnterior = null;
+    // Agrupar jornadas por semana natural
+    const semMap = new Map();
+    jornadas.forEach(j => {
+      const sIdx = j.semanaIdx || Math.floor((j.numero - 1) / 5) + 1;
+      if (!semMap.has(sIdx)) semMap.set(sIdx, []);
+      semMap.get(sIdx).push(j);
+    });
 
-    for (let i = 0; i < jornadas.length; i += jornadasPorPagina) {
-      const slice = jornadas.slice(i, i + jornadasPorPagina);
-      const semActualNum = slice[0].semanaIdx || Math.floor((slice[0].numero - 1) / 5) + 1;
-      const semActualIndex = semActualNum - 1;
-      const nombreSemana = nombresSemanas[semActualIndex] || `SEMANA ${semActualNum}`;
-      const romano = numerosRomanos[semActualIndex] || `${semActualNum}`;
+    let currentPagContent = '';
+    let currentPagHeight = 0; // Presupuesto de altura útil aproximada en puntos (~680pt útil por hoja Carta Arial 12)
+    const MAX_PAGE_HEIGHT = 650;
+    let esPrimeraPaginaAct = true;
 
-      // Calcular rango real de fechas para esta semana
-      const jornadasEstaSemana = jornadas.filter(j => (j.semanaIdx || Math.floor((j.numero - 1) / 5) + 1) === semActualNum);
-      const fechaIniSem = jornadasEstaSemana[0]?.fecha || '';
-      const fechaFinSem = jornadasEstaSemana[jornadasEstaSemana.length - 1]?.fecha || '';
+    const renderJornadaBlock = (dj) => `
+      <div style="padding-left:4px;background:transparent !important;margin-bottom:8px;">
+        <div style="font-size:12pt !important;font-weight:bold;color:#101820;line-height:1.35 !important;margin-bottom:2px;">
+          • Jornada ${dj.numero} (${dj.diaSemana} ${dj.fecha || '—'}): <span style="font-weight:normal;color:#222;">${esc(dj.tarea.resumen)}</span>
+        </div>
+        <ul style="margin:2px 0 2px 20px;padding:0;font-size:12pt !important;line-height:1.45 !important;color:#222;">
+          ${dj.tarea.actividades.map(act => `<li style="margin-bottom:3px;text-align:justify;">${esc(act)}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+
+    // Recorrer cada semana en orden estricto
+    Array.from(semMap.entries()).forEach(([sNum, jList]) => {
+      const semActualIndex = sNum - 1;
+      const nombreSemana = nombresSemanas[semActualIndex] || `SEMANA ${sNum}`;
+      const romano = numerosRomanos[semActualIndex] || `${sNum}`;
+      const fechaIniSem = jList[0]?.fecha || '';
+      const fechaFinSem = jList[jList.length - 1]?.fecha || '';
       const rangoSemTxt = (fechaIniSem && fechaFinSem) ? ` (del ${fechaIniSem} al ${fechaFinSem})` : '';
 
-      const esContinuacion = (semanaAnterior === semActualNum);
-      semanaAnterior = semActualNum;
+      let semanaIniciada = false;
 
-      const headerTitulo = i === 0 ? `
-        <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:6px;border-bottom:1.5px solid #0e1b2c;padding-bottom:2px;background:transparent !important;">
-          II. DETALLE CRONOLÓGICO DE FUNCIONES Y ACTIVIDADES REALIZADAS
-        </div>
-      ` : '';
+      jList.forEach((dj, jIdx) => {
+        // Estimar peso visual de la jornada (en puntos aprox): ~110pt por jornada con 3 actividades
+        const pesoJornada = 100 + (dj.tarea.actividades.length * 15);
+        const pesoBanner = 40;
+        const pesoHeaderII = esPrimeraPaginaAct ? 45 : 0;
 
-      const semanaBanner = esContinuacion ? `
-        <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-bottom:10px;font-size:11.5pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
-          ${romano}. ${nombreSemana} (Continuación)
-        </div>
-      ` : `
-        <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-bottom:10px;font-size:12pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
-          ${romano}. ${nombreSemana}${rangoSemTxt}
-        </div>
-      `;
+        // Si la jornada no entra en la página actual y ya tenemos contenido, cerramos página
+        if (currentPagContent && (currentPagHeight + pesoJornada + (semanaIniciada ? 0 : pesoBanner) > MAX_PAGE_HEIGHT)) {
+          paginasActividades.push(currentPagContent);
+          currentPagContent = '';
+          currentPagHeight = 0;
+          semanaIniciada = false; // Requiere banner de continuación en la nueva hoja
+        }
 
-      let pagContent = `
-        ${headerTitulo}
-        ${semanaBanner}
-        <div style="display:flex;flex-direction:column;gap:10px;background:transparent !important;">
-      `;
+        if (!currentPagContent) {
+          // Nueva página
+          if (esPrimeraPaginaAct) {
+            currentPagContent += `
+              <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:6px;border-bottom:1.5px solid #0e1b2c;padding-bottom:2px;background:transparent !important;">
+                II. DETALLE CRONOLÓGICO DE FUNCIONES Y ACTIVIDADES REALIZADAS
+              </div>
+            `;
+            currentPagHeight += pesoHeaderII;
+            esPrimeraPaginaAct = false;
+          }
 
-      slice.forEach(dj => {
-        pagContent += `
-          <div style="padding-left:4px;background:transparent !important;">
-            <div style="font-size:12pt !important;font-weight:bold;color:#101820;line-height:1.35 !important;margin-bottom:2px;">
-              • Jornada ${dj.numero} (${dj.diaSemana} ${dj.fecha || '—'}): <span style="font-weight:normal;color:#222;">${esc(dj.tarea.resumen)}</span>
+          if (semanaIniciada) {
+            currentPagContent += `
+              <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-bottom:10px;font-size:11.5pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
+                ${romano}. ${nombreSemana} (Continuación)
+              </div>
+            `;
+          } else {
+            currentPagContent += `
+              <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-bottom:10px;font-size:12pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
+                ${romano}. ${nombreSemana}${rangoSemTxt}
+              </div>
+            `;
+            semanaIniciada = true;
+          }
+          currentPagHeight += pesoBanner;
+        } else if (!semanaIniciada) {
+          // Si entra en la página pero inicia nueva semana
+          currentPagContent += `
+            <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-top:8px;margin-bottom:10px;font-size:12pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
+              ${romano}. ${nombreSemana}${rangoSemTxt}
             </div>
-            <ul style="margin:2px 0 2px 20px;padding:0;font-size:12pt !important;line-height:1.45 !important;color:#222;">
-              ${dj.tarea.actividades.map(act => `<li style="margin-bottom:3px;">${esc(act)}</li>`).join('')}
-            </ul>
-          </div>
-        `;
-      });
+          `;
+          currentPagHeight += pesoBanner;
+          semanaIniciada = true;
+        }
 
-      pagContent += `</div>`;
-      paginasActividades.push(pagContent);
+        currentPagContent += renderJornadaBlock(dj);
+        currentPagHeight += pesoJornada;
+      });
+    });
+
+    if (currentPagContent) {
+      paginasActividades.push(currentPagContent);
     }
   } else {
     paginasActividades.push(`
@@ -729,7 +892,7 @@ export function buildInformeWordDocument(d, logoSrc) {
   // Tutor / Supervisión
   const sup = formatearSupervision(d.tutor_nombre, d.tutor_rpa);
 
-  const antecedentes = esc(d.antecedentes || `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía ${notaDesig} de fecha ${fechaNota}.`);
+  const antecedentes = esc(d.antecedentes || `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía: ${notaDesig} de fecha ${fechaNota}.`);
   const conclusiones = esc(d.conclusiones || generarConclusionesTexto(d.genero, nombre));
   const fotos = Array.isArray(d.fotos) ? d.fotos : [];
 
@@ -983,12 +1146,16 @@ export async function exportarHojasCartaAPdf(hojasList, nombreArchivo, progressC
 
   const totalHojas = hojasList.length;
   const opt = {
-    image: { type: 'jpeg', quality: 0.95 },
+    image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
+      width: 816,
+      height: 1056,
+      windowWidth: 816,
+      windowHeight: 1056,
       scrollX: 0,
       scrollY: 0
     },
@@ -1000,38 +1167,77 @@ export async function exportarHojasCartaAPdf(hojasList, nombreArchivo, progressC
     try { await document.fonts.ready; } catch (_) {}
   }
 
-  // 1. Obtener primera página renderizada en canvas
-  if (progressCallback) progressCallback(1, totalHojas);
-  const firstCanvas = await window.html2pdf().set(opt).from(hojasList[0]).toCanvas().get('canvas');
-  const firstImg = firstCanvas.toDataURL('image/jpeg', 0.95);
+  // Crear contenedor temporal invisible normalizado a 816x1056px exactos
+  const stage = document.createElement('div');
+  stage.style.position = 'fixed';
+  stage.style.top = '0';
+  stage.style.left = '0';
+  stage.style.width = '816px';
+  stage.style.height = '1056px';
+  stage.style.overflow = 'hidden';
+  stage.style.zIndex = '-9999';
+  stage.style.background = '#ffffff';
+  stage.style.margin = '0';
+  stage.style.padding = '0';
+  stage.style.transform = 'none';
+  document.body.appendChild(stage);
 
-  // 2. Obtener instancia pdf de html2pdf
-  const pdf = await window.html2pdf().set(opt).from(hojasList[0]).toPdf().get('pdf');
+  try {
+    const renderHojaToDataURL = async (hojaEl) => {
+      stage.innerHTML = '';
+      const clone = hojaEl.cloneNode(true);
+      clone.style.margin = '0';
+      clone.style.width = '816px';
+      clone.style.height = '1056px';
+      clone.style.minHeight = '1056px';
+      clone.style.maxHeight = '1056px';
+      clone.style.boxShadow = 'none';
+      clone.style.transform = 'none';
+      stage.appendChild(clone);
 
-  // Limpiar páginas iniciales duplicadas dejando 1 página limpia
-  const totalBefore = pdf.internal.getNumberOfPages();
-  for (let p = totalBefore; p > 1; p--) {
-    pdf.deletePage(p);
+      const imgs = Array.from(stage.querySelectorAll('img'));
+      if (imgs.length) {
+        await Promise.all(imgs.map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(res => { img.onload = res; img.onerror = res; });
+        }));
+      }
+
+      const canvas = await window.html2pdf().set(opt).from(stage).toCanvas().get('canvas');
+      return canvas.toDataURL('image/jpeg', 0.98);
+    };
+
+    // 1. Primera hoja
+    if (progressCallback) progressCallback(1, totalHojas);
+    const firstImg = await renderHojaToDataURL(hojasList[0]);
+
+    // Obtener instancia base de jsPDF
+    const pdf = await window.html2pdf().set(opt).from(hojasList[0]).toPdf().get('pdf');
+
+    // Limpiar páginas iniciales generadas por html2pdf
+    const totalBefore = pdf.internal.getNumberOfPages();
+    for (let p = totalBefore; p > 1; p--) {
+      pdf.deletePage(p);
+    }
+
+    pdf.setPage(1);
+    pdf.addImage(firstImg, 'JPEG', 0, 0, 215.9, 279.4);
+
+    // 2. Iterar secuencialmente por las siguientes páginas sin colapsar memoria
+    for (let i = 1; i < totalHojas; i++) {
+      if (progressCallback) progressCallback(i + 1, totalHojas);
+      pdf.addPage('letter', 'portrait');
+      pdf.setPage(i + 1);
+
+      const imgData = await renderHojaToDataURL(hojasList[i]);
+      pdf.addImage(imgData, 'JPEG', 0, 0, 215.9, 279.4);
+    }
+
+    pdf.save(nombreArchivo);
+    return totalHojas;
+  } finally {
+    if (stage) stage.remove();
   }
-
-  // Estampar la primera hoja en la página 1
-  pdf.setPage(1);
-  pdf.addImage(firstImg, 'JPEG', 0, 0, 215.9, 279.4);
-
-  // 3. Iterar secuencialmente sobre las siguientes hojas (evita canvas gigante de Chromium)
-  for (let i = 1; i < totalHojas; i++) {
-    if (progressCallback) progressCallback(i + 1, totalHojas);
-    pdf.addPage('letter', 'portrait');
-    pdf.setPage(i + 1);
-
-    const pageCanvas = await window.html2pdf().set(opt).from(hojasList[i]).toCanvas().get('canvas');
-    const imgData = pageCanvas.toDataURL('image/jpeg', 0.95);
-    pdf.addImage(imgData, 'JPEG', 0, 0, 215.9, 279.4);
-  }
-
-  // 4. Guardar archivo PDF final
-  pdf.save(nombreArchivo);
-  return totalHojas;
 }
 
 // Función auxiliar que monta temporalmente las hojas si no están visibles en pantalla
@@ -1119,16 +1325,18 @@ export function descargarInformePDF(d, logoSrc, model, wmOp) {
 
 export function imprimirInformeDocumento(d, logoSrc, model, wmOp) {
   const docHTML = buildPaginasInforme(d, logoSrc, model, wmOp);
+  const nombreLimpio = (d.nombre || 'pasante').trim();
+  const tituloDoc = `Informe_Unico_Pasantia_${nombreLimpio.replace(/[^\w]+/g, '_')}`;
   const w = window.open('', '_blank');
   if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
-  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe Único de Pasantía - ${esc(d.nombre)}</title>
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(tituloDoc)}</title>
     <style>
-      @page { size: letter; margin: 0; }
-      html, body { margin: 0; background: #fff; }
-      .hoja-carta { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: 100vh !important; }
+      @page { size: letter portrait; margin: 0; }
+      html, body { margin: 0; padding: 0; background: #fff; width: 100%; }
+      .hoja-carta { box-shadow: none !important; margin: 0 auto !important; width: 21.59cm !important; height: 27.94cm !important; page-break-after: always; break-after: page; }
       ${PRINT_COLOR_CSS}
     </style></head><body>${docHTML}
-    <script>window.addEventListener('load', function(){ setTimeout(function(){ window.print(); }, 400); });<\/script></body></html>`);
+    <script>window.addEventListener('load', function(){ setTimeout(function(){ window.print(); }, 450); });<\/script></body></html>`);
   w.document.close();
 }
 

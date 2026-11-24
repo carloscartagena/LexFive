@@ -365,9 +365,9 @@ export async function renderCertificados() {
           </div>
         </div>
         <div id="ce_informe_actions" style="display:none;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn--primary btn--sm" id="ce_btn_descargar_informe_pdf" type="button">Descargar Informe PDF (Membretado)</button>
-          <button class="btn btn--ghost btn--sm" id="ce_btn_imprimir_informe" type="button">Imprimir Informe</button>
-          <button class="btn btn--ghost btn--sm" id="ce_btn_descargar_informe_word" type="button">Descargar Informe Word (.doc)</button>
+          <button class="btn btn--primary btn--sm" id="ce_btn_imprimir_informe" type="button" style="font-weight:bold;background:#b89446;color:#fff;">🖨️ Guardar PDF Vectorial / Imprimir (Calidad Óptima)</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_descargar_informe_pdf" type="button">📥 Descargar PDF Directo</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_descargar_informe_word" type="button">📄 Descargar Informe Word (.doc)</button>
         </div>
       </div>
       <div class="card__body"><div class="cert-preview" id="certPreview"></div></div>
@@ -777,6 +777,14 @@ export async function renderCertificados() {
     refActual = c.ref;
     editando = true;
     guardadoActual = false;
+    // Limpiar estado en memoria previo para garantizar sincronización estricta
+    cronogramaPersonalizado = null;
+    if (esPas) {
+      if (Array.isArray(c.customTareas) && c.customTareas.length) {
+        cronogramaPersonalizado = c.customTareas;
+      }
+      pintarEditorJornadas();
+    }
     const banner = $('#ce_editbanner'); if (banner) { banner.style.display = ''; const r = $('#ce_editref'); if (r) r.textContent = c.ref; }
     pintar();
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
@@ -789,6 +797,9 @@ export async function renderCertificados() {
     guardadoActual = false;
     refActual = nuevoRef();
     cuerpoEditado = false;
+    cronogramaPersonalizado = null;
+    const editorWrap = $('#ce_jornadas_editor_wrap');
+    if (editorWrap) editorWrap.style.display = 'none';
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
      'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
     if ($('#ce_genero')) $('#ce_genero').value = 'femenino';
@@ -971,18 +982,17 @@ export async function renderCertificados() {
               badgeIA.style.border = '1px solid rgba(34,197,94,0.3)';
               badgeIA.textContent = '✓ Generado con IA';
               badgeIA.title = 'Actividades generadas exitosamente con Google Gemini';
-              toast('¡Actividades únicas generadas con IA!', 'success');
             } else {
               badgeIA.style.background = 'rgba(234,179,8,0.15)';
               badgeIA.style.color = '#ca8a04';
               badgeIA.style.border = '1px solid rgba(234,179,8,0.3)';
               badgeIA.textContent = '⚠️ Generado con banco local';
               badgeIA.title = crono.motivo ? `Motivo: ${crono.motivo}` : 'Banco normativo local';
-              toast('Actividades generadas mediante banco normativo institucional.', 'info');
             }
           }
           pintarEditorJornadas();
           pintar();
+          toast(`Informe y Hoja de Asistencia actualizados (${crono.length} jornadas)`, 'success');
         }
       } catch (err) {
         console.error('Error al generar con IA:', err);

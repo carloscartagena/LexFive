@@ -607,7 +607,7 @@ export async function renderInforme() {
           $('#in_actividades').value = txt;
           pintar();
           saveDraft();
-          toast('¡Cronograma único generado con IA!', 'success');
+          toast(`Informe y Hoja de Asistencia actualizados (${crono.length} jornadas)`, 'success');
         }
       } catch (err) {
         toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
