@@ -14,66 +14,150 @@ import { loading, toast, openModal, closeModal } from './ui.js';
 import { profName, namesFromIds } from './comunes.js';
 import { descargarArchivo } from './exportar.js';
 import { generateContent, generateContentStream } from './ai.js';
+import { VARIABLES_ESCRITO, ESTRUCTURAS_BASE_BOLIVIA } from './escritos.js';
+import { membreteHeader, membreteFooter, modeloMembrete, abrirImpresionVectorial } from './membrete-base.js';
 
 // Campos disponibles para usar en las plantillas con la forma {{campo}}.
 function placeholdersDisponibles() {
   return [
+    ['CLIENTE_NOMBRE', 'Nombre del cliente'],
+    ['CLIENTE_CI', 'C.I. / Documento'],
+    ['CLIENTE_DOMICILIO', 'Domicilio real'],
+    ['CLIENTE_TELEFONO', 'Teléfono / WhatsApp'],
+    ['CLIENTE_EMAIL', 'Correo electrónico'],
+    ['PROCESO', 'Carátula de la causa'],
+    ['JUZGADO', 'Juzgado / Autoridad'],
+    ['NUREJ', 'NUREJ / Expediente'],
+    ['FECHA_ACTUAL', 'Fecha actual en texto'],
+    ['CIUDAD', 'Ciudad'],
+    ['ABOGADO', 'Abogado patrocinante'],
+    ['RPA', 'R.P.A. del abogado'],
+    // Alias clásicos
     ['caratula', 'Carátula'], ['numero', 'N.º expediente'], ['nurej', 'NUREJ'],
-    ['materia', 'Materia'], ['tipo', 'Tipo'], ['juzgado', 'Juzgado / entidad'],
-    ['parte_contraria', 'Parte contraria'], ['cliente', 'Cliente'],
-    ['cliente_documento', 'Documento del cliente'], ['cliente_telefono', 'Tel. cliente'],
-    ['cliente_email', 'Correo cliente'], ['cliente_direccion', 'Dirección cliente'],
-    ['abogado', 'Abogado(s)'], ['procurador', 'Procurador(es)'],
-    ['proxima_audiencia', 'Próxima audiencia'], ['fecha', 'Fecha de hoy'],
-    ['fecha_larga', 'Fecha de hoy (en letras)']
+    ['materia', 'Materia'], ['juzgado', 'Juzgado / entidad'],
+    ['cliente', 'Cliente'], ['cliente_documento', 'Documento del cliente'],
+    ['cliente_telefono', 'Tel. cliente'], ['cliente_email', 'Correo cliente'],
+    ['cliente_direccion', 'Dirección cliente'], ['abogado', 'Abogado(s)'],
+    ['fecha', 'Fecha de hoy'], ['fecha_larga', 'Fecha de hoy (en letras)']
   ];
 }
 
 // Construye los valores reales a partir del proceso y su cliente.
 function buildMapaCampos(p, cli) {
   const hoy = new Date();
+  const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  const fechaTexto = `${hoy.getDate()} de ${meses[hoy.getMonth()]} de ${hoy.getFullYear()}`;
+  const abg = namesFromIds(p.abogados_ids) || profName(p.abogado_id) || (state.profile && state.profile.nombre) || 'Abg. Carlos Cartagena';
+  const rpa = localStorage.getItem('lexfive_tutor_rpa') || (state.profile && state.profile.rpa) || '8492018-CC';
+
   return {
+    CLIENTE_NOMBRE: cli ? (cli.nombre || '') : '',
+    CLIENTE_CI: cli ? (cli.documento || '') : '',
+    CLIENTE_DOMICILIO: cli ? (cli.direccion || '') : '',
+    CLIENTE_TELEFONO: cli ? (cli.telefono || '') : '',
+    CLIENTE_EMAIL: cli ? (cli.email || '') : '',
+    PROCESO: p.caratula || '',
+    JUZGADO: p.juzgado || 'Juzgado de Turno en lo Civil y Comercial',
+    NUREJ: p.nurej || p.numero || '',
+    FECHA_ACTUAL: fechaTexto,
+    CIUDAD: 'El Alto',
+    ABOGADO: abg,
+    RPA: rpa,
+    // Compatibilidad minúsculas
     caratula: p.caratula || '', numero: p.numero || '', nurej: p.nurej || '',
     materia: p.materia || '', tipo: p.tipo === 'administrativo' ? 'administrativo' : 'judicial',
     juzgado: p.juzgado || '', parte_contraria: p.parte_contraria || '',
     cliente: cli ? (cli.nombre || '') : '', cliente_documento: cli ? (cli.documento || '') : '',
     cliente_telefono: cli ? (cli.telefono || '') : '', cliente_email: cli ? (cli.email || '') : '',
     cliente_direccion: cli ? (cli.direccion || '') : '',
-    abogado: namesFromIds(p.abogados_ids) || profName(p.abogado_id) || '',
+    abogado: abg,
     procurador: namesFromIds(p.procuradores_ids) || profName(p.procurador_id) || '',
     proxima_audiencia: p.proxima_audiencia ? fmtDateTime(p.proxima_audiencia) : '',
     fecha: fmtDate(hoy),
-    fecha_larga: hoy.toLocaleDateString('es-BO', { day: 'numeric', month: 'long', year: 'numeric' })
+    fecha_larga: fechaTexto
   };
 }
 
-// Reemplaza {{campo}} por su valor. Campo conocido sin dato -> línea en blanco;
-// campo desconocido -> se deja tal cual para que el usuario lo note.
+// Reemplaza {{campo}} por su valor.
 function aplicarCampos(texto, mapa) {
-  return (texto || '').replace(/{{\s*(\w+)\s*}}/g, (m, campo) => {
+  return (texto || '').replace(/{{\s*([\w_]+)\s*}}/g, (m, campo) => {
     if (Object.prototype.hasOwnProperty.call(mapa, campo)) return mapa[campo] !== '' ? mapa[campo] : '__________';
     return m;
   });
 }
 
-function memorialHTML(titulo, texto) {
-  const cuerpo = esc(texto).replace(/\n/g, '<br>');
-  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title></head>
-    <body style="font-family:Georgia,'Times New Roman',serif;font-size:12pt;line-height:1.7;color:#111;margin:2.5cm;text-align:justify;">
-    <div>${cuerpo}</div></body></html>`;
+function imprimirTextoForense(titulo, texto, conMembrete = false) {
+  const parrafos = (texto || '')
+    .split(/\n+/)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p => `<p style="margin:0 0 12pt 0;text-align:justify;line-height:1.5;font-size:12pt;font-family:Arial,sans-serif;">${esc(p)}</p>`)
+    .join('');
+
+  let docHTML = '';
+  if (conMembrete) {
+    const model = modeloMembrete();
+    const logoSrc = localStorage.getItem('lexfive_logo') || 'assets/logo-emblem.svg';
+    const headerHtml = membreteHeader(model, logoSrc);
+    const footerHtml = membreteFooter(model);
+    docHTML = `
+      <div class="hoja-carta" style="display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;font-family:Arial,sans-serif;color:#1e293b;position:relative;background:#fff;padding:0;">
+        <div>
+          ${headerHtml}
+          <div style="padding: 28px 44px 10px;">${parrafos}</div>
+        </div>
+        <div>${footerHtml}</div>
+      </div>`;
+  } else {
+    docHTML = `
+      <div class="hoja-carta" style="box-sizing:border-box;font-family:Arial,sans-serif;color:#111;position:relative;background:#fff;padding:2.5cm 2cm 2.5cm 3cm;">
+        <div style="font-size:12pt;line-height:1.5;text-align:justify;">${parrafos}</div>
+      </div>`;
+  }
+  abrirImpresionVectorial(titulo, docHTML);
 }
-function imprimirTexto(titulo, texto) {
-  const w = window.open('', '_blank');
-  if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
-  w.document.write(memorialHTML(titulo, texto) + '<script>window.onload=function(){window.print();}<\/script>');
-  w.document.close();
-}
-function descargarWord(titulo, texto) {
-  const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head>' +
-    memorialHTML(titulo, texto).replace(/^[\s\S]*<body/, '<body').replace(/<\/html>$/, '') + '</html>';
+
+function descargarWordForense(titulo, texto, conMembrete = false) {
+  const parrafos = (texto || '')
+    .split(/\n+/)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p => `<p style="margin:0 0 12pt 0;text-align:justify;line-height:1.5;font-size:12pt;font-family:Arial,sans-serif;">${esc(p)}</p>`)
+    .join('');
+
+  const encabezadoMembrete = conMembrete ? `
+    <div style="border-bottom:2px solid #c2a25a;padding-bottom:12px;margin-bottom:24px;text-align:center;">
+      <div style="font-size:24pt;font-weight:bold;color:#0e1b2c;font-family:Georgia,serif;">Lex<span style="color:#c2a25a;">Five</span></div>
+      <div style="font-size:9pt;letter-spacing:3px;text-transform:uppercase;color:#a8853c;font-family:Arial,sans-serif;margin-top:2px;">Bufete de Abogados · Asesoramiento & Litigio Estratégico</div>
+      <div style="font-size:8.5pt;color:#5c6675;font-family:Arial,sans-serif;margin-top:4px;">Av. Alfredo Franco Valle 708-51, Edif. Real, PB Of. A-6 · El Alto, Bolivia · Tel/WA: +591 78360469</div>
+    </div>` : '';
+
+  const pieMembrete = conMembrete ? `
+    <div style="margin-top:40px;border-top:1px solid #c2a25a;padding-top:10px;text-align:center;font-size:8pt;color:#64748b;font-family:Arial,sans-serif;">
+      Documento profesional elaborado por LexFive Abogados · lexfive.netlify.app
+    </div>` : '';
+
+  const html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <meta charset="utf-8">
+      <title>${esc(titulo)}</title>
+      <style>
+        @page { size: 8.5in 11in; margin: 2.5cm 2cm 2.5cm 3cm; }
+        body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; color: #111; }
+        p { margin: 0 0 12pt 0; text-align: justify; line-height: 1.5; }
+      </style>
+    </head>
+    <body>
+      ${encabezadoMembrete}
+      <div>${parrafos}</div>
+      ${pieMembrete}
+    </body>
+    </html>
+  `;
   const nombre = (titulo || 'memorial').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40) + '.doc';
   descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
-  toast('Documento descargado en Word.', 'success');
+  toast('Documento descargado en Word (.doc forense).', 'success');
 }
 
 export async function renderPlantillas() {
@@ -147,21 +231,46 @@ function plantillaForm(pl = null) {
   const p = pl || {};
   const chips = placeholdersDisponibles().map(([k, label]) =>
     `<button type="button" class="chip-campo" data-campo="${k}" title="Insertar ${esc(label)}">{{${k}}}</button>`).join('');
+  const estOpts = ESTRUCTURAS_BASE_BOLIVIA.map(e => `<option value="${e.id}">${esc(e.nombre)}</option>`).join('');
+
   const body = `
+    <div style="margin-bottom:12px;background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;">
+      <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px;">Cargar estructura base boliviana (opcional)</label>
+      <select id="pl_base_sel" class="input" style="font-size:.84rem;">
+        <option value="">— Seleccionar estructura legal boliviana —</option>
+        ${estOpts}
+      </select>
+    </div>
     <div class="field-row">
       <div class="field"><label>Título *</label><input id="pl_titulo" value="${esc(p.titulo || '')}" placeholder="Ej: Memorial de apersonamiento"></div>
-      <div class="field"><label>Categoría</label><input id="pl_categoria" value="${esc(p.categoria || '')}" placeholder="Ej: Laboral"></div>
+      <div class="field"><label>Categoría</label><input id="pl_categoria" value="${esc(p.categoria || '')}" placeholder="Ej: Civil, Familia, Laboral"></div>
     </div>
     <div class="field">
       <label>Texto de la plantilla *</label>
       <p class="cell-sub" style="margin:0 0 6px">Haga clic en un campo para insertarlo donde está el cursor:</p>
-      <div class="campos-chips">${chips}</div>
-      <textarea id="pl_cuerpo" style="min-height:260px;font-family:Georgia,serif">${esc(p.cuerpo || '')}</textarea>
+      <div class="campos-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">${chips}</div>
+      <textarea id="pl_cuerpo" style="min-height:280px;font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;">${esc(p.cuerpo || '')}</textarea>
     </div>`;
+
   openModal(pl ? 'Editar plantilla' : 'Nueva plantilla', body, [
     { label: 'Cancelar', class: 'btn--ghost', onClick: closeModal },
     { label: 'Guardar', class: 'btn--primary', id: 'pl_save', onClick: () => savePlantilla(pl) }
   ], true);
+
+  const selBase = $('#pl_base_sel');
+  if (selBase) {
+    selBase.onchange = () => {
+      const eid = selBase.value;
+      if (!eid) return;
+      const est = ESTRUCTURAS_BASE_BOLIVIA.find(e => e.id === eid);
+      if (!est) return;
+      $('#pl_titulo').value = est.titulo;
+      $('#pl_categoria').value = est.categoria;
+      $('#pl_cuerpo').value = est.cuerpo;
+      toast('Estructura base cargada en la plantilla.', 'info');
+    };
+  }
+
   // Insertar campo en la posición del cursor del textarea
   document.querySelectorAll('.chip-campo').forEach(c => c.onclick = () => {
     const ta = $('#pl_cuerpo'); const ins = '{{' + c.dataset.campo + '}}';
@@ -206,8 +315,8 @@ async function usarPlantilla(pl) {
   const { data: procs } = await supabase.from('procesos').select('*').eq('eliminado', false).order('created_at', { ascending: false });
   const opts = (procs || []).map(p => `<option value="${p.id}">${esc(p.caratula)}</option>`).join('');
   const body = `
-    <div class="field"><label>Elija el proceso *</label><select id="gen_proc"><option value="">— Seleccione —</option>${opts}</select></div>
-    <button class="btn btn--navy" id="gen_btn">Generar memorial</button>
+    <div class="field"><label>Elija el proceso / causa judicial *</label><select id="gen_proc" class="input"><option value="">— Seleccione la causa —</option>${opts}</select></div>
+    <button class="btn btn--navy" id="gen_btn">⚡ Rellenar variables con este proceso</button>
     <div id="gen_out" style="margin-top:14px"></div>`;
   openModal('Usar plantilla · ' + pl.titulo, body, [{ label: 'Cerrar', class: 'btn--primary', onClick: closeModal }], true);
   $('#gen_btn').onclick = async () => {
@@ -218,14 +327,59 @@ async function usarPlantilla(pl) {
     if (p.cliente_id) { const { data } = await supabase.from('clientes').select('*').eq('id', p.cliente_id).maybeSingle(); cli = data; }
     const texto = aplicarCampos(pl.cuerpo, buildMapaCampos(p, cli));
     $('#gen_out').innerHTML = `
-      <label class="cell-sub" style="display:block;margin-bottom:4px">Documento generado (puede editarlo antes de imprimir o descargar):</label>
-      <textarea id="gen_texto" style="min-height:300px;font-family:Georgia,serif">${esc(texto)}</textarea>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-        <button class="btn btn--primary" id="gen_print">${ICON.doc} Imprimir / PDF</button>
-        <button class="btn btn--ghost" id="gen_word">${ICON.descargar} Descargar Word</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
+        <label class="cell-sub" style="font-weight:600;color:var(--ink,#1e293b);">Documento generado (formato forense boliviano):</label>
+        <button type="button" class="btn btn--ghost btn--sm" id="btn_gen_ia" style="border:1px solid #8b5cf6;color:#8b5cf6;font-weight:600;">✨ Pulir redacción (IA)</button>
       </div>
-      <p class="cell-sub" style="margin-top:6px">Los campos sin dato aparecen como <code>__________</code> para completarlos a mano.</p>`;
-    $('#gen_print').onclick = () => imprimirTexto(pl.titulo, $('#gen_texto').value);
-    $('#gen_word').onclick = () => descargarWord(pl.titulo, $('#gen_texto').value);
+      <textarea id="gen_texto" style="min-height:340px;font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;text-align:justify;padding:12px;width:100%;box-sizing:border-box;">${esc(texto)}</textarea>
+      <div style="margin:10px 0 6px;">
+        <label style="display:inline-flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer;">
+          <input type="checkbox" id="gen_chk_membrete" style="width:16px;height:16px;">
+          <span>Incluir papel membretado institucional de LexFive (para contratos/cartas; desmarcar para tribunales)</span>
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn btn--primary" id="gen_print">${ICON.doc} Guardar PDF / Imprimir</button>
+        <button class="btn btn--ghost" id="gen_word" style="background:#2b579a;border-color:#2b579a;color:#fff;">${ICON.descargar} Descargar Word (.doc)</button>
+      </div>
+      <p class="cell-sub" style="margin-top:8px">Los campos sin dato aparecen como <code>__________</code> para completarlos o editarlos directamente en el texto.</p>`;
+
+    $('#gen_print').onclick = () => {
+      const conMembrete = $('#gen_chk_membrete').checked;
+      imprimirTextoForense(pl.titulo, $('#gen_texto').value, conMembrete);
+    };
+    $('#gen_word').onclick = () => {
+      const conMembrete = $('#gen_chk_membrete').checked;
+      descargarWordForense(pl.titulo, $('#gen_texto').value, conMembrete);
+    };
+
+    $('#btn_gen_ia').onclick = async () => {
+      const txt = $('#gen_texto').value.trim();
+      if (!txt) return;
+      const b = $('#btn_gen_ia');
+      b.disabled = true;
+      const orig = b.innerHTML;
+      b.innerHTML = '⏳ Pulimentando...';
+      toast('Puliendo redacción forense con IA (hasta 60s)...', 'info');
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Tiempo de espera agotado (60s)')), 60000)
+        );
+        const aiPromise = generateContent(
+          `Pule la redacción jurídica del siguiente escrito legal boliviano conservando intactos todos los nombres, CI, juzgados, fechas y montos:\n\n${txt}\n\nDevuelve únicamente el texto legal pulido sin notas ni explicaciones.`,
+          "Eres un jurista boliviano experto y redactor forense sénior."
+        );
+        const res = await Promise.race([aiPromise, timeoutPromise]);
+        if (res && res.trim()) {
+          $('#gen_texto').value = res.trim();
+          toast('Redacción pulida con éxito.', 'success');
+        }
+      } catch (e) {
+        toast('Error al pulir con IA: ' + e.message, 'error');
+      } finally {
+        b.disabled = false;
+        b.innerHTML = orig;
+      }
+    };
   };
 }

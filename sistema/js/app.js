@@ -17,6 +17,7 @@ import { renderUsuarios, renderAuditoria } from './admin.js';
 import { renderBlog } from './blog.js';
 import { renderPlantillas } from './plantillas.js';
 import { renderModelos } from './modelos.js';
+import { renderEscritos } from './escritos.js';
 import { renderTareas } from './tareas.js';
 import { renderReportes } from './reportes.js';
 import { renderFinanzas } from './finanzas.js';
@@ -461,7 +462,8 @@ const VIEWS = {
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
   papelera: { title: 'Papelera', render: renderPapelera },
-  escritos: { title: 'Escritos y Plantillas', render: renderModelos },
+  escritos: { title: 'Escritos y Plantillas', render: renderEscritos },
+  redactor: { title: 'Redactor Inteligente', render: renderEscritos },
   gestorweb: { title: 'Gestor Web', render: renderBlog },
   papeleria: { title: 'Papelería y Marca', render: renderCredenciales },
   administracion: { title: 'Administración', render: renderUsuarios },
@@ -483,10 +485,11 @@ const GRUPOS_TABS = {
   },
   escritos: {
     title: 'Escritos y Plantillas',
-    defaultTab: 'modelos',
+    defaultTab: 'escritos',
     tabs: [
-      { key: 'modelos', label: 'Modelos de memoriales', icon: '📑', render: renderModelos },
-      { key: 'plantillas', label: 'Plantillas de memoriales', icon: '📝', render: renderPlantillas }
+      { key: 'escritos', label: 'Redactor Inteligente', icon: '✍️', render: renderEscritos },
+      { key: 'plantillas', label: 'Plantillas de memoriales', icon: '📝', render: renderPlantillas },
+      { key: 'modelos', label: 'Modelos de memoriales', icon: '📑', render: renderModelos }
     ]
   },
   finanzas: {
@@ -552,9 +555,10 @@ const SUBKEY_MAP = {
   agenda: { group: 'clientes', tab: 'agenda' },
   reportes: { group: 'clientes', tab: 'reportes' },
   // Escritos y Plantillas
-  escritos: { group: 'escritos', tab: 'modelos' },
-  modelos: { group: 'escritos', tab: 'modelos' },
+  escritos: { group: 'escritos', tab: 'escritos' },
+  redactor: { group: 'escritos', tab: 'escritos' },
   plantillas: { group: 'escritos', tab: 'plantillas' },
+  modelos: { group: 'escritos', tab: 'modelos' },
   // Honorarios y Aranceles
   finanzas: { group: 'finanzas', tab: 'finanzas' },
   aranceles: { group: 'finanzas', tab: 'aranceles' },

@@ -49,6 +49,7 @@ export async function renderModelos() {
         </div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <button class="btn btn--primary" id="md_subir">Subir al área seleccionada</button>
+          <button class="btn btn--ghost" id="md_btn_redactor" style="color:#c2a25a; border:1px solid #c2a25a; font-weight:600;">✍️ Redactor y Autocompletado</button>
           <button class="btn btn--ghost" id="md_btn_ia" style="color:var(--primary); font-weight:600;">✨ Redactar con IA</button>
           <span class="cell-sub" id="md_progreso"></span>
         </div>
@@ -122,6 +123,12 @@ export async function renderModelos() {
   $('#md_q').oninput = paint;
   $('#md_farea').onchange = paint;
   wireCategoriaSelect($('#md_area'));
+
+  if ($('#md_btn_redactor')) {
+    $('#md_btn_redactor').onclick = () => {
+      location.hash = '#escritos';
+    };
+  }
 
   if ($('#md_btn_ia')) {
     $('#md_btn_ia').onclick = async () => {
