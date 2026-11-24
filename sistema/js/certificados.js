@@ -195,19 +195,62 @@ function buildCertDoc(d) {
   return membretePagina({ model: d.model, logoSrc: d.logoSrc, pageW: '8.5in', pageH: '11in', wmOp: wmOpacityActual() / 100, contentHTML });
 }
 
-// Abre una ventana de impresión (tamaño carta) con un documento de certificado.
-function abrirImpresionCert(titulo, docHTML) {
+function slugNombre(n) {
+  return (n || 'pasante')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '_')
+    .slice(0, 45);
+}
+
+// Abre una ventana de impresión vectorial en tamaño carta sin márgenes
+function abrirImpresionVectorial(tituloDoc, docHTML) {
   const w = window.open('', '_blank');
-  if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
-  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(titulo)}</title>
+  if (!w) {
+    toast('Permita las ventanas emergentes para imprimir o guardar en PDF.', 'error');
+    return;
+  }
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(tituloDoc)}</title>
     <style>
-      @page { size: letter; margin: 0; }
-      html, body { margin: 0; padding: 0; background: #fff; width: 100%; height: 100%; overflow: hidden; }
-      body > div { width: 100% !important; height: 100vh !important; max-height: 100vh !important; box-sizing: border-box; overflow: hidden; }
+      @page { size: letter portrait; margin: 0; }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        width: 100% !important;
+      }
+      .hoja-carta {
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        width: 21.59cm !important;
+        height: 27.94cm !important;
+        min-height: 27.94cm !important;
+        max-height: 27.94cm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+      }
+      .hoja-carta:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
       ${PRINT_COLOR_CSS}
     </style></head><body>${docHTML}
-    <script>window.addEventListener('load',function(){setTimeout(function(){window.print();},400);});<\/script></body></html>`);
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          window.focus();
+          window.print();
+        }, 350);
+      });
+    <\/script></body></html>`);
   w.document.close();
+}
+
+function abrirImpresionCert(titulo, docHTML) {
+  return abrirImpresionVectorial(titulo, docHTML);
 }
 
 export async function renderCertificados() {
@@ -330,12 +373,7 @@ export async function renderCertificados() {
           <textarea id="ce_cuerpo" rows="8" style="font-family:inherit"></textarea>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-          <button class="btn btn--primary" id="ce_guardar">Guardar</button>
-          <button class="btn btn--ghost" id="ce_print">${ICON.doc} Imprimir</button>
-          <button class="btn btn--ghost" id="ce_pdf">Descargar PDF</button>
-          <button class="btn btn--ghost" id="ce_word">Descargar Word</button>
-          <button class="btn btn--ghost" id="ce_asistencia" style="display:none;" title="Hoja de control de asistencia de 20 días en PDF">Hoja de Asistencia (PDF)</button>
-          <button class="btn btn--ghost" id="ce_informe_word" style="display:none;" title="Borrador oficial editable del Informe Único UMSA en Word">Descargar Informe Word (.doc)</button>
+          <button class="btn btn--primary" id="ce_guardar">Guardar registro</button>
         </div>
         <div class="field" style="margin-top:16px;max-width:440px"><label>Modelo de hoja membretada</label>
           <select id="ce_modelo">${MEMBRETE_MODELOS.map(m => `<option value="${m.id}">${esc(m.nombre)}</option>`).join('')}</select>
@@ -364,10 +402,10 @@ export async function renderCertificados() {
             <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="informe">Informe Único (Multipágina)</button>
           </div>
         </div>
-        <div id="ce_informe_actions" style="display:none;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn--primary btn--sm" id="ce_btn_imprimir_informe" type="button" style="font-weight:bold;background:#b89446;color:#fff;">🖨️ Guardar PDF Vectorial / Imprimir (Calidad Óptima)</button>
-          <button class="btn btn--ghost btn--sm" id="ce_btn_descargar_informe_pdf" type="button">📥 Descargar PDF Directo</button>
-          <button class="btn btn--ghost btn--sm" id="ce_btn_descargar_informe_word" type="button">📄 Descargar Informe Word (.doc)</button>
+        <div id="ce_preview_actions" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn--primary btn--sm" id="ce_btn_imprimir_activo" type="button" style="font-weight:bold;background:#b89446;color:#fff;">🖨️ Guardar PDF / Imprimir</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_expediente_completo" type="button" style="display:none;font-weight:600;border:1px solid #b89446;color:#b89446;">📑 Todo en 1 PDF</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_word_activo" type="button">📄 Word (.doc)</button>
         </div>
       </div>
       <div class="card__body"><div class="cert-preview" id="certPreview"></div></div>
@@ -473,9 +511,10 @@ export async function renderCertificados() {
       hint.textContent = 'En pasantías se recomienda dejar sin sello digital para firmar y sellar con sello húmedo original.';
     }
 
-    // Botones de acción específicos de pasantía
-    const btnAsis = $('#ce_asistencia'); if (btnAsis) btnAsis.style.display = pas ? '' : 'none';
-    const btnInf = $('#ce_informe_word'); if (btnInf) btnInf.style.display = (cat === 'pasantia') ? '' : 'none';
+    const firstTabBtn = $('#ce_preview_tabs button[data-tab="cert"]');
+    if (firstTabBtn) {
+      firstTabBtn.textContent = (cat === 'aceptacion') ? 'Carta de Aceptación' : 'Certificado de Pasantía';
+    }
 
     if (autoTemplate) {
       const sel = $('#ce_tipo');
@@ -535,7 +574,8 @@ export async function renderCertificados() {
   const pintar = () => {
     try {
       const prevTabs = $('#ce_preview_tabs');
-      const infActions = $('#ce_informe_actions');
+      const btnExp = $('#ce_btn_expediente_completo');
+      const btnWord = $('#ce_btn_word_activo');
       const previewEl = $('#certPreview');
       if (!previewEl) return;
       const pas = esPasantia();
@@ -556,20 +596,22 @@ export async function renderCertificados() {
             }
           });
         }
+        if (btnExp) btnExp.style.display = 'inline-flex';
 
         if (vistaPasantiaTab === 'asistencia') {
-          if (infActions) infActions.style.display = 'none';
+          if (btnWord) btnWord.style.display = 'none';
           previewEl.innerHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
         } else if (vistaPasantiaTab === 'informe') {
-          if (infActions) infActions.style.display = 'flex';
+          if (btnWord) btnWord.style.display = 'inline-flex';
           previewEl.innerHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
         } else {
-          if (infActions) infActions.style.display = 'none';
+          if (btnWord) btnWord.style.display = 'inline-flex';
           previewEl.innerHTML = docActual();
         }
       } else {
         if (prevTabs) prevTabs.style.display = 'none';
-        if (infActions) infActions.style.display = 'none';
+        if (btnExp) btnExp.style.display = 'none';
+        if (btnWord) btnWord.style.display = 'inline-flex';
         previewEl.innerHTML = docActual();
       }
     } catch (err) {
@@ -727,7 +769,11 @@ export async function renderCertificados() {
     cont.querySelectorAll('.js-dupcert').forEach(b => b.onclick = () => { const c = EMITIDOS.find(x => x.id === b.dataset.id); if (c) nuevoConDatos(c); });
     cont.querySelectorAll('.js-asistenciacert').forEach(b => b.onclick = () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id);
-      if (c) descargarHojaAsistenciaPDF(c, logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      if (c) {
+        const slug = slugNombre(c.nombre);
+        const asisHTML = buildHojaAsistenciaHTML(c, logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+        abrirImpresionVectorial(`Hoja_Asistencia_${slug}`, asisHTML);
+      }
     });
     cont.querySelectorAll('.js-informecert').forEach(b => b.onclick = () => {
       const c = EMITIDOS.find(x => x.id === b.dataset.id);
@@ -779,7 +825,9 @@ export async function renderCertificados() {
       rpaFirma: $('#ce_rpa') ? $('#ce_rpa').value : '',
       logoSrc, selloSrc: selloActivo(), model: modeloMembrete()
     });
-    abrirImpresionCert(c.tipo || 'Certificado', doc);
+    const slug = slugNombre(c.nombre);
+    const prefijo = (c.tipo && c.tipo.includes('ACEPTACIÓN')) ? 'Carta_Aceptacion_' : (esPas ? 'Certificado_Pasantia_' : 'Certificado_');
+    abrirImpresionVectorial(`${prefijo}${slug}`, doc);
   }
 
   // Carga un certificado emitido en el formulario para EDITARLO (se guarda sobre
@@ -917,21 +965,7 @@ export async function renderCertificados() {
     });
   }
 
-  // Botones de acción del informe en la barra de vista previa
-  const btnPrevInfPdf = $('#ce_btn_descargar_informe_pdf');
-  if (btnPrevInfPdf) btnPrevInfPdf.onclick = () => descargarInformePDF(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
 
-  const btnPrevInfPrint = $('#ce_btn_imprimir_informe');
-  if (btnPrevInfPrint) btnPrevInfPrint.onclick = () => imprimirInformeDocumento(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
-
-  const btnPrevInfWord = $('#ce_btn_descargar_informe_word');
-  if (btnPrevInfWord) btnPrevInfWord.onclick = () => descargarInformeWordDoc(datos(), logoSrc);
-
-  const btnAsisBottom = $('#ce_asistencia');
-  if (btnAsisBottom) btnAsisBottom.onclick = () => descargarHojaAsistenciaPDF(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
-
-  const btnInfWordBottom = $('#ce_informe_word');
-  if (btnInfWordBottom) btnInfWordBottom.onclick = () => descargarInformeWordDoc(datos(), logoSrc);
 
   // Editor plegable de actividades generadas
   const editorWrap = $('#ce_jornadas_editor_wrap');
@@ -1116,91 +1150,70 @@ export async function renderCertificados() {
     registrarCert();
     editando = false;
     const banner = $('#ce_editbanner'); if (banner) banner.style.display = 'none';
-    toast('Certificado guardado en «Certificados emitidos». Para la misma persona, cambie el tipo y vuelva a Guardar: se crea otro sin reemplazar este.', 'success');
-  };
-  $('#ce_print').onclick = () => {
-    if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
-    registrarCert();
-    abrirImpresionCert(tplActual().titulo, docActual());
-  };
-  $('#ce_pdf').onclick = () => {
-    if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
-    registrarCert();
-    const generarPDF = () => {
-      toast('Generando PDF, por favor espere...', 'info');
-      
-      const element = $('#certPreview').firstElementChild;
-      if (!element) {
-        toast('No hay vista previa para exportar.', 'error');
-        return;
-      }
-      
-      const originalShadow = element.style.boxShadow;
-      const originalHeight = element.style.height;
-      element.style.boxShadow = 'none';
-      element.style.height = '10.9in'; // Reducir 0.1in para evitar que jsPDF genere una segunda página por decimales
-
-      const nombreStr = ($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40);
-      const opt = {
-        margin:       0,
-        filename:     `certificado-${nombreStr}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-          scale: 2, 
-          useCORS: true, 
-          scrollY: 0,
-          backgroundColor: '#ffffff'
-        },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
-      
-      html2pdf().set(opt).from(element).save().then(() => {
-        element.style.boxShadow = originalShadow;
-        element.style.height = originalHeight;
-        toast('Certificado descargado en PDF.', 'success');
-      }).catch((e) => {
-        element.style.boxShadow = originalShadow;
-        element.style.height = originalHeight;
-        console.error(e);
-        toast('Error al generar el PDF.', 'error');
-      });
-    };
-
-    if (typeof window.html2pdf === 'undefined') {
-      toast('Cargando módulo PDF...', 'info');
-      const script = document.createElement('script');
-      script.src = 'js/html2pdf.bundle.min.js';
-      script.onload = generarPDF;
-      script.onerror = () => toast('Error al cargar módulo PDF. Revise su conexión.', 'error');
-      document.head.appendChild(script);
-    } else {
-      generarPDF();
-    }
-  };
-  $('#ce_word').onclick = () => {
-    if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
-    registrarCert();
-    const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>' + docActual() + '</body></html>';
-    const nombre = 'certificado-' + (($('#ce_nombre').value || 'lexfive').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 40)) + '.doc';
-    descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
-    toast('Certificado descargado en Word.', 'success');
+    toast('Registro guardado en «Certificados emitidos». Para la misma persona, cambie el tipo y vuelva a Guardar registro: se crea otro sin reemplazar este.', 'success');
   };
 
-  const btnAsistencia = $('#ce_asistencia');
-  if (btnAsistencia) {
-    btnAsistencia.onclick = () => {
-      if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+  // 🖨️ Guardar PDF / Imprimir pestaña activa (Vectorial nativo en tamaño carta)
+  const btnImpActivo = $('#ce_btn_imprimir_activo');
+  if (btnImpActivo) {
+    btnImpActivo.onclick = () => {
+      const nom = (val('ce_nombre') || '').trim();
+      if (!nom) { toast('Escriba el nombre completo.', 'error'); return; }
       registrarCert();
-      descargarHojaAsistenciaPDF(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      const slug = slugNombre(nom);
+      const pas = esPasantia();
+      let tituloDoc = '';
+      let docHTML = '';
+
+      if (!pas || vistaPasantiaTab === 'cert') {
+        const prefijo = catActual() === 'aceptacion' ? 'Carta_Aceptacion_' : (pas ? 'Certificado_Pasantia_' : 'Certificado_');
+        tituloDoc = `${prefijo}${slug}`;
+        docHTML = docActual();
+      } else if (vistaPasantiaTab === 'asistencia') {
+        tituloDoc = `Hoja_Asistencia_${slug}`;
+        docHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      } else if (vistaPasantiaTab === 'informe') {
+        tituloDoc = `Informe_Pasantia_${slug}`;
+        docHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      }
+      abrirImpresionVectorial(tituloDoc, docHTML);
     };
   }
 
-  const btnInformeWord = $('#ce_informe_word');
-  if (btnInformeWord) {
-    btnInformeWord.onclick = () => {
-      if (!($('#ce_nombre').value || '').trim()) { toast('Escriba el nombre completo.', 'error'); return; }
+  // 📑 Todo en 1 PDF (Solo en modo Pasantía: Certificado + Hoja de Asistencia + Informe Único)
+  const btnExpCompleto = $('#ce_btn_expediente_completo');
+  if (btnExpCompleto) {
+    btnExpCompleto.onclick = () => {
+      const nom = (val('ce_nombre') || '').trim();
+      if (!nom) { toast('Escriba el nombre completo.', 'error'); return; }
       registrarCert();
-      descargarInformePasantiaWord(datos());
+      const slug = slugNombre(nom);
+      const tituloDoc = `Expediente_Pasantia_${slug}`;
+      toast('Preparando expediente completo (Certificado + Asistencia + Informe)...', 'info');
+      const certHTML = docActual();
+      const asisHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      const infHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      abrirImpresionVectorial(tituloDoc, certHTML + asisHTML + infHTML);
+    };
+  }
+
+  // 📄 Word (.doc) correspondiente a la pestaña activa (oculto en asistencia)
+  const btnWordActivo = $('#ce_btn_word_activo');
+  if (btnWordActivo) {
+    btnWordActivo.onclick = async () => {
+      const nom = (val('ce_nombre') || '').trim();
+      if (!nom) { toast('Escriba el nombre completo.', 'error'); return; }
+      registrarCert();
+      const slug = slugNombre(nom);
+      if (esPasantia() && vistaPasantiaTab === 'informe') {
+        await descargarInformeWordDoc(datos(), logoSrc);
+      } else {
+        const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>' + docActual() + '</body></html>';
+        const prefijo = catActual() === 'aceptacion' ? 'carta-aceptacion-' : (esPasantia() ? 'certificado-pasantia-' : 'certificado-');
+        const nombreArch = `${prefijo}${slug.toLowerCase().replace(/_/g, '-')}.doc`;
+        descargarArchivo(nombreArch, '\ufeff' + html, 'application/msword');
+        toast('Documento descargado en Word.', 'success');
+      }
     };
   }
 

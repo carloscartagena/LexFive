@@ -484,9 +484,11 @@ button[data-tip], a[data-tip], input[data-tip], select[data-tip], .metric[data-t
 @media (max-width: 520px) { .cred-cut { display: block; } .cred-card { width: 100%; height: auto; min-height: 6cm; } }
 
 
-/* Impresión: ambas caras (anverso y reverso) en una sola hoja de 4 x 6 pulgadas. */
-@page { size: 4in 6in; margin: 3mm; }
+/* Impresión: ambas caras (anverso y reverso) en una sola hoja de 4 x 6 pulgadas para credenciales. */
 @media print {
+    body.printing {
+        page: credencial;
+    }
     body.printing > *:not(#printRoot) { display: none !important; }
     #printRoot { display: block; }
     #printRoot, #printRoot * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -969,3 +971,34 @@ html[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-in
 .bg-option__top input { width: 16px; height: 16px; accent-color: var(--gold-dark, #a8853c); }
 .bg-option strong { font-size: .92rem; }
 @media (max-width: 560px) { .bg-options { grid-template-columns: 1fr; } }
+
+/* ---------- Reglas de Impresión Vectorial de Documentos (Carta) ---------- */
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 0;
+  }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .hoja-carta {
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    width: 21.59cm !important;
+    height: 27.94cm !important;
+    min-height: 27.94cm !important;
+    max-height: 27.94cm !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+  .hoja-carta:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+}
