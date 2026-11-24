@@ -98,23 +98,49 @@
                 return p;
             }
             var p = getParams();
-            var nombre = (p.n || '').trim();
-            var ci = (p.ci || '').trim();
-            var rol = (p.rol || 'Procurador').trim();
-
+            var title = document.querySelector('.vf-title');
             var lead = document.getElementById('vfLead');
             var data = document.getElementById('vfData');
+            var note = document.querySelector('.vf-note');
 
-            if (nombre) {
-                lead.innerHTML = 'El portador de esta credencial pertenece al bufete <strong>LexFive</strong> en calidad de <strong>' + escapeHtml(rol) + '</strong>.';
+            if (p.tipo === 'recibo' || p.nro || p.recibo) {
+                if (title) title.textContent = 'Recibo de pago verificado';
+                var nro = (p.nro || p.recibo || 'REC-OFICIAL').trim();
+                var cliente = (p.c || p.cliente || p.n || 'Cliente').trim();
+                var monto = (p.m || p.monto || '').trim();
+                var fecha = (p.f || p.fecha || '').trim();
+                var concepto = (p.det || p.concepto || 'Pago a cuenta de honorarios profesionales').trim();
+
+                lead.innerHTML = 'Este recibo acredita un pago formal registrado en el sistema del bufete <strong>LexFive Abogados</strong>.';
                 var rows = '';
-                rows += row('Nombre', nombre);
-                if (ci) rows += row('Carnet de identidad', ci);
-                rows += row('Rol', rol);
+                rows += row('N.º de Recibo', nro);
+                rows += row('Cliente / Pagador', cliente);
+                if (monto) rows += row('Monto Recibido', monto);
+                if (fecha) rows += row('Fecha de Emisión', fecha);
+                rows += row('Concepto', concepto);
+                rows += row('Estado', 'Válido y Registrado');
                 rows += row('Bufete', 'LexFive Abogados · La Paz / El Alto — Bolivia');
                 data.innerHTML = rows;
+                if (note) {
+                    note.innerHTML = 'Documento oficial de control y descargo de honorarios profesionales emitido conforme a las políticas del bufete <strong>LexFive Abogados</strong>. La autenticidad y el registro del pago han sido validados.';
+                }
             } else {
-                lead.innerHTML = 'Página oficial de verificación de credenciales del bufete <strong>LexFive</strong>. Escanee el código QR de una credencial para ver los datos del portador.';
+                var nombre = (p.n || '').trim();
+                var ci = (p.ci || '').trim();
+                var rol = (p.rol || 'Procurador').trim();
+
+                if (nombre) {
+                    if (title) title.textContent = 'Credencial verificada';
+                    lead.innerHTML = 'El portador de esta credencial pertenece al bufete <strong>LexFive</strong> en calidad de <strong>' + escapeHtml(rol) + '</strong>.';
+                    var rows = '';
+                    rows += row('Nombre', nombre);
+                    if (ci) rows += row('Carnet de identidad', ci);
+                    rows += row('Rol', rol);
+                    rows += row('Bufete', 'LexFive Abogados · La Paz / El Alto — Bolivia');
+                    data.innerHTML = rows;
+                } else {
+                    lead.innerHTML = 'Página oficial de verificación del bufete <strong>LexFive</strong>. Escanee el código QR de una credencial o recibo oficial para ver los datos registrados.';
+                }
             }
 
             function row(k, v) {

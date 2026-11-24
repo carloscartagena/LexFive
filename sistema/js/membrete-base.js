@@ -127,3 +127,57 @@ export function membreteDocFluido({ model, logoSrc, pageW, contentHTML, wmOp }) 
 // CSS para que las bandas (fondos de color) SÍ se impriman aunque el usuario no
 // active «Gráficos en segundo plano». Se inyecta en la ventana de impresión.
 export const PRINT_COLOR_CSS = '*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}';
+
+// Abre una ventana para impresión vectorial limpia en tamaño Carta
+export function abrirImpresionVectorial(tituloDoc, docHTML) {
+  const w = window.open('', '_blank');
+  if (!w) {
+    if (typeof alert !== 'undefined') alert('Permita las ventanas emergentes para imprimir o guardar en PDF.');
+    return;
+  }
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>${esc(tituloDoc)}</title>
+    <style>
+      @page { size: letter portrait; margin: 0; }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        width: 100% !important;
+      }
+      .hoja-carta {
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        width: 21.59cm !important;
+        height: 27.94cm !important;
+        min-height: 27.94cm !important;
+        max-height: 27.94cm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+      }
+      .hoja-carta:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+      ${PRINT_COLOR_CSS}
+    </style></head><body>${docHTML}
+    <script>
+      window.addEventListener('load', function() {
+        var imgs = Array.from(document.images);
+        Promise.all(imgs.map(function(img) {
+          if (img.complete) return Promise.resolve();
+          return new Promise(function(resolve) {
+            img.onload = img.onerror = resolve;
+          });
+        })).then(function() {
+          setTimeout(function() {
+            window.focus();
+            window.print();
+          }, 300);
+        });
+      });
+    <\/script>
+  </body></html>`);
+  w.document.close();
+}
