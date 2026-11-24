@@ -11,6 +11,7 @@ import { ICON } from './icons.js';
 import { $, content } from './dom.js';
 import { loading, toast, tip, openModal, closeModal } from './ui.js';
 import { profName } from './comunes.js';
+import { generateContent } from './ai.js';
 import { Draft, wireDraft, maybeOfferDraft } from './draft.js';
 
 export async function renderBlog() {
@@ -18,6 +19,22 @@ export async function renderBlog() {
   const { data } = await supabase.from('articulos').select('*').order('updated_at', { ascending: false });
   const arts = data || [];
   content().innerHTML = `
+<!-- ASISTENTE IA DE REDACCIÓN JURÍDICA -->
+    <div class="card" style="margin-bottom:18px;background:var(--bg-soft2);border:1px solid var(--primary-alpha, rgba(184,146,63,0.3));">
+      <div class="card__body" style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <span style="font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px;font-size:0.95rem;">
+            ✨ Asistente IA de Redacción Jurídica
+          </span>
+          <div style="flex-grow:1;min-width:280px;">
+            <input type="text" id="aiTemaArticulo" placeholder="Ej. Proceso de asistencia familiar en Bolivia según la Ley 603" style="width:100%;margin:0;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--white);">
+          </div>
+          <button class="btn btn--primary" id="btnRedactarAI" type="button" style="white-space:nowrap;padding:8px 16px;">
+            ✨ Redactar borrador con IA
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="toolbar">
       <div class="spacer"></div>
       <button class="btn btn--primary" id="btnNuevoArt">${ICON.plus} Nuevo artículo</button>
@@ -37,10 +54,85 @@ export async function renderBlog() {
     const a = arts.find(x => x.id === tr.dataset.id); articuloForm(a);
   });
   $('#btnNuevoArt').onclick = () => articuloForm();
+
+  // Lógica del Asistente IA de Redacción Jurídica
+  const btnRedactar = $('#btnRedactarAI');
+  const inputTema = $('#aiTemaArticulo');
+  if (btnRedactar && inputTema) {
+    btnRedactar.onclick = async () => {
+      const tema = inputTema.value.trim();
+      if (!tema) {
+        toast('Por favor ingrese un tema o consulta jurídica para redactar el artículo.', 'error');
+        inputTema.focus();
+        return;
+      }
+
+      btnRedactar.disabled = true;
+      const originalText = btnRedactar.innerHTML;
+      btnRedactar.innerHTML = '⏳ Redactando con IA...';
+
+      const promptText = `Actúa como redactor jurídico experto del bufete de abogados LexFive en El Alto / La Paz, Bolivia.
+Redacta un artículo jurídico informativo completo, claro y atractivo sobre el tema: "${tema}".
+El artículo debe estar dirigido a personas y empresas interesadas en entender sus derechos y pasos legales en Bolivia.
+
+Devuelve EXCLUSIVAMENTE un objeto JSON válido con esta estructura exacta (sin markdown extra, sin comillas adicionales):
+{
+  "titulo": "Título atractivo, claro y profesional orientado a clientes en Bolivia",
+  "categoria": "Una sola palabra o materia legal corta (ej: Laboral, Familia, Civil, Penal, Informático, Constitucional, Minero, Agrario)",
+  "resumen": "Resumen claro y directo de máximo 2 líneas para las tarjetas del sitio web y blog",
+  "contenido": "Texto completo del artículo redactado con subtítulos claros (1., 2., 3.), base legal boliviana aplicable (mencionando leyes y artículos reales vigentes), explicación de pasos prácticos que debe seguir el ciudadano y párrafo final de cierre formal invitando a acudir o consultar con LexFive Bufete de Abogados en El Alto / La Paz."
+}`;
+
+      try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Tiempo de espera agotado (60 segundos). Verifique su conexión e intente nuevamente.')), 60000)
+        );
+
+        const aiPromise = generateContent(promptText, 'Eres un redactor jurídico senior boliviano. Respondes exclusivamente con un objeto JSON estructurado.');
+        const rawResponse = await Promise.race([aiPromise, timeoutPromise]);
+
+        if (!rawResponse) throw new Error('No se recibió respuesta del asistente de IA.');
+
+        // Limpiar posible bloque markdown ```json ... ```
+        let cleaned = rawResponse.trim();
+        if (cleaned.startsWith('```')) {
+          cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+        }
+
+        let parsed;
+        try {
+          parsed = JSON.parse(cleaned);
+        } catch (jsonErr) {
+          // Si el JSON viene con texto extra, extraer entre llaves
+          const match = cleaned.match(/\{[\s\S]*\}/);
+          if (match) parsed = JSON.parse(match[0]);
+          else throw new Error('El formato devuelto no pudo ser interpretado como JSON: ' + jsonErr.message);
+        }
+
+        toast('Artículo redactado con IA listo para revisión.', 'success');
+        inputTema.value = '';
+        articuloForm(null, {
+          titulo: parsed.titulo || tema,
+          categoria: parsed.categoria || 'General',
+          resumen: parsed.resumen || '',
+          contenido: parsed.contenido || '',
+          estado: 'borrador'
+        });
+      } catch (err) {
+        console.error('Error redactando con IA:', err);
+        toast('No se pudo generar el artículo con IA: ' + err.message, 'error');
+      } finally {
+        btnRedactar.disabled = false;
+        btnRedactar.innerHTML = originalText;
+      }
+    };
+  }
+
 }
 
-function articuloForm(art = null) {
-  const a = art || {};
+function articuloForm(art = null, prefill = null) {
+  const p = prefill || {};
+  const a = art || { titulo: p.titulo || "", categoria: p.categoria || "", resumen: p.resumen || "", contenido: p.contenido || "", estado: p.estado || "borrador" };
   const editable = !art || art.autor_id === state.profile.id || state.profile.rol === 'admin';
   const body = `
     <div class="field"><label>Título *${tip('Título del artículo tal como aparecerá en el blog público.')}</label><input id="af_titulo" value="${esc(a.titulo || '')}" ${editable ? '' : 'disabled'}></div>

@@ -173,3 +173,97 @@ export function calcularJornadasHabilesBolivia(fechaInicioISO, cantidadDias = 20
     fechaFinLarga: ultimaJornada ? `${partes[2]} de ${MESES[Number(partes[1]) - 1]} de ${partes[0]}` : ''
   };
 }
+
+/**
+ * Calcula el vencimiento exacto de un plazo procesal en Bolivia (días hábiles)
+ * Los plazos procesales corren a partir del día siguiente hábil a la notificación.
+ * Excluye sábados, domingos y feriados nacionales/departamentales (La Paz).
+ * @param {string} fechaNotifISO 'YYYY-MM-DD'
+ * @param {number} diasHabiles Cantidad de días hábiles procesales
+ * @param {string|Array} feriadosExtra Fechas 'YYYY-MM-DD' adicionales opcionales
+ * @returns {{ fechaVencimientoISO: string, fechaVencimientoCorta: string, fechaVencimientoLarga: string, diasHabiles: number, feriadosOmitidos: Array }}
+ */
+export function calcularPlazoProcesalBolivia(fechaNotifISO, diasHabiles = 15, feriadosExtra = '') {
+  if (!fechaNotifISO || !diasHabiles || diasHabiles <= 0) {
+    return {
+      fechaVencimientoISO: '',
+      fechaVencimientoCorta: '',
+      fechaVencimientoLarga: '',
+      diasHabiles: 0,
+      feriadosOmitidos: []
+    };
+  }
+
+  const partes = fechaNotifISO.split('-');
+  // Inicia el cómputo al día siguiente de la notificación
+  let cur = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
+  cur.setDate(cur.getDate() + 1);
+
+  const startYear = cur.getFullYear();
+  const feriadosCache = {
+    [startYear]: obtenerFeriadosBolivia(startYear),
+    [startYear + 1]: obtenerFeriadosBolivia(startYear + 1)
+  };
+
+  const extras = new Set();
+  if (typeof feriadosExtra === 'string') {
+    feriadosExtra.split(',').map(s => s.trim()).filter(Boolean).forEach(f => extras.add(f));
+  } else if (Array.isArray(feriadosExtra)) {
+    feriadosExtra.forEach(f => extras.add(String(f).trim()));
+  }
+
+  const diasHabilesComputados = [];
+  const feriadosOmitidos = [];
+  let iter = 0;
+  const maxIter = Math.max(120, diasHabiles * 3);
+
+  while (diasHabilesComputados.length < diasHabiles && iter < maxIter) {
+    iter++;
+    const yyyy = cur.getFullYear();
+    const mm = String(cur.getMonth() + 1).padStart(2, '0');
+    const dd = String(cur.getDate()).padStart(2, '0');
+    const iso = `${yyyy}-${mm}-${dd}`;
+    const dayOfWeek = cur.getDay(); // 0 = Domingo, 6 = Sábado
+
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      cur.setDate(cur.getDate() + 1);
+      continue;
+    }
+
+    if (!feriadosCache[yyyy]) feriadosCache[yyyy] = obtenerFeriadosBolivia(yyyy);
+    const nombreFeriado = feriadosCache[yyyy][iso] || (extras.has(iso) ? 'Feriado judicial / tolerancia' : null);
+
+    if (nombreFeriado) {
+      feriadosOmitidos.push({
+        iso,
+        fechaCorta: `${dd}/${mm}/${yyyy}`,
+        nombre: nombreFeriado
+      });
+      cur.setDate(cur.getDate() + 1);
+      continue;
+    }
+
+    const diaSemana = DIAS_SEMANA[dayOfWeek];
+    const fechaCorta = `${dd}/${mm}/${yyyy}`;
+    const fechaLargaStr = `${diaSemana}, ${cur.getDate()} de ${MESES[cur.getMonth()]} de ${yyyy}`;
+
+    diasHabilesComputados.push({
+      num: diasHabilesComputados.length + 1,
+      iso,
+      fechaCorta,
+      fechaLarga: fechaLargaStr
+    });
+
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const ultimo = diasHabilesComputados[diasHabilesComputados.length - 1];
+
+  return {
+    fechaVencimientoISO: ultimo ? ultimo.iso : '',
+    fechaVencimientoCorta: ultimo ? ultimo.fechaCorta : '',
+    fechaVencimientoLarga: ultimo ? ultimo.fechaLarga : '',
+    diasHabiles,
+    feriadosOmitidos
+  };
+}

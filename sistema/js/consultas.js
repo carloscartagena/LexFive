@@ -11,6 +11,8 @@ import { ICON } from './icons.js';
 import { $, content } from './dom.js';
 import { loading, toast, openModal, closeModal, hint, paginar, pagerHTML, wirePager } from './ui.js';
 import { generateContent } from './ai.js';
+import { clienteForm } from './clientes.js';
+import { loadClientes } from './datos.js';
 
 // Nombre completo de quien envió la consulta (o "—").
 export function consultaNombre(c) {
@@ -24,6 +26,51 @@ function consultaEstadoBadge(estado) {
     archivada: '<span class="badge badge-off">Archivada</span>'
   };
   return map[estado] || `<span class="badge">${esc(estado || '—')}</span>`;
+}
+
+// Construye un enlace de WhatsApp formal a partir de una consulta
+export function getConsultaWaUrl(c) {
+  const tel = c.telefono || '';
+  const digits = tel.replace(/\D/g, '');
+  if (!digits) return null;
+  const full = digits.length <= 8 ? '591' + digits : digits;
+  const nombre = consultaNombre(c);
+  const areaTxt = c.area ? ` sobre ${c.area}` : '';
+  const msg = `Hola ${nombre}, le saluda LexFive Bufete de Abogados. Recibimos su consulta${areaTxt}. ¿En qué horario podemos atenderle?`;
+  return `https://wa.me/${full}?text=${encodeURIComponent(msg)}`;
+}
+
+// Convierte una consulta recibida directamente en cliente del bufete (1 clic)
+export async function convertirConsultaACliente(c) {
+  const nombre = consultaNombre(c);
+  if (!nombre || nombre === '—') {
+    toast('La consulta no cuenta con un nombre válido para crear el cliente.', 'error');
+    return;
+  }
+  const payload = {
+    nombre: nombre,
+    telefono: c.telefono || null,
+    email: c.email || null,
+    notas: `Consulta Web (${c.area || 'General'}):
+${c.mensaje || ''}`,
+    created_by: state.profile ? state.profile.id : null
+  };
+
+  const { data: newCli, error } = await supabase.from('clientes').insert(payload).select().maybeSingle();
+  if (error) {
+    toast('Error al convertir consulta a cliente: ' + error.message, 'error');
+    return;
+  }
+
+  // Marcar la consulta como atendida
+  await supabase.from('consultas').update({ estado: 'atendida' }).eq('id', c.id);
+  c.estado = 'atendida';
+  await logAccion('convertir_cliente', 'consultas', c.id, 'Convertida a cliente: ' + nombre);
+  try { await loadClientes(); } catch (e) {}
+
+  toast(`Consulta convertida a cliente con éxito: ${nombre}`, 'success');
+  closeModal();
+  clienteForm(newCli || payload);
 }
 
 // Construye un enlace de WhatsApp a partir de un teléfono (añade 591 si hace falta)
@@ -66,7 +113,7 @@ export async function renderConsultas() {
       (!q || [c.nombre, c.apellido, c.email, c.telefono, c.area, c.mensaje].some(v => (v || '').toLowerCase().includes(q))));
     const info = paginar(rows, page);
     $('#consTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
-      <thead><tr><th>Fecha</th><th>Nombre</th><th>Contacto</th><th>Área</th><th>Estado</th></tr></thead>
+      <thead><tr><th>Fecha</th><th>Nombre</th><th>Contacto</th><th>Área</th><th>Estado</th><th>Acciones directas</th></tr></thead>
       <tbody>${info.slice.map(c => `
         <tr data-id="${c.id}">
           <td>${fmtDateTime(c.created_at)}</td>
@@ -74,10 +121,21 @@ export async function renderConsultas() {
           <td>${esc(c.email || c.telefono || '—')}</td>
           <td>${c.area ? `<span class="badge badge-mat">${esc(c.area)}</span>` : '—'}</td>
           <td>${consultaEstadoBadge(c.estado)}</td>
+          <td>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              ${c.telefono ? `<a href="${getConsultaWaUrl(c)}" target="_blank" rel="noopener" class="btn btn--sm" style="background:#25d366;color:#fff;border-color:#25d366;padding:4px 8px;font-size:0.75rem;" title="Responder por WhatsApp" onclick="event.stopPropagation();">${ICON.whatsapp} WhatsApp</a>` : ''}
+              <button class="btn btn--sm btn--primary js-btn-convert" data-id="${c.id}" type="button" style="padding:4px 8px;font-size:0.75rem;white-space:nowrap;" title="Convertir a Cliente" onclick="event.stopPropagation();">👤 Convertir a Cliente</button>
+            </div>
+          </td>
         </tr>`).join('')}</tbody></table></div>${pagerHTML(info)}`
       : `<div class="empty">${ICON.consultas}<p>No hay consultas que coincidan.<br>Las consultas enviadas desde el formulario de contacto de la web aparecerán aquí.</p></div>`;
     $('#consTable').querySelectorAll('tr[data-id]').forEach(tr => tr.onclick = () => {
       const c = list.find(x => x.id === tr.dataset.id); openConsultaDetail(c);
+    });
+    $('#consTable').querySelectorAll('.js-btn-convert').forEach(btn => btn.onclick = (e) => {
+      e.stopPropagation();
+      const c = list.find(x => x.id === btn.dataset.id);
+      if (c) convertirConsultaACliente(c);
     });
     wirePager($('#consTable'), info, (n) => { page = n; paint(); });
   }
@@ -88,7 +146,7 @@ export async function renderConsultas() {
 }
 
 export function openConsultaDetail(c) {
-  const wa = waLinkTel(c.telefono, `Hola ${c.nombre || ''}, le escribimos de LexFive en respuesta a su consulta.`);
+  const wa = getConsultaWaUrl(c);
   const mailHref = c.email ? `mailto:${esc(c.email)}?subject=${encodeURIComponent('Su consulta a LexFive')}` : null;
   const body = `
     <div class="detail-grid">
@@ -110,7 +168,7 @@ export function openConsultaDetail(c) {
       <button class="btn btn--ghost btn--sm" id="btnSugerirEstrategia" style="color:var(--primary); font-weight:600;">✨ Sugerir Estrategia</button>
     </div>`;
 
-  const buttons = [];
+  const buttons = [{ label: '👤 Convertir a Cliente', class: 'btn--primary', onClick: () => convertirConsultaACliente(c) }];
   if (c.estado !== 'atendida') buttons.push({ label: 'Marcar atendida', class: 'btn--navy', onClick: () => setConsultaEstado(c, 'atendida') });
   if (c.estado !== 'archivada') buttons.push({ label: 'Archivar', class: 'btn--ghost', onClick: () => setConsultaEstado(c, 'archivada') });
   if (c.estado !== 'nueva') buttons.push({ label: 'Marcar nueva', class: 'btn--ghost', onClick: () => setConsultaEstado(c, 'nueva') });

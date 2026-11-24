@@ -11,6 +11,7 @@ import { ICON } from './icons.js';
 import { $, content } from './dom.js';
 import { loading, toast, hint, openModal, closeModal } from './ui.js';
 import { profName, optionsProfiles } from './comunes.js';
+import { calcularPlazoProcesalBolivia } from './calendario-bo.js';
 
 const TAREA_ESTADOS = { pendiente: 'Pendiente', en_progreso: 'En progreso', hecha: 'Hecha' };
 export const TAREA_PRIOR = { alta: 'Alta', media: 'Media', baja: 'Baja' };
@@ -25,6 +26,45 @@ export async function renderTareas() {
   const procMap = {}; (procs || []).forEach(p => { procMap[p.id] = p.caratula; });
 
   content().innerHTML = `
+    <!-- CALCULADORA DE PLAZOS PROCESALES (BOLIVIA) -->
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card__head" style="justify-content:space-between;cursor:pointer;" id="headCalcPlazos">
+        <h3 style="margin:0;font-size:1.05rem;display:flex;align-items:center;gap:8px;">
+          ⚖️ Calculadora de Plazos Procesales (Bolivia / La Paz)
+        </h3>
+        <button class="btn btn--ghost btn--sm" id="btnToggleCalc" type="button">Mostrar / Ocultar</button>
+      </div>
+      <div class="card__body" id="bodyCalcPlazos" style="display:none;padding-top:10px;">
+        <div class="field-row" style="align-items:flex-end;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Fecha de notificación</label>
+            <input type="date" id="calcFechaNotif" value="${hoyStr}">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Días hábiles</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="number" id="calcDias" value="15" min="1" max="180" style="width:75px;">
+              <button class="btn btn--ghost btn--sm btn-calc-fast" data-dias="3" type="button">3d</button>
+              <button class="btn btn--ghost btn--sm btn-calc-fast" data-dias="5" type="button">5d</button>
+              <button class="btn btn--ghost btn--sm btn-calc-fast" data-dias="10" type="button">10d</button>
+              <button class="btn btn--ghost btn--sm btn-calc-fast" data-dias="15" type="button">15d</button>
+              <button class="btn btn--ghost btn--sm btn-calc-fast" data-dias="30" type="button">30d</button>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:0;flex-grow:2;">
+            <label>Descripción / Asunto del plazo</label>
+            <input type="text" id="calcDesc" placeholder="Ej. Presentar memorial de contestación - Caso Pérez">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <button class="btn btn--primary" id="btnAgendarPlazo" type="button" style="white-space:nowrap;">
+              📌 Agendar como Plazo en Tareas
+            </button>
+          </div>
+        </div>
+        <div id="calcResultado" style="margin-top:14px;padding:12px 16px;background:var(--bg-soft2);border:1px solid var(--line);border-radius:8px;">
+        </div>
+      </div>
+    </div>
     <div class="toolbar">
       <input type="search" id="qTarea" placeholder="Buscar tarea...">
       <select id="fVence" ${hint('Filtre las tareas por su fecha de vencimiento.')}>

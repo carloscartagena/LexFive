@@ -16,7 +16,7 @@ import { profName, namesFromIds } from './comunes.js';
 import { supabase } from './supabase.js';
 import { TAREA_PRIOR, tareaForm } from './tareas.js';
 import { openProcesoDetail } from './procesos.js';
-import { openConsultaDetail, consultaNombre } from './consultas.js';
+import { openConsultaDetail, consultaNombre, getConsultaWaUrl, convertirConsultaACliente } from './consultas.js';
 import { clienteForm } from './clientes.js';
 import { navigate, lastBackupText, exportarRespaldo, revisarRespaldo, openSeguridad2FA, openNotificaciones } from './app.js';
 
@@ -68,7 +68,7 @@ export async function renderDashboard() {
       supabase.from('tareas').select('id', { count: 'exact', head: true }).neq('estado', 'hecha'),
       supabase.from('certificados').select('id', { count: 'exact', head: true }).gte('created_at', inicioMes),
       supabase.from('consultas').select('*').order('created_at', { ascending: false }).limit(5),
-      supabase.from('tareas').select('*').neq('estado', 'hecha').order('vence', { ascending: true, nullsFirst: false }).limit(5),
+      supabase.from('tareas').select('*').neq('estado', 'hecha').order('vence', { ascending: true, nullsFirst: false }).limit(10),
       supabase.from('tareas').select('*').neq('estado', 'hecha').eq('asignado_a', state.profile.id).order('vence', { ascending: true, nullsFirst: false }).limit(8)
     ]);
 
@@ -274,7 +274,7 @@ export async function renderDashboard() {
       </div>
     </div>
 
-    <!-- 3. BLOQUE «ATENCIÓN PRIORITARIA» (2 COLUMNAS) -->
+    <!-- 3. BLOQUE «ATENCIÓN PRIORITARIA» Y SEMÁFORO DE PLAZOS (2 COLUMNAS) -->
     <div class="priority-grid">
       <!-- Columna 1: Últimas consultas recibidas -->
       <div class="card" style="margin-bottom:0;">
@@ -283,44 +283,74 @@ export async function renderDashboard() {
           <button class="btn btn--ghost btn--sm" id="dashVerConsultas" type="button">Ver todas</button>
         </div>
         <div class="card__body--flush">
-          ${ultimasConsultas.length ? ultimasConsultas.map(c => `
-            <div class="priority-item">
+          ${ultimasConsultas.length ? ultimasConsultas.map(c => {
+            const wa = getConsultaWaUrl(c);
+            return `
+            <div class="priority-item" style="padding:12px 18px;align-items:flex-start;">
               <div class="priority-item__main">
-                <div class="priority-item__title">${esc(consultaNombre(c))}</div>
-                <div class="priority-item__sub">
+                <div class="priority-item__title" style="font-weight:700;">${esc(consultaNombre(c))}</div>
+                <div class="priority-item__sub" style="margin-top:3px;gap:6px;">
                   <span>${fmtDate(c.created_at)}</span>
                   ${c.telefono ? `<span>· ${esc(c.telefono)}</span>` : ''}
-                  ${c.asunto ? `<span>· ${esc(c.asunto)}</span>` : ''}
+                  ${c.area ? `<span>· <strong style="color:var(--primary);">${esc(c.area)}</strong></span>` : ''}
                   ${c.estado === 'nueva' ? `<span class="badge" style="background:rgba(239,68,68,0.12);color:#ef4444;font-size:.65rem;padding:2px 6px;">Nueva</span>` : `<span class="badge" style="background:rgba(16,185,129,0.12);color:#10b981;font-size:.65rem;padding:2px 6px;">${esc(c.estado)}</span>`}
                 </div>
+                ${c.mensaje ? `<div class="cell-sub" style="margin-top:4px;font-size:0.83rem;">${esc(c.mensaje.slice(0, 85))}${c.mensaje.length > 85 ? '…' : ''}</div>` : ''}
               </div>
-              <button class="btn btn--primary btn--sm js-dash-ver-consulta" data-id="${c.id}" type="button" style="white-space:nowrap;font-size:.78rem;">Ver / Responder</button>
+              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                ${wa ? `<a href="${wa}" target="_blank" rel="noopener" class="btn btn--sm" style="background:#25d366;color:#fff;border-color:#25d366;padding:4px 8px;font-size:.75rem;" title="Responder por WhatsApp" onclick="event.stopPropagation();">${ICON.whatsapp} WhatsApp</a>` : ''}
+                <button class="btn btn--sm btn--primary js-dash-convert-cli" data-id="${c.id}" type="button" style="padding:4px 8px;font-size:.75rem;white-space:nowrap;" title="Convertir a Cliente">👤 Convertir</button>
+                <button class="btn btn--ghost btn--sm js-dash-ver-consulta" data-id="${c.id}" type="button" style="white-space:nowrap;font-size:.75rem;padding:4px 8px;">Ver</button>
+              </div>
             </div>
-          `).join('') : `<div class="empty" style="padding:24px;">${ICON.consultas}<p>No hay consultas registradas aún.</p></div>`}
+          `;}).join('') : `<div class="empty" style="padding:24px;">${ICON.consultas}<p>No hay consultas registradas aún.</p></div>`}
         </div>
       </div>
 
-      <!-- Columna 2: Próximas tareas pendientes -->
+      <!-- Columna 2: Semáforo de Plazos y Tareas -->
       <div class="card" style="margin-bottom:0;">
         <div class="card__head" style="justify-content:space-between;">
-          <h3 style="margin:0;font-size:1.15rem;display:flex;align-items:center;gap:8px;">${ICON.tareas} Próximas tareas pendientes</h3>
+          <h3 style="margin:0;font-size:1.15rem;display:flex;align-items:center;gap:8px;">
+            ⚖️ Semáforo de Plazos y Tareas
+          </h3>
           <button class="btn btn--ghost btn--sm" id="dashVerTareas" type="button">Ver tablero</button>
         </div>
         <div class="card__body--flush">
           ${proximasTareas.length ? proximasTareas.map(t => {
-            const vencida = t.vence && t.vence < hoyS;
-            const venceHoy = t.vence === hoyS;
+            const hoyDate = new Date(hoyS + 'T00:00:00');
+            const venceDate = t.vence ? new Date(t.vence + 'T00:00:00') : null;
+            const diffDays = venceDate ? Math.round((venceDate - hoyDate) / (1000 * 60 * 60 * 24)) : null;
+
+            let semaforoBadge = '';
+            if (!t.vence) {
+              semaforoBadge = `<span class="badge" style="background:rgba(100,116,139,0.15);color:#64748b;font-weight:700;font-size:0.72rem;">Sin fecha</span>`;
+            } else if (diffDays <= 0) {
+              // ROJO: Vencida o vence hoy
+              const label = diffDays < 0 ? `🔴 Vencida` : '🔴 Vence hoy';
+              semaforoBadge = `<span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;font-weight:700;border:1px solid rgba(239,68,68,0.3);font-size:0.72rem;">${label}</span>`;
+            } else if (diffDays <= 3) {
+              // ÁMBAR: Vence en los próximos 3 días calendario
+              semaforoBadge = `<span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;font-weight:700;border:1px solid rgba(245,158,11,0.3);font-size:0.72rem;">🟡 Vence en ${diffDays}d</span>`;
+            } else {
+              // VERDE: En plazo (> 3 días)
+              semaforoBadge = `<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;font-weight:700;border:1px solid rgba(16,185,129,0.3);font-size:0.72rem;">🟢 En plazo (${fmtDate(t.vence)})</span>`;
+            }
+
             return `
-              <div class="priority-item">
+              <div class="priority-item" style="padding:10px 18px;align-items:center;">
                 <button class="pend-row__check js-dash-done-tarea" data-id="${t.id}" type="button" title="Marcar como hecha" aria-label="Completar" style="width:24px;height:24px;margin-right:8px;font-size:11px;border-radius:6px;border:1.5px solid var(--line);background:transparent;cursor:pointer;">✓</button>
                 <div class="priority-item__main js-dash-open-tarea" data-id="${t.id}" style="cursor:pointer;">
-                  <div class="priority-item__title">${esc(t.titulo)}</div>
-                  <div class="priority-item__sub">
+                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+                    ${semaforoBadge}
                     <span class="badge-prio badge-prio--${t.prioridad}" style="font-size:.65rem;">${TAREA_PRIOR[t.prioridad] || t.prioridad}</span>
-                    ${t.vence ? `<span style="font-weight:600;color:${vencida ? '#ef4444' : (venceHoy ? '#f59e0b' : 'inherit')}">${vencida ? 'Venció ' + fmtDate(t.vence) : (venceHoy ? 'Vence hoy' : 'Vence ' + fmtDate(t.vence))}</span>` : ''}
-                    ${t.asignado_a ? `<span>· ${esc(profName(t.asignado_a))}</span>` : ''}
+                  </div>
+                  <div class="priority-item__title" style="font-weight:600;">${esc(t.titulo)}</div>
+                  <div class="priority-item__sub">
+                    ${t.asignado_a ? `<span>Resp: ${esc(profName(t.asignado_a))}</span>` : ''}
+                    ${t.descripcion ? `<span>· ${esc(t.descripcion.slice(0, 45))}${t.descripcion.length > 45 ? '…' : ''}</span>` : ''}
                   </div>
                 </div>
+                <button class="btn btn--ghost btn--sm js-dash-open-tarea" data-id="${t.id}" type="button" style="padding:3px 8px;font-size:.75rem;">Editar</button>
               </div>
             `;
           }).join('') : `<div class="empty" style="padding:24px;">${ICON.tareas}<p>No hay tareas pendientes. ¡Todo al día!</p></div>`}
@@ -438,6 +468,14 @@ export async function renderDashboard() {
   const dvc = $('#dashVerConsultas'); if (dvc) dvc.onclick = () => navigate('consultas');
   const dvt = $('#dashVerTareas'); if (dvt) dvt.onclick = () => navigate('tareas');
   const bvaBot = $('#btnVerAgendaBottom'); if (bvaBot) bvaBot.onclick = () => navigate('agenda');
+
+  content().querySelectorAll('.js-dash-convert-cli').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      const c = ultimasConsultas.find(x => x.id === btn.dataset.id);
+      if (c) await convertirConsultaACliente(c);
+    };
+  });
 
   content().querySelectorAll('.js-dash-ver-consulta').forEach(btn => {
     btn.onclick = () => {
