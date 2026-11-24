@@ -33,7 +33,10 @@ import {
   buildInformeWordDocument,
   descargarInformePDF,
   imprimirInformeDocumento,
-  descargarInformeWordDoc
+  descargarInformeWordDoc,
+  normalizarNotaDesig,
+  formatearSupervision,
+  formatearModalidadYHorario
 } from './pasantia-docs.js';
 
 export { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, calcularJornadasPasantia, extraerHoras, fechaLarga };
@@ -109,8 +112,9 @@ const CERT_PLANTILLAS = [
     cuerpo: d => {
       const gen = obtenerTratamiento(d.genero);
       const intro = `El BUFETE DE ABOGADOS LEXFIVE, a través de su Dirección y cuerpo de abogados patrocinantes, en uso de sus legítimas atribuciones:`;
-      const desig = (d.nota_designacion && d.fecha_nota_designacion) 
-        ? `, ${gen.designado} mediante ${d.nota_designacion} de fecha ${d.fecha_nota_designacion}, correspondiente a la asignatura ${d.asignatura || 'CJR-410 Pasantía I'}` 
+      const notaNorm = normalizarNotaDesig(d.nota_designacion);
+      const desig = (notaNorm && d.fecha_nota_designacion) 
+        ? `, ${gen.designado} mediante ${notaNorm} de fecha ${d.fecha_nota_designacion}, correspondiente a la asignatura ${d.asignatura || 'CJR-410 Pasantía I'}` 
         : (d.asignatura ? `, correspondiente a la asignatura ${d.asignatura}` : '');
       const ruTxt = d.registro_universitario ? ` y Registro Universitario N.º ${d.registro_universitario}` : '';
       const ciTxt = d.ci ? `, con Cédula de Identidad N.º ${d.ci}` : '';
@@ -289,13 +293,16 @@ export async function renderCertificados() {
                   <p class="cell-sub" id="ce_feriados_info" style="margin-top:2px;font-size:.78rem;color:var(--gold, #a8853c);display:none;"></p>
                 </div>
                 <div class="field" style="grid-column:1/-1;border-top:1px dashed var(--line);padding-top:8px;">
-                  <label style="font-weight:600;">Áreas de práctica forense para actividades</label>
+                  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <label style="font-weight:600;">Áreas de práctica forense para actividades</label>
+                    <button class="btn btn--ghost btn--sm" id="ce_btn_toggle_areas" type="button" style="font-size:.78rem;padding:2px 8px;">Marcar / desmarcar todas</button>
+                  </div>
                   <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;margin-top:4px;">
                     <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="civil" checked> Civil</label>
                     <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="familiar" checked> Familiar</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="laboral"> Laboral</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="penal"> Penal</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="administrativo"> Administrativo (GAMEA)</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="laboral" checked> Laboral</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="penal" checked> Penal</label>
+                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="administrativo" checked> Administrativo (GAMEA)</label>
                     <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="notarial" checked> DDRR / Notarial</label>
                     <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="legaltech" checked> Gestión Digital</label>
                   </div>
@@ -914,6 +921,16 @@ export async function renderCertificados() {
       };
     });
   };
+
+    const btnToggleAreas = $('#ce_btn_toggle_areas');
+  if (btnToggleAreas) {
+    btnToggleAreas.onclick = () => {
+      const cbs = content().querySelectorAll('.ce_area');
+      const allChecked = Array.from(cbs).every(c => c.checked);
+      cbs.forEach(c => { c.checked = !allChecked; });
+      pintar();
+    };
+  }
 
   const btnIA = $('#ce_btn_ia_cronograma');
   const badgeIA = $('#ce_ia_badge');

@@ -92,7 +92,7 @@ export const BANCO_TAREAS_AREAS = {
       resumen: 'Trámites municipales ante GAMEA y saneamiento tributario.',
       actividades: [
         'Gestiones administrativas ante el Gobierno Autónomo Municipal de El Alto (GAMEA) sobre catastro e impuestos.',
-        'Tramitación de certificaciones catastrales, visado de planos y levantamiento de gravámenes municipales.',
+        'Tramitación de certificaciones decenales / treintañales ante Derechos Reales, certificaciones catastrales, visado de planos y levantamiento de gravámenes municipales.',
         'Redacción de recursos de revocatoria y jerárquicos ante administraciones tributarias y reguladoras.'
       ]
     }

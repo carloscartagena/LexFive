@@ -232,13 +232,16 @@ export async function renderInforme() {
       </div>
       <div class="card__body">
         <div style="background:var(--card-bg, rgba(255,255,255,0.03));border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:12px;">
-          <label style="font-weight:600;display:block;margin-bottom:6px;">Áreas de práctica jurídica desarrolladas:</label>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+            <label style="font-weight:600;">Áreas de práctica jurídica desarrolladas:</label>
+            <button class="btn btn--ghost btn--sm" id="in_btn_toggle_areas" type="button" style="font-size:.78rem;padding:2px 8px;">Marcar / desmarcar todas</button>
+          </div>
           <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;margin-bottom:8px;">
             <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="civil" checked> Civil</label>
             <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="familiar" checked> Familiar</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="laboral"> Laboral</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="penal"> Penal</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="administrativo"> Administrativo (GAMEA)</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="laboral" checked> Laboral</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="penal" checked> Penal</label>
+            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="administrativo" checked> Administrativo (GAMEA)</label>
             <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="notarial" checked> DDRR / Notarial</label>
             <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="legaltech" checked> LegalTech</label>
           </div>
@@ -567,6 +570,15 @@ export async function renderInforme() {
   }
 
   // Generador de actividades únicas con IA
+    const btnToggleInAreas = $('#in_btn_toggle_areas');
+  if (btnToggleInAreas) {
+    btnToggleInAreas.onclick = () => {
+      const cbs = content().querySelectorAll('.in_area');
+      const allChecked = Array.from(cbs).every(c => c.checked);
+      cbs.forEach(c => { c.checked = !allChecked; });
+    };
+  }
+
   const btnIA = $('#in_btn_ia_cronograma');
   if (btnIA) {
     btnIA.onclick = async () => {
