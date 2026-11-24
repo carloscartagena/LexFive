@@ -41,6 +41,9 @@ import {
   buildRecomendacionHTML,
   descargarExperienciaWordDoc,
   descargarRecomendacionWordDoc,
+  buildNotaRemisionHTML,
+  buildNotaRemisionWordDoc,
+  descargarNotaRemisionWordDoc,
   extraerImagenesDeDocx,
   optimizarImagenBlob
 } from './pasantia-docs.js';
@@ -392,6 +395,38 @@ export async function renderCertificados() {
                     </div>
                   </details>
                 </div>
+                <!-- NOTA DE REMISIÓN UNIVERSITARIA (IIST / UMSA) -->
+                <div style="grid-column:1/-1;margin-top:10px;">
+                  <div class="card" style="margin:0;border:1px solid var(--line);background:var(--card-bg, rgba(255,255,255,0.03));border-radius:8px;">
+                    <div class="card__head" style="padding:10px 14px;">
+                      <strong style="font-size:.9rem;color:var(--text, #101820);display:flex;align-items:center;gap:6px;">
+                        <span>📋</span> Nota de Remisión Universitaria (IIST / UMSA)
+                      </strong>
+                    </div>
+                    <div class="card__body" style="padding:10px 14px;display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;">
+                      <div class="field">
+                        <label>Destinatario de Nota de Remisión</label>
+                        <input id="ce_remision_destinatario" value="Dr. Erick San Miguel R." placeholder="Ej. Dr. Erick San Miguel R.">
+                      </div>
+                      <div class="field">
+                        <label>Cargo del Destinatario</label>
+                        <input id="ce_remision_cargo" value="RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST)" placeholder="Ej. RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES...">
+                      </div>
+                      <div class="field">
+                        <label>Firmante de la Nota</label>
+                        <select id="ce_remision_firmante">
+                          <option value="estudiante" selected>Estudiante Pasante (entrega personal)</option>
+                          <option value="direccion">Dirección LexFive (remisión institucional en hoja membretada)</option>
+                        </select>
+                      </div>
+                      <div class="field">
+                        <label>Celular del Pasante (opcional, para firma)</label>
+                        <input id="ce_celular_pasante" value="" placeholder="Ej. 70123456">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- ANEXO FOTOGRÁFICO (EVIDENCIA DE PASANTÍA) -->
                 <div style="grid-column:1/-1;margin-top:10px;">
                   <div class="card" style="margin:0;border:1px solid var(--line);background:var(--card-bg, rgba(255,255,255,0.03));border-radius:8px;">
@@ -473,11 +508,12 @@ export async function renderCertificados() {
             <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="informe">Informe Único</button>
             <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="experiencia">Experiencia Pre-Profesional</button>
             <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="recomendacion">Carta de Recomendación</button>
+            <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="remision">Nota de Remisión</button>
           </div>
         </div>
         <div id="ce_preview_actions" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn--primary btn--sm" id="ce_btn_imprimir_activo" type="button" style="font-weight:bold;background:#b89446;color:#fff;">🖨️ Guardar PDF / Imprimir</button>
-          <button class="btn btn--ghost btn--sm" id="ce_btn_expediente_completo" type="button" style="display:none;font-weight:600;border:1px solid #b89446;color:#b89446;">📑 Expediente UMSA (3 en 1)</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_expediente_completo" type="button" style="display:none;font-weight:600;border:1px solid #b89446;color:#b89446;">📑 Expediente UMSA (4 en 1)</button>
           <button class="btn btn--ghost btn--sm" id="ce_btn_paquete_cv" type="button" style="display:none;font-weight:600;border:1px solid #0e1b2c;color:#0e1b2c;">🎓 Paquete CV (2 en 1)</button>
           <button class="btn btn--ghost btn--sm" id="ce_btn_word_activo" type="button">📄 Word (.doc)</button>
         </div>
@@ -573,6 +609,10 @@ export async function renderCertificados() {
     observacion_rec: val('ce_observacion_rec'),
     fotos: fotosPasantiaArray,
     fotos_layout: ($('#ce_fotos_layout') ? $('#ce_fotos_layout').value : '4'),
+    destinatario_remision: val('ce_remision_destinatario') || 'Dr. Erick San Miguel R.',
+    cargo_remision: val('ce_remision_cargo') || 'RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST)',
+    firmante_remision: val('ce_remision_firmante') || 'estudiante',
+    celular_pasante: val('ce_celular_pasante') || '',
     abogadoFirma: val('ce_abogado_firma'),
     rpaFirma: val('ce_rpa')
   });
@@ -691,6 +731,9 @@ export async function renderCertificados() {
         } else if (vistaPasantiaTab === 'recomendacion') {
           if (btnWord) btnWord.style.display = 'inline-flex';
           previewEl.innerHTML = buildRecomendacionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+        } else if (vistaPasantiaTab === 'remision') {
+          if (btnWord) btnWord.style.display = 'inline-flex';
+          previewEl.innerHTML = buildNotaRemisionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
         } else {
           if (btnWord) btnWord.style.display = 'inline-flex';
           previewEl.innerHTML = docActual();
@@ -725,6 +768,11 @@ export async function renderCertificados() {
       const tutRpa = val('ce_tutor_rpa');
       const genVal = val('ce_genero') || 'femenino';
 
+      const destRem = val('ce_remision_destinatario') || 'Dr. Erick San Miguel R.';
+      const cargoRem = val('ce_remision_cargo') || 'RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST)';
+      const firmanteRem = val('ce_remision_firmante') || 'estudiante';
+      const celPas = val('ce_celular_pasante') || '';
+
       // Respaldo local inmediato indexado por ref
       try {
         const extraPayload = {
@@ -734,7 +782,12 @@ export async function renderCertificados() {
           genero: genVal,
           observacion_rec: val('ce_observacion_rec'),
           fotos: fotosPasantiaArray,
-          fotos_layout: ($('#ce_fotos_layout') ? $('#ce_fotos_layout').value : '4')
+          fotos_layout: ($('#ce_fotos_layout') ? $('#ce_fotos_layout').value : '4'),
+          cronograma_json: cronogramaPersonalizado,
+          destinatario_remision: destRem,
+          cargo_remision: cargoRem,
+          firmante_remision: firmanteRem,
+          celular_pasante: celPas
         };
         localStorage.setItem('lexfive_cert_extra_' + refActual, JSON.stringify(extraPayload));
       } catch (_) {}
@@ -764,7 +817,13 @@ export async function renderCertificados() {
         horario: val('ce_horario') || null,
         fecha_inicio: val('ce_fecha_inicio') || null,
         fecha_fin: val('ce_fecha_fin') || null,
-        incluir_sello_digital: $('#ce_sello') ? $('#ce_sello').checked : true
+        incluir_sello_digital: $('#ce_sello') ? $('#ce_sello').checked : true,
+        // Persistencia de cronograma y remisión
+        cronograma_json: cronogramaPersonalizado || null,
+        destinatario_remision: destRem || null,
+        cargo_remision: cargoRem || null,
+        firmante_remision: firmanteRem || null,
+        celular_pasante: celPas || null
       };
       // Solo al crear uno nuevo se fija el autor; al editar se conserva el original.
       if (!editando) row.created_by = state.profile.id;
@@ -780,6 +839,11 @@ export async function renderCertificados() {
             delete fallbackRow.tutor_nombre;
             delete fallbackRow.tutor_rpa;
             delete fallbackRow.genero;
+            delete fallbackRow.cronograma_json;
+            delete fallbackRow.destinatario_remision;
+            delete fallbackRow.cargo_remision;
+            delete fallbackRow.firmante_remision;
+            delete fallbackRow.celular_pasante;
             await supabase.from('certificados').upsert(fallbackRow, { onConflict: 'ref' });
           }
         }
@@ -958,12 +1022,20 @@ export async function renderCertificados() {
     const tutRpaVal = (c.tutor_rpa !== undefined && c.tutor_rpa !== null) ? c.tutor_rpa : (localExtra.tutor_rpa || '');
     const generoVal = (c.genero !== undefined && c.genero !== null) ? c.genero : (localExtra.genero || 'femenino');
     const obsRecVal = (c.observacion_rec !== undefined && c.observacion_rec !== null) ? c.observacion_rec : (localExtra.observacion_rec || '');
+    const destRemVal = (c.destinatario_remision !== undefined && c.destinatario_remision !== null) ? c.destinatario_remision : (localExtra.destinatario_remision || 'Dr. Erick San Miguel R.');
+    const cargoRemVal = (c.cargo_remision !== undefined && c.cargo_remision !== null) ? c.cargo_remision : (localExtra.cargo_remision || 'RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST)');
+    const firmanteRemVal = (c.firmante_remision !== undefined && c.firmante_remision !== null) ? c.firmante_remision : (localExtra.firmante_remision || 'estudiante');
+    const celPasVal = (c.celular_pasante !== undefined && c.celular_pasante !== null) ? c.celular_pasante : (localExtra.celular_pasante || '');
 
     if ($('#ce_docente_guia')) $('#ce_docente_guia').value = docGuiaVal;
     if ($('#ce_tutor_nombre')) $('#ce_tutor_nombre').value = tutNomVal;
     if ($('#ce_tutor_rpa')) $('#ce_tutor_rpa').value = tutRpaVal;
     if ($('#ce_genero')) $('#ce_genero').value = generoVal;
     if ($('#ce_observacion_rec')) $('#ce_observacion_rec').value = obsRecVal;
+    if ($('#ce_remision_destinatario')) $('#ce_remision_destinatario').value = destRemVal;
+    if ($('#ce_remision_cargo')) $('#ce_remision_cargo').value = cargoRemVal;
+    if ($('#ce_remision_firmante')) $('#ce_remision_firmante').value = firmanteRemVal;
+    if ($('#ce_celular_pasante')) $('#ce_celular_pasante').value = celPasVal;
     if ($('#ce_fotos_layout')) $('#ce_fotos_layout').value = localExtra.fotos_layout || c.fotos_layout || '4';
     fotosPasantiaArray = Array.isArray(localExtra.fotos) ? localExtra.fotos : (Array.isArray(c.fotos) ? c.fotos : []);
     pintarFotosGrid();
@@ -973,11 +1045,15 @@ export async function renderCertificados() {
     refActual = c.ref;
     editando = true;
     guardadoActual = false;
-    // Limpiar estado en memoria previo para garantizar sincronización estricta
+    // Restaurar cronograma de 20 jornadas persistido
     cronogramaPersonalizado = null;
     if (esPas) {
-      if (Array.isArray(c.customTareas) && c.customTareas.length) {
+      if (Array.isArray(c.cronograma_json) && c.cronograma_json.length) {
+        cronogramaPersonalizado = c.cronograma_json;
+      } else if (Array.isArray(c.customTareas) && c.customTareas.length) {
         cronogramaPersonalizado = c.customTareas;
+      } else if (Array.isArray(localExtra.cronograma_json) && localExtra.cronograma_json.length) {
+        cronogramaPersonalizado = localExtra.cronograma_json;
       }
       pintarEditorJornadas();
     }
@@ -1001,7 +1077,10 @@ export async function renderCertificados() {
     pintarFotosGrid();
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
      'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario',
-     'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+     'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec', 'ce_celular_pasante'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+    if ($('#ce_remision_destinatario')) $('#ce_remision_destinatario').value = 'Dr. Erick San Miguel R.';
+    if ($('#ce_remision_cargo')) $('#ce_remision_cargo').value = 'RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST)';
+    if ($('#ce_remision_firmante')) $('#ce_remision_firmante').value = 'estudiante';
     if ($('#ce_genero')) $('#ce_genero').value = 'femenino';
     if ($('#ce_prellenar_asistencia')) $('#ce_prellenar_asistencia').checked = true;
     if ($('#ce_uni_pas')) $('#ce_uni_pas').value = 'Universidad Mayor de San Andrés (UMSA)';
@@ -1035,7 +1114,8 @@ export async function renderCertificados() {
     el.oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
   ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero', 'ce_feriados_extra',
-   'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec', 'ce_fecha'].forEach(id => {
+   'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec', 'ce_fecha',
+   'ce_remision_destinatario', 'ce_remision_cargo', 'ce_remision_firmante', 'ce_celular_pasante'].forEach(id => {
     const el = $('#' + id); if (!el) return;
     const handler = () => {
       forkSiNecesario();
@@ -1057,7 +1137,7 @@ export async function renderCertificados() {
       if (!btn) return;
       e.preventDefault();
       const nuevaTab = btn.dataset.tab;
-      if (nuevaTab && ['cert', 'asistencia', 'informe', 'experiencia', 'recomendacion'].includes(nuevaTab)) {
+      if (nuevaTab && ['cert', 'asistencia', 'informe', 'experiencia', 'recomendacion', 'remision'].includes(nuevaTab)) {
         vistaPasantiaTab = nuevaTab;
         pintar();
       }
@@ -1473,12 +1553,15 @@ export async function renderCertificados() {
       } else if (vistaPasantiaTab === 'recomendacion') {
         tituloDoc = `Carta_Recomendacion_${slug}`;
         docHTML = buildRecomendacionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      } else if (vistaPasantiaTab === 'remision') {
+        tituloDoc = `Nota_Remision_${slug}`;
+        docHTML = buildNotaRemisionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
       }
       abrirImpresionVectorial(tituloDoc, docHTML);
     };
   }
 
-  // 📑 Expediente UMSA (3 en 1: Certificado + Asistencia + Informe Único)
+  // 📑 Expediente UMSA (4 en 1: Nota de Remisión + Certificado + Asistencia + Informe Único)
   const btnExpCompleto = $('#ce_btn_expediente_completo');
   if (btnExpCompleto) {
     btnExpCompleto.onclick = () => {
@@ -1487,11 +1570,12 @@ export async function renderCertificados() {
       registrarCert();
       const slug = slugNombre(nom);
       const tituloDoc = `Expediente_UMSA_${slug}`;
-      toast('Preparando Expediente UMSA (3 en 1: Certificado + Asistencia + Informe)...', 'info');
+      toast('Preparando Expediente UMSA (4 en 1: Nota de Remisión + Certificado + Asistencia + Informe)...', 'info');
+      const notaHTML = buildNotaRemisionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
       const certHTML = docActual();
       const asisHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
       const infHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
-      abrirImpresionVectorial(tituloDoc, certHTML + asisHTML + infHTML);
+      abrirImpresionVectorial(tituloDoc, notaHTML + certHTML + asisHTML + infHTML);
     };
   }
 
@@ -1525,6 +1609,8 @@ export async function renderCertificados() {
         await descargarExperienciaWordDoc(datos(), logoSrc);
       } else if (esPasantia() && vistaPasantiaTab === 'recomendacion') {
         await descargarRecomendacionWordDoc(datos(), logoSrc);
+      } else if (esPasantia() && vistaPasantiaTab === 'remision') {
+        await descargarNotaRemisionWordDoc(datos(), logoSrc);
       } else {
         const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>' + docActual() + '</body></html>';
         const prefijo = catActual() === 'aceptacion' ? 'carta-aceptacion-' : (esPasantia() ? 'certificado-pasantia-' : 'certificado-');

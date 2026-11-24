@@ -725,6 +725,9 @@ export async function renderInforme() {
       if ($('#in_ref_cert')) $('#in_ref_cert').value = c.ref || '';
 
       autocalcularFechaFin();
+      if (Array.isArray(c.cronograma_json) && c.cronograma_json.length) {
+        $('#in_actividades').value = formatearCronogramaTexto(c.cronograma_json);
+      }
       $('#in_antecedentes').value = `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía N.º ${c.nota_designacion || 'IIST-001/2026'} de fecha ${fechaLarga(c.fecha_nota_designacion || c.fecha_emision)}.`;
       $('#in_conclusiones').value = generarConclusionesTexto(val('in_genero'));
 

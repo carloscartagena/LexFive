@@ -1768,6 +1768,212 @@ export async function descargarRecomendacionWordDoc(d, logoSrc) {
 }
 
 // ----------------------------------------------------------------------
+// 8.5 NOTA DE REMISIÓN A LA UNIVERSIDAD (IIST / UMSA)
+// ----------------------------------------------------------------------
+export function buildNotaRemisionHTML(d, logoSrc, model, wmOp) {
+  const nombre = esc(d.nombre || '___________________');
+  const ci = esc(d.ci || '—');
+  const ru = esc(d.ru || d.registro_universitario || '');
+  const uni = esc(d.universidad || 'Universidad Mayor de San Andrés (UMSA)');
+  const carrera = esc(d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017');
+  const asignatura = esc(d.asignatura || 'CJR-410 Pasantía I');
+  const gen = obtenerTratamiento(d.genero);
+  const ref = esc(d.ref || 'LF-2026-00000');
+  const fechaDoc = fechaLarga(d.fecha || d.fecha_emision || hoyISO());
+  const destinatario = esc(d.destinatario_remision || 'Dr. Erick San Miguel R.');
+  const cargo = esc(d.cargo_remision || 'RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST)');
+  const firmante = (d.firmante_remision || 'estudiante').toLowerCase();
+  const celular = esc(d.celular_pasante || '');
+  const docenteGuia = esc(d.docente_guia || 'Dr. Marcelo Silva Mollinedo');
+  const tutorNombre = esc(d.tutor_nombre || d.abogadoFirma || 'Dr. Carlos Mendoza Soliz');
+  const tutorRpa = esc(d.tutor_rpa || d.rpaFirma || '');
+  const notaDesig = esc(d.nota_designacion || '');
+  const fechaNota = d.fecha_nota_designacion ? esc(d.fecha_nota_designacion) : '';
+  const modalidad = esc(d.modalidad || '4 semanas a medio tiempo (4 horas diarias)');
+  const horario = esc(d.horario || '14:00 a 18:00');
+
+  let lapso = '';
+  if (d.fecha_inicio_larga && d.fecha_fin_larga) {
+    lapso = `del <strong>${esc(d.fecha_inicio_larga)}</strong> al <strong>${esc(d.fecha_fin_larga)}</strong>`;
+  } else if (d.periodo && d.periodo !== 'correspondiente') {
+    lapso = `durante el período <strong>${esc(d.periodo)}</strong>`;
+  } else {
+    lapso = 'durante el período académico correspondiente';
+  }
+
+  const fotos = Array.isArray(d.fotos) ? d.fotos : [];
+  const anexoFotosTexto = fotos.length > 0 
+    ? `registro fotográfico de práctica forense (${fotos.length} fotografías anexas)`
+    : 'registro fotográfico de evidencia de práctica forense';
+
+  if (firmante === 'direccion') {
+    // ---- MODALIDAD B: DIRECCIÓN LEXFIVE (MEMBRETADA) ----
+    const headHTML = membreteHeader(model, logoSrc);
+    const footHTML = membreteFooter(model);
+    const effectiveWmOp = (wmOp !== undefined && wmOp !== null && wmOp > 0) ? Number(wmOp) : 0.08;
+    const wmHTML = logoSrc ? `
+      <img src="${logoSrc}" alt="" style="position:absolute;top:50%;left:50%;width:13cm;height:13cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${effectiveWmOp.toFixed(2)};pointer-events:none;z-index:0 !important;">
+    ` : '';
+
+    const contentHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <span style="font-size:9pt;color:#5c6675;font-family:Arial,sans-serif;font-weight:600;">Ref. N.º ${ref} &middot; Nota de Remisión Institucional</span>
+        <span style="font-size:9.5pt;color:#0e1b2c;font-family:Arial,sans-serif;">La Paz, ${fechaDoc}</span>
+      </div>
+
+      <div style="margin:6px 0 10px;line-height:1.35;font-size:10.5pt;font-family:Arial,sans-serif;color:#101820;">
+        Señor:<br>
+        <strong style="text-transform:uppercase;color:#0e1b2c;">${destinatario}</strong><br>
+        <strong style="font-size:9.5pt;color:#374151;">${cargo}</strong><br>
+        <span style="font-size:9pt;color:#4b5563;">UNIVERSIDAD MAYOR DE SAN ANDRÉS &middot; FACULTAD DE DERECHO Y CIENCIAS POLÍTICAS</span><br>
+        <u style="font-size:9.5pt;">Presente.–</u>
+      </div>
+
+      <div style="text-align:right;margin:8px 0 10px;font-weight:bold;font-size:10pt;color:#0e1b2c;font-family:Arial,sans-serif;">
+        <u>REF.: REMISIÓN INSTITUCIONAL DE DOCUMENTACIÓN FINAL DE PASANTÍA I (${asignatura})</u>
+      </div>
+
+      <div style="font-size:10.5pt;line-height:1.48;color:#101820;text-align:justify;font-family:Arial,sans-serif;">
+        <p style="margin:0 0 8px;">
+          Distinguido Señor Responsable:
+        </p>
+        <p style="margin:0 0 8px;text-indent:1.8em;">
+          Mediante la presente, el <strong>Bufete de Abogados LEXFIVE</strong>, en estricto cumplimiento de lo establecido en la <strong>Resolución del Honorable Consejo Universitario H.C.U. N.° 104/2016</strong> y en atención a la ${notaDesig ? `Nota de Designación N.º <strong>${notaDesig}</strong>${fechaNota ? ` de fecha ${fechaNota}` : ''}` : 'designación académica oficial'}, tiene a bien dirigirse a su digna autoridad a fin de remitir formalmente la documentación final acreditativa de la conclusión de la <strong>Pasantía I</strong> desarrollada por ${gen.artUniv} <strong>${nombre}</strong>, con C.I. <strong>${ci}</strong>${ru ? ` y R.U. <strong>${ru}</strong>` : ''}, estudiante de la carrera de <strong>${carrera}</strong> de la <strong>${uni}</strong>.
+        </p>
+        <p style="margin:0 0 8px;text-indent:1.8em;">
+          La mencionada práctica forense pre-profesional se llevó a cabo ${lapso}, bajo la modalidad de <strong>${modalidad}</strong> (${horario}), habiendo cumplido satisfactoriamente las comisiones y actuaciones procesales asignadas bajo la supervisión de ${gen.univAbrev} Docente Guía, <strong>${docenteGuia}</strong>, y la tutoría técnica e institucional de nuestra firma legal.
+        </p>
+        <p style="margin:0 0 6px;text-indent:1.8em;">
+          Para fines de archivo, convalidación curricular y calificación en el kardex académico, adjuntamos en fojas útiles los siguientes recaudos debidamente suscritos:
+        </p>
+        <ol style="margin:0 0 8px 1.5em;padding-left:1em;line-height:1.4;font-size:10pt;">
+          <li style="margin-bottom:3px;"><strong>Informe Único de Pasantía</strong> (Memoria Académica, evaluación cualitativa y desglose de actuaciones forenses).</li>
+          <li style="margin-bottom:3px;"><strong>Certificado de Conclusión de Pasantía</strong> emitido por LexFive (Ref. N.º <strong>${ref}</strong>).</li>
+          <li style="margin-bottom:3px;"><strong>Hoja de Control de Asistencia y Permanencia</strong> (registro fidedigno de 20 jornadas de práctica forense).</li>
+          <li style="margin-bottom:3px;"><strong>Anexos:</strong> Nota de Designación oficial y ${anexoFotosTexto}.</li>
+        </ol>
+        <p style="margin:0 0 10px;text-indent:1.8em;">
+          Con este grato motivo, agradeciendo la confianza depositada en nuestro despacho para coadyuvar en la formación forense práctica de sus estudiantes, reiteramos a su autoridad las seguridades de nuestra consideración más distinguida.
+        </p>
+      </div>
+
+      <div style="margin-top:auto;padding-top:14px;display:flex;justify-content:space-around;align-items:flex-end;">
+        <div style="text-align:center;font-size:9pt;font-family:Arial,sans-serif;line-height:1.3;min-width:210px;">
+          <div style="border-top:1px solid #101820;margin-bottom:4px;width:190px;margin-left:auto;margin-right:auto;"></div>
+          <strong>${tutorNombre}</strong><br>
+          <span style="color:#5c6675;">Abogado(a) Patrocinante / Tutor(a)</span><br>
+          ${tutorRpa ? `<span style="color:#5c6675;">R.P.A. N.º ${tutorRpa}</span><br>` : ''}
+          <span style="color:#0e1b2c;font-weight:600;">BUFETE LEXFIVE</span>
+        </div>
+        <div style="text-align:center;font-size:9pt;font-family:Arial,sans-serif;line-height:1.3;min-width:210px;">
+          <div style="border-top:1px solid #101820;margin-bottom:4px;width:190px;margin-left:auto;margin-right:auto;"></div>
+          <strong>DIRECCIÓN JURÍDICA</strong><br>
+          <span style="color:#5c6675;">Bufete de Abogados LexFive</span><br>
+          <span style="color:#5c6675;">Firma y Sello Institucional</span>
+        </div>
+      </div>
+    `;
+
+    return `
+    <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
+      ${headHTML}
+      <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:10px 2.1cm 14px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
+        ${wmHTML}
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:space-between;overflow:hidden;background:transparent !important;">
+          ${contentHTML}
+        </div>
+      </div>
+      ${footHTML}
+    </div>`;
+  }
+
+  // ---- MODALIDAD A: ESTUDIANTE PASANTE (ENTREGA PERSONAL) ----
+  // Formato formal universitario limpio en Arial 12pt, line-height: 1.5, justificado, 1 hoja Carta exacta
+  const contentPersonalHTML = `
+    <div style="text-align:right;margin-bottom:18px;font-size:11.5pt;">
+      La Paz, ${fechaDoc}
+    </div>
+
+    <div style="margin-bottom:16px;line-height:1.35;font-size:11.5pt;">
+      Señor:<br>
+      <strong style="text-transform:uppercase;">${destinatario}</strong><br>
+      <strong>${cargo}</strong><br>
+      UNIVERSIDAD MAYOR DE SAN ANDRÉS<br>
+      FACULTAD DE DERECHO Y CIENCIAS POLÍTICAS<br>
+      <u>Presente.–</u>
+    </div>
+
+    <div style="text-align:right;margin-bottom:16px;font-weight:bold;font-size:11pt;">
+      <u>REF.: REMISIÓN DE DOCUMENTACIÓN FINAL DE PASANTÍA I (${asignatura})</u>
+    </div>
+
+    <p style="margin:0 0 10px;font-size:11.5pt;">
+      De mi mayor consideración y estima:
+    </p>
+
+    <p style="margin:0 0 10px;text-indent:2.5em;">
+      A través de la presente, en estricto cumplimiento a lo establecido en la <strong>Resolución del Honorable Consejo Universitario H.C.U. N.° 104/2016</strong> y los reglamentos académicos vigentes de la Carrera de Derecho, tengo a bien dirigirme a su digna autoridad a fin de formalizar la entrega y remisión de la documentación final acreditativa de la conclusión de mi <strong>Pasantía I</strong>, desarrollada en el <strong>Bufete de Abogados LEXFIVE</strong> ${lapso}, bajo la modalidad de ${modalidad} (${horario}), habiendo sido designada mediante ${notaDesig ? `Nota de Designación N.º <strong>${notaDesig}</strong>${fechaNota ? ` de fecha ${fechaNota}` : ''}` : 'la correspondiente Nota de Designación oficial'} y supervisada académicamente por mi Docente Guía, <strong>${docenteGuia}</strong>.
+    </p>
+
+    <p style="margin:0 0 8px;text-indent:2.5em;">
+      A dicho efecto, adjunto a la presente los siguientes recaudos debidamente foliados y suscritos para fines de evaluación y convalidación curricular:
+    </p>
+
+    <ol style="margin:0 0 12px 2.5em;padding-left:1.2em;line-height:1.45;font-size:11pt;">
+      <li style="margin-bottom:4px;"><strong>Informe Único de Pasantía</strong> (Memoria Académica y Evaluación Integral de Práctica Forense).</li>
+      <li style="margin-bottom:4px;"><strong>Certificado de Conclusión de Pasantía</strong> emitido por el Bufete de Abogados LexFive (Ref. N.º <strong>${ref}</strong>).</li>
+      <li style="margin-bottom:4px;"><strong>Hoja de Control de Asistencia y Permanencia</strong> (registro de 20 jornadas de práctica forense con firmas y sellos).</li>
+      <li style="margin-bottom:4px;"><strong>Anexos:</strong> Nota de Designación con sello de recepción oficial y ${anexoFotosTexto}.</li>
+    </ol>
+
+    <p style="margin:0 0 14px;text-indent:2.5em;">
+      Con este motivo, agradeciendo de antemano la atención que brinde a la presente solicitud para los fines académicos consiguientes de acreditación curricular, me despido con las consideraciones más distinguidas.
+    </p>
+
+    <div style="text-align:center;margin:12px 0 24px;font-weight:500;">
+      Atentamente,
+    </div>
+
+    <div style="margin-top:auto;text-align:center;line-height:1.35;font-size:11pt;">
+      <div style="width:230px;border-top:1.5px solid #101820;margin:0 auto 6px auto;"></div>
+      <strong>${nombre}</strong><br>
+      <span style="font-size:10pt;text-transform:uppercase;color:#374151;">Estudiante Pasante</span><br>
+      <span style="font-size:9.5pt;">C.I.: ${ci}</span><br>
+      ${ru ? `<span style="font-size:9.5pt;">R.U.: ${ru}</span><br>` : ''}
+      ${celular ? `<span style="font-size:9.5pt;">Cel.: ${celular}</span>` : ''}
+    </div>
+  `;
+
+  return `
+  <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;padding:2.2cm 2.5cm 1.8cm 2.5cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;text-align:justify;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
+    ${contentPersonalHTML}
+  </div>`;
+}
+
+export function buildNotaRemisionWordDoc(d, logoSrc) {
+  const firmante = (d.firmante_remision || 'estudiante').toLowerCase();
+  const htmlContent = buildNotaRemisionHTML(d, logoSrc, 'banda', 0.08);
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<style>
+@page { size: 8.5in 11in; margin: 1in; }
+body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.5; text-align: justify; }
+</style>
+</head>
+<body>${htmlContent}</body>
+</html>`;
+}
+
+export async function descargarNotaRemisionWordDoc(d, logoSrc) {
+  toast('Preparando Nota de Remisión en Word...', 'info');
+  const base64Logo = await getLogoBase64(logoSrc);
+  const html = buildNotaRemisionWordDoc(d, base64Logo);
+  const nombre = 'nota-remision-' + ((d.nombre || 'pasante').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 35)) + '.doc';
+  descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
+  toast('Nota de Remisión descargada en Word.', 'success');
+}
+
+// ----------------------------------------------------------------------
 // 9. EXTRACTOR NATIVO DE IMÁGENES DESDE DOCX Y OPTIMIZADOR CANVAS
 // ----------------------------------------------------------------------
 export function optimizarImagenBlob(blob, maxDim = 1200, quality = 0.85) {
