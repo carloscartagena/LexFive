@@ -296,14 +296,14 @@ export async function renderCertificados() {
                     <label style="font-weight:600;">Áreas de práctica forense para actividades</label>
                     <button class="btn btn--ghost btn--sm" id="ce_btn_toggle_areas" type="button" style="font-size:.78rem;padding:2px 8px;">Marcar / desmarcar todas</button>
                   </div>
-                  <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;margin-top:4px;">
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="civil" checked> Civil</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="familiar" checked> Familiar</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="laboral" checked> Laboral</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="penal" checked> Penal</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="administrativo" checked> Administrativo (GAMEA)</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="notarial" checked> DDRR / Notarial</label>
-                    <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="ce_area" value="legaltech" checked> Gestión Digital</label>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.85rem;margin-top:6px;">
+                    <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="ce_area" value="civil" checked> Civil</label>
+                    <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="ce_area" value="familiar" checked> Familiar</label>
+                    <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="ce_area" value="laboral" checked> Laboral</label>
+                    <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="ce_area" value="penal" checked> Penal</label>
+                    <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="ce_area" value="administrativo" checked> Administrativo (GAMEA)</label>
+                    <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="ce_area" value="notarial" checked> DDRR / Notarial</label>
+                    <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="ce_area" value="legaltech" checked> Gestión Digital</label>
                   </div>
                   <div style="display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;">
                     <input id="ce_enfoque" placeholder="Enfoque especial del pasante (ej. asistencia familiar y Derechos Reales)..." style="flex:1;min-width:220px;">
@@ -996,67 +996,97 @@ export async function renderCertificados() {
     };
   }
 
-  const btnIA = $('#ce_btn_ia_cronograma');
-  const badgeIA = $('#ce_ia_badge');
+    const badgeIA = $('#ce_ia_badge');
 
-  if (btnIA) {
-    btnIA.onclick = async () => {
-      const fIni = val('ce_fecha_inicio');
-      if (!fIni) { toast('Seleccione la fecha de inicio primero.', 'error'); return; }
-      autocalcularFechaFin();
-      const mod = val('ce_modalidad') || '4 semanas a medio tiempo (4 horas diarias)';
-      const numDias = (mod.includes('2 semanas') || mod.includes('tiempo completo')) ? 10 : 20;
-      const feriadosExtra = val('ce_feriados_extra');
-      const calc = calcularJornadasHabilesBolivia(fIni, numDias, feriadosExtra);
+  content().addEventListener('click', async (e) => {
+    const btn = e.target.closest('#ce_btn_ia_cronograma');
+    if (!btn) return;
+    e.preventDefault();
 
-      const areas = Array.from(content().querySelectorAll('.ce_area:checked')).map(c => c.value);
-      const enfoque = val('ce_enfoque');
-      const nombre = val('ce_nombre');
+    const fIni = val('ce_fecha_inicio');
+    if (!fIni) { toast('Seleccione la fecha de inicio primero.', 'error'); return; }
+    autocalcularFechaFin();
+    const mod = val('ce_modalidad') || '4 semanas a medio tiempo (4 horas diarias)';
+    const numDias = (mod.includes('2 semanas') || mod.includes('tiempo completo')) ? 10 : 20;
+    const feriadosExtra = val('ce_feriados_extra');
+    const calc = calcularJornadasHabilesBolivia(fIni, numDias, feriadosExtra);
 
-      btnIA.disabled = true;
-      btnIA.textContent = '⏳ Generando con IA...';
-      toast('Generando actividades exclusivas con IA...', 'info');
+    const areas = Array.from(content().querySelectorAll('.ce_area:checked')).map(c => c.value);
+    const enfoque = val('ce_enfoque');
+    const nombre = val('ce_nombre');
 
+    btn.disabled = true;
+    btn.textContent = '⏳ Generando con IA (puede tardar 20–40 s)...';
+    toast('Generando actividades exclusivas con IA (espera hasta 75s)...', 'info');
+
+    try {
+      // Timeout amplio de 75000 ms (75 segundos)
+      const iaPromise = generarCronogramaPasantia({
+        jornadas: calc.jornadas,
+        areas,
+        enfoque,
+        nombrePasante: nombre,
+        usarIA: true
+      });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT_75S')), 75000)
+      );
+
+      const crono = await Promise.race([iaPromise, timeoutPromise]);
+
+      if (crono && crono.length) {
+        cronogramaPersonalizado = crono;
+        const bBadge = $('#ce_ia_badge');
+        if (bBadge) {
+          bBadge.style.display = 'inline-block';
+          if (crono.origen === 'ia') {
+            bBadge.style.background = 'rgba(34,197,94,0.15)';
+            bBadge.style.color = '#16a34a';
+            bBadge.style.border = '1px solid rgba(34,197,94,0.3)';
+            bBadge.textContent = '✓ Generado con IA';
+            bBadge.title = 'Actividades generadas exitosamente con Google Gemini';
+          } else {
+            bBadge.style.background = 'rgba(234,179,8,0.15)';
+            bBadge.style.color = '#ca8a04';
+            bBadge.style.border = '1px solid rgba(234,179,8,0.3)';
+            bBadge.textContent = '⚠️ Generado con banco local';
+            bBadge.title = crono.motivo ? `Motivo: ${crono.motivo}` : 'Banco normativo local';
+          }
+        }
+        pintarEditorJornadas();
+        pintar();
+        toast(`Informe y Hoja de Asistencia actualizados (${crono.length} jornadas)`, 'success');
+      }
+    } catch (err) {
+      console.error('Error al generar con IA:', err);
+      if (err && err.message === 'TIMEOUT_75S') {
+        toast('El servicio de IA tardó más de 75s. Se aplicó el banco normativo local.', 'info');
+      } else {
+        toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
+      }
+      // Fallback a banco local
       try {
-        const crono = await generarCronogramaPasantia({
+        const fallback = await generarCronogramaPasantia({
           jornadas: calc.jornadas,
           areas,
           enfoque,
           nombrePasante: nombre,
-          usarIA: true
+          usarIA: false
         });
-
-        if (crono && crono.length) {
-          cronogramaPersonalizado = crono;
-          if (badgeIA) {
-            badgeIA.style.display = 'inline-block';
-            if (crono.origen === 'ia') {
-              badgeIA.style.background = 'rgba(34,197,94,0.15)';
-              badgeIA.style.color = '#16a34a';
-              badgeIA.style.border = '1px solid rgba(34,197,94,0.3)';
-              badgeIA.textContent = '✓ Generado con IA';
-              badgeIA.title = 'Actividades generadas exitosamente con Google Gemini';
-            } else {
-              badgeIA.style.background = 'rgba(234,179,8,0.15)';
-              badgeIA.style.color = '#ca8a04';
-              badgeIA.style.border = '1px solid rgba(234,179,8,0.3)';
-              badgeIA.textContent = '⚠️ Generado con banco local';
-              badgeIA.title = crono.motivo ? `Motivo: ${crono.motivo}` : 'Banco normativo local';
-            }
-          }
+        if (fallback && fallback.length) {
+          cronogramaPersonalizado = fallback;
           pintarEditorJornadas();
           pintar();
-          toast(`Informe y Hoja de Asistencia actualizados (${crono.length} jornadas)`, 'success');
         }
-      } catch (err) {
-        console.error('Error al generar con IA:', err);
-        toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
-      } finally {
-        btnIA.disabled = false;
-        btnIA.textContent = '✨ Generar nuevo cronograma único (IA)';
+      } catch (_) {}
+    } finally {
+      const activeBtn = $('#ce_btn_ia_cronograma');
+      if (activeBtn) {
+        activeBtn.disabled = false;
+        activeBtn.textContent = '✨ Generar nuevo cronograma único (IA)';
       }
-    };
-  }
+    }
+  });
   const chkAsis = $('#ce_prellenar_asistencia');
   if (chkAsis) chkAsis.onchange = () => { forkSiNecesario(); };
   const ceTipoCert = $('#ce_tipo_cert');

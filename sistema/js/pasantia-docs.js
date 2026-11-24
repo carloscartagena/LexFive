@@ -803,10 +803,32 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
       `;
     });
 
-    // Recuadro superior formal de datos (Página 1: tabla de 2 columnas fijas 54%/46%; Páginas 2+: banner compacto)
-    let infoBoxHtml = '';
+    const footerTotalesYFirma = esUltima ? `
+      <table style="width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:6px;font-size:10.5pt !important;background:transparent !important;table-layout:fixed;">
+        <tr style="background:transparent !important;font-weight:bold;border-top:2px solid #0e1b2c;border-bottom:1.5px solid #0e1b2c;">
+          <td style="padding:6px 8px;border:1px solid #d9dce1;text-align:center;">TOTAL JORNADAS: ${totalJornadas}</td>
+          <td style="padding:6px 8px;border:1px solid #d9dce1;text-align:center;">CARGA HORARIA: ${totalHoras} hrs</td>
+          <td style="padding:6px 8px;border:1px solid #d9dce1;text-align:center;color:#16a34a;">ASISTENCIA: 100 %</td>
+        </tr>
+      </table>
+
+      <div style="border:1px solid #d9dce1;border-radius:6px;padding:8px 14px;background:transparent !important;margin-top:auto;">
+        <div style="text-align:center;font-size:9.5pt !important;font-weight:bold;color:#0e1b2c;letter-spacing:1px;margin-bottom:4px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
+        <div style="display:flex;justify-content:center;align-items:flex-end;">
+          <div style="text-align:center;width:280px;">
+            <div style="min-height:48px;"></div>
+            <div style="border-top:1.2px solid #0e1b2c;padding-top:4px;font-size:10.5pt !important;font-weight:bold;color:#0e1b2c;">Sello y Firma · Abogado(a) Patrocinante</div>
+            <div style="font-size:8.5pt !important;color:#5c6675;">LexFive · Bufete de Abogados</div>
+          </div>
+        </div>
+      </div>
+    ` : '';
+
+    let contentPagina = '';
+
     if (p === 0) {
-      infoBoxHtml = `
+      // PÁGINA 1: Encabezado institucional + Título + Subtítulo limpio + Recuadro 2 columnas + Tabla
+      const infoBoxHtml = `
         <table style="width:100%;border-collapse:collapse;background:transparent !important;border:1px solid rgba(184,148,70,0.45);border-left:3.5px solid #b89446;border-radius:4px;margin-bottom:8px;font-family:Arial,Helvetica,sans-serif !important;font-size:9.5pt !important;line-height:1.3 !important;table-layout:fixed;">
           <colgroup>
             <col style="width:54%;">
@@ -828,69 +850,71 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
           </tbody>
         </table>
       `;
+
+      contentPagina = `
+        <div style="text-align:right;font-size:9.5pt !important;color:#5c6675;margin-bottom:2px;">Ref. N.º ${ref} · Hoja de Asistencia</div>
+        <h1 style="text-align:center;font-size:13pt !important;letter-spacing:1px;color:#0e1b2c;margin:1px 0 1px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif !important;">HOJA DE CONTROL DE ASISTENCIA Y PERMANENCIA</h1>
+        <div style="text-align:center;font-size:10pt !important;color:#a8853c;letter-spacing:1px;margin-bottom:6px;font-weight:bold;">PRÁCTICA PRE-PROFESIONAL / PASANTÍA JURÍDICA</div>
+
+        ${infoBoxHtml}
+
+        <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:4px;background:transparent !important;table-layout:fixed;">
+          <colgroup>
+            <col style="width:6%;">
+            <col style="width:13%;">
+            <col style="width:9%;">
+            <col style="width:9%;">
+            <col style="width:56%;">
+            <col style="width:7%;">
+          </colgroup>
+          <thead>
+            <tr style="background:transparent !important;border-bottom:2px solid #0e1b2c;border-top:1.5px solid #0e1b2c;color:#0e1b2c;">
+              <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">N.º</th>
+              <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Fecha</th>
+              <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Ingreso</th>
+              <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Salida</th>
+              <th style="padding:5px 8px;border:1px solid #d9dce1;text-align:left;">Actividades y Tareas Jurídicas Desarrolladas</th>
+              <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">Hrs.</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        ${footerTotalesYFirma}
+      `;
     } else {
-      infoBoxHtml = `
-        <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.3);padding:4px 10px;margin-bottom:8px;font-size:9.5pt !important;color:#333;background:transparent !important;display:flex;justify-content:space-between;align-items:center;">
-          <div><strong>Pasante:</strong> ${nombre} &nbsp;·&nbsp; <strong>R.U.:</strong> ${ru}</div>
-          <div style="font-weight:bold;color:#8a6d2b;">Ref. N.º ${ref} (Continuación)</div>
-        </div>
+      // PÁGINA 2 Y SIGUIENTES: Entra directamente a la tabla con respiro limpio (margin-top: 12px)
+      contentPagina = `
+        <div style="margin-top:12px;"></div>
+        <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:4px;background:transparent !important;table-layout:fixed;">
+          <colgroup>
+            <col style="width:6%;">
+            <col style="width:13%;">
+            <col style="width:9%;">
+            <col style="width:9%;">
+            <col style="width:56%;">
+            <col style="width:7%;">
+          </colgroup>
+          <thead>
+            <tr style="background:transparent !important;border-bottom:2px solid #0e1b2c;border-top:1.5px solid #0e1b2c;color:#0e1b2c;">
+              <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">N.º</th>
+              <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Fecha</th>
+              <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Ingreso</th>
+              <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Salida</th>
+              <th style="padding:5px 8px;border:1px solid #d9dce1;text-align:left;">Actividades y Tareas Jurídicas Desarrolladas</th>
+              <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">Hrs.</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        ${footerTotalesYFirma}
       `;
     }
-
-    const footerTotalesYFirma = esUltima ? `
-      <table style="width:100%;border-collapse:collapse;margin-top:6px;margin-bottom:6px;font-size:10.5pt !important;background:transparent !important;table-layout:fixed;">
-        <tr style="background:transparent !important;font-weight:bold;border-top:2px solid #0e1b2c;border-bottom:1.5px solid #0e1b2c;">
-          <td style="padding:5px 8px;border:1px solid #d9dce1;text-align:center;">TOTAL JORNADAS: ${totalJornadas}</td>
-          <td style="padding:5px 8px;border:1px solid #d9dce1;text-align:center;">CARGA HORARIA: ${totalHoras} hrs</td>
-          <td style="padding:5px 8px;border:1px solid #d9dce1;text-align:center;color:#16a34a;">ASISTENCIA: 100 %</td>
-        </tr>
-      </table>
-
-      <div style="border:1px solid #d9dce1;border-radius:6px;padding:6px 14px;background:transparent !important;margin-top:auto;">
-        <div style="text-align:center;font-size:9pt !important;font-weight:bold;color:#0e1b2c;letter-spacing:1px;margin-bottom:4px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
-        <div style="display:flex;justify-content:center;align-items:flex-end;">
-          <div style="text-align:center;width:280px;">
-            <div style="min-height:42px;"></div>
-            <div style="border-top:1.2px solid #0e1b2c;padding-top:3px;font-size:10.5pt !important;font-weight:bold;color:#0e1b2c;">Sello y Firma · Abogado(a) Patrocinante</div>
-            <div style="font-size:8.5pt !important;color:#5c6675;">LexFive · Bufete de Abogados</div>
-          </div>
-        </div>
-      </div>
-    ` : '';
-
-    const contentPagina = `
-      <div style="text-align:right;font-size:9.5pt !important;color:#5c6675;margin-bottom:2px;">Ref. N.º ${ref} · Hoja de Asistencia</div>
-      <h1 style="text-align:center;font-size:13pt !important;letter-spacing:1px;color:#0e1b2c;margin:1px 0 1px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif !important;">HOJA DE CONTROL DE ASISTENCIA Y PERMANENCIA</h1>
-      <div style="text-align:center;font-size:10pt !important;color:#a8853c;letter-spacing:1px;margin-bottom:6px;font-weight:bold;">PRÁCTICA PRE-PROFESIONAL / PASANTÍA JURÍDICA ${totalPags > 1 ? `· (Página ${p + 1} de ${totalPags})` : ''}</div>
-
-      ${infoBoxHtml}
-
-      <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:4px;background:transparent !important;table-layout:fixed;">
-        <colgroup>
-          <col style="width:6%;">
-          <col style="width:13%;">
-          <col style="width:9%;">
-          <col style="width:9%;">
-          <col style="width:56%;">
-          <col style="width:7%;">
-        </colgroup>
-        <thead>
-          <tr style="background:transparent !important;border-bottom:2px solid #0e1b2c;border-top:1.5px solid #0e1b2c;color:#0e1b2c;">
-            <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">N.º</th>
-            <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Fecha</th>
-            <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Ingreso</th>
-            <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Salida</th>
-            <th style="padding:5px 8px;border:1px solid #d9dce1;text-align:left;">Actividades y Tareas Jurídicas Desarrolladas</th>
-            <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">Hrs.</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
-      </table>
-
-      ${footerTotalesYFirma}
-    `;
 
     const footHTML = membreteFooter(model).replace('</div>', `
       <span style="position:relative;z-index:2;font-weight:bold;color:#c2a25a;margin-left:14px;white-space:nowrap;font-size:9pt !important;">Página ${p + 1} de ${totalPags}</span>
@@ -901,11 +925,11 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
     ` : '';
 
     paginasHtml.push(`
-      <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:Arial,Helvetica,sans-serif !important;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
-        ${membreteHeader(model, logoSrc)}
-        <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:10px 2.1cm 22px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
+      <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:Arial,Helvetica,sans-serif !important;box-sizing:border-box;overflow:visible;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
+        <div style="flex-shrink:0;overflow:visible;">${membreteHeader(model, logoSrc)}</div>
+        <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:6px 2.1cm 20px;overflow:visible;box-sizing:border-box;background:transparent !important;">
           ${wmHTML}
-          <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;font-family:Arial,Helvetica,sans-serif !important;font-size:11pt !important;line-height:1.4 !important;">
+          <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:visible;background:transparent !important;font-family:Arial,Helvetica,sans-serif !important;font-size:11pt !important;line-height:1.4 !important;">
             ${contentPagina}
           </div>
         </div>

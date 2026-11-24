@@ -239,14 +239,14 @@ export async function renderInforme() {
             <label style="font-weight:600;">Áreas de práctica jurídica desarrolladas:</label>
             <button class="btn btn--ghost btn--sm" id="in_btn_toggle_areas" type="button" style="font-size:.78rem;padding:2px 8px;">Marcar / desmarcar todas</button>
           </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;margin-bottom:8px;">
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="civil" checked> Civil</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="familiar" checked> Familiar</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="laboral" checked> Laboral</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="penal" checked> Penal</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="administrativo" checked> Administrativo (GAMEA)</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="notarial" checked> DDRR / Notarial</label>
-            <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" class="in_area" value="legaltech" checked> LegalTech</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:.85rem;margin-bottom:8px;">
+            <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="in_area" value="civil" checked> Civil</label>
+            <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="in_area" value="familiar" checked> Familiar</label>
+            <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="in_area" value="laboral" checked> Laboral</label>
+            <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="in_area" value="penal" checked> Penal</label>
+            <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="in_area" value="administrativo" checked> Administrativo (GAMEA)</label>
+            <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="in_area" value="notarial" checked> DDRR / Notarial</label>
+            <label style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><input type="checkbox" class="in_area" value="legaltech" checked> Gestión Digital</label>
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <input id="in_enfoque" value="${esc(V.in_enfoque || '')}" placeholder="Enfoque especial del pasante (ej. asistencia familiar, procesos monitorios en El Alto)..." style="flex:1;min-width:240px;">
@@ -585,44 +585,72 @@ export async function renderInforme() {
     };
   }
 
-  const btnIA = $('#in_btn_ia_cronograma');
-  if (btnIA) {
-    btnIA.onclick = async () => {
-      const fIni = val('in_fecha_inicio');
-      if (!fIni) { toast('Seleccione la fecha de inicio primero.', 'error'); return; }
-      const calc = autocalcularFechaFin();
-      const areas = Array.from(content().querySelectorAll('.in_area:checked')).map(c => c.value);
-      const enfoque = val('in_enfoque');
-      const nombre = val('in_nombre');
+    content().addEventListener('click', async (e) => {
+    const btn = e.target.closest('#in_btn_ia_cronograma');
+    if (!btn) return;
+    e.preventDefault();
 
-      btnIA.disabled = true;
-      btnIA.textContent = '⏳ Generando con IA...';
-      toast('Generando actividades exclusivas con IA...', 'info');
+    const fIni = val('in_fecha_inicio');
+    if (!fIni) { toast('Seleccione la fecha de inicio primero.', 'error'); return; }
+    const calc = autocalcularFechaFin();
+    const areas = Array.from(content().querySelectorAll('.in_area:checked')).map(c => c.value);
+    const enfoque = val('in_enfoque');
+    const nombre = val('in_nombre');
 
+    btn.disabled = true;
+    btn.textContent = '⏳ Generando con IA (puede tardar 20–40 s)...';
+    toast('Generando actividades exclusivas con IA (espera hasta 75s)...', 'info');
+
+    try {
+      const iaPromise = generarCronogramaPasantia({
+        jornadas: calc.jornadas,
+        areas,
+        enfoque,
+        nombrePasante: nombre,
+        usarIA: true
+      });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT_75S')), 75000)
+      );
+
+      const crono = await Promise.race([iaPromise, timeoutPromise]);
+
+      if (crono && crono.length) {
+        const txt = formatearCronogramaTexto(crono);
+        $('#in_actividades').value = txt;
+        pintar();
+        saveDraft();
+        toast(`Informe y Hoja de Asistencia actualizados (${crono.length} jornadas)`, 'success');
+      }
+    } catch (err) {
+      console.error('Error al generar con IA:', err);
+      if (err && err.message === 'TIMEOUT_75S') {
+        toast('El servicio de IA tardó más de 75s. Se aplicó el banco normativo local.', 'info');
+      } else {
+        toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
+      }
       try {
-        const crono = await generarCronogramaPasantia({
+        const fallback = await generarCronogramaPasantia({
           jornadas: calc.jornadas,
           areas,
           enfoque,
           nombrePasante: nombre,
-          usarIA: true
+          usarIA: false
         });
-
-        if (crono && crono.length) {
-          const txt = formatearCronogramaTexto(crono);
-          $('#in_actividades').value = txt;
+        if (fallback && fallback.length) {
+          $('#in_actividades').value = formatearCronogramaTexto(fallback);
           pintar();
           saveDraft();
-          toast(`Informe y Hoja de Asistencia actualizados (${crono.length} jornadas)`, 'success');
         }
-      } catch (err) {
-        toast('Error al generar con IA, usando tareas predeterminadas.', 'error');
-      } finally {
-        btnIA.disabled = false;
-        btnIA.textContent = '✨ Generar nuevo cronograma único (IA)';
+      } catch (_) {}
+    } finally {
+      const activeBtn = $('#in_btn_ia_cronograma');
+      if (activeBtn) {
+        activeBtn.disabled = false;
+        activeBtn.textContent = '✨ Generar nuevo cronograma único (IA)';
       }
-    };
-  }
+    }
+  });
 
   // Botón restaurar predeterminadas
   $('#in_btn_regen_act').onclick = () => {
