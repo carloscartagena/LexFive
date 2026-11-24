@@ -21,6 +21,7 @@ import { renderTareas } from './tareas.js';
 import { renderReportes } from './reportes.js';
 import { renderFinanzas } from './finanzas.js';
 import { renderAranceles } from './aranceles.js';
+import { renderCotizador } from './cotizador.js';
 import { renderPapelera } from './papelera.js';
 import { renderAreas } from './areas.js';
 import { renderSitio } from './sitio.js';
@@ -439,6 +440,7 @@ const VIEWS = {
   reportes: { title: 'Reportes', render: renderReportes },
   tareas: { title: 'Tareas y Plazos', render: renderTareas },
   finanzas: { title: 'Honorarios y pagos', render: renderFinanzas },
+  cotizador: { title: 'Cotizador de Servicios Jurídicos', render: renderCotizador },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
   plantillas: { title: 'Plantillas de memoriales', render: renderPlantillas },
   clientes: { title: 'Clientes y Causas', render: renderClientes },
@@ -493,7 +495,8 @@ const GRUPOS_TABS = {
     finOnly: true,
     tabs: [
       { key: 'finanzas', label: 'Honorarios y pagos', icon: '💰', render: renderFinanzas },
-      { key: 'aranceles', label: 'Calculadora de Aranceles', icon: '⚖️', render: renderAranceles }
+      { key: 'aranceles', label: 'Calculadora de Aranceles', icon: '⚖️', render: renderAranceles },
+      { key: 'cotizador', label: 'Cotizador', icon: '📝', render: renderCotizador }
     ]
   },
   certificados: {
@@ -555,6 +558,7 @@ const SUBKEY_MAP = {
   // Honorarios y Aranceles
   finanzas: { group: 'finanzas', tab: 'finanzas' },
   aranceles: { group: 'finanzas', tab: 'aranceles' },
+  cotizador: { group: 'finanzas', tab: 'cotizador' },
   // Certificados y Pasantías
   certificados: { group: 'certificados', tab: 'certificados' },
   informe: { group: 'certificados', tab: 'informe' },
