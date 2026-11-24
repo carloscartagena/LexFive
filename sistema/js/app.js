@@ -39,34 +39,50 @@ import { updateNovedadesBadge, renderNovedades, renderMisProcesos } from './port
 import { IMG, ensureImgCache } from './media.js';
 import { wmOpacityActual, applyWmOpacity, Branding, lastBrandingPush, hydrateBranding, applyLogo } from './branding.js';
 
-const NAV = [
-  { key: 'dashboard', label: 'Panel', icon: ICON.dashboard },
-  { key: 'procesos', label: 'Procesos', icon: ICON.procesos },
-  { key: 'agenda', label: 'Agenda', icon: ICON.audiencia },
-  { key: 'reportes', label: 'Reportes', icon: ICON.grafico },
-  { key: 'tareas', label: 'Tareas', icon: ICON.tareas },
-  { key: 'modelos', label: 'Modelos', icon: ICON.doc },
-  { key: 'plantillas', label: 'Plantillas', icon: ICON.plantilla },
-  { key: 'clientes', label: 'Clientes', icon: ICON.clientes },
-  { key: 'consultas', label: 'Consultas', icon: ICON.consultas },
-  { key: 'aranceles', label: 'Aranceles', icon: ICON.dinero, finOnly: true },
-  { key: 'finanzas', label: 'Honorarios', icon: ICON.dinero, finOnly: true },
-  { key: 'blog', label: 'Blog', icon: ICON.blog },
-  { key: 'credenciales', label: 'Credenciales', icon: ICON.llave, credOnly: true },
-  { key: 'credguardadas', label: 'Credenciales guardadas', icon: ICON.usuarios, credOnly: true },
-  { key: 'sellos', label: 'Sellos y logos', icon: ICON.sello, credOnly: true },
-  { key: 'sitio', label: 'Sitio web', icon: ICON.blog, credOnly: true },
-  { key: 'areas', label: 'Áreas de práctica', icon: ICON.categorias, credOnly: true },
-  { key: 'certificados', label: 'Certificados', icon: ICON.doc, credOnly: true },
-  { key: 'tarjetas', label: 'Tarjetas de presentación', icon: ICON.doc, credOnly: true },
-  { key: 'membrete', label: 'Hoja membretada', icon: ICON.doc, credOnly: true },
-  { key: 'informe', label: 'Informe de pasantía', icon: ICON.doc, credOnly: true },
-  { key: 'testimonios', label: 'Testimonios', icon: ICON.estrella, adminOnly: true },
-  { key: 'categorias', label: 'Categorías', icon: ICON.categorias, adminOnly: true },
-  { key: 'usuarios', label: 'Usuarios', icon: ICON.usuarios, adminOnly: true },
-  { key: 'auditoria', label: 'Auditoría', icon: ICON.auditoria, adminOnly: true },
-  { key: 'papelera', label: 'Papelera', icon: ICON.papelera, adminOnly: true }
+// 4 Secciones principales agrupadas y plegables para el panel
+const SECCIONES_NAV = [
+  {
+    id: 'gestion_juridica',
+    titulo: 'Gestión Jurídica',
+    defOpen: true,
+    items: [
+      { key: 'dashboard', label: 'Inicio', icon: ICON.dashboard },
+      { key: 'clientes', label: 'Clientes y Causas', icon: ICON.clientes },
+      { key: 'tareas', label: 'Tareas y Plazos', icon: ICON.tareas },
+      { key: 'consultas', label: 'Consultas', icon: ICON.consultas }
+    ]
+  },
+  {
+    id: 'documentos_finanzas',
+    titulo: 'Documentos y Finanzas',
+    defOpen: true,
+    items: [
+      { key: 'escritos', label: 'Escritos y Plantillas', icon: ICON.doc },
+      { key: 'finanzas', label: 'Honorarios y Aranceles', icon: ICON.dinero, finOnly: true },
+      { key: 'certificados', label: 'Certificados y Pasantías', icon: ICON.doc, credOnly: true }
+    ]
+  },
+  {
+    id: 'sitio_web',
+    titulo: 'Sitio Web y Publicaciones',
+    defOpen: false,
+    items: [
+      { key: 'gestorweb', label: 'Gestor Web', icon: ICON.blog, credOnly: true }
+    ]
+  },
+  {
+    id: 'identidad_sistema',
+    titulo: 'Identidad y Sistema',
+    defOpen: false,
+    items: [
+      { key: 'papeleria', label: 'Papelería y Marca', icon: ICON.sello, credOnly: true },
+      { key: 'administracion', label: 'Administración', icon: ICON.usuarios, adminOnly: true }
+    ]
+  }
 ];
+
+// Flat array para compatibilidad con código existente
+const NAV = SECCIONES_NAV.flatMap(s => s.items);
 // credOnly = solo administrador y abogado (NO procurador ni cliente)
 
 // Barra discreta que avisa cuando hay una versión nueva del panel disponible
@@ -414,18 +430,18 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 // ============================================================
-//  Navegación
+//  Navegación y Grupos de Pestañas
 // ============================================================
 const VIEWS = {
-  dashboard: { title: 'Panel general', render: renderDashboard },
+  dashboard: { title: 'Inicio', render: renderDashboard },
   procesos: { title: 'Procesos', render: renderProcesos },
   agenda: { title: 'Agenda y calendario', render: renderAgenda },
   reportes: { title: 'Reportes', render: renderReportes },
-  tareas: { title: 'Tareas y pendientes', render: renderTareas },
+  tareas: { title: 'Tareas y Plazos', render: renderTareas },
   finanzas: { title: 'Honorarios y pagos', render: renderFinanzas },
   modelos: { title: 'Modelos de memoriales', render: renderModelos },
   plantillas: { title: 'Plantillas de memoriales', render: renderPlantillas },
-  clientes: { title: 'Clientes', render: renderClientes },
+  clientes: { title: 'Clientes y Causas', render: renderClientes },
   consultas: { title: 'Consultas recibidas', render: renderConsultas },
   aranceles: { title: 'Calculadora de Aranceles', render: renderAranceles },
   blog: { title: 'Blog', render: renderBlog },
@@ -443,9 +459,124 @@ const VIEWS = {
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
   papelera: { title: 'Papelera', render: renderPapelera },
+  escritos: { title: 'Escritos y Plantillas', render: renderModelos },
+  gestorweb: { title: 'Gestor Web', render: renderBlog },
+  papeleria: { title: 'Papelería y Marca', render: renderCredenciales },
+  administracion: { title: 'Administración', render: renderUsuarios },
   misprocesos: { title: 'Mis procesos', render: renderMisProcesos },
   novedades: { title: 'Novedades de mis procesos', render: renderNovedades },
   opinion: { title: 'Mi opinión', render: renderMiOpinion }
+};
+
+const GRUPOS_TABS = {
+  clientes: {
+    title: 'Clientes y Causas',
+    defaultTab: 'clientes',
+    tabs: [
+      { key: 'clientes', label: 'Clientes', icon: '👥', render: renderClientes },
+      { key: 'procesos', label: 'Causas (Procesos)', icon: '⚖️', render: renderProcesos },
+      { key: 'agenda', label: 'Agenda y Plazos', icon: '📅', render: renderAgenda },
+      { key: 'reportes', label: 'Reportes', icon: '📊', render: renderReportes }
+    ]
+  },
+  escritos: {
+    title: 'Escritos y Plantillas',
+    defaultTab: 'modelos',
+    tabs: [
+      { key: 'modelos', label: 'Modelos de memoriales', icon: '📑', render: renderModelos },
+      { key: 'plantillas', label: 'Plantillas de memoriales', icon: '📝', render: renderPlantillas }
+    ]
+  },
+  finanzas: {
+    title: 'Honorarios y Aranceles',
+    defaultTab: 'finanzas',
+    finOnly: true,
+    tabs: [
+      { key: 'finanzas', label: 'Honorarios y pagos', icon: '💰', render: renderFinanzas },
+      { key: 'aranceles', label: 'Calculadora de Aranceles', icon: '⚖️', render: renderAranceles }
+    ]
+  },
+  certificados: {
+    title: 'Certificados y Pasantías',
+    defaultTab: 'certificados',
+    credOnly: true,
+    tabs: [
+      { key: 'certificados', label: 'Certificados y Pasantías', icon: '📜', render: renderCertificados },
+      { key: 'informe', label: 'Historial de Informes', icon: '📋', render: renderInforme }
+    ]
+  },
+  gestorweb: {
+    title: 'Gestor Web',
+    defaultTab: 'blog',
+    credOnly: true,
+    extraRightHTML: '<a href="../index.html" target="_blank" rel="noopener" class="btn btn--sm btn--ghost" style="margin-left:auto;font-weight:600;display:inline-flex;align-items:center;gap:6px;">Ver sitio público ↗</a>',
+    tabs: [
+      { key: 'blog', label: 'Blog', icon: '📰', render: renderBlog },
+      { key: 'areas', label: 'Áreas de práctica', icon: '🏛️', render: renderAreas },
+      { key: 'testimonios', label: 'Testimonios', icon: '⭐', render: renderTestimonios, adminOnly: true },
+      { key: 'categorias', label: 'Categorías', icon: '🏷️', render: renderCategorias, adminOnly: true },
+      { key: 'sitio', label: 'Configuración del Sitio', icon: '⚙️', render: renderSitio }
+    ]
+  },
+  papeleria: {
+    title: 'Papelería y Marca',
+    defaultTab: 'credenciales',
+    credOnly: true,
+    tabs: [
+      { key: 'credenciales', label: 'Credenciales', icon: '🪪', render: renderCredenciales },
+      { key: 'credguardadas', label: 'Credenciales guardadas', icon: '🗂️', render: renderCredGuardadas },
+      { key: 'membrete', label: 'Hoja membretada', icon: '📄', render: renderMembrete },
+      { key: 'tarjetas', label: 'Tarjetas de presentación', icon: '💳', render: renderTarjetas },
+      { key: 'sellos', label: 'Sellos y logos', icon: '🔖', render: renderSellos }
+    ]
+  },
+  administracion: {
+    title: 'Administración',
+    defaultTab: 'usuarios',
+    adminOnly: true,
+    tabs: [
+      { key: 'usuarios', label: 'Usuarios', icon: '👥', render: renderUsuarios },
+      { key: 'auditoria', label: 'Auditoría', icon: '📜', render: renderAuditoria },
+      { key: 'papelera', label: 'Papelera', icon: '🗑️', render: renderPapelera }
+    ]
+  }
+};
+
+const SUBKEY_MAP = {
+  // Clientes y Causas
+  clientes: { group: 'clientes', tab: 'clientes' },
+  procesos: { group: 'clientes', tab: 'procesos' },
+  agenda: { group: 'clientes', tab: 'agenda' },
+  reportes: { group: 'clientes', tab: 'reportes' },
+  // Escritos y Plantillas
+  escritos: { group: 'escritos', tab: 'modelos' },
+  modelos: { group: 'escritos', tab: 'modelos' },
+  plantillas: { group: 'escritos', tab: 'plantillas' },
+  // Honorarios y Aranceles
+  finanzas: { group: 'finanzas', tab: 'finanzas' },
+  aranceles: { group: 'finanzas', tab: 'aranceles' },
+  // Certificados y Pasantías
+  certificados: { group: 'certificados', tab: 'certificados' },
+  informe: { group: 'certificados', tab: 'informe' },
+  // Gestor Web
+  gestorweb: { group: 'gestorweb', tab: 'blog' },
+  blog: { group: 'gestorweb', tab: 'blog' },
+  areas: { group: 'gestorweb', tab: 'areas' },
+  testimonios: { group: 'gestorweb', tab: 'testimonios' },
+  categorias: { group: 'gestorweb', tab: 'categorias' },
+  sitio: { group: 'gestorweb', tab: 'sitio' },
+  // Papelería y Marca
+  papeleria: { group: 'papeleria', tab: 'credenciales' },
+  credenciales: { group: 'papeleria', tab: 'credenciales' },
+  credguardadas: { group: 'papeleria', tab: 'credguardadas' },
+  membrete: { group: 'papeleria', tab: 'membrete' },
+  tarjetas: { group: 'papeleria', tab: 'tarjetas' },
+  sellos: { group: 'papeleria', tab: 'sellos' },
+  // Administración
+  administracion: { group: 'administracion', tab: 'usuarios' },
+  usuarios: { group: 'administracion', tab: 'usuarios' },
+  auditoria: { group: 'administracion', tab: 'auditoria' },
+  papelera: { group: 'administracion', tab: 'papelera' }
 };
 
 const CLIENT_NAV = [
@@ -458,62 +589,185 @@ export function navigate(key) {
   const isClient = state.profile.rol === 'cliente';
   if (isClient) {
     if (!['misprocesos', 'novedades', 'opinion'].includes(key)) key = 'misprocesos';
-  } else {
-    if (!VIEWS[key]) key = 'dashboard';
-    if (['usuarios', 'auditoria', 'testimonios', 'categorias', 'papelera'].includes(key) && state.profile.rol !== 'admin') key = 'dashboard';
-    if (key === 'credenciales' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'credguardadas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'sellos' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'sitio' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'areas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'certificados' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'tarjetas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'membrete' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'informe' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'aranceles' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
-    if (key === 'finanzas' && !['admin', 'abogado'].includes(state.profile.rol)) key = 'dashboard';
+    state.view = key;
+    const tabsCont = $('#viewTabsContainer');
+    if (tabsCont) { tabsCont.style.display = 'none'; tabsCont.innerHTML = ''; }
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
+    $('#pageTitle').textContent = VIEWS[key] ? VIEWS[key].title : 'Portal del Cliente';
+    $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show');
+    runViewRender(key, VIEWS[key].render);
+    return;
   }
-  state.view = key;
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
-  $('#pageTitle').textContent = VIEWS[key].title;
+
+  const rol = state.profile.rol;
+  const mapping = SUBKEY_MAP[key];
+
+  let parentKey = key;
+  let activeTabKey = key;
+  let pageTitle = '';
+  let renderFn = null;
+
+  if (mapping) {
+    const grp = GRUPOS_TABS[mapping.group];
+    parentKey = mapping.group;
+    activeTabKey = mapping.tab;
+
+    // Permisos del grupo
+    if (grp.adminOnly && rol !== 'admin') { navigate('dashboard'); return; }
+    if (grp.credOnly && !['admin', 'abogado'].includes(rol)) { navigate('dashboard'); return; }
+    if (grp.finOnly && !['admin', 'abogado'].includes(rol)) { navigate('dashboard'); return; }
+
+    // Encontrar tab específica
+    let tabObj = grp.tabs.find(t => t.key === activeTabKey);
+    if (tabObj && tabObj.adminOnly && rol !== 'admin') {
+      tabObj = grp.tabs.find(t => !t.adminOnly) || grp.tabs[0];
+      activeTabKey = tabObj.key;
+    }
+    if (!tabObj) tabObj = grp.tabs[0];
+
+    pageTitle = grp.title;
+    renderFn = tabObj.render;
+
+    // Renderizar barra de pestañas en #viewTabsContainer
+    const tabsCont = $('#viewTabsContainer');
+    if (tabsCont) {
+      tabsCont.style.display = 'block';
+      const visibleTabs = grp.tabs.filter(t => !t.adminOnly || rol === 'admin');
+      tabsCont.innerHTML = `
+        <div class="view-tabs-bar" role="tablist">
+          ${visibleTabs.map(t => {
+            const isActive = (t.key === activeTabKey);
+            return `<button class="btn btn--sm ${isActive ? 'btn--primary' : 'btn--ghost'} js-vtab" data-tab="${t.key}" type="button" role="tab" style="${isActive ? 'font-weight:700;' : ''}">${t.icon || ''} ${esc(t.label)}</button>`;
+          }).join('')}
+          ${grp.extraRightHTML || ''}
+        </div>
+      `;
+      tabsCont.querySelectorAll('.js-vtab').forEach(btn => {
+        btn.onclick = () => {
+          if (btn.dataset.tab !== activeTabKey) {
+            navigate(btn.dataset.tab);
+          }
+        };
+      });
+    }
+  } else {
+    // Vistas standalone (dashboard, tareas, consultas)
+    if (!VIEWS[key]) key = 'dashboard';
+    parentKey = key;
+    activeTabKey = key;
+    pageTitle = (key === 'dashboard') ? 'Inicio' : VIEWS[key].title;
+    renderFn = VIEWS[key].render;
+
+    const tabsCont = $('#viewTabsContainer');
+    if (tabsCont) { tabsCont.style.display = 'none'; tabsCont.innerHTML = ''; }
+  }
+
+  state.view = parentKey;
+  state.subview = activeTabKey;
+
+  // Auto-expandir la sección que contiene el nav-item si está plegada
+  const targetItem = document.querySelector(`.nav-item[data-key="${parentKey}"]`);
+  if (targetItem) {
+    const secEl = targetItem.closest('.nav-section');
+    if (secEl && secEl.classList.contains('is-collapsed')) {
+      secEl.classList.remove('is-collapsed');
+      const secId = secEl.id.replace('sec_', '');
+      localStorage.setItem('lexfive_nav_sec_' + secId, '1');
+    }
+  }
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === parentKey));
+  $('#pageTitle').textContent = pageTitle;
   $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show');
-  // Render con red de seguridad: si la vista falla o tarda demasiado, en vez de
-  // quedarse en "Cargando..." se muestra un aviso con botón para reintentar.
+
+  runViewRender(activeTabKey, renderFn);
+}
+
+function runViewRender(viewKey, renderFn) {
   const cont = content();
   let settled = false;
-  Promise.resolve().then(() => VIEWS[key].render())
+  Promise.resolve().then(() => renderFn())
     .then(() => { settled = true; actualizarBadgesMenu(); })
     .catch((e) => {
       settled = true;
-      console.error('Error al cargar la vista «' + key + '»', e);
-      if (cont && state.view === key) {
+      console.error('Error al cargar la vista «' + viewKey + '»', e);
+      if (cont) {
         cont.innerHTML = '<div class="empty"><p>No se pudo cargar esta sección.</p><button class="btn btn--primary btn--sm" id="btnReintentarVista" type="button">Reintentar</button></div>';
-        const r = document.getElementById('btnReintentarVista'); if (r) r.onclick = () => navigate(key);
+        const r = document.getElementById('btnReintentarVista'); if (r) r.onclick = () => navigate(viewKey);
       }
     });
   setTimeout(() => {
-    if (settled || state.view !== key) return;
+    if (settled) return;
     if (cont && cont.querySelector('.loading')) {
       cont.innerHTML = '<div class="empty"><p>Esta sección está tardando más de lo normal. Puede reintentar.</p><button class="btn btn--primary btn--sm" id="btnReintentarVista" type="button">Reintentar</button></div>';
-      const r = document.getElementById('btnReintentarVista'); if (r) r.onclick = () => navigate(key);
+      const r = document.getElementById('btnReintentarVista'); if (r) r.onclick = () => navigate(viewKey);
     }
   }, 15000);
 }
 
 function buildSidebar() {
   const nav = $('#sidebarNav');
+  if (!nav) return;
   const rol = state.profile.rol;
-  const items = rol === 'cliente'
-    ? CLIENT_NAV
-    : NAV.filter(n => {
-        if (n.adminOnly) return rol === 'admin';
-        if (n.credOnly) return rol === 'admin' || rol === 'abogado';
-        if (n.finOnly) return rol === 'admin' || rol === 'abogado';
-        return true;
-      });
-  nav.innerHTML = items
-    .map(n => `<button class="nav-item" data-key="${n.key}">${n.icon}<span>${n.label}</span></button>`).join('');
-  nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
+
+  if (rol === 'cliente') {
+    nav.innerHTML = CLIENT_NAV
+      .map(n => `<button class="nav-item ${state.view === n.key ? 'active' : ''}" data-key="${n.key}">${n.icon}<span>${esc(n.label)}</span></button>`).join('');
+    nav.querySelectorAll('.nav-item').forEach(b => b.onclick = () => navigate(b.dataset.key));
+    actualizarBadgesMenu();
+    return;
+  }
+
+  nav.innerHTML = SECCIONES_NAV.map(sec => {
+    const itemsVisibles = sec.items.filter(n => {
+      if (n.adminOnly) return rol === 'admin';
+      if (n.credOnly) return rol === 'admin' || rol === 'abogado';
+      if (n.finOnly) return rol === 'admin' || rol === 'abogado';
+      return true;
+    });
+    if (!itemsVisibles.length) return '';
+
+    const storeKey = 'lexfive_nav_sec_' + sec.id;
+    const stored = localStorage.getItem(storeKey);
+    const isOpen = stored !== null ? stored === '1' : sec.defOpen;
+
+    const itemsHtml = itemsVisibles.map(n => {
+      const isActive = (state.view === n.key);
+      return `<button class="nav-item ${isActive ? 'active' : ''}" data-key="${n.key}" type="button">
+        ${n.icon}<span>${esc(n.label)}</span>
+      </button>`;
+    }).join('');
+
+    return `
+      <div class="nav-section ${isOpen ? '' : 'is-collapsed'}" id="sec_${sec.id}">
+        <button class="nav-section__header js-toggle-sec" data-sec="${sec.id}" type="button" aria-expanded="${isOpen}">
+          <span>${esc(sec.titulo)}</span>
+          <span class="nav-section__arrow">▼</span>
+        </button>
+        <div class="nav-section__items">
+          ${itemsHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  nav.querySelectorAll('.js-toggle-sec').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const secId = btn.dataset.sec;
+      const secEl = document.getElementById('sec_' + secId);
+      if (!secEl) return;
+      const willCollapse = !secEl.classList.contains('is-collapsed');
+      secEl.classList.toggle('is-collapsed', willCollapse);
+      btn.setAttribute('aria-expanded', !willCollapse);
+      localStorage.setItem('lexfive_nav_sec_' + secId, willCollapse ? '0' : '1');
+    };
+  });
+
+  nav.querySelectorAll('.nav-item').forEach(b => {
+    b.onclick = () => navigate(b.dataset.key);
+  });
+
   actualizarBadgesMenu();
 }
 
