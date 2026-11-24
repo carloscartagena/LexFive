@@ -4,7 +4,7 @@
    expediente judicial o administrativo mediante su código o enlace WhatsApp.
    ============================================================ */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { SUPABASE_URL, SUPABASE_KEY, WHATSAPP } from './sistema/js/config.js';
+import { SUPABASE_URL, SUPABASE_KEY, WHATSAPP } from '../sistema/js/config.js';
 
 (function () {
   'use strict';

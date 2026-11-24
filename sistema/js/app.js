@@ -999,204 +999,221 @@ async function arrancarSesion() {
 }
 
 (async function init() {
-  const profile = await arrancarSesion();
-  if (!profile) return;
-
-  // Cabecera de usuario
-  $('#userName').textContent = profile.nombre;
-  $('#userRol').textContent = ROLES[profile.rol] || profile.rol;
-  $('#userAvatar').textContent = initials(profile.nombre);
-
-  buildSidebar();
-
-  // Buscador global en la barra superior (solo personal, no clientes).
-  if (profile.rol !== 'cliente') {
-    const actions = $('#topbarActions');
-    if (actions) {
-      const btn = document.createElement('button');
-      btn.className = 'btn btn--ghost btn--sm topbar__search';
-      btn.id = 'btnBuscarGlobal';
-      btn.innerHTML = ICON.buscar + '<span>Buscar</span>';
-      btn.setAttribute('data-tip', 'Busque a la vez en procesos, clientes y consultas (atajo: Ctrl/⌘ + K).');
-      btn.onclick = () => openBuscadorGlobal();
-      actions.appendChild(btn);
-    }
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); openBuscadorGlobal(); }
-    });
-  }
-
-  // Campanita de notificaciones (novedades dentro de la app), para todos los roles.
-  initNotifBell();
-
-  // Registrar el service worker para que el sistema se pueda instalar como
-  // app en el celular y funcione mejor (PWA). Además, nos aseguramos de que el
-  // celular SIEMPRE termine con la última versión: si aparece un service worker
-  // nuevo (tras un despliegue), se activa y la página se recarga UNA sola vez
-  // para aplicarlo, de modo que no se quede sirviendo archivos viejos en caché
-  // (esa era la causa de que el panel o los testimonios no cargaran en algunos
-  // teléfonos aunque en la PC sí funcionaran).
-  if ('serviceWorker' in navigator) {
-    // Solo recargamos automáticamente si ya había un service worker controlando
-    // la página; en la primera instalación (sin controlador previo) no se
-    // recarga, para no duplicar la carga inicial.
-    let _recargaPorSW = false;
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (_recargaPorSW) return;
-        _recargaPorSW = true;
-        // Si hay un modal abierto (el usuario está en medio de algo) no
-        // recargamos de golpe: mostramos la barra para que recargue cuando
-        // quiera. Si no, recargamos al instante para aplicar la versión nueva.
-        const modal = document.getElementById('modalOverlay');
-        if (modal && modal.classList.contains('open')) { mostrarAvisoActualizacion(); return; }
-        location.reload();
-      });
-    }
-
-    navigator.serviceWorker.register('sw.js').then((reg) => {
-      // Comprobar de inmediato si hay una versión nueva en el servidor.
-      try { reg.update(); } catch (e) {}
-      // Volver a comprobar al regresar a la app (muy típico en el celular) y,
-      // como respaldo, cada 30 minutos si la app queda abierta.
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') { try { reg.update(); } catch (e) {} }
-      });
-      setInterval(() => { try { reg.update(); } catch (e) {} }, 30 * 60 * 1000);
-    }).catch(() => {});
-
-    // El SW también avisa cuando detecta una versión nueva (barra discreta con
-    // botón "Actualizar"), por si la recarga automática no llegara a aplicarse.
-    navigator.serviceWorker.addEventListener('message', (e) => {
-      if (e.data && e.data.tipo === 'lexfive-nueva-version') mostrarAvisoActualizacion();
-    });
-  }
-
-  // Aplica el logo elegido por el bufete. Primero, pintado rápido con la
-  // última versión conocida en este equipo; luego se refresca desde la nube
-  // para que coincida con lo elegido en cualquier otro dispositivo.
   try {
-    const cache = Branding.local();
-    if (cache.logoImg) IMG.logo = cache.logoImg;
-    if (cache.logoId) applyLogo(cache.logoId);
-    else { const lg = localStorage.getItem('lexfive_logo'); if (lg) applyLogo(lg); }
-  } catch (e) {}
-  Branding.load().then(b => {
-    if (!b) return;
-    if (b.logoImg) IMG.logo = b.logoImg;
-    if (b.logoId) { localStorage.setItem('lexfive_logo', b.logoId); applyLogo(b.logoId); }
-  }).catch(() => {});
+    const profile = await arrancarSesion();
+    if (!profile) return;
 
-  // Escuchar cambios de logo/sello en vivo desde otros dispositivos.
-  subscribeBrandingRealtime();
+    // Cabecera de usuario
+    try {
+      const un = $('#userName'); if (un) un.textContent = profile.nombre;
+      const ur = $('#userRol'); if (ur) ur.textContent = ROLES[profile.rol] || profile.rol;
+      const ua = $('#userAvatar'); if (ua) ua.textContent = initials(profile.nombre);
+    } catch (e) { console.warn('Error al pintar cabecera de usuario:', e); }
 
-  // Respaldo del tiempo real: al volver a esta pestaña/app, refresca el logo y
-  // el sello desde la nube. Así se actualiza aunque el canal en vivo no esté
-  // disponible (p. ej. si aún no se ejecutó db/18 o el navegador lo bloquea).
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState !== 'visible') return;
-    Branding.load().then(b => {
-      if (!b) return;
-      if (b.logoImg) IMG.logo = b.logoImg;
-      if (b.selloImg) IMG.sello = b.selloImg;
-      if (b.logoId) { localStorage.setItem('lexfive_logo', b.logoId); applyLogo(b.logoId); }
-    }).catch(() => {});
-  });
+    try {
+      buildSidebar();
+    } catch (e) { console.warn('Error al construir sidebar:', e); }
 
-  // Aplica la intensidad guardada del logo de fondo y activa el aviso de "sin conexión".
-  applyWmOpacity(wmOpacityActual());
-  initOfflineIndicator();
+    // Buscador global en la barra superior (solo personal, no clientes).
+    if (profile.rol !== 'cliente') {
+      try {
+        const actions = $('#topbarActions');
+        if (actions && !$('#btnBuscarGlobal')) {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn--ghost btn--sm topbar__search';
+          btn.id = 'btnBuscarGlobal';
+          btn.innerHTML = ICON.buscar + '<span>Buscar</span>';
+          btn.setAttribute('data-tip', 'Busque a la vez en procesos, clientes y consultas (atajo: Ctrl/⌘ + K).');
+          btn.onclick = () => openBuscadorGlobal();
+          actions.appendChild(btn);
+        }
+        document.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); openBuscadorGlobal(); }
+        });
+      } catch (e) { console.warn('Error al inicializar buscador global:', e); }
+    }
 
-  // Manejo global de errores: en vez de fallar en silencio, avisa con un mensaje
-  // amable (sin abrumar: máximo uno cada 8 segundos).
-  let _lastErr = 0;
-  const avisoError = () => {
-    const now = Date.now();
-    if (now - _lastErr < 8000) return;
-    _lastErr = now;
-    if (!navigator.onLine) return; // el banner de "sin conexión" ya lo cubre
-    toast('Ocurrió un problema. Si persiste, recargue la página.', 'error');
-  };
-  window.addEventListener('error', avisoError);
-  window.addEventListener('unhandledrejection', avisoError);
+    // Campanita de notificaciones (alertas en vivo)
+    try {
+      initNotifBell();
+    } catch (e) { console.warn('Error al iniciar campana de notificaciones:', e); }
 
-  // Eventos globales
-  // Al cerrar sesión, llevar al sitio web público (front-end) en vez de a la
-  // pantalla de login. Así es coherente con el cierre por inactividad y con el
-  // clic en el logo, que también van al sitio público. Lo autoguardado se
-  // conserva y se puede recuperar al volver a iniciar sesión.
-  $('#btnLogout').onclick = () => signOutTo('../index.html');
-  initTooltipEngine();
+    // Registrar el service worker para PWA
+    try {
+      if ('serviceWorker' in navigator) {
+        let _recargaPorSW = false;
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (_recargaPorSW) return;
+            _recargaPorSW = true;
+            const modal = document.getElementById('modalOverlay');
+            if (modal && modal.classList.contains('open')) { mostrarAvisoActualizacion(); return; }
+            location.reload();
+          });
+        }
 
-  // Modo claro/oscuro: sincroniza el botón con el tema ya aplicado y permite alternarlo.
-  applyTheme(currentTheme());
-  const btnTheme = $('#btnTheme');
-  if (btnTheme) btnTheme.onclick = toggleTheme;
+        navigator.serviceWorker.register('sw.js').then((reg) => {
+          try { reg.update(); } catch (e) {}
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') { try { reg.update(); } catch (e) {} }
+          });
+          setInterval(() => { try { reg.update(); } catch (e) {} }, 30 * 60 * 1000);
+        }).catch(() => {});
 
-  // Tamaño de letra (accesibilidad): botones A− / A+ en la barra superior.
-  applyFontScale(currentFontScale());
-  const bFontMinus = $('#btnFontMinus'); if (bFontMinus) bFontMinus.onclick = () => changeFontScale(-1);
-  const bFontPlus = $('#btnFontPlus'); if (bFontPlus) bFontPlus.onclick = () => changeFontScale(1);
+        navigator.serviceWorker.addEventListener('message', (e) => {
+          if (e.data && e.data.tipo === 'lexfive-nueva-version') mostrarAvisoActualizacion();
+        });
+      }
+    } catch (e) { console.warn('Error con Service Worker:', e); }
 
-  // Al hacer clic en el logo (ir al sitio público), cerrar la sesión por
-  // seguridad. El autoguardado conserva lo que se estaba escribiendo, así que
-  // al volver a iniciar sesión se podrá recuperar.
-  const panelLogo = document.querySelector('.sidebar__head .logo');
-  if (panelLogo) {
-    panelLogo.setAttribute('data-tip', 'Vuelve al sitio web público y cierra su sesión por seguridad. Lo que esté escribiendo queda autoguardado y podrá recuperarlo al volver a entrar.');
-    panelLogo.addEventListener('click', (e) => {
-      e.preventDefault();
-      signOutTo('../index.html');
+    // Aplica el logo elegido por el bufete
+    try {
+      const cache = Branding.local();
+      if (cache.logoImg) IMG.logo = cache.logoImg;
+      if (cache.logoId) applyLogo(cache.logoId);
+      else { const lg = localStorage.getItem('lexfive_logo'); if (lg) applyLogo(lg); }
+    } catch (e) {}
+    try {
+      Branding.load().then(b => {
+        if (!b) return;
+        if (b.logoImg) IMG.logo = b.logoImg;
+        if (b.logoId) { localStorage.setItem('lexfive_logo', b.logoId); applyLogo(b.logoId); }
+      }).catch(() => {});
+    } catch (e) {}
+
+    try { subscribeBrandingRealtime(); } catch (e) {}
+
+    // Respaldo de branding al volver a la pestaña
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        Branding.load().then(b => {
+          if (!b) return;
+          if (b.logoImg) IMG.logo = b.logoImg;
+          if (b.selloImg) IMG.sello = b.selloImg;
+          if (b.logoId) { localStorage.setItem('lexfive_logo', b.logoId); applyLogo(b.logoId); }
+        }).catch(() => {});
+      } catch (e) {}
     });
-  }
-  $('#modalClose').onclick = closeModal;
-  $('#modalOverlay').onclick = (e) => { if (e.target === $('#modalOverlay')) closeModal(); };
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-  $('#menuToggle').onclick = () => { $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show'); };
-  $('#backdrop').onclick = () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); };
 
-  // Cierre de sesión automático por inactividad (10 minutos)
-  const IDLE_MS = 10 * 60 * 1000;
-  let idleTimer;
-  function resetIdle() {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(async () => {
-      alert('Su sesión se cerró automáticamente por 10 minutos de inactividad.\n\nTranquilo: lo que estaba escribiendo (descripción del caso, memorial, etc.) quedó guardado y podrá recuperarlo al volver a iniciar sesión.');
-      await signOutTo('../index.html');
-    }, IDLE_MS);
-  }
-  ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(ev =>
-    document.addEventListener(ev, resetIdle, { passive: true }));
-  resetIdle();
+    try {
+      applyWmOpacity(wmOpacityActual());
+      initOfflineIndicator();
+    } catch (e) {}
 
-  // Vista inicial según el rol
-  navigate(profile.rol === 'cliente' ? 'misprocesos' : 'dashboard');
-  if (profile.rol === 'cliente') updateNovedadesBadge();
+    // Manejo global de errores amigables
+    let _lastErr = 0;
+    const avisoError = () => {
+      const now = Date.now();
+      if (now - _lastErr < 8000) return;
+      _lastErr = now;
+      if (!navigator.onLine) return;
+      toast('Ocurrió un problema. Si persiste, recargue la página.', 'error');
+    };
+    window.addEventListener('error', avisoError);
+    window.addEventListener('unhandledrejection', avisoError);
 
-  // Recordatorio automático de audiencias vencidas/próximas al abrir el panel.
-  if (profile.rol !== 'cliente') {
-    const lastRemind = Number(localStorage.getItem('lexfive_remind_ts') || 0);
-    const now = Date.now();
-    // Solo avisar una vez cada 4 horas (para no molestar en cada recarga).
-    if (now - lastRemind > 4 * 60 * 60 * 1000) {
-      (async () => {
-        try {
-          const { data: pp } = await supabase.from('procesos').select('caratula,proxima_audiencia,estado')
-            .eq('eliminado', false).not('proxima_audiencia', 'is', null);
-          if (!pp || !pp.length) return;
-          const ahora = new Date();
-          const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
-          const vencidas = pp.filter(p => new Date(p.proxima_audiencia) < ahora && !['archivado', 'concluido'].includes(p.estado));
-          const proximas = pp.filter(p => { const d = new Date(p.proxima_audiencia); return d >= ahora && d <= en7 && !['archivado', 'concluido'].includes(p.estado); });
-          if (vencidas.length || proximas.length) {
-            const msgs = [];
-            if (vencidas.length) msgs.push(vencidas.length + ' audiencia(s) VENCIDA(S)');
-            if (proximas.length) msgs.push(proximas.length + ' audiencia(s) en los próximos 7 días');
-            toast('Atención: ' + msgs.join(' y ') + '. Revise el panel general.', vencidas.length ? 'error' : '');
-            localStorage.setItem('lexfive_remind_ts', String(now));
-          }
-        } catch (e) {}
-      })();
+    // Eventos globales de UI
+    try {
+      const btnLogout = $('#btnLogout');
+      if (btnLogout) btnLogout.onclick = () => signOutTo('../index.html');
+      initTooltipEngine();
+
+      applyTheme(currentTheme());
+      const btnTheme = $('#btnTheme');
+      if (btnTheme) btnTheme.onclick = toggleTheme;
+
+      applyFontScale(currentFontScale());
+      const bFontMinus = $('#btnFontMinus'); if (bFontMinus) bFontMinus.onclick = () => changeFontScale(-1);
+      const bFontPlus = $('#btnFontPlus'); if (bFontPlus) bFontPlus.onclick = () => changeFontScale(1);
+
+      const panelLogo = document.querySelector('.sidebar__head .logo');
+      if (panelLogo) {
+        panelLogo.setAttribute('data-tip', 'Vuelve al sitio web público y cierra su sesión por seguridad.');
+        panelLogo.addEventListener('click', (e) => {
+          e.preventDefault();
+          signOutTo('../index.html');
+        });
+      }
+      const mc = $('#modalClose'); if (mc) mc.onclick = closeModal;
+      const mo = $('#modalOverlay'); if (mo) mo.onclick = (e) => { if (e.target === mo) closeModal(); };
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+      const mt = $('#menuToggle'); if (mt) mt.onclick = () => { $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show'); };
+      const bd = $('#backdrop'); if (bd) bd.onclick = () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); };
+    } catch (e) { console.warn('Error en listeners de UI:', e); }
+
+    // Cierre de sesión por inactividad
+    try {
+      const IDLE_MS = 10 * 60 * 1000;
+      let idleTimer;
+      function resetIdle() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(async () => {
+          alert('Su sesión se cerró automáticamente por 10 minutos de inactividad.\n\nTranquilo: lo que estaba escribiendo quedó guardado.');
+          await signOutTo('../index.html');
+        }, IDLE_MS);
+      }
+      ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(ev =>
+        document.addEventListener(ev, resetIdle, { passive: true }));
+      resetIdle();
+    } catch (e) {}
+
+    // Vista inicial según el rol
+    try {
+      navigate(profile.rol === 'cliente' ? 'misprocesos' : 'dashboard');
+      if (profile.rol === 'cliente') updateNovedadesBadge();
+    } catch (e) {
+      console.warn('Error al navegar a vista inicial:', e);
+      content().innerHTML = `<div class="card" style="margin:24px auto;max-width:600px;padding:24px;"><h3>Bienvenido a LexFive</h3><p>Haga clic en el menú lateral para ingresar a sus módulos.</p></div>`;
+    }
+
+    // Recordatorio automático de audiencias
+    if (profile.rol !== 'cliente') {
+      try {
+        const lastRemind = Number(localStorage.getItem('lexfive_remind_ts') || 0);
+        const now = Date.now();
+        if (now - lastRemind > 4 * 60 * 60 * 1000) {
+          (async () => {
+            try {
+              const { data: pp } = await supabase.from('procesos').select('caratula,proxima_audiencia,estado')
+                .eq('eliminado', false).not('proxima_audiencia', 'is', null);
+              if (!pp || !pp.length) return;
+              const ahora = new Date();
+              const en7 = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+              const vencidas = pp.filter(p => new Date(p.proxima_audiencia) < ahora && !['archivado', 'concluido'].includes(p.estado));
+              const proximas = pp.filter(p => { const d = new Date(p.proxima_audiencia); return d >= ahora && d <= en7 && !['archivado', 'concluido'].includes(p.estado); });
+              if (vencidas.length || proximas.length) {
+                const msgs = [];
+                if (vencidas.length) msgs.push(vencidas.length + ' audiencia(s) VENCIDA(S)');
+                if (proximas.length) msgs.push(proximas.length + ' audiencia(s) en los próximos 7 días');
+                toast('Atención: ' + msgs.join(' y ') + '. Revise el panel general.', vencidas.length ? 'error' : '');
+                localStorage.setItem('lexfive_remind_ts', String(now));
+              }
+            } catch (e) {}
+          })();
+        }
+      } catch (e) {}
+    }
+
+  } catch (bootErr) {
+    console.error('Error crítico al inicializar el panel:', bootErr);
+    const cont = content();
+    if (cont) {
+      cont.innerHTML = `
+        <div class="card" style="max-width:540px;margin:64px auto;padding:28px;text-align:center;border-left:5px solid #c0392b;box-shadow:0 8px 30px rgba(0,0,0,0.12);">
+          <div style="font-size:2.4rem;margin-bottom:8px;">⚠️</div>
+          <h3 style="color:#c0392b;margin:0 0 10px;">No se pudo iniciar el panel</h3>
+          <p class="cell-sub" style="margin:0 0 18px;font-size:0.92rem;">
+            Ocurrió un problema durante el arranque del sistema: <br>
+            <strong style="color:var(--ink);">${esc(bootErr.message || bootErr)}</strong>
+          </p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn--primary" onclick="location.reload()">Reintentar</button>
+            <button class="btn btn--ghost" onclick="localStorage.clear();sessionStorage.clear();location.reload()">Limpiar caché local y recargar</button>
+            <a href="../index.html" class="btn btn--ghost">Ir al inicio</a>
+          </div>
+        </div>
+      `;
     }
   }
 })();

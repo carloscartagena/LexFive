@@ -88,3 +88,13 @@ export function initials(name) {
 export function esEmailValido(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || '').trim());
 }
+
+// Convierte un texto/nombre a formato seguro para nombres de archivo (slug)
+export function slugNombre(n) {
+  return String(n || 'documento')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'documento';
+}

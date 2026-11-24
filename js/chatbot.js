@@ -1,4 +1,4 @@
-import { generateContent } from './sistema/js/ai.js';
+import { generateContent } from '../sistema/js/ai.js';
 
 (function() {
     'use strict';
