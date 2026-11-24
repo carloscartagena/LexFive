@@ -19,9 +19,27 @@ import { hydrateBranding, pickActiveLogo, pickActiveSello, brandLogoSrc, brandSe
 import { supabase } from './supabase.js';
 import { state } from './state.js';
 import { MEMBRETE_MODELOS, modeloMembrete, setModeloMembrete, membreteHeader, membreteFooter, PRINT_COLOR_CSS } from './membrete-base.js';
-import { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, fechaLarga } from './certificados.js';
 import { calcularJornadasHabilesBolivia } from './calendario-bo.js';
 import { generarCronogramaPasantia } from './pasantia-ai.js';
+import {
+  PASANTIA_CRONOGRAMA_BASE,
+  obtenerTratamiento,
+  extraerHoras,
+  calcularJornadasPasantia,
+  fechaLarga,
+  getLogoBase64,
+  buildHojaAsistenciaHTML,
+  descargarHojaAsistenciaPDF,
+  buildPaginasInforme,
+  buildInformeWordDocument,
+  descargarInformePDF,
+  imprimirInformeDocumento,
+  descargarInformeWordDoc,
+  generarConclusionesTexto,
+  renderPaginaHoja
+} from './pasantia-docs.js';
+
+export { buildInformeWordDocument };
 
 function urlAbs(src) {
   if (!src) return '';
@@ -56,434 +74,6 @@ async function fetchCertificadosPasantia() {
 }
 
 // Estructura de conclusiones institucionales
-function generarConclusionesTexto(genero) {
-  const t = obtenerTratamiento(genero);
-  return `1. EJE ACADÉMICO Y JURÍDICO (EFICIENCIA EN EL DESEMPEÑO):
-${t.mencionado} ha desarrollado a cabalidad cada una de las labores asignadas por el cuerpo de abogados patrocinantes del Bufete LexFive, demostrando alto grado de diligencia, proactividad y rigor técnico en la investigación forense, manejo de cuadernos procesales y redacción de memoriales en materias Civil, Familiar, Laboral y Penal.
-
-2. EJE ÉTICO, DEONTOLÓGICO Y LEALTAD PROFESIONAL:
-Todas las funciones forenses y administrativas fueron desempeñadas en estricta observancia a la Ley N.º 387 del Ejercicio de la Abogacía y el Código de Ética Profesional, preservando el deber de reserva, secreto profesional y custodia responsable de la documentación confidencial del despacho y de los patrocinados.
-
-3. EJE PRÁCTICO Y FORTALECIMIENTO DE HABILIDADES FORENSES:
-La pasantía jurídica permitió articular satisfactoriamente la formación teórica adquirida en las aulas universitarias con la praxis judicial cotidiana, consolidando criterios de argumentación, celeridad procesal y resolución de controversias en estrados judiciales y oficinas registrales.`;
-}
-
-// Divide el documento en páginas tamaño Carta estructuradas
-function renderPaginaHoja({ model, logoSrc, numPag, totalPags, contentHTML, wmOp, modoPresentacion }) {
-  const isAcademico = modoPresentacion === 'umsa';
-  let headHTML = '';
-  let footHTML = '';
-
-  if (isAcademico) {
-    headHTML = `
-      <div style="border-bottom:2px solid #0e1b2c;padding:12px 2.1cm 8px;text-align:center;font-family:Georgia,serif;">
-        <div style="font-size:12px;font-weight:bold;color:#0e1b2c;letter-spacing:1px;text-transform:uppercase;">UNIVERSIDAD MAYOR DE SAN ANDRÉS · FACULTAD DE DERECHO Y CIENCIAS POLÍTICAS</div>
-        <div style="font-size:9.5px;color:#a8853c;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST) · PLAN DE ESTUDIOS 2017</div>
-      </div>
-    `;
-    footHTML = `
-      <div style="border-top:1px solid #d9dce1;padding:8px 2.1cm 12px;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#5c6675;font-family:Arial,sans-serif;">
-        <span>LexFive Bufete de Abogados · Sede Central El Alto - La Paz</span>
-        <span style="font-weight:bold;color:#0e1b2c;">Página ${numPag} de ${totalPags}</span>
-      </div>
-    `;
-  } else {
-    headHTML = membreteHeader(model, logoSrc);
-    footHTML = membreteFooter(model).replace('</div>', `
-      <span style="position:relative;z-index:2;font-weight:bold;color:#c2a25a;margin-left:14px;white-space:nowrap;">Página ${numPag} de ${totalPags}</span>
-    </div>`);
-  }
-
-  const wmHTML = (logoSrc && wmOp && !isAcademico) ? `
-    <img src="${logoSrc}" alt="" style="position:absolute;top:50%;left:50%;width:11.5cm;height:11.5cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${Number(wmOp).toFixed(2)};pointer-events:none;z-index:0;">
-  ` : '';
-
-  return `
-  <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;min-height:27.94cm;max-height:27.94cm;height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:'Times New Roman',Georgia,serif;font-size:12px;line-height:1.45;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
-    ${headHTML}
-    <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:16px 2.1cm 12px;overflow:hidden;">
-      ${wmHTML}
-      <div style="position:relative;z-index:1;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;">
-        ${contentHTML}
-      </div>
-    </div>
-    ${footHTML}
-  </div>`;
-}
-
-// Arma las páginas del documento multipágina de acuerdo al contenido
-function buildPaginasInforme(d, logoSrc, model, wmOp) {
-  const nombre = esc(d.nombre || '___________________');
-  const ci = esc(d.ci || '—');
-  const ru = esc(d.ru || d.registro_universitario || '—');
-  const uni = esc(d.universidad || 'Universidad Mayor de San Andrés (UMSA)');
-  const carrera = esc(d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017');
-  const asignatura = esc(d.asignatura || 'CJR-410 Pasantía I');
-  const notaDesig = esc(d.nota_designacion || 'IIST-001/2026');
-  const fechaNota = esc(d.fecha_nota_designacion || fechaLarga(d.fecha_emision || d.fecha));
-  const modalidad = esc(d.modalidad || '4 semanas a medio tiempo (4 horas diarias)');
-  const horario = esc(d.horario || '14:00 a 18:00');
-  const duracion = esc(d.duracion || modalidad);
-  const fechaDoc = fechaLarga(d.fecha || hoyISO());
-  const docente = esc(d.docente_guia || 'Dr. Franklin Rubén Pareja Aliaga');
-  const docenteCargo = esc(d.docente_cargo || 'Docente de la Carrera de Derecho – Guía de la Materia de Pasantía');
-  const supervision = esc(d.supervision || 'Abogado(a) Patrocinante – LexFive Bufete de Abogados');
-  const antecedentes = esc(d.antecedentes || `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía N.º ${notaDesig} de fecha ${fechaNota}.`);
-  const actividades = d.actividades || '';
-  const conclusiones = esc(d.conclusiones || generarConclusionesTexto(d.genero));
-  const fotos = Array.isArray(d.fotos) ? d.fotos : [];
-  const modo = d.modo_presentacion || 'lexfive';
-
-  // PÁGINA 1: Portada institucional, datos y antecedentes
-  const pag1HTML = `
-    <div style="text-align:center;font-family:Georgia,serif;margin-bottom:12px;">
-      <h1 style="font-size:16px;letter-spacing:1.5px;color:#0e1b2c;margin:0 0 4px;text-transform:uppercase;">INFORME ÚNICO DE PASANTÍA</h1>
-      <div style="font-size:11px;font-weight:bold;color:#a8853c;letter-spacing:1px;text-transform:uppercase;">${uni} · ${carrera}</div>
-      <div style="font-size:10px;color:#555;margin-top:2px;">ASIGNATURA: ${asignatura}</div>
-    </div>
-
-    <div style="border-top:1.5px solid #0e1b2c;border-bottom:1.5px solid #0e1b2c;padding:6px 0;margin-bottom:12px;font-size:11.5px;">
-      <div style="display:grid;grid-template-columns:85px 1fr;gap:3px;margin-bottom:3px;">
-        <strong>A:</strong>
-        <div><strong>${docente}</strong><br><span style="font-size:10px;color:#444;">${docenteCargo}</span></div>
-      </div>
-      <div style="display:grid;grid-template-columns:85px 1fr;gap:3px;margin-bottom:3px;">
-        <strong>DE:</strong>
-        <div><strong>Univ. ${nombre}</strong> &nbsp;|&nbsp; R.U.: ${ru} &nbsp;|&nbsp; C.I.: ${ci}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:85px 1fr;gap:3px;margin-bottom:3px;">
-        <strong>REF.:</strong>
-        <div><strong>INFORME ÚNICO DE PASANTÍA PRE-PROFESIONAL (${asignatura})</strong></div>
-      </div>
-      <div style="display:grid;grid-template-columns:85px 1fr;gap:3px;">
-        <strong>FECHA:</strong>
-        <div>${fechaDoc}</div>
-      </div>
-    </div>
-
-    <p style="margin:0 0 8px;font-weight:bold;">Señor Docente Guía:</p>
-    <p style="margin:0 0 10px;text-align:justify;text-indent:18px;">
-      A tiempo de hacerle llegar un cordial y distinguido saludo, en cumplimiento a las normativas vigentes de la Carrera de Derecho de la Universidad Mayor de San Andrés, pongo a su consideración el presente <strong>Informe Único de Pasantía</strong>, el cual sintetiza y documenta pormenorizadamente las actividades, diligencias y labores técnico-jurídicas desarrolladas durante mi permanencia en calidad de Pasante en el Bufete de Abogados LexFive, bajo las siguientes especificaciones:
-    </p>
-
-    <div style="background:#f8f9fb;border:1px solid #d9dce1;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;">
-      <div style="margin-bottom:3px;"><strong>• Institución Receptora:</strong> Bufete de Abogados LexFive (Área de Litigio, Asesoría Jurídica y Diligenciamiento Procesal).</div>
-      <div style="margin-bottom:3px;"><strong>• Duración y Modalidad:</strong> ${duracion} (${modalidad} · Horario: ${horario}).</div>
-      <div style="margin-bottom:3px;"><strong>• Supervisión Forense:</strong> ${supervision}.</div>
-      <div><strong>• Ubicación del Despacho:</strong> Av. Alfredo Franco Valle N.º 708-51, Edif. Real, Planta Baja Of. A-6, Ciudad de El Alto - Bolivia.</div>
-    </div>
-
-    <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:4px;border-bottom:1px solid #d9dce1;padding-bottom:2px;">I. ANTECEDENTES Y MARCO NORMATIVO</div>
-    <div style="white-space:pre-line;text-align:justify;font-size:11.5px;line-height:1.45;">${antecedentes}</div>
-  `;
-
-  // Desglosar semanas de actividades
-  const semanasBlocks = actividades.split(/(?=\n?[I|V|X]+\.\s+[A-ZÁÉÍÓÚÑ\s]+SEMANA)/i).map(s => s.trim()).filter(Boolean);
-  const paginasActividades = [];
-
-  if (!semanasBlocks.length) {
-    paginasActividades.push(`
-      <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">II. DETALLE DE FUNCIONES REALIZADAS</div>
-      <p style="margin:0 0 10px;text-align:justify;">A continuación se describen las funciones asignadas y ejecutadas:</p>
-      <div style="white-space:pre-line;font-size:11px;line-height:1.4;">${esc(actividades)}</div>
-    `);
-  } else {
-    for (let idx = 0; idx < semanasBlocks.length; idx++) {
-      const semContent = semanasBlocks[idx];
-      paginasActividades.push(`
-        <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">${idx === 0 ? 'II. DETALLE CRONOLÓGICO DE FUNCIONES REALIZADAS' : 'II. DETALLE CRONOLÓGICO DE FUNCIONES REALIZADAS (Continuación)'}</div>
-        <div style="white-space:pre-line;font-size:10.5px;line-height:1.4;text-align:justify;">${esc(semContent)}</div>
-      `);
-    }
-  }
-
-  // PÁGINA DE CONCLUSIONES Y VISTO BUENO (Termina con firmas, NUNCA con anexos)
-  const pagConclusionesHTML = `
-    <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">III. CONCLUSIONES Y VISTO BUENO INSTITUCIONAL</div>
-    <p style="margin:0 0 10px;text-align:justify;text-indent:18px;">
-      Habiendo concluido satisfactoriamente el ciclo programado de prácticas pre-profesionales, se establecen las siguientes conclusiones institucionales y valorativas:
-    </p>
-
-    <div style="white-space:pre-line;font-size:11px;line-height:1.45;text-align:justify;margin-bottom:16px;">${conclusiones}</div>
-
-    <p style="margin:0 0 24px;text-align:justify;">
-      Es cuanto tengo a bien informar a su autoridad en honor a la verdad, para los fines académicos consiguientes.
-    </p>
-
-    <div style="margin-top:auto;border:1px solid #d9dce1;border-radius:6px;padding:12px 16px;background:#fafbfc;">
-      <div style="text-align:center;font-size:9px;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin-bottom:8px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;">
-        <div style="text-align:center;flex:1;">
-          <div style="min-height:55px;"></div>
-          <div style="border-top:1.2px solid #0e1b2c;padding-top:4px;font-size:10px;font-weight:bold;color:#0e1b2c;">Univ. ${nombre}</div>
-          <div style="font-size:8.5px;color:#5c6675;">Estudiante Pasante<br>R.U. ${ru} · C.I. ${ci}</div>
-        </div>
-        <div style="text-align:center;flex:1;">
-          <div style="min-height:55px;"></div>
-          <div style="border-top:1.2px solid #0e1b2c;padding-top:4px;font-size:10px;font-weight:bold;color:#0e1b2c;">V.º B.º Abogado(a) Patrocinante / Dirección</div>
-          <div style="font-size:8.5px;color:#5c6675;">LexFive · Bufete de Abogados</div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // PÁGINA DE ANEXOS (Siempre inicia en hoja nueva limpia)
-  const pagAnexosHTML = `
-    <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">IV. ÍNDICE DE ANEXOS Y CONSTANCIAS DE RESPALDO</div>
-    <p style="margin:0 0 12px;text-align:justify;text-indent:18px;">
-      En calidad de respaldo fáctico y documental de las funciones desarrolladas, se acompañan los siguientes instrumentos forenses y acreditaciones oficiales:
-    </p>
-
-    <table style="width:100%;border-collapse:collapse;font-size:10.5px;margin-bottom:16px;">
-      <thead>
-        <tr style="background:#0e1b2c;color:#fff;">
-          <th style="padding:5px 8px;border:1px solid #0e1b2c;width:35px;text-align:center;">N.º</th>
-          <th style="padding:5px 10px;border:1px solid #0e1b2c;text-align:left;">Documento de Respaldo</th>
-          <th style="padding:5px 8px;border:1px solid #0e1b2c;width:150px;text-align:center;">Estado / Verificación</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">1</td>
-          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Nota Oficial de Designación de Pasantía</strong> emitida por el Instituto de Investigaciones, Seminarios y Tesis (IIST).</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">N.º ${notaDesig}</td>
-        </tr>
-        <tr style="background:#f8f9fb;">
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">2</td>
-          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Carta de Aceptación de Pasantía</strong> emitida por la Dirección del Bufete LexFive.</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">Original adjunto</td>
-        </tr>
-        <tr>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">3</td>
-          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Certificado Oficial de Pasantía Jurídica</strong> refrendado por LexFive con QR verificable.</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">Ref. ${esc(d.ref || 'Verificable')}</td>
-        </tr>
-        <tr style="background:#f8f9fb;">
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">4</td>
-          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Hoja de Control de Asistencia y Permanencia</strong> debidamente validada por el Bufete de Abogados LexFive.</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">Asistencia 100%</td>
-        </tr>
-        <tr>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">5</td>
-          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Muestrario Forense</strong> (Borradores de memoriales, fichas procesales y copias de actuaciones).</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">Compulsa adjunta</td>
-        </tr>
-        <tr style="background:#f8f9fb;">
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;font-weight:bold;">6</td>
-          <td style="padding:6px;border:1px solid #d9dce1;"><strong>Registro Fotográfico de Prácticas Forenses</strong> (Despacho, estrados judiciales y notarías).</td>
-          <td style="padding:6px;border:1px solid #d9dce1;text-align:center;">${fotos.length ? `${fotos.length} fotografías` : 'Anexo fotográfico'}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div style="background:#fdfaf2;border:1px solid #e7d3a1;border-radius:6px;padding:10px 14px;font-size:10.5px;color:#7a5a18;">
-      <strong>Nota Institucional:</strong> La documentación precedentemente enunciada se adjunta correlativamente al expediente académico del pasante para su compulsa por el tribunal evaluador y la emisión de la nota de aprobación final.
-    </div>
-  `;
-
-  // PÁGINAS DE FOTOGRAFÍAS (2 fotos por página Carta)
-  const paginasFotos = [];
-  if (fotos.length) {
-    for (let f = 0; f < fotos.length; f += 2) {
-      const f1 = fotos[f];
-      const f2 = fotos[f + 1];
-      const itemFoto = (foto, num) => `
-        <div style="margin-bottom:14px;text-align:center;">
-          <div style="height:8.8cm;border:1px solid #d9dce1;border-radius:6px;overflow:hidden;background:#f5f6f8;display:flex;align-items:center;justify-content:center;">
-            <img src="${foto.src}" style="max-width:100%;max-height:100%;object-fit:contain;" alt="">
-          </div>
-          <div style="font-size:9.5px;color:#333;margin-top:4px;font-family:Arial,sans-serif;">
-            <strong>Fotografía N.º ${num}:</strong> ${esc(foto.pie || 'Desarrollo de actividades forenses en Bufete LexFive.')}
-          </div>
-        </div>
-      `;
-
-      paginasFotos.push(`
-        <div style="font-weight:bold;font-size:12px;color:#0e1b2c;margin-bottom:8px;border-bottom:1px solid #d9dce1;padding-bottom:2px;page-break-after:avoid;">ANEXO: REGISTRO FOTOGRÁFICO DE ACTIVIDADES</div>
-        ${itemFoto(f1, f + 1)}
-        ${f2 ? itemFoto(f2, f + 2) : ''}
-      `);
-    }
-  }
-
-  const todasLasPaginas = [pag1HTML, ...paginasActividades, pagConclusionesHTML, pagAnexosHTML, ...paginasFotos];
-  const total = todasLasPaginas.length;
-
-  return todasLasPaginas.map((html, i) => renderPaginaHoja({
-    model,
-    logoSrc,
-    numPag: i + 1,
-    totalPags: total,
-    contentHTML: html,
-    wmOp,
-    modoPresentacion: modo
-  })).join('');
-}
-
-// Genera el documento Word (.doc) multipágina con encabezado y pie de página de Microsoft Word
-export function buildInformeWordDocument(d, logoSrc) {
-  const nombre = esc(d.nombre || '___________________');
-  const ci = esc(d.ci || '—');
-  const ru = esc(d.ru || d.registro_universitario || '—');
-  const uni = esc(d.universidad || 'Universidad Mayor de San Andrés (UMSA)');
-  const carrera = esc(d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017');
-  const asignatura = esc(d.asignatura || 'CJR-410 Pasantía I');
-  const notaDesig = esc(d.nota_designacion || 'IIST-001/2026');
-  const fechaNota = esc(d.fecha_nota_designacion || fechaLarga(d.fecha_emision || d.fecha));
-  const modalidad = esc(d.modalidad || '4 semanas a medio tiempo (4 horas diarias)');
-  const horario = esc(d.horario || '14:00 a 18:00');
-  const duracion = esc(d.duracion || modalidad);
-  const fechaDoc = fechaLarga(d.fecha || hoyISO());
-  const docente = esc(d.docente_guia || 'Dr. Franklin Rubén Pareja Aliaga');
-  const docenteCargo = esc(d.docente_cargo || 'Docente de la Carrera de Derecho – Guía de la Materia de Pasantía');
-  const supervision = esc(d.supervision || 'Abogado(a) Patrocinante – LexFive Bufete de Abogados');
-  const antecedentes = esc(d.antecedentes || `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía N.º ${notaDesig} de fecha ${fechaNota}.`);
-  const actividades = d.actividades || '';
-  const conclusiones = esc(d.conclusiones || generarConclusionesTexto(d.genero));
-  const fotos = Array.isArray(d.fotos) ? d.fotos : [];
-
-  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-<meta charset="utf-8">
-<title>Informe Único de Pasantía - ${nombre}</title>
-<!--[if gte mso 9]>
-<xml>
- <w:WordDocument>
-  <w:View>Print</w:View>
-  <w:Zoom>100</w:Zoom>
-  <w:DoNotOptimizeForBrowser/>
- </w:WordDocument>
-</xml>
-<![endif]-->
-<style>
-  @page Section1 {
-    size: 21.59cm 27.94cm;
-    margin: 2.5cm 2.2cm 2.5cm 2.2cm;
-    mso-header-margin: 1.2cm;
-    mso-footer-margin: 1.2cm;
-    mso-header: h1;
-    mso-footer: f1;
-  }
-  div.Section1 { page: Section1; }
-  table#headerTable { width: 100%; border-bottom: 2pt solid #c2a25a; margin-bottom: 15pt; }
-  table#footerTable { width: 100%; border-top: 1.5pt solid #c2a25a; font-family: Arial, sans-serif; font-size: 8.5pt; color: #555; }
-  body { font-family: 'Times New Roman', Georgia, serif; font-size: 12pt; line-height: 1.45; color: #000; }
-  h1 { font-size: 15pt; text-align: center; color: #0e1b2c; margin: 0 0 4pt; text-transform: uppercase; }
-  h2 { font-size: 12pt; font-weight: bold; color: #0e1b2c; border-bottom: 1pt solid #d9dce1; padding-bottom: 3pt; margin: 16pt 0 6pt; page-break-after: avoid; break-after: avoid; }
-  p { margin: 0 0 8pt; text-align: justify; text-indent: 18pt; }
-  .p-noint { margin: 0 0 8pt; text-align: justify; text-indent: 0; }
-  .table-data { width: 100%; border-collapse: collapse; margin: 8pt 0 14pt; }
-  .table-data th, .table-data td { border: 1pt solid #444; padding: 5pt 7pt; font-size: 10pt; text-align: left; }
-  .table-data th { background: #f2f2f2; font-weight: bold; }
-  .page-break { page-break-before: always; break-before: page; }
-</style>
-</head>
-<body>
-<div class="Section1">
-
-<!-- Encabezado de Word -->
-<table id="headerTable">
-  <tr>
-    <td style="width:70px;vertical-align:middle;padding-bottom:6pt;">
-      ${logoSrc ? `<img src="${logoSrc}" width="60" height="60" alt="LexFive">` : ''}
-    </td>
-    <td style="vertical-align:middle;padding-bottom:6pt;">
-      <div style="font-size:18pt;font-weight:bold;color:#0e1b2c;font-family:Georgia,serif;">Lex<span style="color:#c2a25a;">Five</span></div>
-      <div style="font-size:9pt;letter-spacing:2pt;color:#a8853c;font-family:Arial,sans-serif;text-transform:uppercase;">Bufete de Abogados · Área de Litigio y Práctica Forense</div>
-      <div style="font-size:8pt;color:#666;font-family:Arial,sans-serif;">Av. Alfredo Franco Valle 708-51, Edif. Real Of. A-6 · El Alto - Bolivia · Tel: +591 78360469</div>
-    </td>
-  </tr>
-</table>
-
-<!-- Pie de página de Word -->
-<table id="footerTable">
-  <tr>
-    <td style="text-align:left;padding-top:4pt;">LexFive Bufete de Abogados · El Alto, Bolivia</td>
-    <td style="text-align:right;padding-top:4pt;">Página <span style="mso-field-code:' PAGE '"></span> de <span style="mso-field-code:' NUMPAGES '"></span></td>
-  </tr>
-</table>
-
-<h1>INFORME ÚNICO DE PASANTÍA PRE-PROFESIONAL</h1>
-<div style="text-align:center;font-size:11pt;color:#a8853c;font-weight:bold;margin-bottom:14pt;">${uni} · ${carrera}</div>
-
-<table style="width:100%;border-top:1.5pt solid #0e1b2c;border-bottom:1.5pt solid #0e1b2c;margin-bottom:14pt;font-size:11pt;">
-  <tr><td style="width:70pt;font-weight:bold;padding:2pt 0;">A:</td><td><strong>${docente}</strong><br><span style="font-size:9.5pt;color:#444;">${docenteCargo}</span></td></tr>
-  <tr><td style="font-weight:bold;padding:2pt 0;">DE:</td><td><strong>Univ. ${nombre}</strong> &nbsp;|&nbsp; R.U.: ${ru} &nbsp;|&nbsp; C.I.: ${ci}</td></tr>
-  <tr><td style="font-weight:bold;padding:2pt 0;">REF.:</td><td><strong>INFORME ÚNICO DE PASANTÍA PRE-PROFESIONAL (${asignatura})</strong></td></tr>
-  <tr><td style="font-weight:bold;padding:2pt 0;">FECHA:</td><td>${fechaDoc}</td></tr>
-</table>
-
-<p class="p-noint"><strong>Señor Docente Guía:</strong></p>
-<p>A tiempo de hacerle llegar un cordial y distinguido saludo, en cumplimiento a las normativas de la Carrera de Derecho de la Universidad Mayor de San Andrés, pongo a su consideración el presente <strong>Informe Único de Pasantía</strong> bajo las siguientes características institucionales:</p>
-
-<table class="table-data">
-  <tr><th style="width:28%;">Institución Receptora:</th><td>Bufete de Abogados "LexFive" (Área de Litigio y Asesoría Jurídica)</td></tr>
-  <tr><th>Duración y Modalidad:</th><td>${duracion} (${modalidad} · Horario: ${horario})</td></tr>
-  <tr><th>Supervisión Forense:</th><td>${supervision}</td></tr>
-  <tr><th>Ubicación del Despacho:</th><td>Av. Alfredo Franco Valle 708-51, Edif. Real Of. A-6, El Alto - Bolivia</td></tr>
-</table>
-
-<h2>I. ANTECEDENTES Y MARCO NORMATIVO</h2>
-<div style="white-space:pre-line;font-size:11pt;line-height:1.45;">${antecedentes}</div>
-
-<div class="page-break"></div>
-
-<h2>II. DETALLE CRONOLÓGICO DE FUNCIONES Y ACTIVIDADES REALIZADAS</h2>
-<p class="p-noint">Las funciones forenses se ejecutaron de lunes a viernes bajo el cronograma oficial coordinado con el despacho:</p>
-<div style="white-space:pre-line;font-size:10.5pt;line-height:1.4;">${esc(actividades)}</div>
-
-<div class="page-break"></div>
-
-<h2>III. CONCLUSIONES Y VISTO BUENO INSTITUCIONAL</h2>
-<p class="p-noint">Habiendo completado el período de prácticas, se formulan las siguientes conclusiones:</p>
-<div style="white-space:pre-line;font-size:11pt;line-height:1.45;">${conclusiones}</div>
-
-<p style="margin-top:20pt;">Es cuanto se informa en honor a la verdad y para los fines académicos consiguientes.</p>
-
-<table style="width:100%;margin-top:40pt;border-collapse:collapse;">
-  <tr>
-    <td style="width:50%;text-align:center;padding:0 15pt;vertical-align:bottom;">
-      <div style="border-top:1.5pt solid #000;padding-top:4pt;font-weight:bold;font-size:10pt;">Univ. ${nombre}</div>
-      <div style="font-size:9pt;color:#555;">Estudiante Pasante<br>R.U. ${ru} · C.I. ${ci}</div>
-    </td>
-    <td style="width:50%;text-align:center;padding:0 15pt;vertical-align:bottom;">
-      <div style="border-top:1.5pt solid #000;padding-top:4pt;font-weight:bold;font-size:10pt;">V.º B.º Abogado(a) Patrocinante / Dirección</div>
-      <div style="font-size:9pt;color:#555;">LexFive · Bufete de Abogados</div>
-    </td>
-  </tr>
-</table>
-
-<div class="page-break"></div>
-
-<h2>IV. ÍNDICE DE ANEXOS Y CONSTANCIAS DE RESPALDO</h2>
-<p class="p-noint">Se adjuntan al presente informe los instrumentos de respaldo correspondientes:</p>
-
-<table class="table-data">
-  <tr><th>N.º</th><th>Documento</th><th>Verificación</th></tr>
-  <tr><td>1</td><td>Nota Oficial de Designación de Pasantía</td><td>N.º ${notaDesig}</td></tr>
-  <tr><td>2</td><td>Carta de Aceptación de Pasantía de LexFive</td><td>Original adjunto</td></tr>
-  <tr><td>3</td><td>Certificado Oficial de Pasantía Jurídica LexFive</td><td>Ref. ${esc(d.ref || 'Verificable por QR')}</td></tr>
-  <tr><td>4</td><td>Hoja de Control de Asistencia y Permanencia</td><td>Debidamente validada por LexFive</td></tr>
-  <tr><td>5</td><td>Muestrario de Actuaciones Forenses</td><td>Compulsa adjunta</td></tr>
-  <tr><td>6</td><td>Registro Fotográfico de Prácticas Forenses</td><td>${fotos.length ? `${fotos.length} fotografías adjuntas` : 'Anexo fotográfico'}</td></tr>
-</table>
-
-${fotos.length ? `
-  <div class="page-break"></div>
-  <h2>ANEXO: REGISTRO FOTOGRÁFICO DE ACTIVIDADES</h2>
-  ${fotos.map((f, i) => `
-    <div style="text-align:center;margin-bottom:20pt;">
-      <img src="${f.src}" style="max-width:16cm;max-height:10cm;" alt=""><br>
-      <span style="font-size:9pt;font-family:Arial,sans-serif;"><strong>Fotografía N.º ${i + 1}:</strong> ${esc(f.pie || 'Práctica forense en LexFive')}</span>
-    </div>
-  `).join('')}
-` : ''}
-
-</div>
-</body>
-</html>`;
-}
-
 export async function renderInforme() {
   loading();
   try { await withTimeout(ensureImgCache(), 8000, 'imágenes'); } catch (e) {}
@@ -523,6 +113,8 @@ export async function renderInforme() {
     in_enfoque: '',
     in_docente: 'Dr. Franklin Rubén Pareja Aliaga',
     in_docente_cargo: 'Docente de la Carrera de Derecho – Guía de la Materia de Pasantía',
+    in_tutor_nombre: '',
+    in_tutor_rpa: '',
     in_supervision: 'Abogado(a) Patrocinante – LexFive Bufete de Abogados',
     in_fecha_pres: hoyISO(),
     in_antecedentes: `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía N.º IIST-001/2026 de fecha ${fechaLarga(hoyISO())}.`,
@@ -624,7 +216,9 @@ export async function renderInforme() {
         <div class="cert-form">
           ${campo('in_docente', 'Docente Guía / Destinatario (A:)', V.in_docente)}
           ${campo('in_docente_cargo', 'Cargo del Docente Guía', V.in_docente_cargo)}
-          ${campo('in_supervision', 'Supervisión Institucional en Bufete', V.in_supervision)}
+          ${campo('in_tutor_nombre', 'Abogado(a) Patrocinante / Tutor(a) (opcional)', V.in_tutor_nombre, 'Ej: Abg. Carlos Cartagena')}
+          ${campo('in_tutor_rpa', 'R.P.A. del Tutor(a) (opcional)', V.in_tutor_rpa, 'Ej: 9876543-LP')}
+          ${campo('in_supervision', 'Supervisión Institucional en Bufete (texto resumen)', V.in_supervision)}
           <div class="field"><label>Fecha de presentación del informe</label><input id="in_fecha_pres" type="date" value="${esc(V.in_fecha_pres)}"></div>
         </div>
         ${campoArea('in_antecedentes', 'Antecedentes y Resoluciones Universitarias', V.in_antecedentes, 3)}
@@ -651,6 +245,7 @@ export async function renderInforme() {
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <input id="in_enfoque" value="${esc(V.in_enfoque || '')}" placeholder="Enfoque especial del pasante (ej. asistencia familiar, procesos monitorios en El Alto)..." style="flex:1;min-width:240px;">
             <button class="btn btn--primary btn--sm" id="in_btn_ia_cronograma" type="button">✨ Generar actividades únicas con IA</button>
+            <span id="in_ia_badge" style="display:none;padding:3px 8px;border-radius:12px;font-size:.78rem;font-weight:600;"></span>
             <button class="btn btn--ghost btn--sm" id="in_btn_regen_act" type="button">🔄 Restaurar predeterminadas</button>
           </div>
         </div>
@@ -817,6 +412,8 @@ export async function renderInforme() {
     enfoque: val('in_enfoque'),
     docente_guia: val('in_docente'),
     docente_cargo: val('in_docente_cargo'),
+    tutor_nombre: val('in_tutor_nombre'),
+    tutor_rpa: val('in_tutor_rpa'),
     supervision: val('in_supervision'),
     fecha: val('in_fecha_pres'),
     antecedentes: val('in_antecedentes'),
@@ -1103,19 +700,7 @@ export async function renderInforme() {
 
   // IMPRESIÓN DIRECTA
   $('#in_btn_print').onclick = () => {
-    const d = recolectar();
-    const docHTML = buildPaginasInforme(d, logoSrc, modeloMembrete(), wmOpacityActual() / 100);
-    const w = window.open('', '_blank');
-    if (!w) { toast('Permita las ventanas emergentes para imprimir.', 'error'); return; }
-    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe Único de Pasantía - ${esc(d.nombre)}</title>
-      <style>
-        @page { size: letter; margin: 0; }
-        html, body { margin: 0; background: #fff; }
-        .hoja-carta { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: 100vh !important; }
-        ${PRINT_COLOR_CSS}
-      </style></head><body>${docHTML}
-      <script>window.addEventListener('load', function(){ setTimeout(function(){ window.print(); }, 400); });<\/script></body></html>`);
-    w.document.close();
+    imprimirInformeDocumento(recolectar(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
   };
 
   // DESCARGA EN MICROSOFT WORD (.DOC) MULTIPÁGINA

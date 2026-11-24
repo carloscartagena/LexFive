@@ -144,6 +144,8 @@ export async function generarCronogramaPasantia({
 }) {
   if (!jornadas || !jornadas.length) return [];
 
+  let lastError = null;
+
   // Intento con IA si está habilitada
   if (usarIA) {
     try {
@@ -172,7 +174,7 @@ Asegura variedad, rigor técnico boliviano (mencionar leyes bolivianas reales co
         const cleanJSON = resp.replace(/```json/gi, '').replace(/```/g, '').trim();
         const parsed = JSON.parse(cleanJSON);
         if (Array.isArray(parsed) && parsed.length >= jornadas.length) {
-          return jornadas.map((j, i) => {
+          const list = jornadas.map((j, i) => {
             const aiItem = parsed[i] || parsed[parsed.length - 1];
             return {
               num: j.num,
@@ -185,9 +187,13 @@ Asegura variedad, rigor técnico boliviano (mencionar leyes bolivianas reales co
                 : ['Práctica forense en despacho.', 'Registro en sistema LexFive.', 'Compulsa de plazos procesales.']
             };
           });
+          list.origen = 'ia';
+          list.motivo = null;
+          return list;
         }
       }
     } catch (err) {
+      lastError = err;
       console.warn('Fallo generación con IA, usando fallback determinista:', err);
     }
   }
@@ -204,7 +210,7 @@ Asegura variedad, rigor técnico boliviano (mencionar leyes bolivianas reales co
     Object.values(BANCO_TAREAS_AREAS).forEach(list => pool.push(...list));
   }
 
-  return jornadas.map((j, i) => {
+  const list = jornadas.map((j, i) => {
     const item = pool[i % pool.length];
     return {
       num: j.num,
@@ -215,4 +221,7 @@ Asegura variedad, rigor técnico boliviano (mencionar leyes bolivianas reales co
       actividades: [...item.actividades]
     };
   });
+  list.origen = 'fallback';
+  list.motivo = lastError ? (lastError.message || String(lastError)) : 'Generación local por áreas de práctica';
+  return list;
 }
