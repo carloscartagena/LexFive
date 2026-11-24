@@ -25,6 +25,7 @@ import { openHonorarios } from './finanzas.js';
 import { mountOpinion } from './opiniones.js';
 import { supabase } from './supabase.js';
 import { openPlazos } from './agenda.js';
+import { ETAPAS_PROCESALES, TIPOS_ACTUACION, getCodigoSeguimiento, copiarEnlaceSeguimiento, enviarAvanceWhatsApp, renderTimelineVertical } from './seguimiento.js';
 
 // Construye el CSV de la lista de procesos (usa datos del panel, por eso vive
 // junto a la vista de Procesos en vez de en ./exportar.js).
@@ -167,7 +168,10 @@ function procesoForm(proc = null) {
       <div class="field"><label>Materia${tip('Área del derecho del caso (Laboral, Civil, Penal...). Si falta una, elija "Crear nueva categoría" y se agregará a todo el sistema.')}</label><select id="pf_materia" class="js-categoria" data-include-blank="1"><option value="">—</option>${categoriaOptions(p.materia)}</select></div>
       <div class="field"><label>Estado${tip('Etapa actual del caso. Manténgalo al día para que el equipo y el cliente sepan cómo avanza.')}</label><select id="pf_estado">${Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}" ${p.estado === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
     </div>
-    <div class="field"><label>Juzgado / Entidad${tip('Nombre del juzgado o de la entidad donde se tramita el caso. Ej: "Juzgado 2º de Trabajo de El Alto".')}</label><input id="pf_juzgado" value="${esc(p.juzgado || '')}"></div>
+    <div class="field-row">
+      <div class="field"><label>Etapa procesal actual${tip('Fase procesal actual del litigio (según normativa procesal boliviana). Se refleja en el portal de seguimiento del cliente.')}</label><select id="pf_etapa">${ETAPAS_PROCESALES.map(e => `<option value="${esc(e)}" ${(p.etapa || 'Preparatoria / Demanda') === e ? 'selected' : ''}>${esc(e)}</option>`).join('')}</select></div>
+      <div class="field"><label>Juzgado / Entidad / Fiscalía${tip('Nombre del juzgado, fiscalía o de la entidad donde se tramita el caso. Ej: "Juzgado 2º de Trabajo de El Alto".')}</label><input id="pf_juzgado" value="${esc(p.juzgado || '')}"></div>
+    </div>
     <div class="field-row">
       <div class="field"><label>Cliente${tip('Persona o empresa que representamos. Elíjala de la lista; si es nueva, use el campo de abajo para registrarla.')}</label><select id="pf_cliente">${optionsClientes(p.cliente_id)}</select></div>
       <div class="field"><label>Parte contraria${tip('La otra parte del proceso (demandado o demandante según el caso).')}</label><input id="pf_contraria" value="${esc(p.parte_contraria || '')}"></div>
@@ -192,7 +196,7 @@ function procesoForm(proc = null) {
 
   // Autoguardado de borrador (no perder lo escrito si se cierra la sesión)
   const draftName = 'proceso_' + (proc ? proc.id : 'nuevo');
-  const fields = ['pf_caratula', 'pf_numero', 'pf_nurej', 'pf_tipo', 'pf_materia', 'pf_estado',
+  const fields = ['pf_caratula', 'pf_numero', 'pf_nurej', 'pf_tipo', 'pf_materia', 'pf_estado', 'pf_etapa',
     'pf_juzgado', 'pf_cliente', 'pf_contraria', 'pf_cliente_nuevo', 'pf_inicio', 'pf_audiencia', 'pf_desc'];
   const draft = wireDraft(draftName, fields, ['pf-abo', 'pf-proc']);
   maybeOfferDraft(draftName, draft);
@@ -219,6 +223,7 @@ async function saveProceso(proc) {
     tipo: $('#pf_tipo').value,
     materia: $('#pf_materia').value || null,
     estado: $('#pf_estado').value,
+    etapa: $('#pf_etapa') ? $('#pf_etapa').value : null,
     juzgado: $('#pf_juzgado').value.trim() || null,
     cliente_id: clienteId,
     parte_contraria: $('#pf_contraria').value.trim() || null,
@@ -263,17 +268,42 @@ export async function openProcesoDetail(id, readonly = false) {
   openModal('Detalle del proceso', '<div class="loading"><div class="spinner"></div>Cargando...</div>', [], true);
   const { data: p } = await supabase.from('procesos').select('*').eq('id', id).single();
   if (!p) { toast('No se encontró el proceso.', 'error'); closeModal(); return; }
-  const [{ data: acts }, { data: docs }] = await Promise.all([
+  const [{ data: acts }, { data: docs }, { data: clienteData }] = await Promise.all([
     supabase.from('actuaciones').select('*').eq('proceso_id', id).order('fecha', { ascending: false }),
-    supabase.from('documentos').select('*').eq('proceso_id', id).order('created_at', { ascending: false })
+    supabase.from('documentos').select('*').eq('proceso_id', id).order('created_at', { ascending: false }),
+    p.cliente_id ? supabase.from('clientes').select('id, nombre, telefono, email').eq('id', p.cliente_id).maybeSingle() : Promise.resolve({ data: null })
   ]);
+  const cli = clienteData || null;
+  const codSeg = getCodigoSeguimiento(p);
 
   const detail = `
+    <!-- Barra superior de Ficha Procesal y Seguimiento -->
+    <div style="background:linear-gradient(135deg, rgba(14,27,44,0.04) 0%, rgba(184,148,70,0.09) 100%); border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700;">Etapa procesal actual</div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:2px; flex-wrap:wrap;">
+          <span style="font-size:0.92rem; font-weight:700; color:var(--navy,#0e1b2c); background:#fff; border:1px solid #c2a25a; padding:3px 10px; border-radius:14px;">
+            ⚖️ ${esc(p.etapa || 'Preparatoria / Demanda')}
+          </span>
+          <span style="font-size:0.82rem; color:var(--muted);">Código de seguimiento: <strong style="font-family:monospace; color:var(--primary); font-size:0.92rem;">${esc(codSeg)}</strong></span>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <button type="button" class="btn btn--sm btn--ghost" id="btnCopyTrackingModal" style="display:inline-flex; align-items:center; gap:5px; font-size:0.8rem;">
+          <span>📋</span> Copiar enlace de seguimiento
+        </button>
+        <button type="button" class="btn btn--sm" id="btnWaUltimoAvance" style="background:#25d366; border-color:#25d366; color:#fff; display:inline-flex; align-items:center; gap:5px; font-size:0.8rem; font-weight:600;">
+          <span>💬</span> Enviar último avance por WhatsApp
+        </button>
+      </div>
+    </div>
+
     <div class="detail-grid">
       <div class="detail-item"><label>N.º de proceso</label><span>${esc(p.numero || '—')}</span></div>
       <div class="detail-item"><label>NUREJ</label><span>${esc(p.nurej || '—')}</span></div>
       <div class="detail-item"><label>Materia</label><span>${esc(p.materia || '—')} · ${p.tipo === 'administrativo' ? 'Administrativo' : 'Judicial'}</span></div>
-      <div class="detail-item"><label>Juzgado / Entidad</label><span>${esc(p.juzgado || '—')}</span></div>
+      <div class="detail-item"><label>Juzgado / Entidad / Fiscalía</label><span>${esc(p.juzgado || '—')}</span></div>
+      <div class="detail-item"><label>Etapa Procesal</label><span style="font-weight:600; color:var(--gold);">${esc(p.etapa || 'Preparatoria / Demanda')}</span></div>
       <div class="detail-item"><label>Estado</label><span>${badgeEstado(p.estado)}</span></div>
       <div class="detail-item"><label>Cliente</label><span>${esc(clienteName(p.cliente_id))}</span></div>
       <div class="detail-item"><label>Parte contraria</label><span>${esc(p.parte_contraria || '—')}</span></div>
@@ -310,31 +340,24 @@ export async function openProcesoDetail(id, readonly = false) {
       </table>
     </div>
 
-    <h4 class="section-title" style="margin-top:24px;">Historial de actividades del caso${tip('Cada paso del caso en orden. Registre el avance (ej: "Respuesta del juzgado") y adjunte los archivos correspondientes.')}</h4>
-    ${readonly ? '' : `<div class="act-form" style="background: rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--line);">
+    <h4 class="section-title" style="margin-top:24px;">Línea de tiempo del expediente (Actuaciones procesales)${tip('Cada paso del caso en orden cronológico. Registre el avance judicial o administrativo y notifique al cliente en 1 clic por WhatsApp.')}</h4>
+    ${readonly ? '' : `<div class="act-form" style="background: rgba(0,0,0,0.06); padding: 14px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--line);">
       <div class="field-row" style="margin-bottom:8px">
         <input type="date" id="actFecha" value="${new Date().toISOString().slice(0,10)}" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)">
-        <input id="actDesc" placeholder="Descripción de la actividad (ej: Respuesta del juzgado, Nuevo memorial...)" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)">
+        <select id="actTipo" style="padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)">
+          ${TIPOS_ACTUACION.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('')}
+        </select>
+        <input id="actDesc" placeholder="Descripción de la actividad (ej: Respuesta del juzgado, Auto de admisión...)" style="flex-grow:2;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg)">
       </div>
       <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
         <div style="flex-grow:1;min-width:200px;"><label style="font-size:.8rem;color:var(--muted)">Documentos de respaldo (opcional, máx. 10 MB c/u)</label><input type="file" id="actFiles" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.txt,.png,.jpg,.jpeg,.webp,.gif,.svg" multiple><span class="cell-sub" id="actFilesPreview" style="display:block;margin-top:4px"></span></div>
-        <button class="btn btn--navy" id="btnActuacion">Agregar actividad</button>
+        <button class="btn btn--navy" id="btnActuacion">+ Registrar actuación</button>
       </div>
       <span class="cell-sub" id="actProgreso"></span>
     </div>`}
     
-    <div class="table-wrap" style="border-radius:8px; overflow:hidden; border: 1px solid var(--line);">
-      <table class="data" style="width:100%; margin:0;">
-        <thead style="background: rgba(0,0,0,0.2);">
-          <tr>
-            <th>Fecha</th>
-            <th>Descripción de la Actividad</th>
-            <th>Documentos / Archivos</th>
-            <th>Registrado por</th>
-          </tr>
-        </thead>
-        <tbody id="actList">${renderActs(acts || [], docs || [])}</tbody>
-      </table>
+    <div id="actTimelineContainer">
+      ${renderTimelineVertical(acts || [], docs || [], cli, p, readonly)}
     </div>
     ${state.profile.rol === 'cliente' ? `<div class="card" id="opinionProc" style="margin-top:18px"></div>` : ''}`;
 
@@ -424,12 +447,24 @@ export async function openProcesoDetail(id, readonly = false) {
       supabase.from('actuaciones').select('*').eq('proceso_id', id).order('fecha', { ascending: false }),
       supabase.from('documentos').select('*').eq('proceso_id', id).order('created_at', { ascending: false })
     ]);
-    $('#actList').innerHTML = renderActs(na || [], nd || []);
-    wireTimelineDocs(id, readonly, reloadTimeline);
+    if ($('#actTimelineContainer')) {
+      $('#actTimelineContainer').innerHTML = renderTimelineVertical(na || [], nd || [], cli, p, readonly);
+    }
+    wireTimelineDocs(id, readonly, reloadTimeline, na || [], cli, p);
     // Refresca también la lista general de documentos
     if ($('#docList')) { $('#docList').innerHTML = renderDocs((nd || []).filter(d => !d.actuacion_id), readonly); wireDocs(id); }
   }
-  wireTimelineDocs(id, readonly, reloadTimeline);
+  wireTimelineDocs(id, readonly, reloadTimeline, acts || [], cli, p);
+
+  if ($('#btnCopyTrackingModal')) {
+    $('#btnCopyTrackingModal').onclick = () => copiarEnlaceSeguimiento(codSeg);
+  }
+  if ($('#btnWaUltimoAvance')) {
+    $('#btnWaUltimoAvance').onclick = () => {
+      const ult = (acts && acts.length > 0) ? acts[0] : null;
+      enviarAvanceWhatsApp(cli, p, ult);
+    };
+  }
 
   // Vista previa + validación de los adjuntos de la actuación (varios archivos).
   const actFilesEl = $('#actFiles');
@@ -450,11 +485,15 @@ export async function openProcesoDetail(id, readonly = false) {
     btn.disabled = true; btn.textContent = 'Guardando...';
 
     // 1) Crear la actuación
+    const actTipoVal = $('#actTipo') ? $('#actTipo').value : 'Actuación';
     const { data: actData, error } = await supabase.from('actuaciones').insert({
-      proceso_id: id, fecha: $('#actFecha').value || new Date().toISOString().slice(0, 10),
-      descripcion: desc, created_by: state.profile.id
+      proceso_id: id,
+      fecha: $('#actFecha').value || new Date().toISOString().slice(0, 10),
+      tipo: actTipoVal,
+      descripcion: desc,
+      created_by: state.profile.id
     }).select().single();
-    if (error) { toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = 'Agregar al historial'; return; }
+    if (error) { toast('Error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '+ Registrar actuación'; return; }
     await logAccion('actuacion', 'proceso', id, desc.slice(0, 60));
 
     // Aviso automático al cliente del proceso (correo + push). No bloquea ni
@@ -482,7 +521,7 @@ export async function openProcesoDetail(id, readonly = false) {
       ok++;
     }
     prog.textContent = '';
-    btn.disabled = false; btn.textContent = 'Agregar al historial';
+    btn.disabled = false; btn.textContent = '+ Registrar actuación';
     $('#actDesc').value = ''; if ($('#actFiles')) $('#actFiles').value = '';
     if (window.__clearActDraft) window.__clearActDraft();
     await reloadTimeline();
@@ -558,9 +597,9 @@ function renderActs(acts, docs = []) {
   }).join('');
 }
 
-// Conecta los botones de descargar/eliminar de los adjuntos del historial
-function wireTimelineDocs(procId, readonly, reload) {
-  document.querySelectorAll('#actList .act-file').forEach(row => {
+// Conecta los botones de descargar/eliminar de los adjuntos del historial y los botones de WhatsApp
+function wireTimelineDocs(procId, readonly, reload, actsList = [], cli = null, proc = null) {
+  document.querySelectorAll('#actTimelineContainer .act-file, #actList .act-file').forEach(row => {
     const path = row.dataset.path, docId = row.dataset.id;
     const dl = row.querySelector('.js-tl-dl');
     if (dl) dl.onclick = async () => {
@@ -576,6 +615,15 @@ function wireTimelineDocs(procId, readonly, reload) {
       await logAccion('eliminar_documento', 'proceso', procId, path);
       if (reload) await reload();
       toast('Archivo eliminado.', 'success');
+    };
+  });
+
+  // Enviar avance individual por WhatsApp
+  document.querySelectorAll('#actTimelineContainer .js-wa-act').forEach(btn => {
+    btn.onclick = () => {
+      const actId = btn.dataset.actId;
+      const act = (actsList || []).find(a => a.id === actId);
+      enviarAvanceWhatsApp(cli, proc, act);
     };
   });
 }

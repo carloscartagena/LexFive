@@ -92,6 +92,30 @@
             </div>
         </section>
 
+        <!-- ===== Consulta y Seguimiento de Expedientes en Línea ===== -->
+        <section class="section section--light" id="consulta-expediente" style="background: linear-gradient(180deg, rgba(184, 148, 70, 0.08) 0%, rgba(10, 25, 47, 0.02) 100%); border-bottom: 1px solid var(--line); padding: 48px 0;">
+            <div class="container" style="max-width: 860px;">
+                <div style="text-align: center; margin-bottom: 28px;">
+                    <span class="tag" style="background: rgba(184,148,70,0.15); color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.78rem; padding: 4px 14px; border-radius: 20px;">Portal de Clientes LexFive</span>
+                    <h2 style="font-size: 2rem; color: var(--primary); margin: 12px 0 8px;">Seguimiento de Expedientes en Línea</h2>
+                    <p style="color: var(--muted); max-width: 620px; margin: 0 auto; font-size: 0.98rem; line-height: 1.6;">
+                        Ingrese el código confidencial de seguimiento provisto por su abogado (ej. <code>LX-1234567</code>) para consultar el estado procesal y los últimos actuados de su causa en tiempo real.
+                    </p>
+                </div>
+
+                <div class="card" style="background: var(--bg); border: 1.5px solid var(--line); box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 12px; padding: 24px;">
+                    <form id="formConsultaCaso" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" id="inputCodigoCaso" placeholder="Código de seguimiento (ej. LX-A1B2C3D)" style="flex: 1 1 280px; padding: 12px 16px; border: 1.5px solid var(--line); border-radius: 8px; font-size: 1rem; font-family: monospace; text-transform: uppercase;" required>
+                        <button type="submit" id="btnConsultarCaso" class="btn btn--primary" style="padding: 12px 24px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <span>Buscar expediente</span>
+                        </button>
+                    </form>
+
+                    <div id="resultadoCaso" style="margin-top: 18px;"></div>
+                </div>
+            </div>
+        </section>
+
         <!-- ===== Casos ===== -->
         <section class="section">
             <div class="container">
@@ -221,5 +245,6 @@
     </button>
 
     <script src="js/main.js?v=20260624"></script>
+    <script type="module" src="js/casos.js?v=20260624"></script>
 </body>
 </html>
