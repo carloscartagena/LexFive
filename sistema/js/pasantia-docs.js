@@ -40,10 +40,14 @@ export function fechaLarga(d) {
   const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (m) {
     const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const anio = parseInt(m[1], 10);
+    const mes = parseInt(m[2], 10) - 1;
     const dia = parseInt(m[3], 10);
-    const mes = meses[parseInt(m[2], 10) - 1];
-    const anio = m[1];
-    return `${dia} de ${mes} de ${anio}`;
+    const dt = new Date(anio, mes, dia);
+    const diaNum = dt.getDate();
+    const mesNom = meses[dt.getMonth()];
+    const anioNum = dt.getFullYear();
+    return `${diaNum} de ${mesNom} de ${anioNum}`;
   }
   return String(d);
 }
@@ -427,14 +431,15 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   const carrera = esc(d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017');
   const asignatura = esc(d.asignatura || 'CJR-410 Pasantía I');
   const notaDesig = esc(normalizarNotaDesig(d.nota_designacion || 'IIST-001/2026'));
-  const fechaNota = esc(d.fecha_nota_designacion || fechaLarga(d.fecha_emision || d.fecha));
+  const fechaNota = esc(d.fecha_nota_designacion || fechaLarga(d.fecha || d.fecha_emision));
   const horario = esc(d.horario || '14:00 a 18:00');
   const modalidadCompleta = esc(formatearModalidadYHorario(d.modalidad, horario));
   const fechaDoc = fechaLarga(d.fecha || d.fecha_emision || hoyISO());
 
   // Docente Guía
-  const docente = esc(d.docente_guia || 'Dr. Franklin Rubén Pareja Aliaga');
-  const docenteCargo = 'Docente Guía de la Materia de Pasantía · Carrera de Derecho UMSA';
+  const docenteNombreRaw = (d.docente_guia || '').trim();
+  const docente = docenteNombreRaw ? esc(docenteNombreRaw) : 'Docente Guía de la Materia de Pasantía – Carrera de Derecho UMSA';
+  const docenteCargo = docenteNombreRaw ? (d.docente_cargo ? esc(d.docente_cargo) : 'Docente Guía de la Materia de Pasantía · Carrera de Derecho UMSA') : 'Carrera de Derecho · Universidad Mayor de San Andrés';
 
   // Tutor / Supervisión Forense
   const sup = formatearSupervision(d.tutor_nombre, d.tutor_rpa);
@@ -635,44 +640,49 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
       En cumplimiento a los requerimientos normativos del Instituto de Investigaciones, Seminarios y Tesis (IIST) de la Carrera de Derecho, se adjunta al presente informe la documentación de respaldo que acredita fehacientemente la realización efectiva de la pasantía:
     </p>
 
-    <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:14px;background:transparent !important;">
+    <table style="width:100%;border-collapse:collapse;font-size:11.5pt !important;line-height:1.45 !important;margin-bottom:14px;background:transparent !important;table-layout:fixed;">
+      <colgroup>
+        <col style="width:7%;">
+        <col style="width:68%;">
+        <col style="width:25%;">
+      </colgroup>
       <thead>
         <tr style="background:transparent !important;border-bottom:2px solid #0e1b2c;border-top:1.5px solid #0e1b2c;color:#0e1b2c;">
-          <th style="padding:6px 8px;text-align:center;width:40px;border-bottom:2px solid #0e1b2c;">N.º</th>
-          <th style="padding:6px 10px;text-align:left;border-bottom:2px solid #0e1b2c;">Instrumento o Constancia de Respaldo</th>
-          <th style="padding:6px 8px;text-align:center;width:160px;border-bottom:2px solid #0e1b2c;">Verificación</th>
+          <th style="padding:8px 6px;text-align:center;border-bottom:2px solid #0e1b2c;">N.º</th>
+          <th style="padding:8px 10px;text-align:left;border-bottom:2px solid #0e1b2c;">Instrumento o Constancia de Respaldo</th>
+          <th style="padding:8px 8px;text-align:center;border-bottom:2px solid #0e1b2c;">Verificación</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">1</td>
-          <td style="padding:7px 10px;border-bottom:1px solid #d9dce1;"><strong>Nota Oficial de Designación de Pasantía</strong> emitida por la Dirección de Carrera / IIST</td>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;">${notaDesig}</td>
+          <td style="padding:8px 6px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">1</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #d9dce1;text-align:justify;"><strong>Nota Oficial de Designación de Pasantía</strong> emitida por la Dirección de Carrera / IIST</td>
+          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">${notaDesig}</td>
         </tr>
         <tr>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">2</td>
-          <td style="padding:7px 10px;border-bottom:1px solid #d9dce1;"><strong>Carta de Aceptación Institucional</strong> emitida por el Bufete de Abogados LexFive</td>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;">Original adjunto</td>
+          <td style="padding:8px 6px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">2</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #d9dce1;text-align:justify;"><strong>Carta de Aceptación Institucional</strong> emitida por el Bufete de Abogados LexFive</td>
+          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">Original adjunto</td>
         </tr>
         <tr>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">3</td>
-          <td style="padding:7px 10px;border-bottom:1px solid #d9dce1;"><strong>Certificado Oficial de Conclusión de Pasantía</strong> con código QR de verificación digital</td>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;">Ref. ${esc(d.ref || 'Verificable')}</td>
+          <td style="padding:8px 6px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">3</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #d9dce1;text-align:justify;"><strong>Certificado Oficial de Conclusión de Pasantía</strong> con código QR de verificación digital</td>
+          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">Ref. ${esc(d.ref || 'Verificable')}</td>
         </tr>
         <tr>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">4</td>
-          <td style="padding:7px 10px;border-bottom:1px solid #d9dce1;"><strong>Hoja de Control de Asistencia y Permanencia</strong> (jornadas hábiles con sellos institucionales)</td>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;">Formulario sellado</td>
+          <td style="padding:8px 6px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">4</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #d9dce1;text-align:justify;"><strong>Hoja de Control de Asistencia y Permanencia</strong> (jornadas hábiles con sellos institucionales)</td>
+          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">Formulario sellado</td>
         </tr>
         <tr>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">5</td>
-          <td style="padding:7px 10px;border-bottom:1px solid #d9dce1;"><strong>Muestrario de Actuaciones Forenses</strong> (copias simples de memoriales redactados y diligenciados)</td>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;">Compulsa adjunta</td>
+          <td style="padding:8px 6px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">5</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #d9dce1;text-align:justify;"><strong>Muestrario de Actuaciones Forenses</strong> (copias simples de memoriales redactados y diligenciados)</td>
+          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">Compulsa adjunta</td>
         </tr>
         <tr>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">6</td>
-          <td style="padding:7px 10px;border-bottom:1px solid #d9dce1;"><strong>Registro Fotográfico de Prácticas Forenses</strong> (acompañamiento en estrados e instalaciones)</td>
-          <td style="padding:7px;text-align:center;border-bottom:1px solid #d9dce1;">${fotos.length ? `${fotos.length} fotos adjuntas` : 'Fotografías anexas'}</td>
+          <td style="padding:8px 6px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">6</td>
+          <td style="padding:8px 10px;border-bottom:1px solid #d9dce1;text-align:justify;"><strong>Registro Fotográfico de Prácticas Forenses</strong> (acompañamiento en estrados e instalaciones)</td>
+          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">${fotos.length ? `${fotos.length} fotos adjuntas` : 'Fotografías anexas'}</td>
         </tr>
       </tbody>
     </table>
@@ -734,7 +744,7 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
   const carrera = esc(d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017');
   const asignatura = esc(d.asignatura || 'CJR-410 Pasantía I');
   const horario = esc(d.horario || '14:00 a 18:00');
-  const modalidadCompleta = esc(formatearModalidadYHorario(d.modalidad, horario));
+  const modalidad = esc(d.modalidad || '4 semanas a medio tiempo');
   const prellenar = d.prellenar_asistencia !== false;
   const ref = esc(d.ref || '');
 
@@ -745,17 +755,32 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
   const totalJornadas = jornadas.length;
   const totalHoras = totalJornadas * infoHoras.horas;
 
-  // 7 filas por página para que con Arial 11.5pt y padding cómodo entre holgado sin tocar pie
-  const filasPorPagina = 7;
-  const totalPags = Math.ceil(totalJornadas / filasPorPagina) || 1;
-  const paginasHtml = [];
+  // Paginación equilibrada que llena el 85%-92% de cada hoja Carta sin huecos
+  let pageSlices = [];
+  if (totalJornadas <= 10) {
+    pageSlices = [jornadas];
+  } else if (totalJornadas <= 22) {
+    const corteP1 = Math.min(11, Math.ceil(totalJornadas * 0.55));
+    pageSlices = [
+      jornadas.slice(0, corteP1),
+      jornadas.slice(corteP1)
+    ];
+  } else {
+    const p1 = 11;
+    pageSlices.push(jornadas.slice(0, p1));
+    let rem = jornadas.slice(p1);
+    while (rem.length > 10) {
+      pageSlices.push(rem.slice(0, 11));
+      rem = rem.slice(11);
+    }
+    if (rem.length) pageSlices.push(rem);
+  }
 
+  const totalPags = pageSlices.length;
+  const paginasHtml = [];
   const effectiveWmOp = (wmOp !== undefined && wmOp !== null && wmOp > 0) ? Number(wmOp) : 0.08;
 
-  for (let p = 0; p < totalPags; p++) {
-    const inicio = p * filasPorPagina;
-    const fin = Math.min(inicio + filasPorPagina, totalJornadas);
-    const slice = jornadas.slice(inicio, fin);
+  pageSlices.forEach((slice, p) => {
     const esUltima = (p === totalPags - 1);
 
     let rowsHtml = '';
@@ -768,71 +793,95 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
 
       rowsHtml += `
         <tr style="background:transparent !important;">
-          <td style="text-align:center;font-weight:bold;color:#444;font-size:11pt !important;padding:7px 5px;border:1px solid #d9dce1;">${j.numero}</td>
-          <td style="padding:7px 5px;font-size:10.5pt !important;text-align:center;border:1px solid #d9dce1;white-space:nowrap;">${fecha}</td>
-          <td style="padding:7px 5px;font-size:10.5pt !important;text-align:center;border:1px solid #d9dce1;">${ing}</td>
-          <td style="padding:7px 5px;font-size:10.5pt !important;text-align:center;border:1px solid #d9dce1;">${sal}</td>
-          <td style="padding:7px 8px;font-size:11pt !important;color:#101820;border:1px solid #d9dce1;line-height:1.4 !important;background:transparent !important;">${act}</td>
-          <td style="padding:7px 5px;font-size:11pt !important;text-align:center;border:1px solid #d9dce1;font-weight:bold;">${hrs}</td>
+          <td style="text-align:center;font-weight:bold;color:#444;font-size:11pt !important;padding:6px 4px;border:1px solid #d9dce1;vertical-align:middle;">${j.numero}</td>
+          <td style="padding:6px 4px;font-size:10.5pt !important;text-align:center;border:1px solid #d9dce1;white-space:nowrap;vertical-align:middle;">${fecha}</td>
+          <td style="padding:6px 4px;font-size:10.5pt !important;text-align:center;border:1px solid #d9dce1;vertical-align:middle;">${ing}</td>
+          <td style="padding:6px 4px;font-size:10.5pt !important;text-align:center;border:1px solid #d9dce1;vertical-align:middle;">${sal}</td>
+          <td style="padding:6px 8px;font-size:11pt !important;color:#101820;border:1px solid #d9dce1;line-height:1.4 !important;background:transparent !important;vertical-align:middle;text-align:left;">${act}</td>
+          <td style="padding:6px 4px;font-size:11pt !important;text-align:center;border:1px solid #d9dce1;font-weight:bold;vertical-align:middle;">${hrs}</td>
         </tr>
       `;
     });
 
-    const infoBoxHtml = `
-      <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.45);border-top:1px solid rgba(184,148,70,0.45);border-right:1px solid rgba(184,148,70,0.45);border-radius:4px;padding:6px 12px;margin-bottom:8px;font-size:11pt !important;line-height:1.45;color:#1a2332;background:transparent !important;">
-        <div style="display:grid;grid-template-columns:2.5fr 1fr 1fr;gap:6px;">
-          <div><strong>Estudiante / Pasante:</strong> ${nombre}</div>
-          <div><strong>C.I.:</strong> ${ci}</div>
-          <div><strong>R.U.:</strong> ${ru}</div>
+    // Recuadro superior formal de datos (Página 1: tabla de 2 columnas fijas 54%/46%; Páginas 2+: banner compacto)
+    let infoBoxHtml = '';
+    if (p === 0) {
+      infoBoxHtml = `
+        <table style="width:100%;border-collapse:collapse;background:transparent !important;border:1px solid rgba(184,148,70,0.45);border-left:3.5px solid #b89446;border-radius:4px;margin-bottom:8px;font-family:Arial,Helvetica,sans-serif !important;font-size:9.5pt !important;line-height:1.3 !important;table-layout:fixed;">
+          <colgroup>
+            <col style="width:54%;">
+            <col style="width:46%;">
+          </colgroup>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(184,148,70,0.22);">
+              <td style="padding:4px 8px;vertical-align:middle;color:#101820;"><strong>Estudiante / Pasante:</strong> ${nombre}</td>
+              <td style="padding:4px 8px;vertical-align:middle;color:#101820;"><strong>C.I.:</strong> ${ci} &nbsp;·&nbsp; <strong>R.U.:</strong> ${ru}</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(184,148,70,0.22);">
+              <td style="padding:4px 8px;vertical-align:middle;color:#101820;"><strong>Universidad:</strong> ${uni}</td>
+              <td style="padding:4px 8px;vertical-align:middle;color:#101820;"><strong>Carrera:</strong> ${carrera}</td>
+            </tr>
+            <tr>
+              <td style="padding:4px 8px;vertical-align:middle;color:#101820;"><strong>Asignatura:</strong> ${asignatura}</td>
+              <td style="padding:4px 8px;vertical-align:middle;color:#101820;"><strong>Modalidad:</strong> ${modalidad} &nbsp;·&nbsp; <strong>Horario:</strong> ${horario}</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    } else {
+      infoBoxHtml = `
+        <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.3);padding:4px 10px;margin-bottom:8px;font-size:9.5pt !important;color:#333;background:transparent !important;display:flex;justify-content:space-between;align-items:center;">
+          <div><strong>Pasante:</strong> ${nombre} &nbsp;·&nbsp; <strong>R.U.:</strong> ${ru}</div>
+          <div style="font-weight:bold;color:#8a6d2b;">Ref. N.º ${ref} (Continuación)</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:2px;">
-          <div><strong>Universidad:</strong> ${uni}</div>
-          <div><strong>Carrera:</strong> ${carrera}</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1.5fr 2.5fr;gap:6px;margin-top:2px;">
-          <div><strong>Asignatura:</strong> ${asignatura}</div>
-          <div><strong>Modalidad y Horario:</strong> ${modalidadCompleta}</div>
-        </div>
-      </div>
-    `;
+      `;
+    }
 
     const footerTotalesYFirma = esUltima ? `
-      <table style="width:100%;border-collapse:collapse;margin-top:6px;margin-bottom:8px;font-size:11pt !important;background:transparent !important;">
+      <table style="width:100%;border-collapse:collapse;margin-top:6px;margin-bottom:6px;font-size:10.5pt !important;background:transparent !important;table-layout:fixed;">
         <tr style="background:transparent !important;font-weight:bold;border-top:2px solid #0e1b2c;border-bottom:1.5px solid #0e1b2c;">
-          <td style="padding:6px 8px;border:1px solid #d9dce1;text-align:center;">TOTAL JORNADAS: ${totalJornadas}</td>
-          <td style="padding:6px 8px;border:1px solid #d9dce1;text-align:center;">CARGA HORARIA: ${totalHoras} hrs</td>
-          <td style="padding:6px 8px;border:1px solid #d9dce1;text-align:center;color:#16a34a;">ASISTENCIA: 100 %</td>
+          <td style="padding:5px 8px;border:1px solid #d9dce1;text-align:center;">TOTAL JORNADAS: ${totalJornadas}</td>
+          <td style="padding:5px 8px;border:1px solid #d9dce1;text-align:center;">CARGA HORARIA: ${totalHoras} hrs</td>
+          <td style="padding:5px 8px;border:1px solid #d9dce1;text-align:center;color:#16a34a;">ASISTENCIA: 100 %</td>
         </tr>
       </table>
 
-      <div style="border:1px solid #d9dce1;border-radius:6px;padding:8px 14px;background:transparent !important;margin-top:auto;">
-        <div style="text-align:center;font-size:9.5pt !important;font-weight:bold;color:#0e1b2c;letter-spacing:1px;margin-bottom:6px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
+      <div style="border:1px solid #d9dce1;border-radius:6px;padding:6px 14px;background:transparent !important;margin-top:auto;">
+        <div style="text-align:center;font-size:9pt !important;font-weight:bold;color:#0e1b2c;letter-spacing:1px;margin-bottom:4px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
         <div style="display:flex;justify-content:center;align-items:flex-end;">
           <div style="text-align:center;width:280px;">
-            <div style="min-height:45px;"></div>
-            <div style="border-top:1.2px solid #0e1b2c;padding-top:3px;font-size:11pt !important;font-weight:bold;color:#0e1b2c;">Sello y Firma · Abogado(a) Patrocinante</div>
-            <div style="font-size:9pt !important;color:#5c6675;">LexFive · Bufete de Abogados</div>
+            <div style="min-height:42px;"></div>
+            <div style="border-top:1.2px solid #0e1b2c;padding-top:3px;font-size:10.5pt !important;font-weight:bold;color:#0e1b2c;">Sello y Firma · Abogado(a) Patrocinante</div>
+            <div style="font-size:8.5pt !important;color:#5c6675;">LexFive · Bufete de Abogados</div>
           </div>
         </div>
       </div>
     ` : '';
 
     const contentPagina = `
-      <div style="text-align:right;font-size:10pt !important;color:#5c6675;margin-bottom:2px;">Ref. N.º ${ref} · Hoja de Asistencia</div>
-      <h1 style="text-align:center;font-size:13.5pt !important;letter-spacing:1px;color:#0e1b2c;margin:2px 0 1px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif !important;">HOJA DE CONTROL DE ASISTENCIA Y PERMANENCIA</h1>
-      <div style="text-align:center;font-size:10.5pt !important;color:#a8853c;letter-spacing:1px;margin-bottom:8px;font-weight:bold;">PRÁCTICA PRE-PROFESIONAL / PASANTÍA JURÍDICA ${totalPags > 1 ? `· (Parte ${p + 1} de ${totalPags})` : ''}</div>
+      <div style="text-align:right;font-size:9.5pt !important;color:#5c6675;margin-bottom:2px;">Ref. N.º ${ref} · Hoja de Asistencia</div>
+      <h1 style="text-align:center;font-size:13pt !important;letter-spacing:1px;color:#0e1b2c;margin:1px 0 1px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif !important;">HOJA DE CONTROL DE ASISTENCIA Y PERMANENCIA</h1>
+      <div style="text-align:center;font-size:10pt !important;color:#a8853c;letter-spacing:1px;margin-bottom:6px;font-weight:bold;">PRÁCTICA PRE-PROFESIONAL / PASANTÍA JURÍDICA ${totalPags > 1 ? `· (Página ${p + 1} de ${totalPags})` : ''}</div>
 
       ${infoBoxHtml}
 
-      <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:6px;background:transparent !important;">
+      <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:4px;background:transparent !important;table-layout:fixed;">
+        <colgroup>
+          <col style="width:6%;">
+          <col style="width:13%;">
+          <col style="width:9%;">
+          <col style="width:9%;">
+          <col style="width:56%;">
+          <col style="width:7%;">
+        </colgroup>
         <thead>
           <tr style="background:transparent !important;border-bottom:2px solid #0e1b2c;border-top:1.5px solid #0e1b2c;color:#0e1b2c;">
-            <th style="padding:6px 4px;width:34px;border:1px solid #d9dce1;text-align:center;">N.º</th>
-            <th style="padding:6px 4px;width:75px;border:1px solid #d9dce1;text-align:center;">Fecha</th>
-            <th style="padding:6px 4px;width:55px;border:1px solid #d9dce1;text-align:center;">Ingreso</th>
-            <th style="padding:6px 4px;width:55px;border:1px solid #d9dce1;text-align:center;">Salida</th>
-            <th style="padding:6px 8px;border:1px solid #d9dce1;text-align:left;">Actividades y Tareas Jurídicas Desarrolladas</th>
-            <th style="padding:6px 4px;width:44px;border:1px solid #d9dce1;text-align:center;">Hrs.</th>
+            <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">N.º</th>
+            <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Fecha</th>
+            <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Ingreso</th>
+            <th style="padding:5px 4px;border:1px solid #d9dce1;text-align:center;">Salida</th>
+            <th style="padding:5px 8px;border:1px solid #d9dce1;text-align:left;">Actividades y Tareas Jurídicas Desarrolladas</th>
+            <th style="padding:5px 3px;border:1px solid #d9dce1;text-align:center;">Hrs.</th>
           </tr>
         </thead>
         <tbody>
@@ -854,16 +903,16 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
     paginasHtml.push(`
       <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:Arial,Helvetica,sans-serif !important;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
         ${membreteHeader(model, logoSrc)}
-        <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:12px 2.1cm 26px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
+        <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:10px 2.1cm 22px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
           ${wmHTML}
-          <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;font-family:Arial,Helvetica,sans-serif !important;font-size:11.5pt !important;line-height:1.45 !important;">
+          <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;font-family:Arial,Helvetica,sans-serif !important;font-size:11pt !important;line-height:1.4 !important;">
             ${contentPagina}
           </div>
         </div>
         ${footHTML}
       </div>
     `);
-  }
+  });
 
   return paginasHtml.join('');
 }
@@ -879,15 +928,16 @@ export function buildInformeWordDocument(d, logoSrc) {
   const carrera = esc(d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017');
   const asignatura = esc(d.asignatura || 'CJR-410 Pasantía I');
   const notaDesig = esc(normalizarNotaDesig(d.nota_designacion || 'IIST-001/2026'));
-  const fechaNota = esc(d.fecha_nota_designacion || fechaLarga(d.fecha_emision || d.fecha));
+  const fechaNota = esc(d.fecha_nota_designacion || fechaLarga(d.fecha || d.fecha_emision));
   const horario = esc(d.horario || '14:00 a 18:00');
   const modalidadCompleta = esc(formatearModalidadYHorario(d.modalidad, horario));
   const fechaDoc = fechaLarga(d.fecha || d.fecha_emision || hoyISO());
   const ref = esc(d.ref || 'LF-2026-00000');
 
   // Docente Guía
-  const docente = esc(d.docente_guia || 'Dr. Franklin Rubén Pareja Aliaga');
-  const docenteCargo = 'Docente Guía de la Materia de Pasantía · Carrera de Derecho UMSA';
+  const docenteNombreRaw = (d.docente_guia || '').trim();
+  const docente = docenteNombreRaw ? esc(docenteNombreRaw) : 'Docente Guía de la Materia de Pasantía – Carrera de Derecho UMSA';
+  const docenteCargo = docenteNombreRaw ? (d.docente_cargo ? esc(d.docente_cargo) : 'Docente Guía de la Materia de Pasantía · Carrera de Derecho UMSA') : 'Carrera de Derecho · Universidad Mayor de San Andrés';
 
   // Tutor / Supervisión
   const sup = formatearSupervision(d.tutor_nombre, d.tutor_rpa);

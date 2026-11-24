@@ -272,9 +272,9 @@ export async function renderCertificados() {
                 <div class="field"><label>Universidad</label><input id="ce_uni_pas" value="Universidad Mayor de San Andrés (UMSA)"></div>
                 <div class="field"><label>Carrera y Plan de Estudios</label><input id="ce_carrera_plan" value="Carrera de Derecho – Plan de Estudios 2017"></div>
                 <div class="field"><label>Asignatura</label><input id="ce_asignatura" value="CJR-410 Pasantía I"></div>
-                <div class="field"><label>Docente Guía (para el Informe)</label><input id="ce_docente_guia" placeholder="Ej: Dr. Franklin Rubén Pareja Aliaga" value="Dr. Franklin Rubén Pareja Aliaga"></div>
-                <div class="field"><label>Abogado(a) Patrocinante / Tutor(a) (para el Informe)</label><input id="ce_tutor_nombre" placeholder="Ej: Abg. Carlos Cartagena (opcional)"></div>
-                <div class="field"><label>R.P.A. del Tutor(a) (opcional)</label><input id="ce_tutor_rpa" placeholder="Ej: 9876543-LP"></div>
+                <div class="field"><label>Docente Guía (para el Informe)</label><input id="ce_docente_guia" placeholder="Ej. Dr. Marcelo Silva Mollinedo" value=""></div>
+                <div class="field"><label>Abogado(a) Patrocinante / Tutor(a) (para el Informe)</label><input id="ce_tutor_nombre" placeholder="Opcional: dejar vacío para formato institucional" value=""></div>
+                <div class="field"><label>R.P.A. del Tutor(a) (opcional)</label><input id="ce_tutor_rpa" placeholder="Ej. 6059319 ZCCA" value=""></div>
                 <div class="field"><label>N.º de Nota de Designación</label><input id="ce_nota_desig" placeholder="Ej: IIST-CA-003/2026 (opcional)"></div>
                 <div class="field"><label>Fecha de Nota</label><input id="ce_fecha_nota" type="date"></div>
                 <div class="field"><label>Fecha de inicio</label><input id="ce_fecha_inicio" type="date"></div>
@@ -436,13 +436,15 @@ export async function renderCertificados() {
     carrera: val('ce_carrera'),
     horas: val('ce_horas'),
     destinatario: val('ce_dest'),
+    fecha: val('ce_fecha'),
+    fecha_emision: val('ce_fecha'),
     // Pasantía universitaria
     genero: val('ce_genero') || 'femenino',
     prellenar_asistencia: $('#ce_prellenar_asistencia') ? $('#ce_prellenar_asistencia').checked : true,
     registro_universitario: val('ce_ru'),
     carrera_plan: val('ce_carrera_plan') || 'Carrera de Derecho – Plan de Estudios 2017',
     asignatura: val('ce_asignatura') || 'CJR-410 Pasantía I',
-    docente_guia: val('ce_docente_guia') || 'Dr. Franklin Rubén Pareja Aliaga',
+    docente_guia: val('ce_docente_guia'),
     tutor_nombre: val('ce_tutor_nombre'),
     tutor_rpa: val('ce_tutor_rpa'),
     nota_designacion: val('ce_nota_desig'),
@@ -585,9 +587,25 @@ export async function renderCertificados() {
 
   // Registra el certificado en la nube (best-effort) para que sea verificable
   // por su N.º de referencia. Si la tabla aún no existe (db/25), no pasa nada.
-  const registrarCert = () => {
+  const registrarCert = async () => {
     try {
       const tipoCert = esPasantia() ? 'pasantia' : 'trabajo';
+      const docGuia = val('ce_docente_guia');
+      const tutNom = val('ce_tutor_nombre');
+      const tutRpa = val('ce_tutor_rpa');
+      const genVal = val('ce_genero') || 'femenino';
+
+      // Respaldo local inmediato indexado por ref
+      try {
+        const extraPayload = {
+          docente_guia: docGuia,
+          tutor_nombre: tutNom,
+          tutor_rpa: tutRpa,
+          genero: genVal
+        };
+        localStorage.setItem('lexfive_cert_extra_' + refActual, JSON.stringify(extraPayload));
+      } catch (_) {}
+
       const row = {
         ref: refActual,
         tipo: tplActual().titulo,
@@ -599,10 +617,14 @@ export async function renderCertificados() {
         cuerpo: $('#ce_cuerpo').value || null,
         fecha_emision: val('ce_fecha') || null,
         // Pasantía
+        genero: genVal,
         registro_universitario: val('ce_ru') || null,
         universidad: esPasantia() ? (val('ce_uni_pas') || null) : (val('ce_uni') || null),
         carrera_plan: val('ce_carrera_plan') || null,
         asignatura: val('ce_asignatura') || null,
+        docente_guia: docGuia || null,
+        tutor_nombre: tutNom || null,
+        tutor_rpa: tutRpa || null,
         nota_designacion: val('ce_nota_desig') || null,
         fecha_nota_designacion: val('ce_fecha_nota') || null,
         modalidad: val('ce_modalidad') || null,
@@ -614,7 +636,24 @@ export async function renderCertificados() {
       // Solo al crear uno nuevo se fija el autor; al editar se conserva el original.
       if (!editando) row.created_by = state.profile.id;
       guardadoActual = true;
-      supabase.from('certificados').upsert(row, { onConflict: 'ref' }).then(() => { cargarEmitidos(); }, () => {});
+
+      try {
+        const { error } = await supabase.from('certificados').upsert(row, { onConflict: 'ref' });
+        if (error) {
+          // Tolerancia ante columna inexistente antes de ejecutar la migración SQL
+          if (error.code === '42703' || (error.message && error.message.includes('column'))) {
+            const fallbackRow = Object.assign({}, row);
+            delete fallbackRow.docente_guia;
+            delete fallbackRow.tutor_nombre;
+            delete fallbackRow.tutor_rpa;
+            delete fallbackRow.genero;
+            await supabase.from('certificados').upsert(fallbackRow, { onConflict: 'ref' });
+          }
+        }
+      } catch (errSup) {
+        console.warn('Upsert en Supabase con fallback local:', errSup);
+      }
+      cargarEmitidos();
     } catch (e) { /* ignorado */ }
   };
 
@@ -768,9 +807,22 @@ export async function renderCertificados() {
     if (c.fecha_fin && $('#ce_fecha_fin')) $('#ce_fecha_fin').value = (c.fecha_fin || '').slice(0, 10);
     if (c.modalidad && $('#ce_modalidad')) $('#ce_modalidad').value = c.modalidad;
     if (c.horario && $('#ce_horario')) $('#ce_horario').value = c.horario;
-    if (c.docente_guia && $('#ce_docente_guia')) $('#ce_docente_guia').value = c.docente_guia;
-    if (c.tutor_nombre && $('#ce_tutor_nombre')) $('#ce_tutor_nombre').value = c.tutor_nombre;
-    if (c.tutor_rpa && $('#ce_tutor_rpa')) $('#ce_tutor_rpa').value = c.tutor_rpa;
+    // Respaldo local de campos adicionales
+    let localExtra = {};
+    try {
+      const stored = localStorage.getItem('lexfive_cert_extra_' + (c.id || c.ref)) || localStorage.getItem('lexfive_cert_extra_' + c.ref);
+      if (stored) localExtra = JSON.parse(stored);
+    } catch (_) {}
+
+    const docGuiaVal = (c.docente_guia !== undefined && c.docente_guia !== null) ? c.docente_guia : (localExtra.docente_guia || '');
+    const tutNomVal = (c.tutor_nombre !== undefined && c.tutor_nombre !== null) ? c.tutor_nombre : (localExtra.tutor_nombre || '');
+    const tutRpaVal = (c.tutor_rpa !== undefined && c.tutor_rpa !== null) ? c.tutor_rpa : (localExtra.tutor_rpa || '');
+    const generoVal = (c.genero !== undefined && c.genero !== null) ? c.genero : (localExtra.genero || 'femenino');
+
+    if ($('#ce_docente_guia')) $('#ce_docente_guia').value = docGuiaVal;
+    if ($('#ce_tutor_nombre')) $('#ce_tutor_nombre').value = tutNomVal;
+    if ($('#ce_tutor_rpa')) $('#ce_tutor_rpa').value = tutRpaVal;
+    if ($('#ce_genero')) $('#ce_genero').value = generoVal;
     if (typeof c.incluir_sello_digital === 'boolean' && $('#ce_sello')) $('#ce_sello').checked = c.incluir_sello_digital;
     $('#ce_cuerpo').value = cuerpoGuardado || tpl.cuerpo(datos());
     cuerpoEditado = true;
@@ -801,7 +853,8 @@ export async function renderCertificados() {
     const editorWrap = $('#ce_jornadas_editor_wrap');
     if (editorWrap) editorWrap.style.display = 'none';
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
-     'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+     'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario',
+     'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
     if ($('#ce_genero')) $('#ce_genero').value = 'femenino';
     if ($('#ce_prellenar_asistencia')) $('#ce_prellenar_asistencia').checked = true;
     if ($('#ce_uni_pas')) $('#ce_uni_pas').value = 'Universidad Mayor de San Andrés (UMSA)';
@@ -834,7 +887,8 @@ export async function renderCertificados() {
     const el = $('#' + id); if (!el) return;
     el.oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
-  ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero', 'ce_feriados_extra'].forEach(id => {
+  ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero', 'ce_feriados_extra',
+   'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_fecha'].forEach(id => {
     const el = $('#' + id); if (!el) return;
     const handler = () => {
       forkSiNecesario();
@@ -1014,7 +1068,7 @@ export async function renderCertificados() {
     else forkSiNecesario();
     regenerar(); pintar();
   };
-  $('#ce_fecha').onchange = () => { forkSiNecesario(); pintar(); };
+  // $('#ce_fecha') ya está enlazado en el listener multivariable superior
   $('#ce_cuerpo').oninput = () => { forkSiNecesario(); cuerpoEditado = true; pintar(); };
   $('#ce_restaurar').onclick = () => { regenerar(); pintar(); toast('Texto regenerado a partir de los datos.', 'success'); };
   const btnNuevo = $('#ce_nuevo'); if (btnNuevo) btnNuevo.onclick = nuevoCert;

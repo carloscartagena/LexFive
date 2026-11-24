@@ -111,8 +111,8 @@ export async function renderInforme() {
     in_horario: '14:00 a 18:00',
     in_feriados_extra: '',
     in_enfoque: '',
-    in_docente: 'Dr. Franklin Rubén Pareja Aliaga',
-    in_docente_cargo: 'Docente de la Carrera de Derecho – Guía de la Materia de Pasantía',
+    in_docente: '',
+    in_docente_cargo: '',
     in_tutor_nombre: '',
     in_tutor_rpa: '',
     in_supervision: 'Abogado(a) Patrocinante – LexFive Bufete de Abogados',
@@ -138,6 +138,9 @@ export async function renderInforme() {
     V.in_fecha_fin = precargado.fecha_fin ? precargado.fecha_fin.slice(0, 10) : V.in_fecha_fin;
     V.in_modalidad = precargado.modalidad || V.in_modalidad;
     V.in_horario = precargado.horario || V.in_horario;
+    if (precargado.docente_guia !== undefined) V.in_docente = precargado.docente_guia || '';
+    if (precargado.tutor_nombre !== undefined) V.in_tutor_nombre = precargado.tutor_nombre || '';
+    if (precargado.tutor_rpa !== undefined) V.in_tutor_rpa = precargado.tutor_rpa || '';
     V.in_ref = precargado.ref || '';
     V.in_conclusiones = generarConclusionesTexto(V.in_genero);
   }
@@ -214,8 +217,8 @@ export async function renderInforme() {
       <div class="card__head"><h3>🎓 Destinatario, Docente Guía y Supervisión</h3></div>
       <div class="card__body">
         <div class="cert-form">
-          ${campo('in_docente', 'Docente Guía / Destinatario (A:)', V.in_docente)}
-          ${campo('in_docente_cargo', 'Cargo del Docente Guía', V.in_docente_cargo)}
+          ${campo('in_docente', 'Docente Guía / Destinatario (A:)', V.in_docente, 'Ej. Dr. Marcelo Silva Mollinedo')}
+          ${campo('in_docente_cargo', 'Cargo del Docente Guía', V.in_docente_cargo, 'Docente Guía de la Materia de Pasantía · Carrera de Derecho UMSA')}
           ${campo('in_tutor_nombre', 'Abogado(a) Patrocinante / Tutor(a) (opcional)', V.in_tutor_nombre, 'Ej: Abg. Carlos Cartagena')}
           ${campo('in_tutor_rpa', 'R.P.A. del Tutor(a) (opcional)', V.in_tutor_rpa, 'Ej: 9876543-LP')}
           ${campo('in_supervision', 'Supervisión Institucional en Bufete (texto resumen)', V.in_supervision)}
@@ -518,7 +521,7 @@ export async function renderInforme() {
     const el = $('#' + id); if (el) el.oninput = () => { pintar(); saveDraft(); };
   });
 
-  ['in_genero', 'in_fecha_nota', 'in_fecha_inicio', 'in_fecha_fin', 'in_modalidad', 'in_fecha_pres', 'in_feriados_extra', 'in_modo_pres'].forEach(id => {
+  ['in_genero', 'in_fecha_nota', 'in_fecha_inicio', 'in_fecha_fin', 'in_modalidad', 'in_fecha_pres', 'in_feriados_extra', 'in_modo_pres', 'in_docente', 'in_docente_cargo', 'in_tutor_nombre', 'in_tutor_rpa'].forEach(id => {
     const el = $('#' + id);
     if (el) {
       el.onchange = () => {
@@ -551,6 +554,9 @@ export async function renderInforme() {
       if ($('#in_uni')) $('#in_uni').value = c.universidad || 'Universidad Mayor de San Andrés (UMSA)';
       if ($('#in_carrera')) $('#in_carrera').value = c.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017';
       if ($('#in_asignatura')) $('#in_asignatura').value = c.asignatura || 'CJR-410 Pasantía I';
+      if ($('#in_docente')) $('#in_docente').value = c.docente_guia || '';
+      if ($('#in_tutor_nombre')) $('#in_tutor_nombre').value = c.tutor_nombre || '';
+      if ($('#in_tutor_rpa')) $('#in_tutor_rpa').value = c.tutor_rpa || '';
       if ($('#in_nota_desig')) $('#in_nota_desig').value = c.nota_designacion || '';
       if ($('#in_fecha_nota')) $('#in_fecha_nota').value = (c.fecha_nota_designacion || hoyISO()).slice(0, 10);
       if ($('#in_fecha_inicio')) $('#in_fecha_inicio').value = (c.fecha_inicio || hoyISO()).slice(0, 10);
