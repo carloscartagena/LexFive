@@ -1,8 +1,7 @@
 // ============================================================
 //  LexFive — Generador Unificado de Documentos de Pasantía
 //  (Hoja de Asistencia Multipágina, Informe Único Académico en Arial 12 · 1.5,
-//  y Exportaciones a PDF, Impresión y Word .doc)
-//  Fondos 100% transparentes sobre papel membretado y marca de agua institucional.
+//  y Exportación PDF Hoja por Hoja sin Lienzos en Blanco)
 // ============================================================
 import { esc, hoyISO } from './util.js';
 import { toast } from './ui.js';
@@ -247,7 +246,6 @@ export function generarConclusionesTexto(genero, nombrePasante = '') {
 
 // ----------------------------------------------------------------------
 // 1. RENDERIZADO DE HOJA CARTA MEMBRETADA (ARIAL 12 · INTERLINEADO 1.5)
-//    FONDO 100% TRANSPARENTE PARA QUE LA MARCA DE AGUA SE VEA IMPECABLE
 // ----------------------------------------------------------------------
 export function renderPaginaHoja({ model, logoSrc, numPag, totalPags, contentHTML, wmOp, modoPresentacion }) {
   const isAcademico = modoPresentacion === 'umsa';
@@ -280,11 +278,11 @@ export function renderPaginaHoja({ model, logoSrc, numPag, totalPags, contentHTM
   ` : '';
 
   return `
-  <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:Arial,Helvetica,sans-serif !important;font-size:12pt !important;line-height:1.5 !important;text-align:justify;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
+  <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:Arial,Helvetica,sans-serif !important;font-size:12pt !important;line-height:1.45 !important;text-align:justify;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
     ${headHTML}
-    <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:12px 2.1cm 32px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
+    <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:10px 2.1cm 26px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
       ${wmHTML}
-      <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;font-family:Arial,Helvetica,sans-serif !important;font-size:12pt !important;line-height:1.5 !important;">
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;font-family:Arial,Helvetica,sans-serif !important;font-size:12pt !important;line-height:1.45 !important;">
         ${contentHTML}
       </div>
     </div>
@@ -293,8 +291,7 @@ export function renderPaginaHoja({ model, logoSrc, numPag, totalPags, contentHTM
 }
 
 // ----------------------------------------------------------------------
-// 2. INFORME ÚNICO DE PASANTÍA (PAGINACIÓN REAL 2-3 JORNADAS POR HOJA)
-//    ARIAL 12 · INTERLINEADO 1.5 · FONDOS TRANSPARENTES
+// 2. INFORME ÚNICO DE PASANTÍA (PAGINACIÓN BALANCEADA DE 3 JORNADAS POR HOJA)
 // ----------------------------------------------------------------------
 export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   const nombre = esc(d.nombre || '___________________');
@@ -313,7 +310,7 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   const docente = esc(d.docente_guia || 'Dr. Franklin Rubén Pareja Aliaga');
   const docenteCargo = 'Docente Guía de la Materia de Pasantía · Carrera de Derecho UMSA';
 
-  // Tutor / Supervisión con verificación de títulos profesionales
+  // Tutor / Supervisión Forense
   const sup = formatearSupervision(d.tutor_nombre, d.tutor_rpa);
 
   const antecedentes = esc(d.antecedentes || `1) Guía de Procedimiento para Pasantías en la Carrera de Derecho, aprobada mediante Resolución del Honorable Consejo Universitario N.º 104/2016.\n2) Nota de Designación de Pasantía ${notaDesig} de fecha ${fechaNota}.`);
@@ -322,24 +319,23 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   const modo = d.modo_presentacion || 'lexfive';
 
   // --- HOJA 1: PORTADA INSTITUCIONAL, CARACTERÍSTICAS Y ANTECEDENTES ---
-  // Fondo 100% transparente con bordes limpios dorados
   const pag1HTML = `
-    <div style="text-align:center;margin-bottom:12px;background:transparent !important;">
-      <h1 style="font-size:13pt !important;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin:0 0 4px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif !important;">INFORME ÚNICO DE PASANTÍA</h1>
+    <div style="text-align:center;margin-bottom:10px;background:transparent !important;">
+      <h1 style="font-size:13pt !important;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin:0 0 3px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif !important;">INFORME ÚNICO DE PASANTÍA</h1>
       <div style="font-size:11pt !important;font-weight:bold;color:#a8853c;letter-spacing:0.5px;text-transform:uppercase;">${uni} · ${carrera}</div>
       <div style="font-size:10pt !important;color:#555;margin-top:2px;">ASIGNATURA: ${asignatura}</div>
     </div>
 
-    <div style="border-top:1.5px solid #0e1b2c;border-bottom:1.5px solid #0e1b2c;padding:8px 0;margin-bottom:12px;font-size:11pt !important;line-height:1.45;background:transparent !important;">
-      <div style="display:grid;grid-template-columns:85px 1fr;gap:4px;margin-bottom:3px;">
+    <div style="border-top:1.5px solid #0e1b2c;border-bottom:1.5px solid #0e1b2c;padding:6px 0;margin-bottom:10px;font-size:11pt !important;line-height:1.4;background:transparent !important;">
+      <div style="display:grid;grid-template-columns:85px 1fr;gap:4px;margin-bottom:2px;">
         <strong>A:</strong>
         <div><strong>${docente}</strong><br><span style="font-size:9.5pt !important;color:#444;">${docenteCargo}</span></div>
       </div>
-      <div style="display:grid;grid-template-columns:85px 1fr;gap:4px;margin-bottom:3px;">
+      <div style="display:grid;grid-template-columns:85px 1fr;gap:4px;margin-bottom:2px;">
         <strong>DE:</strong>
         <div><strong>Univ. ${nombre}</strong> &nbsp;|&nbsp; R.U.: ${ru} &nbsp;|&nbsp; C.I.: ${ci}</div>
       </div>
-      <div style="display:grid;grid-template-columns:85px 1fr;gap:4px;margin-bottom:3px;">
+      <div style="display:grid;grid-template-columns:85px 1fr;gap:4px;margin-bottom:2px;">
         <strong>REF.:</strong>
         <div><strong>INFORME ÚNICO DE PASANTÍA PRE-PROFESIONAL (${asignatura})</strong></div>
       </div>
@@ -349,52 +345,80 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
       </div>
     </div>
 
-    <p style="margin:0 0 8px;font-weight:bold;font-size:12pt !important;">Señor Docente Guía:</p>
-    <p style="margin:0 0 10px;text-align:justify;text-indent:18px;font-size:12pt !important;line-height:1.5 !important;">
+    <p style="margin:0 0 6px;font-weight:bold;font-size:12pt !important;">Señor Docente Guía:</p>
+    <p style="margin:0 0 8px;text-align:justify;text-indent:18px;font-size:12pt !important;line-height:1.45 !important;">
       A tiempo de hacerle llegar un cordial y distinguido saludo, en cumplimiento a las normativas vigentes de la Carrera de Derecho de la Universidad Mayor de San Andrés, pongo a su consideración el presente <strong>Informe Único de Pasantía</strong>, el cual documenta pormenorizadamente las actividades, diligencias y labores técnico-jurídicas desarrolladas durante mi permanencia en calidad de Pasante en el Bufete de Abogados LexFive, bajo las siguientes especificaciones:
     </p>
 
-    <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.45);border-top:1px solid rgba(184,148,70,0.45);border-right:1px solid rgba(184,148,70,0.45);border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:11pt !important;line-height:1.45;background:transparent !important;">
-      <div style="margin-bottom:4px;"><strong>• Institución Receptora:</strong> Bufete de Abogados LexFive (Área de Litigio, Asesoría Jurídica y Diligenciamiento Procesal).</div>
-      <div style="margin-bottom:4px;"><strong>• Duración y Modalidad:</strong> ${modalidadCompleta}.</div>
-      <div style="margin-bottom:4px;"><strong>• Supervisión Forense:</strong> ${sup.html}.</div>
+    <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.45);border-top:1px solid rgba(184,148,70,0.45);border-right:1px solid rgba(184,148,70,0.45);border-radius:4px;padding:6px 12px;margin-bottom:10px;font-size:11pt !important;line-height:1.4;background:transparent !important;">
+      <div style="margin-bottom:3px;"><strong>• Institución Receptora:</strong> Bufete de Abogados LexFive (Área de Litigio, Asesoría Jurídica y Diligenciamiento Procesal).</div>
+      <div style="margin-bottom:3px;"><strong>• Duración y Modalidad:</strong> ${modalidadCompleta}.</div>
+      <div style="margin-bottom:3px;"><strong>• Supervisión Forense:</strong> ${sup.html}.</div>
       <div><strong>• Ubicación del Despacho:</strong> Av. Alfredo Franco Valle N.º 708-51, Edif. Real, Planta Baja Of. A-6, Ciudad de El Alto - Bolivia.</div>
     </div>
 
-    <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:6px;border-bottom:1.5px solid #0e1b2c;padding-bottom:2px;">I. ANTECEDENTES Y MARCO NORMATIVO</div>
-    <div style="white-space:pre-line;text-align:justify;font-size:12pt !important;line-height:1.5 !important;">${antecedentes}</div>
+    <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:4px;border-bottom:1.5px solid #0e1b2c;padding-bottom:2px;">I. ANTECEDENTES Y MARCO NORMATIVO</div>
+    <div style="white-space:pre-line;text-align:justify;font-size:12pt !important;line-height:1.45 !important;">${antecedentes}</div>
   `;
 
-  // --- CRONOGRAMA DE ACTIVIDADES EN ARIAL 12 CON 2 A 3 JORNADAS POR HOJA ---
-  // Distribución holgada y cómoda que garantiza cero solapamientos
+  // --- CRONOGRAMA DE ACTIVIDADES EN ARIAL 12 CON 3 JORNADAS POR HOJA ---
   const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad, d.feriados_extra, d.customTareas);
   const paginasActividades = [];
 
+  // Agrupar jornadas por semanas naturales (5 jornadas por semana) para títulos formales
+  const nombresSemanas = ['PRIMERA SEMANA', 'SEGUNDA SEMANA', 'TERCERA SEMANA', 'CUARTA SEMANA', 'QUINTA SEMANA'];
+  const numerosRomanos = ['I', 'II', 'III', 'IV', 'V'];
+
   if (jornadas.length) {
-    const jornadasPorPagina = 2; // 2 a 3 jornadas por hoja para permitir texto rico en Arial 12 y 1.5
+    const jornadasPorPagina = 3; // 3 jornadas por hoja Carta llena cómodamente la página
+    let semanaAnterior = null;
+
     for (let i = 0; i < jornadas.length; i += jornadasPorPagina) {
       const slice = jornadas.slice(i, i + jornadasPorPagina);
-      const primeraJornada = slice[0];
-      const ultimaJornada = slice[slice.length - 1];
+      const semActualNum = slice[0].semanaIdx || Math.floor((slice[0].numero - 1) / 5) + 1;
+      const semActualIndex = semActualNum - 1;
+      const nombreSemana = nombresSemanas[semActualIndex] || `SEMANA ${semActualNum}`;
+      const romano = numerosRomanos[semActualIndex] || `${semActualNum}`;
+
+      // Calcular rango real de fechas para esta semana
+      const jornadasEstaSemana = jornadas.filter(j => (j.semanaIdx || Math.floor((j.numero - 1) / 5) + 1) === semActualNum);
+      const fechaIniSem = jornadasEstaSemana[0]?.fecha || '';
+      const fechaFinSem = jornadasEstaSemana[jornadasEstaSemana.length - 1]?.fecha || '';
+      const rangoSemTxt = (fechaIniSem && fechaFinSem) ? ` (del ${fechaIniSem} al ${fechaFinSem})` : '';
+
+      const esContinuacion = (semanaAnterior === semActualNum);
+      semanaAnterior = semActualNum;
+
+      const headerTitulo = i === 0 ? `
+        <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:6px;border-bottom:1.5px solid #0e1b2c;padding-bottom:2px;background:transparent !important;">
+          II. DETALLE CRONOLÓGICO DE FUNCIONES Y ACTIVIDADES REALIZADAS
+        </div>
+      ` : '';
+
+      const semanaBanner = esContinuacion ? `
+        <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-bottom:10px;font-size:11.5pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
+          ${romano}. ${nombreSemana} (Continuación)
+        </div>
+      ` : `
+        <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-bottom:10px;font-size:12pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
+          ${romano}. ${nombreSemana}${rangoSemTxt}
+        </div>
+      `;
 
       let pagContent = `
-        <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:8px;border-bottom:1.5px solid #0e1b2c;padding-bottom:3px;background:transparent !important;">
-          ${i === 0 ? 'II. DETALLE CRONOLÓGICO DE FUNCIONES Y ACTIVIDADES REALIZADAS' : 'II. DETALLE CRONOLÓGICO DE FUNCIONES (Continuación)'}
-        </div>
-        <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.35);padding:3px 10px;margin-bottom:12px;font-size:12pt !important;font-weight:bold;color:#0e1b2c;background:transparent !important;">
-          SEMANA ${primeraJornada.semanaIdx || Math.floor((primeraJornada.num - 1) / 5) + 1} · (Jornadas ${primeraJornada.numero} a ${ultimaJornada.numero})
-        </div>
-        <div style="display:flex;flex-direction:column;gap:14px;background:transparent !important;">
+        ${headerTitulo}
+        ${semanaBanner}
+        <div style="display:flex;flex-direction:column;gap:10px;background:transparent !important;">
       `;
 
       slice.forEach(dj => {
         pagContent += `
           <div style="padding-left:4px;background:transparent !important;">
-            <div style="font-size:12pt !important;font-weight:bold;color:#101820;line-height:1.4 !important;margin-bottom:4px;">
+            <div style="font-size:12pt !important;font-weight:bold;color:#101820;line-height:1.35 !important;margin-bottom:2px;">
               • Jornada ${dj.numero} (${dj.diaSemana} ${dj.fecha || '—'}): <span style="font-weight:normal;color:#222;">${esc(dj.tarea.resumen)}</span>
             </div>
-            <ul style="margin:4px 0 4px 22px;padding:0;font-size:12pt !important;line-height:1.5 !important;color:#222;">
-              ${dj.tarea.actividades.map(act => `<li style="margin-bottom:4px;">${esc(act)}</li>`).join('')}
+            <ul style="margin:2px 0 2px 20px;padding:0;font-size:12pt !important;line-height:1.45 !important;color:#222;">
+              ${dj.tarea.actividades.map(act => `<li style="margin-bottom:3px;">${esc(act)}</li>`).join('')}
             </ul>
           </div>
         `;
@@ -414,17 +438,17 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   // --- CONCLUSIONES Y VISTO BUENO INSTITUCIONAL ---
   const pagConclusionesHTML = `
     <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:8px;border-bottom:1.5px solid #0e1b2c;padding-bottom:3px;background:transparent !important;">III. CONCLUSIONES Y VISTO BUENO INSTITUCIONAL</div>
-    <p style="margin:0 0 10px;text-align:justify;text-indent:18px;font-size:12pt !important;line-height:1.5 !important;">
+    <p style="margin:0 0 10px;text-align:justify;text-indent:18px;font-size:12pt !important;line-height:1.45 !important;">
       Habiendo concluido satisfactoriamente el ciclo programado de prácticas pre-profesionales, se establecen las siguientes conclusiones institucionales y valorativas:
     </p>
 
-    <div style="white-space:pre-line;font-size:12pt !important;line-height:1.5 !important;text-align:justify;margin-bottom:18px;">${conclusiones}</div>
+    <div style="white-space:pre-line;font-size:12pt !important;line-height:1.45 !important;text-align:justify;margin-bottom:16px;">${conclusiones}</div>
 
-    <p style="margin:0 0 24px;text-align:justify;font-size:12pt !important;line-height:1.5 !important;">
+    <p style="margin:0 0 20px;text-align:justify;font-size:12pt !important;line-height:1.45 !important;">
       Es cuanto tengo a bien informar a su autoridad en honor a la verdad, para los fines académicos consiguientes.
     </p>
 
-    <div style="margin-top:auto;border:1px solid #d9dce1;border-radius:6px;padding:14px 18px;background:transparent !important;">
+    <div style="margin-top:auto;border:1px solid #d9dce1;border-radius:6px;padding:12px 18px;background:transparent !important;">
       <div style="text-align:center;font-size:9.5pt !important;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin-bottom:8px;">VALIDACIÓN Y CONFORMIDAD INSTITUCIONAL</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;">
         <div style="text-align:center;flex:1;">
@@ -444,11 +468,11 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   // --- ÍNDICE DE ANEXOS ---
   const pagAnexosHTML = `
     <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:8px;border-bottom:1.5px solid #0e1b2c;padding-bottom:3px;background:transparent !important;">IV. ÍNDICE DE ANEXOS Y CONSTANCIAS DE RESPALDO</div>
-    <p style="margin:0 0 12px;text-align:justify;text-indent:18px;font-size:12pt !important;line-height:1.5 !important;">
+    <p style="margin:0 0 10px;text-align:justify;text-indent:18px;font-size:12pt !important;line-height:1.45 !important;">
       En cumplimiento a los requerimientos normativos del Instituto de Investigaciones, Seminarios y Tesis (IIST) de la Carrera de Derecho, se adjunta al presente informe la documentación de respaldo que acredita fehacientemente la realización efectiva de la pasantía:
     </p>
 
-    <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:16px;background:transparent !important;">
+    <table style="width:100%;border-collapse:collapse;font-size:11pt !important;margin-bottom:14px;background:transparent !important;">
       <thead>
         <tr style="background:transparent !important;border-bottom:2px solid #0e1b2c;border-top:1.5px solid #0e1b2c;color:#0e1b2c;">
           <th style="padding:6px 8px;text-align:center;width:40px;border-bottom:2px solid #0e1b2c;">N.º</th>
@@ -490,7 +514,7 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
       </tbody>
     </table>
 
-    <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.45);padding:8px 12px;font-size:10.5pt !important;color:#555;line-height:1.45;background:transparent !important;">
+    <div style="border-left:3px solid #b89446;border-bottom:1px solid rgba(184,148,70,0.45);padding:8px 12px;font-size:10.5pt !important;color:#555;line-height:1.4;background:transparent !important;">
       <strong>Nota aclaratoria:</strong> Todos los respaldos adjuntos cuentan con la firma, sello y conformidad de los abogados directores y tutores del Despacho Jurídico LexFive, gozando de plena validez para la evaluación académica.
     </div>
   `;
@@ -538,7 +562,6 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
 
 // ----------------------------------------------------------------------
 // 3. HOJA DE ASISTENCIA MULTIPÁGINA (ARIAL 11.5 · FONDOS TRANSPARENTES)
-//    MÁXIMO 7 A 8 FILAS POR HOJA CON MARCA DE AGUA Y NUMERACIÓN
 // ----------------------------------------------------------------------
 export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
   const nombre = esc(d.nombre || '___________________');
@@ -668,7 +691,7 @@ export function buildHojaAsistenciaHTML(d, logoSrc, model, wmOp) {
     paginasHtml.push(`
       <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;font-family:Arial,Helvetica,sans-serif !important;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
         ${membreteHeader(model, logoSrc)}
-        <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:12px 2.1cm 32px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
+        <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:12px 2.1cm 26px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
           ${wmHTML}
           <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;font-family:Arial,Helvetica,sans-serif !important;font-size:11.5pt !important;line-height:1.45 !important;">
             ${contentPagina}
@@ -710,32 +733,40 @@ export function buildInformeWordDocument(d, logoSrc) {
   const conclusiones = esc(d.conclusiones || generarConclusionesTexto(d.genero, nombre));
   const fotos = Array.isArray(d.fotos) ? d.fotos : [];
 
-  // Agrupar jornadas por semanas para Word
+  // Agrupar jornadas por semanas para Word (3 jornadas por página)
   const jornadas = calcularJornadasPasantia(d.fecha_inicio, d.fecha_fin, d.modalidad, d.feriados_extra, d.customTareas);
-  const semanasMap = {};
-  jornadas.forEach(j => {
-    const sem = j.semanaIdx || Math.floor((j.numero - 1) / 5) + 1;
-    if (!semanasMap[sem]) semanasMap[sem] = [];
-    semanasMap[sem].push(j);
-  });
+  const nombresSemanas = ['PRIMERA SEMANA', 'SEGUNDA SEMANA', 'TERCERA SEMANA', 'CUARTA SEMANA', 'QUINTA SEMANA'];
+  const numerosRomanos = ['I', 'II', 'III', 'IV', 'V'];
 
   let cronogramaWordHtml = '';
-  Object.keys(semanasMap).forEach((semNum, idx) => {
-    const dias = semanasMap[semNum];
-    const fechaIniSem = dias[0].fecha || '';
-    const fechaFinSem = dias[dias.length - 1].fecha || '';
-    const rangoSem = (fechaIniSem && fechaFinSem) ? ` (del ${fechaIniSem} al ${fechaFinSem})` : '';
+  let semanaAnterior = null;
 
-    if (idx > 0) {
+  for (let i = 0; i < jornadas.length; i += 3) {
+    const slice = jornadas.slice(i, i + 3);
+    const semNum = slice[0].semanaIdx || Math.floor((slice[0].numero - 1) / 5) + 1;
+    const semIndex = semNum - 1;
+    const nombreSemana = nombresSemanas[semIndex] || `SEMANA ${semNum}`;
+    const romano = numerosRomanos[semIndex] || `${semNum}`;
+
+    const jornadasEstaSemana = jornadas.filter(j => (j.semanaIdx || Math.floor((j.numero - 1) / 5) + 1) === semNum);
+    const fechaIniSem = jornadasEstaSemana[0]?.fecha || '';
+    const fechaFinSem = jornadasEstaSemana[jornadasEstaSemana.length - 1]?.fecha || '';
+    const rangoSemTxt = (fechaIniSem && fechaFinSem) ? ` (del ${fechaIniSem} al ${fechaFinSem})` : '';
+
+    if (i > 0) {
       cronogramaWordHtml += `<div class="page-break"></div>`;
     }
 
+    const esContinuacion = (semanaAnterior === semNum);
+    semanaAnterior = semNum;
+
     cronogramaWordHtml += `
       <h3 style="font-size:12pt;font-weight:bold;color:#8a6d2b;border-bottom:1pt solid #ccc;padding-bottom:3pt;margin-top:14pt;page-break-after:avoid;">
-        SEMANA ${semNum}${rangoSem} · (Jornadas ${dias[0].numero} a ${dias[dias.length - 1].numero})
+        ${romano}. ${nombreSemana}${esContinuacion ? ' (Continuación)' : rangoSemTxt}
       </h3>
     `;
-    dias.forEach(dj => {
+
+    slice.forEach(dj => {
       cronogramaWordHtml += `
         <div style="margin-bottom:8pt;page-break-inside:avoid;">
           <p style="margin:0 0 2pt;font-weight:bold;font-size:12pt;text-indent:0;">
@@ -747,7 +778,7 @@ export function buildInformeWordDocument(d, logoSrc) {
         </div>
       `;
     });
-  });
+  }
 
   return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head>
@@ -943,40 +974,124 @@ ${fotos.length ? `
 }
 
 // ----------------------------------------------------------------------
-// 5. ACCIONES DE EXPORTACIÓN (PDF, WORD, IMPRESIÓN)
+// 5. MOTOR ROBUSTO DE EXPORTACIÓN PDF HOJA POR HOJA (FIX DEFINITIVO DE CANVAS EN BLANCO)
 // ----------------------------------------------------------------------
+export async function exportarHojasCartaAPdf(hojasList, nombreArchivo, progressCallback) {
+  if (!hojasList || !hojasList.length) {
+    throw new Error('No se encontraron hojas para exportar a PDF.');
+  }
+
+  const totalHojas = hojasList.length;
+  const opt = {
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0
+    },
+    jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+  };
+
+  // Asegurar que las fuentes y recursos visuales estén listos
+  if (document.fonts && document.fonts.ready) {
+    try { await document.fonts.ready; } catch (_) {}
+  }
+
+  // 1. Obtener primera página renderizada en canvas
+  if (progressCallback) progressCallback(1, totalHojas);
+  const firstCanvas = await window.html2pdf().set(opt).from(hojasList[0]).toCanvas().get('canvas');
+  const firstImg = firstCanvas.toDataURL('image/jpeg', 0.95);
+
+  // 2. Obtener instancia pdf de html2pdf
+  const pdf = await window.html2pdf().set(opt).from(hojasList[0]).toPdf().get('pdf');
+
+  // Limpiar páginas iniciales duplicadas dejando 1 página limpia
+  const totalBefore = pdf.internal.getNumberOfPages();
+  for (let p = totalBefore; p > 1; p--) {
+    pdf.deletePage(p);
+  }
+
+  // Estampar la primera hoja en la página 1
+  pdf.setPage(1);
+  pdf.addImage(firstImg, 'JPEG', 0, 0, 215.9, 279.4);
+
+  // 3. Iterar secuencialmente sobre las siguientes hojas (evita canvas gigante de Chromium)
+  for (let i = 1; i < totalHojas; i++) {
+    if (progressCallback) progressCallback(i + 1, totalHojas);
+    pdf.addPage('letter', 'portrait');
+    pdf.setPage(i + 1);
+
+    const pageCanvas = await window.html2pdf().set(opt).from(hojasList[i]).toCanvas().get('canvas');
+    const imgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+    pdf.addImage(imgData, 'JPEG', 0, 0, 215.9, 279.4);
+  }
+
+  // 4. Guardar archivo PDF final
+  pdf.save(nombreArchivo);
+  return totalHojas;
+}
+
+// Función auxiliar que monta temporalmente las hojas si no están visibles en pantalla
+export async function renderizarYExportarPDF(htmlContent, nombreArchivo, labelDoc) {
+  let tempDiv = null;
+  try {
+    toast(`Iniciando generación de ${labelDoc}...`, 'info');
+
+    // Montar en un contenedor visible fuera de la vista del usuario (nunca display:none ni left:-9999px)
+    tempDiv = document.createElement('div');
+    tempDiv.style.position = 'fixed';
+    tempDiv.style.top = '0';
+    tempDiv.style.left = '0';
+    tempDiv.style.zIndex = '-1';
+    tempDiv.style.opacity = '1';
+    tempDiv.style.width = '21.59cm';
+    tempDiv.style.pointerEvents = 'none';
+    tempDiv.innerHTML = htmlContent;
+    document.body.appendChild(tempDiv);
+
+    // Esperar carga de imágenes
+    const imgs = Array.from(tempDiv.querySelectorAll('img'));
+    if (imgs.length) {
+      await Promise.all(imgs.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(res => { img.onload = res; img.onerror = res; });
+      }));
+    }
+
+    const hojas = Array.from(tempDiv.querySelectorAll('.hoja-carta'));
+    if (!hojas.length) {
+      throw new Error('No se generaron hojas válidas en el documento.');
+    }
+
+    const totalPags = await exportarHojasCartaAPdf(hojas, nombreArchivo, (act, tot) => {
+      toast(`Generando PDF (página ${act} de ${tot})...`, 'info');
+    });
+
+    toast(`PDF de ${labelDoc} generado correctamente (${totalPags} páginas).`, 'success');
+  } catch (err) {
+    console.error(`Error al exportar ${labelDoc} a PDF:`, err);
+    toast(`Error al exportar PDF: ${err.message || err}`, 'error');
+  } finally {
+    if (tempDiv) tempDiv.remove();
+  }
+}
+
 export function descargarHojaAsistenciaPDF(d, logoSrc, model, wmOp) {
-  const tempDiv = document.createElement('div');
-  tempDiv.style.position = 'fixed';
-  tempDiv.style.left = '-9999px';
-  tempDiv.style.top = '0';
-  tempDiv.innerHTML = buildHojaAsistenciaHTML(d, logoSrc, model, wmOp);
-  document.body.appendChild(tempDiv);
+  const nombreArch = `asistencia-${(d.nombre || 'pasante').toLowerCase().replace(/[^\w]+/g, '-')}.pdf`;
+  const html = buildHojaAsistenciaHTML(d, logoSrc, model, wmOp);
 
   const ejecutar = () => {
-    const opt = {
-      margin: 0,
-      filename: `asistencia-${(d.nombre || 'pasante').toLowerCase().replace(/[^\w]+/g, '-')}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
-    window.html2pdf().set(opt).from(tempDiv).save().then(() => {
-      tempDiv.remove();
-      toast('Hoja de asistencia multipágina descargada en PDF.', 'success');
-    }).catch(err => {
-      tempDiv.remove();
-      console.error(err);
-      toast('Error al generar PDF de asistencia.', 'error');
-    });
+    renderizarYExportarPDF(html, nombreArch, 'Hoja de Asistencia');
   };
 
   if (typeof window.html2pdf === 'undefined') {
     const script = document.createElement('script');
     script.src = 'js/html2pdf.bundle.min.js';
     script.onload = ejecutar;
-    script.onerror = () => { tempDiv.remove(); toast('Error al cargar html2pdf.', 'error'); };
+    script.onerror = () => toast('Error al cargar html2pdf.bundle.min.js.', 'error');
     document.head.appendChild(script);
   } else {
     ejecutar();
@@ -984,37 +1099,18 @@ export function descargarHojaAsistenciaPDF(d, logoSrc, model, wmOp) {
 }
 
 export function descargarInformePDF(d, logoSrc, model, wmOp) {
-  const tempDiv = document.createElement('div');
-  tempDiv.style.position = 'fixed';
-  tempDiv.style.left = '-9999px';
-  tempDiv.style.top = '0';
-  tempDiv.innerHTML = buildPaginasInforme(d, logoSrc, model, wmOp);
-  document.body.appendChild(tempDiv);
+  const nombreArch = `informe-pasantia-${(d.nombre || 'umsa').toLowerCase().replace(/[^\w]+/g, '-')}.pdf`;
+  const html = buildPaginasInforme(d, logoSrc, model, wmOp);
 
   const ejecutar = () => {
-    const opt = {
-      margin: 0,
-      filename: `informe-pasantia-${(d.nombre || 'umsa').toLowerCase().replace(/[^\w]+/g, '-')}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
-    window.html2pdf().set(opt).from(tempDiv).save().then(() => {
-      tempDiv.remove();
-      toast('Informe descargado en PDF.', 'success');
-    }).catch(err => {
-      tempDiv.remove();
-      console.error(err);
-      toast('Error al exportar PDF.', 'error');
-    });
+    renderizarYExportarPDF(html, nombreArch, 'Informe Único');
   };
 
   if (typeof window.html2pdf === 'undefined') {
     const script = document.createElement('script');
     script.src = 'js/html2pdf.bundle.min.js';
     script.onload = ejecutar;
-    script.onerror = () => { tempDiv.remove(); toast('Error al cargar html2pdf.', 'error'); };
+    script.onerror = () => toast('Error al cargar html2pdf.bundle.min.js.', 'error');
     document.head.appendChild(script);
   } else {
     ejecutar();
