@@ -52,6 +52,22 @@ export function fechaLarga(d) {
   return String(d);
 }
 
+export function calcularInicialApellido(nombreCompleto) {
+  if (!nombreCompleto || typeof nombreCompleto !== 'string') return '';
+  const conectores = new Set(['de', 'del', 'la', 'las', 'los', 'y']);
+  const limpio = nombreCompleto
+    .replace(/\b(univ|est|sr|srta|dr|dra|lic|msc|phd)\.?\s+/gi, '')
+    .trim();
+  if (!limpio) return '';
+  const palabras = limpio.split(/\s+/).filter(Boolean);
+  if (!palabras.length) return '';
+  const sig = palabras.filter(w => !conectores.has(w.toLowerCase()));
+  if (!sig.length) return palabras[0][0].toUpperCase();
+  if (sig.length === 1) return sig[0][0].toUpperCase();
+  if (sig.length === 2) return sig[1][0].toUpperCase();
+  return sig[sig.length - 2][0].toUpperCase();
+}
+
 // Catálogo base de 20 jornadas de práctica forense
 export const PASANTIA_CRONOGRAMA_BASE = [
   { dia: 1, semana: 1, resumen: 'Inducción institucional, normativa deontológica, confidencialidad y protocolos de despacho.', detalle: 'Inducción institucional sobre normas deontológicas del ejercicio de la abogacía, protocolos de reserva, confidencialidad profesional y funcionamiento orgánico del bufete LexFive.' },
@@ -435,6 +451,9 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
   const horario = esc(d.horario || '14:00 a 18:00');
   const modalidadCompleta = esc(formatearModalidadYHorario(d.modalidad, horario));
   const fechaDoc = fechaLarga(d.fecha || d.fecha_emision || hoyISO());
+  const inicial = (d.inicial_apellido !== undefined && d.inicial_apellido !== null && String(d.inicial_apellido).trim() !== '')
+    ? esc(String(d.inicial_apellido).trim().toUpperCase())
+    : (d.inicial_apellido === '' ? '' : esc(calcularInicialApellido(d.nombre || '')));
 
   // Docente Guía
   const docenteNombreRaw = (d.docente_guia || '').trim();
@@ -451,10 +470,14 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
 
   // --- HOJA 1: PORTADA INSTITUCIONAL, CARACTERÍSTICAS Y ANTECEDENTES ---
   const pag1HTML = `
-    <div style="text-align:center;margin-bottom:10px;background:transparent !important;">
+    <div style="position:relative;text-align:center;margin-bottom:10px;padding:0 70px;background:transparent !important;min-height:58px;">
       <h1 style="font-size:13pt !important;font-weight:bold;letter-spacing:1px;color:#0e1b2c;margin:0 0 3px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif !important;">INFORME ÚNICO DE PASANTÍA</h1>
       <div style="font-size:11pt !important;font-weight:bold;color:#a8853c;letter-spacing:0.5px;text-transform:uppercase;">${uni} · ${carrera}</div>
       <div style="font-size:10pt !important;color:#555;margin-top:2px;">ASIGNATURA: ${asignatura}</div>
+      <div style="position:absolute;top:0;right:0;width:58px;height:58px;border:1.8px solid #111827;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;">
+        <span style="font-family:Arial,sans-serif;font-size:28pt;font-weight:800;line-height:1;color:#000000;">${inicial || '&nbsp;'}</span>
+        <span style="font-family:Arial,sans-serif;font-size:4.8pt;font-weight:700;letter-spacing:0.2px;line-height:1.1;margin-top:3px;color:#111827;text-transform:uppercase;">INICIAL DE APELLIDO</span>
+      </div>
     </div>
 
     <div style="border-top:1.5px solid #0e1b2c;border-bottom:1.5px solid #0e1b2c;padding:6px 0;margin-bottom:10px;font-size:11pt !important;line-height:1.4;background:transparent !important;">
@@ -994,6 +1017,9 @@ export function buildInformeWordDocument(d, logoSrc) {
   const modalidadCompleta = esc(formatearModalidadYHorario(d.modalidad, horario));
   const fechaDoc = fechaLarga(d.fecha || d.fecha_emision || hoyISO());
   const ref = esc(d.ref || 'LF-2026-00000');
+  const inicial = (d.inicial_apellido !== undefined && d.inicial_apellido !== null && String(d.inicial_apellido).trim() !== '')
+    ? esc(String(d.inicial_apellido).trim().toUpperCase())
+    : (d.inicial_apellido === '' ? '' : esc(calcularInicialApellido(d.nombre || '')));
 
   // Docente Guía
   const docenteNombreRaw = (d.docente_guia || '').trim();
@@ -1166,8 +1192,30 @@ export function buildInformeWordDocument(d, logoSrc) {
   </table>
 </div>
 
-<h1>INFORME ÚNICO DE PASANTÍA PRE-PROFESIONAL</h1>
-<div style="text-align:center;font-size:11pt;color:#8a6d2b;font-weight:bold;margin-bottom:12pt;">${uni} · ${carrera}</div>
+<table width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin-bottom:12pt;">
+  <tr>
+    <td width="65" style="width:65pt;vertical-align:top;">&nbsp;</td>
+    <td align="center" style="text-align:center;vertical-align:middle;">
+      <h1 style="margin:0 0 4pt;font-size:13pt;font-family:Arial,sans-serif;text-align:center;">INFORME ÚNICO DE PASANTÍA</h1>
+      <div style="font-size:11pt;color:#8a6d2b;font-weight:bold;text-align:center;">${uni} · ${carrera}</div>
+      <div style="font-size:10pt;color:#555;text-align:center;margin-top:2pt;">ASIGNATURA: ${asignatura}</div>
+    </td>
+    <td width="65" align="right" style="width:65pt;vertical-align:top;text-align:right;">
+      <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:1.5pt solid #000000;width:58pt;height:58pt;text-align:center;margin-left:auto;">
+        <tr>
+          <td align="center" valign="middle" style="height:44pt;text-align:center;vertical-align:middle;font-family:Arial,sans-serif;font-size:28pt;font-weight:bold;color:#000000;line-height:1;">
+            ${inicial || '&nbsp;'}
+          </td>
+        </tr>
+        <tr>
+          <td align="center" valign="bottom" style="height:12pt;text-align:center;vertical-align:bottom;padding-bottom:2pt;font-family:Arial,sans-serif;font-size:5pt;font-weight:bold;color:#111827;letter-spacing:0.2pt;text-transform:uppercase;">
+            INICIAL DE APELLIDO
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
 
 <table width="100%" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border-top:1.5pt solid #0e1b2c;border-bottom:1.5pt solid #0e1b2c;margin-bottom:12pt;font-size:11pt;line-height:140%;">
   <tr><td width="70" style="width:70pt;font-weight:bold;padding:3pt 0;">A:</td><td style="padding:3pt 0;"><strong>${docente}</strong><br><span style="font-size:9.5pt;color:#444;">${docenteCargo}</span></td></tr>

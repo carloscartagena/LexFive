@@ -45,7 +45,8 @@ import {
   buildNotaRemisionWordDoc,
   descargarNotaRemisionWordDoc,
   extraerImagenesDeDocx,
-  optimizarImagenBlob
+  optimizarImagenBlob,
+  calcularInicialApellido
 } from './pasantia-docs.js';
 
 export { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, calcularJornadasPasantia, extraerHoras, fechaLarga };
@@ -337,6 +338,9 @@ export async function renderCertificados() {
                     <option value="neutro">Neutro / General (el(la) universitario(a))</option>
                   </select>
                 </div>
+                <div class="field"><label>Inicial de apellido (recuadro UMSA)</label>
+                  <input id="ce_inicial_apellido" maxlength="2" placeholder="Ej. V" style="text-transform:uppercase;max-width:140px;font-weight:bold;">
+                </div>
                 <div class="field"><label>Registro Universitario (R.U.)</label><input id="ce_ru" placeholder="Ej: 20150001"></div>
                 <div class="field"><label>Universidad</label><input id="ce_uni_pas" value="Universidad Mayor de San Andrés (UMSA)"></div>
                 <div class="field"><label>Carrera y Plan de Estudios</label><input id="ce_carrera_plan" value="Carrera de Derecho – Plan de Estudios 2017"></div>
@@ -589,6 +593,7 @@ export async function renderCertificados() {
     fecha_emision: val('ce_fecha'),
     // Pasantía universitaria
     genero: val('ce_genero') || 'femenino',
+    inicial_apellido: val('ce_inicial_apellido'),
     prellenar_asistencia: $('#ce_prellenar_asistencia') ? $('#ce_prellenar_asistencia').checked : true,
     registro_universitario: val('ce_ru'),
     carrera_plan: val('ce_carrera_plan') || 'Carrera de Derecho – Plan de Estudios 2017',
@@ -780,6 +785,7 @@ export async function renderCertificados() {
           tutor_nombre: tutNom,
           tutor_rpa: tutRpa,
           genero: genVal,
+          inicial_apellido: val('ce_inicial_apellido'),
           observacion_rec: val('ce_observacion_rec'),
           fotos: fotosPasantiaArray,
           fotos_layout: ($('#ce_fotos_layout') ? $('#ce_fotos_layout').value : '4'),
@@ -1037,6 +1043,13 @@ export async function renderCertificados() {
     if ($('#ce_remision_firmante')) $('#ce_remision_firmante').value = firmanteRemVal;
     if ($('#ce_celular_pasante')) $('#ce_celular_pasante').value = celPasVal;
     if ($('#ce_fotos_layout')) $('#ce_fotos_layout').value = localExtra.fotos_layout || c.fotos_layout || '4';
+    const inicialVal = (c.inicial_apellido !== undefined && c.inicial_apellido !== null)
+      ? c.inicial_apellido
+      : (localExtra.inicial_apellido !== undefined ? localExtra.inicial_apellido : calcularInicialApellido(c.nombre || ''));
+    if ($('#ce_inicial_apellido')) {
+      $('#ce_inicial_apellido').value = (inicialVal || '').toUpperCase();
+      $('#ce_inicial_apellido').dataset.manual = '1';
+    }
     fotosPasantiaArray = Array.isArray(localExtra.fotos) ? localExtra.fotos : (Array.isArray(c.fotos) ? c.fotos : []);
     pintarFotosGrid();
     if (typeof c.incluir_sello_digital === 'boolean' && $('#ce_sello')) $('#ce_sello').checked = c.incluir_sello_digital;
@@ -1077,7 +1090,7 @@ export async function renderCertificados() {
     pintarFotosGrid();
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
      'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario',
-     'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec', 'ce_celular_pasante'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+     'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec', 'ce_celular_pasante', 'ce_inicial_apellido'].forEach(id => { const el = $('#' + id); if (el) { el.value = ''; delete el.dataset.manual; } });
     if ($('#ce_remision_destinatario')) $('#ce_remision_destinatario').value = 'Dr. Erick San Miguel R.';
     if ($('#ce_remision_cargo')) $('#ce_remision_cargo').value = 'RESPONSABLE DEL INSTITUTO DE INVESTIGACIONES, SEMINARIOS Y TESIS (IIST)';
     if ($('#ce_remision_firmante')) $('#ce_remision_firmante').value = 'estudiante';
@@ -1096,6 +1109,10 @@ export async function renderCertificados() {
   // NUEVO, para no volver a escribirlos. No reemplaza el anterior.
   function nuevoConDatos(c) {
     $('#ce_nombre').value = c.nombre || '';
+    if ($('#ce_inicial_apellido')) {
+      $('#ce_inicial_apellido').value = (c.inicial_apellido || calcularInicialApellido(c.nombre) || '').toUpperCase();
+      delete $('#ce_inicial_apellido').dataset.manual;
+    }
     $('#ce_ci').value = c.ci || '';
     $('#ce_calidad').value = c.cargo || '';
     $('#ce_periodo').value = c.periodo || '';
@@ -1128,6 +1145,21 @@ export async function renderCertificados() {
     el.onchange = handler;
     el.oninput = handler;
   });
+
+  const elNombreCe = $('#ce_nombre');
+  const elIniCe = $('#ce_inicial_apellido');
+  if (elNombreCe && elIniCe) {
+    elNombreCe.addEventListener('input', () => {
+      if (!elIniCe.dataset.manual) {
+        elIniCe.value = calcularInicialApellido(elNombreCe.value);
+      }
+    });
+    elIniCe.addEventListener('input', () => {
+      elIniCe.dataset.manual = '1';
+      forkSiNecesario();
+      pintar();
+    });
+  }
 
     // ---- Pestañas de Vista Previa (Delegación de eventos sobre el contenedor) ----
   const tabsContainer = $('#ce_preview_tabs');
