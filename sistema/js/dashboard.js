@@ -19,6 +19,7 @@ import { openProcesoDetail } from './procesos.js';
 import { openConsultaDetail, consultaNombre, getConsultaWaUrl, convertirConsultaACliente } from './consultas.js';
 import { clienteForm } from './clientes.js';
 import { navigate, lastBackupText, exportarRespaldo, revisarRespaldo, openSeguridad2FA, openNotificaciones } from './app.js';
+import { renderMorningAlertBannerHTML, wireMorningAlertBanner } from './alertas.js';
 
 // Abre un modal para enviar el recordatorio por WhatsApp (a los 5 abogados)
 // o por correo (a todo el personal del bufete).
@@ -221,6 +222,7 @@ export async function renderDashboard() {
     </div>` : '';
 
   content().innerHTML = `
+    ${renderMorningAlertBannerHTML()}
     <!-- 1. HERO Y ACCESOS RÁPIDOS DEL DESPACHO -->
     <div class="dash-hero">
       <div class="dash-hero__info">
@@ -512,6 +514,7 @@ export async function renderDashboard() {
     if (p) recordarPorWhatsApp(p);
   });
 
+  wireMorningAlertBanner();
   const beb = $('#btnExportBackup'); if (beb) beb.onclick = () => exportarRespaldo(beb);
   const brb = $('#btnRevisarBackup'); if (brb) brb.onclick = () => revisarRespaldo();
   const b2fa = $('#btn2FA'); if (b2fa) b2fa.onclick = () => openSeguridad2FA();

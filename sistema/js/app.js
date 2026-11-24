@@ -14,6 +14,8 @@ import { clienteName } from './comunes.js';
 import { renderConsultas, consultaNombre, openConsultaDetail } from './consultas.js';
 import { loadProfiles } from './datos.js';
 import { renderUsuarios, renderAuditoria } from './admin.js';
+import { renderBackup } from './backup.js';
+import { initNotifBell } from './alertas.js';
 import { renderBlog } from './blog.js';
 import { renderPlantillas } from './plantillas.js';
 import { renderModelos } from './modelos.js';
@@ -461,6 +463,7 @@ const VIEWS = {
   categorias: { title: 'Categorías', render: renderCategorias },
   usuarios: { title: 'Usuarios', render: renderUsuarios },
   auditoria: { title: 'Auditoría', render: renderAuditoria },
+  backup: { title: 'Respaldo / Backup', render: renderBackup },
   papelera: { title: 'Papelera', render: renderPapelera },
   escritos: { title: 'Escritos y Plantillas', render: renderEscritos },
   redactor: { title: 'Redactor Inteligente', render: renderEscritos },
@@ -543,6 +546,7 @@ const GRUPOS_TABS = {
     tabs: [
       { key: 'usuarios', label: 'Usuarios', icon: '👥', render: renderUsuarios },
       { key: 'auditoria', label: 'Auditoría', icon: '📜', render: renderAuditoria },
+      { key: 'backup', label: 'Respaldo / Backup', icon: '💾', render: renderBackup },
       { key: 'papelera', label: 'Papelera', icon: '🗑️', render: renderPapelera }
     ]
   }
@@ -584,6 +588,7 @@ const SUBKEY_MAP = {
   administracion: { group: 'administracion', tab: 'usuarios' },
   usuarios: { group: 'administracion', tab: 'usuarios' },
   auditoria: { group: 'administracion', tab: 'auditoria' },
+  backup: { group: 'administracion', tab: 'backup' },
   papelera: { group: 'administracion', tab: 'papelera' }
 };
 
@@ -931,118 +936,8 @@ function changeFontScale(dir) {
 }
 
 // ============================================================
-//  Campanita de notificaciones (novedades dentro de la app).
-//  El cliente ve "Novedad en su proceso" al entrar, sin depender del correo.
-//  Si la tabla 'notificaciones' aún no se creó (db/24), la campana se oculta
-//  sola y nada se rompe.
+//  Centro de Alertas en Vivo y Notificaciones (alertas.js)
 // ============================================================
-const NOTIF = { items: [], unread: 0, ok: false };
-
-async function cargarNotificaciones() {
-  if (!state.profile) return;
-  try {
-    const { data, error } = await supabase.from('notificaciones').select('*')
-      .eq('user_id', state.profile.id)
-      .order('created_at', { ascending: false }).limit(25);
-    if (error) throw error;
-    NOTIF.items = data || [];
-    NOTIF.unread = NOTIF.items.filter(n => !n.leida).length;
-    NOTIF.ok = true;
-  } catch (e) {
-    NOTIF.ok = false; // la tabla no existe todavía: ocultamos la campana
-  }
-  pintarCampana();
-}
-
-function pintarCampana() {
-  const bell = $('#btnNotif');
-  if (!bell) return;
-  bell.hidden = !NOTIF.ok;
-  const c = bell.querySelector('.notif-bell__count');
-  if (c) {
-    if (NOTIF.ok && NOTIF.unread > 0) { c.hidden = false; c.textContent = NOTIF.unread > 9 ? '9+' : String(NOTIF.unread); }
-    else c.hidden = true;
-  }
-  const panel = $('#notifPanel');
-  if (panel && panel.classList.contains('open')) renderNotifPanel(panel);
-}
-
-function notifListHTML() {
-  if (!NOTIF.items.length) return '<div class="notif-empty">No tiene notificaciones.</div>';
-  return NOTIF.items.map(n => `
-    <button class="notif-item ${n.leida ? '' : 'is-unread'}" data-id="${n.id}" type="button">
-      <div class="notif-item__title">${esc(n.titulo || 'Notificación')}</div>
-      ${n.cuerpo ? `<div class="notif-item__body">${esc(n.cuerpo)}</div>` : ''}
-      <div class="notif-item__time">${fmtDateTime(n.created_at)}</div>
-    </button>`).join('');
-}
-
-function renderNotifPanel(panel) {
-  panel.innerHTML = `
-    <div class="notif-panel__head">
-      <strong>Notificaciones</strong>
-      ${NOTIF.unread ? '<button class="btn btn--ghost btn--sm" id="notifReadAll" type="button">Marcar leídas</button>' : ''}
-    </div>
-    <div class="notif-list">${notifListHTML()}</div>`;
-  panel.querySelectorAll('.notif-item').forEach(it => it.onclick = () => marcarNotifLeida(it.dataset.id));
-  const ra = panel.querySelector('#notifReadAll'); if (ra) ra.onclick = marcarTodasLeidas;
-}
-
-function toggleNotifPanel() {
-  let panel = $('#notifPanel');
-  if (!panel) { panel = document.createElement('div'); panel.id = 'notifPanel'; panel.className = 'notif-panel'; document.body.appendChild(panel); }
-  if (panel.classList.contains('open')) { panel.classList.remove('open'); return; }
-  renderNotifPanel(panel);
-  const bell = $('#btnNotif');
-  const r = bell.getBoundingClientRect();
-  panel.style.top = (r.bottom + 8) + 'px';
-  panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
-  panel.classList.add('open');
-}
-
-async function marcarNotifLeida(id) {
-  const n = NOTIF.items.find(x => x.id === id);
-  if (n && !n.leida) {
-    n.leida = true; NOTIF.unread = Math.max(0, NOTIF.unread - 1); pintarCampana();
-    try { await supabase.from('notificaciones').update({ leida: true }).eq('id', id); } catch (e) {}
-  }
-}
-
-async function marcarTodasLeidas() {
-  const ids = NOTIF.items.filter(n => !n.leida).map(n => n.id);
-  NOTIF.items.forEach(n => n.leida = true); NOTIF.unread = 0; pintarCampana();
-  try { if (ids.length) await supabase.from('notificaciones').update({ leida: true }).in('id', ids); } catch (e) {}
-}
-
-function subscribeNotifsRealtime() {
-  try {
-    supabase.channel('notif-' + state.profile.id)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notificaciones', filter: 'user_id=eq.' + state.profile.id }, () => cargarNotificaciones())
-      .subscribe();
-  } catch (e) {}
-}
-
-function initNotifBell() {
-  const actions = $('#topbarActions');
-  if (!actions || $('#btnNotif')) return;
-  const btn = document.createElement('button');
-  btn.className = 'btn btn--ghost btn--sm notif-bell';
-  btn.id = 'btnNotif';
-  btn.type = 'button';
-  btn.setAttribute('aria-label', 'Notificaciones');
-  btn.title = 'Notificaciones';
-  btn.innerHTML = ICON.campana + '<span class="notif-bell__count" hidden></span>';
-  btn.hidden = true;
-  btn.onclick = (e) => { e.stopPropagation(); toggleNotifPanel(); };
-  actions.insertBefore(btn, actions.firstChild);
-  document.addEventListener('click', (e) => {
-    const panel = $('#notifPanel');
-    if (panel && panel.classList.contains('open') && !panel.contains(e.target) && !btn.contains(e.target)) panel.classList.remove('open');
-  });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') cargarNotificaciones(); });
-  cargarNotificaciones();
-  subscribeNotifsRealtime();
-}
 
 // ============================================================
 //  Arranque
