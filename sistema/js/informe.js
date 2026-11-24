@@ -38,7 +38,8 @@ import {
   generarConclusionesTexto,
   renderPaginaHoja,
   extraerImagenesDeDocx,
-  optimizarImagenBlob
+  optimizarImagenBlob,
+  calcularInicialApellido
 } from './pasantia-docs.js';
 
 export { buildInformeWordDocument };
@@ -99,6 +100,7 @@ export async function renderInforme() {
   // Valores iniciales
   const V = Object.assign({
     in_nombre: 'Luis Joel Fernandez Pacosillo',
+    in_inicial_apellido: 'F',
     in_ci: '8492019 LP',
     in_ru: '1846019',
     in_genero: 'masculino',
@@ -128,6 +130,9 @@ export async function renderInforme() {
 
   if (precargado) {
     V.in_nombre = precargado.nombre || V.in_nombre;
+    V.in_inicial_apellido = (precargado.inicial_apellido !== undefined && precargado.inicial_apellido !== null)
+      ? precargado.inicial_apellido
+      : calcularInicialApellido(V.in_nombre);
     V.in_ci = precargado.ci || V.in_ci;
     V.in_ru = precargado.registro_universitario || V.in_ru;
     V.in_genero = precargado.genero || V.in_genero;
@@ -181,6 +186,9 @@ export async function renderInforme() {
       <div class="card__body">
         <div class="cert-form">
           ${campo('in_nombre', 'Nombre completo del pasante', V.in_nombre)}
+          <div class="field"><label>Inicial de apellido (recuadro UMSA)</label>
+            <input id="in_inicial_apellido" value="${esc(V.in_inicial_apellido || '')}" maxlength="2" placeholder="Ej. V" style="text-transform:uppercase;max-width:140px;font-weight:bold;">
+          </div>
           ${campo('in_ci', 'Cédula de Identidad (C.I.)', V.in_ci)}
           ${campo('in_ru', 'Registro Universitario (R.U.)', V.in_ru)}
           <div class="field"><label>Género / Tratamiento</label>
@@ -424,6 +432,7 @@ export async function renderInforme() {
 
   const recolectar = () => ({
     nombre: val('in_nombre'),
+    inicial_apellido: val('in_inicial_apellido'),
     ci: val('in_ci'),
     ru: val('in_ru'),
     genero: val('in_genero') || 'femenino',
@@ -643,6 +652,7 @@ export async function renderInforme() {
   function saveDraft() {
     Draft.save('informe', {
       in_nombre: val('in_nombre'),
+      in_inicial_apellido: val('in_inicial_apellido'),
       in_ci: val('in_ci'),
       in_ru: val('in_ru'),
       in_genero: val('in_genero'),
@@ -700,6 +710,21 @@ export async function renderInforme() {
     const el = $('#' + id); if (el) el.oninput = () => { pintar(); saveDraft(); };
   });
 
+  const elNombreIn = $('#in_nombre');
+  const elIniIn = $('#in_inicial_apellido');
+  if (elNombreIn && elIniIn) {
+    elNombreIn.addEventListener('input', () => {
+      if (!elIniIn.dataset.manual) {
+        elIniIn.value = calcularInicialApellido(elNombreIn.value);
+      }
+    });
+    elIniIn.addEventListener('input', () => {
+      elIniIn.dataset.manual = '1';
+      pintar();
+      saveDraft();
+    });
+  }
+
   // Selector de importación desde certificado emitido
   const selCert = $('#in_sel_cert');
   if (selCert) {
@@ -707,6 +732,17 @@ export async function renderInforme() {
       const c = certsPasantia.find(x => x.id === selCert.value);
       if (!c) return;
       if ($('#in_nombre')) $('#in_nombre').value = c.nombre || '';
+      if ($('#in_inicial_apellido')) {
+        let ini = c.inicial_apellido;
+        if (!ini) {
+          try {
+            const loc = JSON.parse(localStorage.getItem('lexfive_cert_extra_' + (c.id || c.ref)) || '{}');
+            ini = loc.inicial_apellido;
+          } catch (_) {}
+        }
+        $('#in_inicial_apellido').value = (ini || calcularInicialApellido(c.nombre) || '').toUpperCase();
+        delete $('#in_inicial_apellido').dataset.manual;
+      }
       if ($('#in_ci')) $('#in_ci').value = c.ci || '';
       if ($('#in_ru')) $('#in_ru').value = c.registro_universitario || '';
       if ($('#in_genero') && c.genero) $('#in_genero').value = c.genero;
