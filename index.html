@@ -107,7 +107,7 @@
             <div class="topbar__contact">
                 <span class="topbar__loc">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
-                    Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.
+                    Av. Alfredo Franco Valle 708-51, <span data-brand-address>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</span>
                 </span>
             </div>
             <div class="topbar__hours">
@@ -117,7 +117,7 @@
     </div>
 
     <!-- ===== Encabezado / Navegación ===== -->
-    <header class="header" id="header">
+        <header class="header" id="header">
         <div class="container header__inner">
             <a href="index.html" class="logo">
                 <span class="logo__mark">L5</span>
@@ -129,12 +129,14 @@
 
             <nav class="nav" id="nav" aria-label="Navegación principal">
                 <ul class="nav__list">
-                    <li><a href="#inicio" class="nav__link">Inicio</a></li>
-                    <li><a href="#nosotros" class="nav__link">Nosotros</a></li>
-                    <li><a href="#equipo" class="nav__link">Equipo</a></li>
-                    <li><a href="#testimonios" class="nav__link">Testimonios</a></li>
-                    <li class="nav__item--access"><a href="sistema/login.html" class="nav__link">Inicio de sesión</a></li>
-                    <li><a href="#contacto" class="nav__link nav__link--cta">Contacto</a></li>
+                    <li><a href="index.html" class="nav__link is-active">Inicio</a></li>
+                    <li><a href="#areas" class="nav__link">Áreas de Práctica</a></li>
+                    <li><a href="blog.html" class="nav__link">Blog</a></li>
+                    <li><a href="casos.html" class="nav__link">Seguimiento de Casos</a></li>
+                    <li><a href="verificar-certificado.html" class="nav__link">Verificar Certificado</a></li>
+                    <li><a href="faq.html" class="nav__link">Preguntas Frecuentes</a></li>
+                    <li class="nav__item--access"><a href="sistema/index.html" class="nav__link" title="Panel interno para abogados del bufete">Acceso Abogados</a></li>
+                    <li><a href="#contacto" class="nav__link nav__link--cta">Consulta Jurídica</a></li>
                 </ul>
             </nav>
 
@@ -213,6 +215,21 @@
                 </div>
             </div>
         </section>
+
+        <!-- ===== Áreas de Práctica ===== -->
+        <section class="section areas" id="areas">
+            <div class="container">
+                <header class="section__head">
+                    <p class="section__eyebrow">Especialidades</p>
+                    <h2 class="section__title">Áreas de Práctica</h2>
+                    <p class="section__lead">Asesoramiento jurídico integral con experiencia, rigor técnico y un enfoque moderno adaptado a sus necesidades.</p>
+                </header>
+                <div class="areas__grid" id="areasGrid">
+                    <!-- Cargadas dinámicamente desde Supabase (areas_practica) -->
+                </div>
+            </div>
+        </section>
+
 
         <!-- ===== Derecho + Tecnología ===== -->
         <section class="section techlaw" id="tecnologia">
@@ -1178,7 +1195,7 @@
             <p class="section__lead" style="margin-inline:auto;">Casos de éxito y opiniones reales de personas y empresas que confiaron en nosotros.</p>
         </header>
         
-        <div class="testimonials__grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+        <div class="testimonials__grid" id="testimoniosGrid">
             <article class="testi-card" style="background:#041230; padding:2rem; border-radius:12px; border:1px solid rgba(212,175,55,0.2);">
                 <div class="testi-card__stars" style="color:#d4af37; font-size:1.2rem; margin-bottom:1rem; text-align:center;">★★★★★</div>
                 <p style="color:#f8fafc; font-style:italic; font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem; text-align:center;">"El equipo de LexFive nos brindó una excelente defensa. Son transparentes con los costos y tienen un nivel de compromiso que no habíamos visto en otros bufetes. Absolutamente recomendados."</p>
@@ -1209,6 +1226,24 @@
 
 
         <!-- ===== Contacto ===== -->
+        
+        <!-- ===== Blog / Actualidad Jurídica ===== -->
+        <section class="section blog-preview" id="blog">
+            <div class="container">
+                <header class="section__head" style="text-align:center;">
+                    <p class="section__eyebrow" style="margin-inline:auto;">Actualidad y Criterios Legales</p>
+                    <h2 class="section__title text-gold">Actualidad Jurídica</h2>
+                    <p class="section__lead" style="margin-inline:auto;">Artículos de orientación, novedades normativas y guías prácticas redactadas por nuestro equipo legal.</p>
+                </header>
+                <div class="blog-grid" id="homeBlogGrid">
+                    <!-- Cargados dinámicamente desde Supabase (articulos) -->
+                </div>
+                <div style="text-align:center; margin-top:36px;">
+                    <a href="blog.html" class="btn btn--outline" style="border-color:var(--gold); color:var(--gold); padding:10px 24px; font-weight:600;">Ver todos los artículos &rarr;</a>
+                </div>
+            </div>
+        </section>
+
         <section class="section contact" id="contacto">
             <div class="container contact__grid">
                 <div class="contact__info">
@@ -1221,7 +1256,7 @@
                             <span class="contact__icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
                             </span>
-                            <div><strong>Oficina</strong><br>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</div>
+                            <div><strong>Oficina</strong><br>Av. Alfredo Franco Valle 708-51, <span data-brand-address>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</span></div>
                         </li>
                         <li>
                             <span class="contact__icon" aria-hidden="true">
@@ -1354,7 +1389,7 @@
     </main>
 
     <!-- ===== Pie de página ===== -->
-    <footer class="footer">
+        <footer class="footer">
         <div class="container footer__grid">
             <div class="footer__brand">
                 <a href="index.html" class="logo logo--light">
@@ -1364,7 +1399,7 @@
                         <small>Abogados</small>
                     </span>
                 </a>
-                <p>Soluciones legales con experiencia, ética y compromiso. Su confianza es nuestro mayor patrimonio.</p>
+                <p>Soluciones legales con experiencia, ética y compromiso. Su tranquilidad y confianza son nuestro mayor patrimonio.</p>
                 <div class="footer__social">
                     <a href="https://www.facebook.com/LexFiveAbogados" target="_blank" rel="noopener" aria-label="Facebook de LexFive">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.9 3.78-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>
@@ -1381,26 +1416,30 @@
                 </div>
             </div>
             <div class="footer__col">
-                <h4>Enlaces</h4>
+                <h4>Navegación</h4>
                 <ul>
                     <li><a href="index.html">Inicio</a></li>
-                    <li><a href="#areas">Áreas de práctica</a></li>
-                    <li><a href="#nosotros">Nosotros</a></li>
-                    <li><a href="#testimonios">Testimonios</a></li>
+                    <li><a href="#areas">Áreas de Práctica</a></li>
+                    <li><a href="blog.html">Blog Jurídico</a></li>
+                    <li><a href="casos.html">Seguimiento de Casos</a></li>
+                    <li><a href="verificar-certificado.html">Verificar Certificado</a></li>
+                    <li><a href="faq.html">Preguntas Frecuentes</a></li>
+                    <li><a href="sistema/index.html">Acceso Abogados</a></li>
                 </ul>
             </div>
             <div class="footer__col">
                 <h4>Contacto</h4>
                 <ul class="footer__contact">
-                    <li>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</li>
-                    <li>Lunes a viernes: 9:00 &ndash; 18:00</li>
-                    <li><a href="index.html#contacto">Solicitar una consulta</a></li>
+                    <li data-brand-address>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</li>
+                    <li data-brand-schedule>Lunes a Viernes: 8:30 &ndash; 18:30 | Sábados: 9:00 &ndash; 13:00</li>
+                    <li>Tel / WhatsApp: <a href="https://wa.me/59178360469" target="_blank" rel="noopener" data-brand-whatsapp><span data-brand-phone>+591 78360469</span></a></li>
+                    <li><a href="#contacto" class="btn btn--outline" style="display:inline-block; margin-top:8px; padding:6px 14px; font-size:0.85rem; border-color:var(--gold); color:var(--gold);">Solicitar Consulta Jurídica</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer__bottom">
             <div class="container footer__bottom-inner">
-                <p>&copy; <span id="year"></span> LexFive. Todos los derechos reservados.</p>
+                <p>&copy; <span id="year"></span> LexFive Abogados. Todos los derechos reservados.</p>
                 <p class="footer__legal"><a href="aviso-privacidad.html">Aviso de privacidad</a> &middot; <a href="terminos.html">Términos y condiciones</a></p>
             </div>
         </div>

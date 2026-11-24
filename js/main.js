@@ -371,12 +371,23 @@
                     mensaje: mensaje.value.trim()
                 };
 
-                /* 1) Almacenamiento principal: la bandeja "Consultas" del panel (Supabase). */
-                var saveConsulta = (window.LexFive && typeof window.LexFive.guardarConsulta === 'function')
-                    ? Promise.resolve(window.LexFive.guardarConsulta(consulta))
-                    : Promise.resolve({ skipped: true });
+                /* 1) Inserción directa en la bandeja "Consultas" del panel (Supabase). */
+                var telefonoEl = document.getElementById('telefono');
+                var areaEl = document.getElementById('area');
+                var consulta = {
+                    nombre: nombre.value.trim(),
+                    apellido: (apellido && apellido.value.trim()) ? apellido.value.trim() : null,
+                    email: email.value.trim(),
+                    telefono: (telefonoEl && telefonoEl.value.trim()) ? telefonoEl.value.trim() : null,
+                    area: (areaEl && areaEl.value) ? areaEl.value : null,
+                    mensaje: mensaje.value.trim(),
+                    estado: 'nueva'
+                };
 
-                /* 2) Aviso por correo con Web3Forms (si la clave está configurada). */
+                var SB_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
+                var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
+
+                /* Aviso por correo con Web3Forms (si la clave está configurada). */
                 function enviarCorreo() {
                     if (!keyConfigured) { return Promise.resolve({ skipped: true }); }
                     var payload = {};
@@ -390,20 +401,46 @@
                     .catch(function () { return { success: false }; });
                 }
 
-                saveConsulta
-                    .then(function (res) {
-                        var savedOk = !!(res && !res.error && !res.skipped);
-                        var saveSkipped = !!(res && res.skipped);
-                        return enviarCorreo().then(function (mail) {
-                            var mailOk = !!(mail && mail.success);
-                            var mailSkipped = !!(mail && mail.skipped);
-                            // Éxito si se guardó en el panel, si se envió el correo,
-                            // o si no hay backend disponible (modo demostración).
-                            if (savedOk || mailOk || (saveSkipped && mailSkipped)) { showSuccess(); }
-                            else { showFail(); }
-                        });
-                    })
-                    .catch(function () { showFail(); });
+                // Inserción en Supabase con return=minimal para cumplir RLS público
+                fetch(SB_URL + '/rest/v1/consultas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SB_KEY,
+                        'Authorization': 'Bearer ' + SB_KEY,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(consulta)
+                })
+                .then(function (res) {
+                    if (res.ok || res.status === 201) {
+                        enviarCorreo(); // en paralelo en segundo plano
+                        showSuccess();
+                    } else {
+                        // Reintento con helper global si existiera o correo
+                        if (window.LexFive && typeof window.LexFive.guardarConsulta === 'function') {
+                            window.LexFive.guardarConsulta(consulta)
+                                .then(function () { showSuccess(); })
+                                .catch(function () {
+                                    enviarCorreo().then(function (m) {
+                                        if (m && m.success) showSuccess();
+                                        else showFail();
+                                    });
+                                });
+                        } else {
+                            enviarCorreo().then(function (m) {
+                                if (m && m.success) showSuccess();
+                                else showFail();
+                            });
+                        }
+                    }
+                })
+                .catch(function () {
+                    enviarCorreo().then(function (m) {
+                        if (m && m.success) showSuccess();
+                        else showFail();
+                    });
+                });
             });
         }
 
@@ -645,16 +682,57 @@
     } catch (e) {}
 })();
 
-
-/* ---------- Áreas de práctica: carrusel dinámico desde Supabase ----------
-   El bufete administra las áreas desde el panel («Áreas de práctica»), cada una
-   con título, descripción e imagen. Aquí se cargan desde Supabase y se muestran
-   como carrusel, reemplazando las tarjetas estáticas. Si no hay datos o no hay
-   conexión, se mantienen las tarjetas por defecto que ya trae el HTML. */
+/* ============================================================
+   LexFive — Módulos Dinámicos Públicos Conectados a Supabase
+   1) Branding y Contacto en vivo
+   2) Áreas de Práctica (grilla responsiva con WhatsApp y formulario)
+   3) Últimas publicaciones del Blog en Home
+   4) Testimonios dinámicos
+   5) Selección automática de áreas desde cualquier botón
+   ============================================================ */
 (function () {
+    'use strict';
+
     var SB_URL = 'https://soazmibvesvuwgxeealo.supabase.co';
     var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
-    var ICON_AREA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M5 21V9m14 12V9M9 21V9m6 12V9M2 9l10-6 10 6"/></svg>';
+
+    var ICON_AREA_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V9m14 12V9M9 21V9m6 12V9M2 9l10-6 10 6"/></svg>';
+    var ICON_WA_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>';
+
+    var DEFAULT_AREAS = [
+        { titulo: 'Derecho Laboral', descripcion: 'Despidos, beneficios sociales, finiquitos, reincorporaciones y asesoría laboral patronal y obrera.', orden: 1 },
+        { titulo: 'Derecho Civil', descripcion: 'Contratos, derecho propietario, usucapión, desalojos, recuperación de deudas y responsabilidad civil.', orden: 2 },
+        { titulo: 'Derecho Penal', descripcion: 'Defensa penal técnica y estratégica, querellas, denuncias, medidas cautelares y audiencias de juicio.', orden: 3 },
+        { titulo: 'Derecho de Familia', descripcion: 'Divorcios, asistencia familiar, guarda y custodia de menores, filiación y procesos sucesorios.', orden: 4 },
+        { titulo: 'Derecho Informático', descripcion: 'Protección de datos personales, delitos informáticos, contratos tecnológicos y comercio electrónico.', orden: 5 },
+        { titulo: 'Derecho Minero', descripcion: 'Contratos mineros, autorizaciones transitorias especiales, servidumbres y regulación sectorial.', orden: 6 },
+        { titulo: 'Derecho Agrario', descripcion: 'Saneamiento y titulación de tierras (INRA), conflictos de linderos, avasallamientos y posesión agraria.', orden: 7 },
+        { titulo: 'Derecho Constitucional', descripcion: 'Acciones de libertad, amparos constitucionales, acciones de cumplimiento y defensa de garantías.', orden: 8 }
+    ];
+
+    var DEFAULT_BLOG_HOME = [
+        {
+            id: 'despido-injustificado-bolivia',
+            titulo: '¿Qué hacer ante un despido injustificado en Bolivia?',
+            categoria: 'Laboral',
+            fecha: '2026-05-15',
+            resumen: 'Conozca los pasos a seguir, derechos irrenunciables y los plazos legales para reclamar su reincorporación o el pago inmediato de beneficios sociales.'
+        },
+        {
+            id: 'guia-divorcio-bolivia',
+            titulo: 'Guía práctica del divorcio en Bolivia: Notarial y Judicial',
+            categoria: 'Familia',
+            fecha: '2026-04-28',
+            resumen: 'Diferencias entre el divorcio por mutuo acuerdo notarial y el contencioso judicial, fijación de asistencia familiar y liquidación de bienes gananciales.'
+        },
+        {
+            id: 'delitos-informaticos-estafas-digitales',
+            titulo: 'Delitos informáticos y protección de datos en Bolivia',
+            categoria: 'Informático',
+            fecha: '2026-04-10',
+            resumen: 'Cómo protegerse legalmente ante estafas digitales, suplantación de identidad en redes y transacciones electrónicas según el marco legal vigente.'
+        }
+    ];
 
     function esc(s) {
         return (s == null ? '' : String(s)).replace(/[&<>"']/g, function (c) {
@@ -662,56 +740,276 @@
         });
     }
 
-    function render(areas) {
-        var grid = document.querySelector('.areas .areas__grid');
-        if (!grid || !areas || !areas.length) return;
-        var slides = areas.map(function (a) {
-            var img = a.imagen_url
-                ? '<div class="area-slide__img" style="background-image:url(\'' + esc(a.imagen_url) + '\')"></div>'
-                : '<div class="area-slide__img area-slide__img--empty">' + ICON_AREA + '</div>';
-            return '<article class="area-slide">' + img +
-                '<div class="area-slide__body"><h3 class="area-slide__title">' + esc(a.titulo) +
-                '</h3><p class="area-slide__text">' + esc(a.descripcion || '') + '</p></div></article>';
-        }).join('');
-        var wrap = document.createElement('div');
-        wrap.className = 'areas-carousel';
-        wrap.innerHTML =
-            '<button class="areas-carousel__nav areas-carousel__nav--prev" type="button" aria-label="Anterior">\u2039</button>' +
-            '<div class="areas-carousel__track">' + slides + '</div>' +
-            '<button class="areas-carousel__nav areas-carousel__nav--next" type="button" aria-label="Siguiente">\u203A</button>';
-        grid.replaceWith(wrap);
-        var track = wrap.querySelector('.areas-carousel__track');
-        var prev = wrap.querySelector('.areas-carousel__nav--prev');
-        var next = wrap.querySelector('.areas-carousel__nav--next');
-        var slidesEls = wrap.querySelectorAll('.area-slide');
-        var idx = 0;
-        var timer = null;
+    /* ---------- 1. BRANDING Y CONTACTO DINÁMICO ---------- */
+    function aplicarBranding(b) {
+        if (!b) return;
 
-        function go(n) {
-            if (!slidesEls.length) return;
-            idx = (n + slidesEls.length) % slidesEls.length;
-            var sl = slidesEls[idx];
-            track.scrollTo({ left: sl.offsetLeft - track.offsetLeft, behavior: 'smooth' });
+        // Logo
+        if (b.logoUrl) {
+            document.querySelectorAll('img[data-brand-logo]').forEach(function (img) {
+                img.src = b.logoUrl;
+            });
+            document.querySelectorAll('.logo__mark').forEach(function (m) {
+                m.style.backgroundImage = 'url("' + b.logoUrl + '")';
+                m.style.backgroundSize = 'contain';
+                m.style.backgroundRepeat = 'no-repeat';
+                m.style.backgroundPosition = 'center';
+                m.textContent = '';
+            });
         }
-        function play() { stop(); timer = setInterval(function () { go(idx + 1); }, 5000); }
-        function stop() { if (timer) { clearInterval(timer); timer = null; } }
 
-        if (prev) prev.addEventListener('click', function () { go(idx - 1); play(); });
-        if (next) next.addEventListener('click', function () { go(idx + 1); play(); });
-        // Avanza solo, y se pausa cuando el usuario interactúa (mouse o toque).
-        wrap.addEventListener('mouseenter', stop);
-        wrap.addEventListener('mouseleave', play);
-        track.addEventListener('touchstart', stop, { passive: true });
-        track.addEventListener('touchend', play, { passive: true });
-        if (slidesEls.length > 1) play();
+        // Teléfono
+        if (b.telefono) {
+            document.querySelectorAll('[data-brand-phone]').forEach(function (el) { el.textContent = b.telefono; });
+            document.querySelectorAll('a[href^="tel:"]').forEach(function (a) {
+                a.href = 'tel:' + b.telefono.replace(/[^0-9+]/g, '');
+            });
+        }
+
+        // WhatsApp
+        var waNum = b.whatsapp || b.telefono;
+        if (waNum) {
+            var cleanWa = waNum.replace(/[^0-9]/g, '');
+            document.querySelectorAll('[data-brand-whatsapp]').forEach(function (el) {
+                if (el.tagName === 'A') el.href = 'https://wa.me/' + cleanWa;
+            });
+            document.querySelectorAll('a[href*="wa.me"]').forEach(function (a) {
+                try {
+                    var u = new URL(a.href);
+                    var t = u.searchParams.get('text');
+                    a.href = 'https://wa.me/' + cleanWa + (t ? '?text=' + encodeURIComponent(t) : '');
+                } catch (e) {
+                    a.href = 'https://wa.me/' + cleanWa;
+                }
+            });
+        }
+
+        // Dirección
+        if (b.direccion) {
+            document.querySelectorAll('[data-brand-address]').forEach(function (el) { el.textContent = b.direccion; });
+        }
+
+        // Horario
+        if (b.horario) {
+            document.querySelectorAll('[data-brand-schedule]').forEach(function (el) { el.textContent = b.horario; });
+        }
+
+        // Email
+        if (b.email) {
+            document.querySelectorAll('[data-brand-email]').forEach(function (el) { el.textContent = b.email; });
+            document.querySelectorAll('a[href^="mailto:"]').forEach(function (a) { a.href = 'mailto:' + b.email; });
+        }
     }
 
-    try {
-        fetch(SB_URL + '/rest/v1/areas_practica?select=titulo,descripcion,imagen_url,orden&activo=eq.true&order=orden.asc', {
+    /* ---------- 2. ÁREAS DE PRÁCTICA DINÁMICAS ---------- */
+    function renderAreas(areas) {
+        var grid = document.getElementById('areasGrid');
+        if (!grid) return;
+
+        var list = (areas && areas.length) ? areas : DEFAULT_AREAS;
+        var waPhone = '59178360469';
+        try {
+            var b = JSON.parse(localStorage.getItem('lexfive_branding') || '{}');
+            if (b.whatsapp) waPhone = b.whatsapp.replace(/[^0-9]/g, '');
+            else if (b.telefono) waPhone = b.telefono.replace(/[^0-9]/g, '');
+        } catch (e) {}
+
+        grid.innerHTML = list.map(function (a) {
+            var mediaHtml = '';
+            if (a.imagen_url) {
+                mediaHtml = '<div class="area-card__media"><img src="' + esc(a.imagen_url) + '" alt="' + esc(a.titulo) + '" loading="lazy" onerror="this.parentElement.remove()"></div>';
+            } else {
+                mediaHtml = '<div class="area-card__icon-box">' + ICON_AREA_SVG + '</div>';
+            }
+            var waUrl = 'https://wa.me/' + waPhone + '?text=' + encodeURIComponent('Hola LexFive, deseo consultar sobre ' + a.titulo);
+            return '<article class="area-card" data-area="' + esc(a.titulo) + '">' +
+                '<div>' + mediaHtml +
+                '<h3 class="area-card__title">' + esc(a.titulo) + '</h3>' +
+                '<p class="area-card__text">' + esc(a.descripcion || '') + '</p>' +
+                '</div>' +
+                '<div class="area-card__actions">' +
+                    '<a href="' + waUrl + '" target="_blank" rel="noopener" class="btn-area-action btn-area-wa" title="Consultar por WhatsApp">' +
+                        ICON_WA_SVG + ' WhatsApp' +
+                    '</a>' +
+                    '<a href="#contacto" class="btn-area-action btn-area-form" data-select-area="' + esc(a.titulo) + '" title="Solicitar consulta en el formulario">' +
+                        'Consulta &darr;' +
+                    '</a>' +
+                '</div>' +
+            '</article>';
+        }).join('');
+
+        // Sincronizar select #area en el formulario de contacto
+        var selectEl = document.getElementById('area');
+        if (selectEl) {
+            list.forEach(function (a) {
+                var exists = Array.from(selectEl.options).some(function (opt) {
+                    return opt.value.toLowerCase() === a.titulo.toLowerCase() || opt.text.toLowerCase() === a.titulo.toLowerCase();
+                });
+                if (!exists) {
+                    var opt = document.createElement('option');
+                    opt.value = a.titulo;
+                    opt.textContent = a.titulo;
+                    selectEl.appendChild(opt);
+                }
+            });
+        }
+    }
+
+    /* ---------- 3. ÚLTIMAS PUBLICACIONES DEL BLOG (HOME) ---------- */
+    function renderHomeBlog(arts) {
+        var grid = document.getElementById('homeBlogGrid');
+        if (!grid) return;
+
+        var list = (arts && arts.length) ? arts : DEFAULT_BLOG_HOME;
+        grid.innerHTML = list.map(function (a) {
+            var fechaStr = '';
+            try {
+                var d = new Date(a.fecha || a.created_at);
+                fechaStr = d.toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' });
+            } catch (e) { fechaStr = a.fecha || ''; }
+            var link = 'blog.html?id=' + encodeURIComponent(a.id);
+            return '<article class="post-card" onclick="window.location.href='' + link + ''">' +
+                '<div class="post-card__media"></div>' +
+                '<div class="post-card__body">' +
+                    '<div class="post-card__meta">' +
+                        '<span class="tag">' + esc(a.categoria || 'General') + '</span>' +
+                        '<span class="post-card__date">' + esc(fechaStr) + '</span>' +
+                    '</div>' +
+                    '<h3 class="post-card__title" style="font-size:1.22rem; margin-bottom:10px;">' + esc(a.titulo) + '</h3>' +
+                    '<p class="post-card__excerpt">' + esc(a.resumen || a.contenido || '') + '</p>' +
+                    '<div style="margin-top:auto; padding-top:14px;">' +
+                        '<a href="' + link + '" class="post-card__link" style="font-weight:600; color:var(--gold); display:inline-flex; align-items:center; gap:6px;">' +
+                            'Leer artículo completo &rarr;' +
+                        '</a>' +
+                    '</div>' +
+                '</div>' +
+            '</article>';
+        }).join('');
+    }
+
+    /* ---------- 4. TESTIMONIOS DINÁMICOS ---------- */
+    function renderTestimonios(testis) {
+        var grid = document.getElementById('testimoniosGrid') || document.querySelector('.testimonials__grid');
+        if (!grid || !testis || !testis.length) return;
+
+        grid.innerHTML = testis.map(function (t) {
+            var starsCount = Math.max(1, Math.min(5, Number(t.calificacion) || 5));
+            var stars = '★'.repeat(starsCount) + '☆'.repeat(5 - starsCount);
+            return '<article class="testi-card" style="background:#041230; padding:2rem; border-radius:12px; border:1px solid rgba(212,175,55,0.2);">' +
+                '<div class="testi-card__stars" style="color:#d4af37; font-size:1.2rem; margin-bottom:1rem; text-align:center;">' + stars + '</div>' +
+                '<p style="color:#f8fafc; font-style:italic; font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem; text-align:center;">"' + esc(t.texto) + '"</p>' +
+                '<div class="testi-card__author" style="text-align:center;">' +
+                    '<strong style="color:#d4af37; display:block;">' + esc(t.nombre || 'Cliente') + '</strong>' +
+                    '<span style="color:#38bdf8; font-size:0.8rem;">' + esc(t.detalle || 'Cliente verificado') + '</span>' +
+                '</div>' +
+            '</article>';
+        }).join('');
+    }
+
+    /* ---------- 5. ACCIÓN AL PULSAR CONSULTAR POR ÁREA ---------- */
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-select-area]');
+        if (!btn) return;
+        var areaName = btn.getAttribute('data-select-area');
+        var selectEl = document.getElementById('area');
+        if (selectEl && areaName) {
+            var opt = Array.from(selectEl.options).find(function (o) {
+                return o.value.toLowerCase() === areaName.toLowerCase() || o.text.toLowerCase() === areaName.toLowerCase();
+            });
+            if (opt) {
+                selectEl.value = opt.value;
+            } else {
+                var newOpt = document.createElement('option');
+                newOpt.value = areaName;
+                newOpt.textContent = areaName;
+                selectEl.appendChild(newOpt);
+                selectEl.value = areaName;
+            }
+        }
+        var contactSec = document.getElementById('contacto');
+        if (contactSec) {
+            e.preventDefault();
+            contactSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(function () {
+                var msg = document.getElementById('mensaje');
+                if (msg) msg.focus();
+            }, 450);
+        }
+    });
+
+    /* ---------- INICIALIZACIÓN Y CACHÉ LOCAL ---------- */
+    function initDynamicFrontend() {
+        // 1. Carga inmediata con copias en caché
+        try {
+            var cachedBranding = JSON.parse(localStorage.getItem('lexfive_branding') || '{}');
+            aplicarBranding(cachedBranding);
+            var cachedAreas = JSON.parse(localStorage.getItem('lexfive_areas') || '[]');
+            renderAreas(cachedAreas);
+            var cachedBlog = JSON.parse(localStorage.getItem('lexfive_recent_blog') || '[]');
+            renderHomeBlog(cachedBlog);
+        } catch (e) {}
+
+        // 2. Sincronización en vivo desde Supabase REST
+        // Branding
+        fetch(SB_URL + '/rest/v1/configuracion?clave=eq.branding&select=valor', {
             headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
         })
         .then(function (r) { return r.ok ? r.json() : []; })
-        .then(function (rows) { if (rows && rows.length) render(rows); })
-        .catch(function () {});
-    } catch (e) {}
+        .then(function (rows) {
+            if (rows && rows[0] && rows[0].valor) {
+                var b = rows[0].valor;
+                try { localStorage.setItem('lexfive_branding', JSON.stringify(b)); } catch (e) {}
+                aplicarBranding(b);
+            }
+        }).catch(function () {});
+
+        // Áreas de práctica
+        fetch(SB_URL + '/rest/v1/areas_practica?select=id,titulo,descripcion,imagen_url,orden&activo=eq.true&order=orden.asc', {
+            headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+        })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (rows) {
+            if (rows && rows.length) {
+                try { localStorage.setItem('lexfive_areas', JSON.stringify(rows)); } catch (e) {}
+                renderAreas(rows);
+            } else {
+                renderAreas(DEFAULT_AREAS);
+            }
+        }).catch(function () { renderAreas(DEFAULT_AREAS); });
+
+        // Últimos 3 artículos del Blog
+        if (document.getElementById('homeBlogGrid')) {
+            fetch(SB_URL + '/rest/v1/articulos?select=id,titulo,resumen,categoria,fecha,created_at&estado=eq.publicado&order=fecha.desc,created_at.desc&limit=3', {
+                headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+            })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (rows) {
+                if (rows && rows.length) {
+                    try { localStorage.setItem('lexfive_recent_blog', JSON.stringify(rows)); } catch (e) {}
+                    renderHomeBlog(rows);
+                } else {
+                    renderHomeBlog(DEFAULT_BLOG_HOME);
+                }
+            }).catch(function () { renderHomeBlog(DEFAULT_BLOG_HOME); });
+        }
+
+        // Testimonios aprobados
+        if (document.getElementById('testimoniosGrid') || document.querySelector('.testimonials__grid')) {
+            fetch(SB_URL + '/rest/v1/testimonios?select=id,nombre,detalle,texto,calificacion&estado=eq.aprobado&order=created_at.desc', {
+                headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+            })
+            .then(function (r) { return r.ok ? r.json() : []; })
+            .then(function (rows) {
+                if (rows && rows.length) {
+                    renderTestimonios(rows);
+                }
+            }).catch(function () {});
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initDynamicFrontend);
+    } else {
+        initDynamicFrontend();
+    }
 })();

@@ -53,24 +53,29 @@
     </div>
 
     <!-- ===== Encabezado / Navegación ===== -->
-    <header class="header" id="header">
+        <header class="header" id="header">
         <div class="container header__inner">
             <a href="index.html" class="logo">
                 <span class="logo__mark">L5</span>
-                <span class="logo__text"><strong>LexFive</strong><small>Abogados</small></span>
+                <span class="logo__text">
+                    <strong>LexFive</strong>
+                    <small>Abogados</small>
+                </span>
             </a>
+
             <nav class="nav" id="nav" aria-label="Navegación principal">
                 <ul class="nav__list">
                     <li><a href="index.html" class="nav__link">Inicio</a></li>
-                    <li><a href="index.html#areas" class="nav__link">Áreas</a></li>
-                    <li><a href="index.html#nosotros" class="nav__link">Nosotros</a></li>
-                    <li><a href="casos.html" class="nav__link">Casos de éxito</a></li>
+                    <li><a href="index.html#areas" class="nav__link">Áreas de Práctica</a></li>
                     <li><a href="blog.html" class="nav__link is-active">Blog</a></li>
-                    <li><a href="faq.html" class="nav__link">FAQ</a></li>
-                    <li class="nav__item--access"><a href="sistema/login.html" class="nav__link">Inicio de sesión</a></li>
-                    <li><a href="index.html#contacto" class="nav__link nav__link--cta">Contáctenos</a></li>
+                    <li><a href="casos.html" class="nav__link">Seguimiento de Casos</a></li>
+                    <li><a href="verificar-certificado.html" class="nav__link">Verificar Certificado</a></li>
+                    <li><a href="faq.html" class="nav__link">Preguntas Frecuentes</a></li>
+                    <li class="nav__item--access"><a href="sistema/index.html" class="nav__link" title="Panel interno para abogados del bufete">Acceso Abogados</a></li>
+                    <li><a href="index.html#contacto" class="nav__link nav__link--cta">Consulta Jurídica</a></li>
                 </ul>
             </nav>
+
             <button class="nav__toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav">
                 <span></span><span></span><span></span>
             </button>
@@ -81,98 +86,91 @@
         <!-- ===== Banner ===== -->
         <section class="page-hero">
             <div class="container page-hero__inner">
-                <p class="breadcrumb"><a href="index.html">Inicio</a> &nbsp;/&nbsp; Blog</p>
-                <h1>Blog jurídico</h1>
-                <p>Información clara y práctica para entender mejor sus derechos. Artículos sobre temas legales que afectan su día a día.</p>
+                <p class="breadcrumb"><a href="index.html">Inicio</a> &nbsp;/&nbsp; Blog Jurídico</p>
+                <h1>Actualidad Jurídica &amp; Criterios Legales</h1>
+                <p>Análisis riguroso, novedades normativas y guías prácticas redactadas por los abogados del bufete LexFive.</p>
             </div>
         </section>
 
-        <!-- ===== Artículos ===== -->
-        <section class="section">
+        <!-- ===== Controles y Artículos ===== -->
+        <section class="section" id="blogSection">
             <div class="container">
-                <div class="blog-grid">
-                    <article class="post-card">
-                        <div class="post-card__media"></div>
-                        <div class="post-card__body">
-                            <div class="post-card__meta"><span class="tag">Laboral</span><span class="post-card__date">15 may 2026</span></div>
-                            <h2 class="post-card__title">¿Qué hacer ante un despido injustificado?</h2>
-                            <p class="post-card__excerpt">Conozca los pasos a seguir y los plazos legales para reclamar su reincorporación o el pago de beneficios sociales.</p>
-                            <a href="#" class="post-card__link">Leer más &rarr;</a>
-                        </div>
-                    </article>
+                <!-- Buscador rápido y Filtro por categorías -->
+                <div class="blog-controls" id="blogControls">
+                    <div class="blog-search-wrap">
+                        <svg class="blog-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="search" id="blogSearch" class="blog-search-input" placeholder="Buscar por tema, palabra clave o título..." aria-label="Buscar artículos">
+                    </div>
+                    <div class="blog-categories" id="blogCategories">
+                        <button type="button" class="blog-cat-btn is-active" data-cat="all">Todas las materias</button>
+                    </div>
+                </div>
 
-                    <article class="post-card">
-                        <div class="post-card__media"></div>
-                        <div class="post-card__body">
-                            <div class="post-card__meta"><span class="tag">Familiar</span><span class="post-card__date">28 abr 2026</span></div>
-                            <h2 class="post-card__title">Guía básica del divorcio en Bolivia</h2>
-                            <p class="post-card__excerpt">Diferencias entre el divorcio por mutuo acuerdo y el contencioso, y qué documentos necesita para iniciarlo.</p>
-                            <a href="#" class="post-card__link">Leer más &rarr;</a>
+                <!-- Vista 1: Cuadrícula de Artículos -->
+                <div id="blogListView">
+                    <div class="blog-grid" id="blogGrid">
+                        <!-- Skeletons de carga suave -->
+                        <div class="post-card" style="opacity:0.6; min-height:260px; display:flex; align-items:center; justify-content:center;">
+                            <p style="color:var(--muted);">Cargando artículos...</p>
                         </div>
-                    </article>
+                    </div>
+                    <div id="blogEmpty" style="display:none; text-align:center; padding:48px 20px; color:var(--muted);">
+                        <p style="font-size:1.15rem; margin-bottom:14px; font-weight:600; color:var(--navy);">No se encontraron artículos para su búsqueda.</p>
+                        <p style="font-size:0.95rem; margin-bottom:20px;">Intente buscar con otros términos o seleccione otra materia legal.</p>
+                        <button type="button" class="btn btn--outline" id="btnResetFilters" style="border-color:var(--gold); color:var(--gold); border-radius:999px;">Restablecer filtros</button>
+                    </div>
+                </div>
 
-                    <article class="post-card">
-                        <div class="post-card__media"></div>
-                        <div class="post-card__body">
-                            <div class="post-card__meta"><span class="tag">Penal</span><span class="post-card__date">10 abr 2026</span></div>
-                            <h2 class="post-card__title">Sus derechos durante una detención</h2>
-                            <p class="post-card__excerpt">Qué puede y qué no puede hacer la autoridad, y por qué contar con defensa técnica desde el primer momento es clave.</p>
-                            <a href="#" class="post-card__link">Leer más &rarr;</a>
+                <!-- Vista 2: Lectura Completa del Artículo -->
+                <div id="blogDetailView" style="display:none;">
+                    <article class="blog-detail">
+                        <button type="button" class="blog-detail__back" id="btnBackToBlog">
+                            &larr; Volver al listado de artículos
+                        </button>
+                        <div class="blog-detail__header">
+                            <span class="tag" id="detailCategory">General</span>
+                            <h1 class="blog-detail__title" id="detailTitle">Título del artículo</h1>
+                            <div class="blog-detail__meta">
+                                <span id="detailDate">Fecha</span> &middot;
+                                <span id="detailAuthor">Equipo Legal LexFive</span> &middot;
+                                <span id="detailReadTime">Lectura: 4 min</span>
+                            </div>
                         </div>
-                    </article>
-
-                    <article class="post-card">
-                        <div class="post-card__media"></div>
-                        <div class="post-card__body">
-                            <div class="post-card__meta"><span class="tag">Civil</span><span class="post-card__date">22 mar 2026</span></div>
-                            <h2 class="post-card__title">Cómo redactar un contrato de alquiler seguro</h2>
-                            <p class="post-card__excerpt">Cláusulas indispensables que protegen tanto al propietario como al inquilino y evitan conflictos futuros.</p>
-                            <a href="#" class="post-card__link">Leer más &rarr;</a>
+                        <div class="blog-detail__content" id="detailContent">
+                            <!-- Contenido completo formateado -->
                         </div>
-                    </article>
-
-                    <article class="post-card">
-                        <div class="post-card__media"></div>
-                        <div class="post-card__body">
-                            <div class="post-card__meta"><span class="tag">Familiar</span><span class="post-card__date">05 mar 2026</span></div>
-                            <h2 class="post-card__title">Asistencia familiar: cómo se calcula</h2>
-                            <p class="post-card__excerpt">Criterios que toma en cuenta el juez para fijar el monto y qué hacer si no se cumple con el pago.</p>
-                            <a href="#" class="post-card__link">Leer más &rarr;</a>
-                        </div>
-                    </article>
-
-                    <article class="post-card">
-                        <div class="post-card__media"></div>
-                        <div class="post-card__body">
-                            <div class="post-card__meta"><span class="tag">Laboral</span><span class="post-card__date">18 feb 2026</span></div>
-                            <h2 class="post-card__title">Beneficios sociales: lo que todo trabajador debe saber</h2>
-                            <p class="post-card__excerpt">Aguinaldo, indemnización, desahucio y vacaciones: a qué tiene derecho y cómo reclamarlos.</p>
-                            <a href="#" class="post-card__link">Leer más &rarr;</a>
+                        <div class="blog-detail__share">
+                            <div class="blog-detail__share-title">Compartir este artículo:</div>
+                            <div class="blog-detail__share-actions">
+                                <a href="#" id="btnShareWa" target="_blank" rel="noopener" class="btn-share btn-share-wa">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg> WhatsApp
+                                </a>
+                                <button type="button" id="btnShareCopy" class="btn-share btn-share-copy">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copiar enlace
+                                </button>
+                                <a href="index.html#contacto" id="btnConsultTopic" class="btn-share btn-share-consult">
+                                    Consultar sobre este tema &rarr;
+                                </a>
+                            </div>
                         </div>
                     </article>
                 </div>
             </div>
         </section>
-
-        <!-- ===== Banda CTA ===== -->
-        <section class="cta-band">
-            <div class="container">
-                <h2>¿Tiene una duda legal concreta?</h2>
-                <p>No se quede con la incertidumbre. Escríbanos y le orientamos sobre su caso particular.</p>
-                <a href="index.html#contacto" class="btn btn--primary">Contactar a un abogado</a>
-            </div>
-        </section>
     </main>
 
     <!-- ===== Pie de página ===== -->
-    <footer class="footer">
+        <footer class="footer">
         <div class="container footer__grid">
             <div class="footer__brand">
                 <a href="index.html" class="logo logo--light">
                     <span class="logo__mark">L5</span>
-                    <span class="logo__text"><strong>LexFive</strong><small>Abogados</small></span>
+                    <span class="logo__text">
+                        <strong>LexFive</strong>
+                        <small>Abogados</small>
+                    </span>
                 </a>
-                <p>Soluciones legales con experiencia, ética y compromiso. Su confianza es nuestro mayor patrimonio.</p>
+                <p>Soluciones legales con experiencia, ética y compromiso. Su tranquilidad y confianza son nuestro mayor patrimonio.</p>
                 <div class="footer__social">
                     <a href="https://www.facebook.com/LexFiveAbogados" target="_blank" rel="noopener" aria-label="Facebook de LexFive">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.9 3.78-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>
@@ -189,28 +187,30 @@
                 </div>
             </div>
             <div class="footer__col">
-                <h4>Enlaces</h4>
+                <h4>Navegación</h4>
                 <ul>
                     <li><a href="index.html">Inicio</a></li>
-                    <li><a href="index.html#areas">Áreas de práctica</a></li>
-                    <li><a href="index.html#nosotros">Nosotros</a></li>
-                    <li><a href="casos.html">Casos de éxito</a></li>
-                    <li><a href="blog.html">Blog</a></li>
-                    <li><a href="faq.html">Preguntas frecuentes</a></li>
+                    <li><a href="index.html#areas">Áreas de Práctica</a></li>
+                    <li><a href="blog.html">Blog Jurídico</a></li>
+                    <li><a href="casos.html">Seguimiento de Casos</a></li>
+                    <li><a href="verificar-certificado.html">Verificar Certificado</a></li>
+                    <li><a href="faq.html">Preguntas Frecuentes</a></li>
+                    <li><a href="sistema/index.html">Acceso Abogados</a></li>
                 </ul>
             </div>
             <div class="footer__col">
                 <h4>Contacto</h4>
                 <ul class="footer__contact">
-                    <li>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina 6-A. El Alto, Bolivia.</li>
-                    <li>Lunes a viernes: 9:00 &ndash; 18:00</li>
-                    <li><a href="index.html#contacto">Solicitar una consulta</a></li>
+                    <li data-brand-address>Av. Alfredo Franco Valle 708-51, Edificio Real, Planta baja oficina A-6. El Alto, Bolivia.</li>
+                    <li data-brand-schedule>Lunes a Viernes: 8:30 &ndash; 18:30 | Sábados: 9:00 &ndash; 13:00</li>
+                    <li>Tel / WhatsApp: <a href="https://wa.me/59178360469" target="_blank" rel="noopener" data-brand-whatsapp><span data-brand-phone>+591 78360469</span></a></li>
+                    <li><a href="index.html#contacto" class="btn btn--outline" style="display:inline-block; margin-top:8px; padding:6px 14px; font-size:0.85rem; border-color:var(--gold); color:var(--gold);">Solicitar Consulta Jurídica</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer__bottom">
             <div class="container footer__bottom-inner">
-                <p>&copy; <span id="year"></span> LexFive. Todos los derechos reservados.</p>
+                <p>&copy; <span id="year"></span> LexFive Abogados. Todos los derechos reservados.</p>
                 <p class="footer__legal"><a href="aviso-privacidad.html">Aviso de privacidad</a> &middot; <a href="terminos.html">Términos y condiciones</a></p>
             </div>
         </div>
@@ -225,249 +225,7 @@
     </button>
 
     <script src="js/main.js?v=20260624"></script>
-    <script type="module">
-      // Carga dinámica de artículos publicados desde el panel (Supabase)
-      import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-      import { SUPABASE_URL, SUPABASE_KEY } from './sistema/js/config.js';
-      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-      const grid = document.querySelector('.blog-grid');
-      const esc = s => (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-      const fmt = d => { try { return new Date(d).toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' }); } catch (e) { return ''; } };
-
-      function showArticle(a) {
-        const ov = document.createElement('div');
-        ov.style.cssText = 'position:fixed;inset:0;background:rgba(14,27,44,.6);display:flex;align-items:flex-start;justify-content:center;padding:40px 18px;z-index:200;overflow-y:auto;';
-        ov.innerHTML = `<div style="background:#fff;max-width:720px;width:100%;border-radius:8px;padding:40px;box-shadow:0 25px 60px rgba(14,27,44,.25);">
-          <span class="tag">${esc(a.categoria || 'General')}</span>
-          <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#0e1b2c;margin:14px 0 6px;">${esc(a.titulo)}</h2>
-          <p style="color:#5c6675;font-size:.9rem;margin-bottom:20px;">${fmt(a.fecha)}</p>
-          <div style="color:#1a2330;line-height:1.8;white-space:pre-wrap;">${esc(a.contenido || a.resumen || '')}</div>
-          <button style="margin-top:26px;background:#c2a25a;color:#0e1b2c;border:none;padding:12px 24px;border-radius:5px;font-weight:600;cursor:pointer;">Cerrar</button>
-        </div>`;
-        ov.addEventListener('click', e => { if (e.target === ov || e.target.tagName === 'BUTTON') ov.remove(); });
-        document.body.appendChild(ov);
-      }
-
-      // ===== Artículos de ejemplo con su contenido completo =====
-      // Si el bufete aún no ha publicado artículos propios desde el panel,
-      // estos textos de ejemplo quedan disponibles y el botón «Leer más» abre
-      // el artículo completo en una ventana, en el mismo orden que las tarjetas.
-      const EJEMPLOS = [
-        {
-          categoria: 'Laboral',
-          fecha: '2026-05-15',
-          titulo: '¿Qué hacer ante un despido injustificado?',
-          contenido:
-`En Bolivia, ningún trabajador puede ser despedido sin una causa legal justificada. Cuando un empleador pone fin a la relación laboral sin motivo válido, el trabajador tiene derecho a elegir entre dos caminos: pedir su reincorporación al puesto o cobrar sus beneficios sociales con la indemnización correspondiente.
-
-1. Identifique si el despido fue injustificado
-La ley solo permite despedir con causa (por ejemplo, faltas graves debidamente comprobadas según el Decreto Ley 16896 o el Reglamento de la Ley General del Trabajo). Si lo despidieron por reducción de personal, por reclamar sus derechos, o sin explicación, lo más probable es que se trate de un despido injustificado.
-
-2. Reúna sus pruebas cuanto antes
-Guarde su contrato, boletas de pago, mensajes, memorándums y cualquier documento que demuestre la fecha de ingreso, el cargo, el sueldo y la forma en que terminó la relación. Estas pruebas serán decisivas.
-
-3. Conozca el plazo clave: 90 días
-Para solicitar la reincorporación ante el Ministerio de Trabajo, el trabajador cuenta con un plazo de 90 días calendario desde la fecha del despido. Si deja pasar ese plazo, aún puede reclamar el pago de sus beneficios sociales, pero ya no la reincorporación por esta vía.
-
-4. Elija su vía
-- Reincorporación: se tramita ante la Jefatura Departamental del Trabajo. Si procede, el empleador debe reincorporarlo y pagarle los sueldos que dejó de percibir.
-- Beneficios sociales: incluye desahucio (3 sueldos), indemnización (un sueldo por cada año trabajado), aguinaldo y vacaciones pendientes, entre otros.
-
-5. Asesórese antes de firmar cualquier finiquito
-Muchos trabajadores firman documentos de renuncia o finiquitos que no reflejan lo que realmente les corresponde. Antes de firmar, conviene revisar los cálculos con un abogado.
-
-En LexFive lo ayudamos a calcular lo que le corresponde y a iniciar el trámite dentro de los plazos legales. Una consulta a tiempo evita perder derechos.`
-        },
-        {
-          categoria: 'Familiar',
-          fecha: '2026-04-28',
-          titulo: 'Guía básica del divorcio en Bolivia',
-          contenido:
-`El Código de las Familias y del Proceso Familiar (Ley 603) regula el divorcio en Bolivia. Hoy el proceso es más ágil que antes, pero conviene entender las dos formas principales en que puede tramitarse.
-
-Divorcio por mutuo acuerdo
-Es la vía más rápida y económica. Ambos cónyuges están de acuerdo en separarse y firman un convenio regulador que define:
-- La guarda y el régimen de visitas de los hijos.
-- El monto de la asistencia familiar.
-- La división de los bienes en común.
-
-Cuando hay acuerdo total y no hay hijos menores en conflicto, el trámite puede resolverse en pocas audiencias.
-
-Divorcio contencioso
-Procede cuando uno de los cónyuges no está de acuerdo o cuando no hay consenso sobre los hijos o los bienes. El juez de familia resuelve cada punto en disputa con base en las pruebas presentadas. Es un proceso más largo, pero garantiza que se protejan los derechos de quien lo necesita.
-
-Documentos que normalmente necesita
-- Certificado de matrimonio actualizado.
-- Certificados de nacimiento de los hijos.
-- Documentos de identidad de ambos.
-- Documentación de los bienes (folios reales, facturas, títulos).
-
-Temas que el divorcio resuelve
-El divorcio no solo disuelve el vínculo: también define la asistencia familiar, la guarda de los hijos, el régimen de visitas y la división de los bienes gananciales. Por eso es importante llegar con todo bien planteado.
-
-Recomendación
-Aunque exista buena relación entre las partes, un convenio mal redactado genera problemas a futuro (sobre todo con la asistencia familiar y los bienes). En LexFive redactamos convenios claros y lo acompañamos en todo el proceso, sea por mutuo acuerdo o contencioso.`
-        },
-        {
-          categoria: 'Penal',
-          fecha: '2026-04-10',
-          titulo: 'Sus derechos durante una detención',
-          contenido:
-`Saber qué puede y qué no puede hacer la autoridad durante una detención es fundamental para proteger su libertad. La Constitución Política del Estado y el Código de Procedimiento Penal reconocen una serie de garantías a toda persona.
-
-Sus derechos básicos
-- A guardar silencio: nadie está obligado a declarar contra sí mismo. Puede negarse a declarar hasta contar con su abogado.
-- A ser informado: debe saber el motivo de su detención y quién la ordena.
-- A un abogado: tiene derecho a una defensa técnica desde el primer momento. Si no puede pagar uno, el Estado debe proporcionarle un defensor público.
-- A comunicarse: puede avisar a un familiar o persona de confianza sobre su situación.
-- A no sufrir tortura ni tratos degradantes: cualquier declaración obtenida bajo presión o violencia es nula.
-
-Sobre los plazos
-La regla general es que una persona aprehendida debe ser puesta a disposición de la autoridad competente dentro de las primeras horas. La detención preventiva solo puede ser ordenada por un juez y debe estar debidamente fundamentada.
-
-Qué NO debe hacer la autoridad
-- Detenerlo sin orden judicial, salvo en caso de flagrancia.
-- Obligarlo a declarar o firmar documentos sin su abogado.
-- Mantenerlo incomunicado.
-
-Qué hacer si lo detienen
-1. Mantenga la calma y no firme nada sin asesoría.
-2. Exija que se informe a su familia.
-3. Pida la presencia de su abogado antes de cualquier declaración.
-4. Anote nombres, horas y lugares: todo dato sirve para su defensa.
-
-Contar con defensa técnica desde el primer minuto cambia el resultado de un caso. En LexFive brindamos asistencia inmediata para proteger su libertad y sus garantías.`
-        },
-        {
-          categoria: 'Civil',
-          fecha: '2026-03-22',
-          titulo: 'Cómo redactar un contrato de alquiler seguro',
-          contenido:
-`Un buen contrato de alquiler evita la mayoría de los conflictos entre propietario e inquilino. Estas son las cláusulas indispensables que todo contrato debería incluir para proteger a ambas partes.
-
-1. Identificación clara de las partes
-Nombres completos, números de carnet de identidad y domicilios del propietario y del inquilino. Si hay garante, también debe figurar.
-
-2. Descripción del inmueble
-Dirección exacta, descripción del bien y de lo que incluye (muebles, garaje, depósitos). Conviene adjuntar un inventario con el estado en que se entrega.
-
-3. Monto, forma y fecha de pago
-El canon mensual, la moneda, el día de pago y el medio (depósito, transferencia, efectivo con recibo). Definir desde el inicio cómo se acredita el pago evita discusiones.
-
-4. Plazo y renovación
-La duración del contrato y las condiciones para renovarlo o darlo por terminado. Indique con cuántos días de anticipación debe avisar cada parte.
-
-5. Garantía o depósito
-El monto que se entrega en garantía, en qué casos se descuenta y cuándo se devuelve.
-
-6. Responsabilidades de cada parte
-Quién paga los servicios (agua, luz, gas, expensas), quién se hace cargo de las reparaciones menores y mayores, y las reglas de uso del inmueble.
-
-7. Causales de terminación
-Las situaciones en que el contrato puede terminar antes de tiempo (falta de pago, daños, uso indebido) y sus consecuencias.
-
-Recomendaciones finales
-- Firme dos ejemplares, uno para cada parte.
-- Considere reconocer las firmas ante notario para dar mayor seguridad jurídica.
-- Tome fotos del inmueble al entregarlo y al recibirlo.
-
-Un contrato bien redactado es la mejor prevención. En LexFive elaboramos y revisamos contratos de alquiler para que usted quede protegido frente a cualquier eventualidad.`
-        },
-        {
-          categoria: 'Familiar',
-          fecha: '2026-03-05',
-          titulo: 'Asistencia familiar: cómo se calcula',
-          contenido:
-`La asistencia familiar es el aporte económico destinado a cubrir las necesidades de los hijos (alimentación, salud, educación, vivienda, vestimenta y recreación). No existe un monto fijo: el juez lo determina caso por caso.
-
-Criterios que toma en cuenta el juez
-- Las necesidades reales del hijo o hija: edad, salud, gastos de estudio y nivel de vida.
-- La capacidad económica del obligado: sus ingresos, su patrimonio y sus posibilidades reales de pago.
-- El principio de proporcionalidad: se busca un equilibrio justo entre lo que el hijo necesita y lo que el obligado puede dar.
-
-Cómo se fija el monto
-El juez analiza las pruebas de ingresos (boletas de pago, actividad económica, bienes) y los gastos del menor. Si el obligado no demuestra ingresos formales, el juez puede estimar su capacidad económica a partir de su forma de vida y su actividad.
-
-Actualización del monto
-La asistencia familiar puede aumentar o disminuir si cambian las circunstancias: si suben los gastos del hijo, si mejora o empeora la situación económica del obligado, etc. Para ello se inicia un trámite de aumento o reducción.
-
-¿Qué pasa si no se cumple con el pago?
-El incumplimiento tiene consecuencias serias. El beneficiario puede solicitar al juez medidas de cobro y, en casos de incumplimiento reiterado, la ley contempla la posibilidad de apremio (arresto) del obligado hasta que regularice los pagos atrasados.
-
-Recomendaciones
-- Guarde comprobantes de todos los pagos realizados.
-- Si su situación económica cambia, tramite el ajuste por la vía legal en lugar de dejar de pagar por cuenta propia.
-- Priorice siempre el interés superior del niño.
-
-En LexFive lo asesoramos tanto para solicitar una asistencia familiar justa como para tramitar su aumento, reducción o cobro cuando no se cumple.`
-        },
-        {
-          categoria: 'Laboral',
-          fecha: '2026-02-18',
-          titulo: 'Beneficios sociales: lo que todo trabajador debe saber',
-          contenido:
-`Los beneficios sociales son los derechos económicos que protegen al trabajador. Conocerlos es la mejor forma de asegurarse de recibir lo que le corresponde al terminar una relación laboral.
-
-Aguinaldo
-Equivale a un sueldo y se paga cada año hasta el 20 de diciembre. Si el trabajador no completó el año, recibe la parte proporcional al tiempo trabajado.
-
-Indemnización
-Corresponde a un sueldo por cada año de trabajo (y la parte proporcional por meses). Es un derecho adquirido a partir de los primeros años de servicio y se paga tanto en despido como, en muchos casos, en retiro voluntario.
-
-Desahucio
-Equivale a tres sueldos. Se paga cuando el trabajador es despedido sin causa justificada y sin el preaviso que manda la ley.
-
-Vacaciones
-Según los años de antigüedad, el trabajador tiene derecho a un número creciente de días de descanso pagados al año. Si no las usó, debe recibir su pago al finalizar la relación.
-
-Otros conceptos
-Dependiendo del caso, también pueden corresponder horas extra, bonos de antigüedad, primas (cuando la empresa tiene utilidades) y otros pagos acordados.
-
-Plazo de pago del finiquito
-Una vez terminada la relación laboral, el empleador debe pagar los beneficios sociales en un plazo breve. Si no lo hace dentro del plazo legal, la deuda puede actualizarse y generar una multa a favor del trabajador.
-
-Cómo reclamarlos
-1. Solicite por escrito el pago de su finiquito.
-2. Si no hay respuesta, acuda al Ministerio de Trabajo.
-3. Conserve siempre copias de sus boletas, contratos y comunicaciones.
-
-Cada caso tiene particularidades. En LexFive calculamos con precisión lo que le corresponde y lo acompañamos en el reclamo para que reciba todos sus beneficios sociales.`
-        }
-      ];
-
-      function wireEjemplos() {
-        const cards = grid.querySelectorAll('.post-card');
-        cards.forEach((card, i) => {
-          const link = card.querySelector('.post-card__link');
-          if (!link || !EJEMPLOS[i]) return;
-          link.addEventListener('click', e => { e.preventDefault(); showArticle(EJEMPLOS[i]); });
-        });
-      }
-
-      (async () => {
-        if (!grid) return;
-        let data = null, error = null;
-        try {
-          const res = await sb.from('articulos').select('*').eq('estado', 'publicado').order('fecha', { ascending: false });
-          data = res.data; error = res.error;
-        } catch (e) { error = e; }
-        if (error || !data || !data.length) { wireEjemplos(); return; } // si no hay publicados, usa los artículos de ejemplo
-        grid.innerHTML = data.map(a => `
-          <article class="post-card">
-            <div class="post-card__media"></div>
-            <div class="post-card__body">
-              <div class="post-card__meta"><span class="tag">${esc(a.categoria || 'General')}</span><span class="post-card__date">${fmt(a.fecha)}</span></div>
-              <h2 class="post-card__title">${esc(a.titulo)}</h2>
-              <p class="post-card__excerpt">${esc(a.resumen || (a.contenido ? a.contenido.slice(0, 150) + '…' : ''))}</p>
-              <a href="#" class="post-card__link" data-id="${a.id}">Leer más &rarr;</a>
-            </div>
-          </article>`).join('');
-        grid.querySelectorAll('.post-card__link').forEach(link => link.addEventListener('click', e => {
-          e.preventDefault();
-          const art = data.find(x => x.id === link.dataset.id);
-          if (art) showArticle(art);
-        }));
-      })();
-    </script>
+    
+    <script src="js/blog-publico.js?v=20260624"></script>
 </body>
 </html>
