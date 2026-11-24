@@ -3,7 +3,7 @@
 //  (Hoja de Asistencia Multipágina, Informe Único Académico en Arial 12 · 1.5,
 //  y Exportación PDF Hoja por Hoja sin Lienzos en Blanco)
 // ============================================================
-import { esc, hoyISO } from './util.js';
+import { esc, hoyISO, SITIO_URL, qrURL } from './util.js';
 import { toast } from './ui.js';
 import { descargarArchivo } from './exportar.js';
 import { membreteHeader, membreteFooter, PRINT_COLOR_CSS } from './membrete-base.js';
@@ -1421,4 +1421,274 @@ export async function descargarInformeWordDoc(d, logoSrc) {
   const nombre = 'informe-pasantia-' + ((d.nombre || 'umsa').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 35)) + '.doc';
   descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
   toast('Informe descargado en Word.', 'success');
+}
+
+
+// ----------------------------------------------------------------------
+// 6. CERTIFICADO DE EXPERIENCIA PRE-PROFESIONAL (1 HOJA CARTA)
+// ----------------------------------------------------------------------
+export function buildExperienciaHTML(d, logoSrc, model, wmOp) {
+  const nombre = esc(d.nombre || '___________________');
+  const ci = esc(d.ci || '—');
+  const ru = esc(d.ru || d.registro_universitario || '');
+  const uni = esc(d.universidad || 'Universidad Mayor de San Andrés (UMSA)');
+  const carrera = esc(d.carrera_plan || 'Carrera de Derecho – Plan de Estudios 2017');
+  const gen = obtenerTratamiento(d.genero);
+  const ref = esc(d.ref || 'LF-2026-00000');
+  const fechaDoc = fechaLarga(d.fecha || d.fecha_emision || hoyISO());
+  
+  let lapso = '';
+  if (d.fecha_inicio_larga && d.fecha_fin_larga) {
+    lapso = `del <strong>${esc(d.fecha_inicio_larga)}</strong> al <strong>${esc(d.fecha_fin_larga)}</strong>`;
+  } else if (d.periodo && d.periodo !== 'correspondiente') {
+    lapso = `durante el período <strong>${esc(d.periodo)}</strong>`;
+  } else {
+    lapso = 'durante el período académico correspondiente';
+  }
+  
+  const horas = extraerHoras(d.horario, d.modalidad) || (d.horas ? parseInt(d.horas, 10) : 80);
+  const modHor = esc(formatearModalidadYHorario(d.modalidad, d.horario));
+  
+  const qrLink = `${SITIO_URL}verificar-certificado.html?ref=${encodeURIComponent(d.ref || '')}&n=${encodeURIComponent(d.nombre || '')}&ci=${encodeURIComponent(d.ci || '')}&t=experiencia`;
+  const qrImgSrc = qrURL(qrLink);
+  
+  const headHTML = membreteHeader(model, logoSrc);
+  const footHTML = membreteFooter(model);
+  const effectiveWmOp = (wmOp !== undefined && wmOp !== null && wmOp > 0) ? Number(wmOp) : 0.08;
+  const wmHTML = logoSrc ? `
+    <img src="${logoSrc}" alt="" style="position:absolute;top:50%;left:50%;width:13cm;height:13cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${effectiveWmOp.toFixed(2)};pointer-events:none;z-index:0 !important;">
+  ` : '';
+
+  const contentHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:2px;">
+      <span style="font-size:9pt;color:#5c6675;font-family:Arial,sans-serif;font-weight:600;">Ref. N.º ${ref} &middot; Experiencia Pre-Profesional</span>
+    </div>
+    
+    <div style="text-align:center;margin:4px 0 10px;">
+      <h1 style="font-size:15.5pt !important;font-weight:bold;color:#0e1b2c;letter-spacing:1px;text-transform:uppercase;margin:0 0 3px;font-family:Georgia,serif;">CERTIFICADO DE EXPERIENCIA PRE-PROFESIONAL</h1>
+      <div style="font-size:9.5pt !important;font-weight:bold;color:#a8853c;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;">PRÁCTICA FORENSE Y GESTIÓN JURÍDICA</div>
+    </div>
+
+    <div style="font-size:10.5pt;line-height:1.52;color:#101820;text-align:justify;font-family:Arial,sans-serif;">
+      <p style="margin:0 0 8px;">
+        El <strong>BUFETE DE ABOGADOS LEXFIVE</strong>, mediante su Dirección Jurídica y cuerpo colegiado de abogados patrocinantes, en mérito a las facultades que le confiere el ordenamiento jurídico vigente:
+      </p>
+      
+      <div style="text-align:center;font-weight:bold;font-size:11pt;color:#0e1b2c;letter-spacing:2px;margin:6px 0 8px;">
+        CERTIFICA:
+      </div>
+
+      <p style="margin:0 0 8px;">
+        Que, ${gen.artUniv} <strong>${nombre}</strong>, con Cédula de Identidad N.º <strong>${ci}</strong>${ru ? `, con Registro Universitario N.º <strong>${ru}</strong>` : ''}, estudiante de la <strong>${carrera}</strong> de la <strong>${uni}</strong>, completó satisfactoriamente su práctica pre-profesional jurídica y pasantía forense en nuestra institución, ${lapso}, acumulando un total efectivo de <strong>${horas} horas académicas</strong> bajo la modalidad de <strong>${modHor}</strong>.
+      </p>
+
+      <p style="margin:0 0 6px;">
+        Durante el desarrollo de su práctica, ${gen.artPasante} demostró solvencia teórica, rigurosidad metodológica y probada ética profesional, habiendo adquirido y consolidado destrezas prácticas en las siguientes áreas y procedimientos:
+      </p>
+
+      <ul style="margin:4px 0 8px 18px;padding:0;font-size:9.8pt;line-height:1.42;">
+        <li style="margin-bottom:3px;"><strong>Derecho Civil, Familiar y Notarial:</strong> Elaboración de memoriales en demandas ordinarias, procesos extraordinarios de asistencia familiar, divorcios, minutas y diligenciamiento registral ante Derechos Reales (DDRR).</li>
+        <li style="margin-bottom:3px;"><strong>Derecho Penal y Procesal Penal:</strong> Seguimiento de causas en etapa preparatoria, redacción de apersonamientos y control de plazos procesales ante el Ministerio Público y juzgados cautelares.</li>
+        <li style="margin-bottom:3px;"><strong>Derecho Laboral y Administrativo:</strong> Preparación de trámites de reincorporación y liquidación de beneficios sociales ante la Jefatura Departamental de Trabajo y el Gobierno Autónomo Municipal de El Alto (GAMEA).</li>
+        <li style="margin-bottom:3px;"><strong>Herramientas de Justicia Digital (LegalTech):</strong> Manejo operativo y seguimiento de causas a través del Buzón Judicial (Hermes / Thor), sistema Justicia Libre 2.0 (FGE), Plataforma Ciudadana del TDJ y el sistema informático de control de expedientes de LexFive.</li>
+      </ul>
+
+      <p style="margin:0 0 8px;font-size:9.2pt;color:#374151;font-style:italic;border-left:3px solid #c2a25a;padding-left:8px;line-height:1.35;">
+        La presente certificación acredita formación académica y práctica forense pre-profesional sin que constituya relación laboral de dependencia, en estricto cumplimiento de la normativa académica universitaria y la legislación laboral boliviana.
+      </p>
+
+      <p style="margin:0 0 8px;">
+        Es cuanto se certifica en la ciudad de El Alto a los ${fechaDoc}, para fines curriculares y acreditación de méritos ${gen.delInteresado}.
+      </p>
+    </div>
+
+    <div style="flex:1 1 auto;min-height:6px;"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:auto;">
+      <div style="display:flex;align-items:center;gap:10px;max-width:55%;">
+        <img src="${qrImgSrc}" alt="QR de verificación" style="width:2.2cm;height:2.2cm;flex-shrink:0;border:1px solid #d9dce1;padding:2px;background:#fff;">
+        <div style="font-size:8pt;color:#5c6675;line-height:1.35;font-family:Arial,sans-serif;">
+          <strong style="color:#0e1b2c;">Verificación Oficial:</strong> Escanee este código QR para validar la autenticidad y emisión institucional de este documento en el portal de LexFive Bufete de Abogados.
+        </div>
+      </div>
+
+      <div style="text-align:center;min-width:230px;max-width:270px;">
+        <div style="min-height:45px;"></div>
+        <div style="border-top:1.5px solid #0e1b2c;padding-top:4px;font-size:10pt;font-weight:bold;color:#0e1b2c;font-family:Arial,sans-serif;">
+          ${d.tutor_nombre ? esc(d.tutor_nombre) : 'DIRECCIÓN / ABOGADO(A) PATROCINANTE'}
+        </div>
+        <div style="font-size:8.5pt;color:#5c6675;font-family:Arial,sans-serif;margin-top:2px;line-height:1.25;">
+          ${d.tutor_nombre ? (d.tutor_rpa ? `R.P.A. ${esc(d.tutor_rpa)}<br>` : '') + 'TUTOR(A) INSTITUCIONAL' : 'LexFive Bufete de Abogados'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  return `
+  <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
+    ${headHTML}
+    <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:12px 2.1cm 16px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
+      ${wmHTML}
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;">
+        ${contentHTML}
+      </div>
+    </div>
+    ${footHTML}
+  </div>`;
+}
+
+// ----------------------------------------------------------------------
+// 7. CARTA DE RECOMENDACIÓN PROFESIONAL (1 HOJA CARTA)
+// ----------------------------------------------------------------------
+export function buildRecomendacionHTML(d, logoSrc, model, wmOp) {
+  const nombre = esc(d.nombre || '___________________');
+  const ci = esc(d.ci || '—');
+  const gen = obtenerTratamiento(d.genero);
+  const ref = esc(d.ref || 'LF-2026-00000');
+  const fechaDoc = fechaLarga(d.fecha || d.fecha_emision || hoyISO());
+  
+  let lapso = '';
+  if (d.fecha_inicio_larga && d.fecha_fin_larga) {
+    lapso = `del <strong>${esc(d.fecha_inicio_larga)}</strong> al <strong>${esc(d.fecha_fin_larga)}</strong>`;
+  } else if (d.periodo && d.periodo !== 'correspondiente') {
+    lapso = `durante el período <strong>${esc(d.periodo)}</strong>`;
+  } else {
+    lapso = 'durante el período correspondiente';
+  }
+
+  const qrLink = `${SITIO_URL}verificar-certificado.html?ref=${encodeURIComponent(d.ref || '')}&n=${encodeURIComponent(d.nombre || '')}&ci=${encodeURIComponent(d.ci || '')}&t=recomendacion`;
+  const qrImgSrc = qrURL(qrLink);
+  
+  const headHTML = membreteHeader(model, logoSrc);
+  const footHTML = membreteFooter(model);
+  const effectiveWmOp = (wmOp !== undefined && wmOp !== null && wmOp > 0) ? Number(wmOp) : 0.08;
+  const wmHTML = logoSrc ? `
+    <img src="${logoSrc}" alt="" style="position:absolute;top:50%;left:50%;width:13cm;height:13cm;object-fit:contain;transform:translate(-50%,-50%);opacity:${effectiveWmOp.toFixed(2)};pointer-events:none;z-index:0 !important;">
+  ` : '';
+
+  const observacionExtra = (d.observacion_rec && d.observacion_rec.trim()) 
+    ? `Asimismo, cabe destacar de manera especial su ${esc(d.observacion_rec.trim().replace(/^su\s+/i, ''))}.`
+    : `Asimismo, evidenció una notable capacidad de trabajo en equipo bajo presión, iniciativa constante y un trato ético y respetuoso tanto con el personal jurisdiccional como con nuestros clientes y patrocinados.`;
+
+  const contentHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+      <span style="font-size:9pt;color:#5c6675;font-family:Arial,sans-serif;font-weight:600;">Ref. N.º ${ref} &middot; Carta de Recomendación</span>
+      <span style="font-size:9.5pt;color:#0e1b2c;font-family:Arial,sans-serif;">El Alto / La Paz, ${fechaDoc}</span>
+    </div>
+    
+    <div style="text-align:center;margin:6px 0 14px;">
+      <h1 style="font-size:15.5pt !important;font-weight:bold;color:#0e1b2c;letter-spacing:1px;text-transform:uppercase;margin:0 0 3px;font-family:Georgia,serif;">CARTA DE RECOMENDACIÓN PROFESIONAL</h1>
+      <div style="font-size:9.5pt !important;font-weight:bold;color:#a8853c;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif;">BUFETE DE ABOGADOS LEXFIVE</div>
+    </div>
+
+    <div style="font-size:10.5pt;line-height:1.58;color:#101820;text-align:justify;font-family:Arial,sans-serif;">
+      <div style="font-weight:bold;color:#0e1b2c;font-size:11pt;margin-bottom:12px;letter-spacing:1px;">
+        A QUIEN CORRESPONDA:
+      </div>
+
+      <p style="margin:0 0 10px;">
+        Por medio de la presente, el Bufete de Abogados <strong>LEXFIVE</strong> tiene a bien expresar su más amplia, sincera y fundada recomendación profesional en favor de ${gen.artUniv} <strong>${nombre}</strong>, titular de la Cédula de Identidad N.º <strong>${ci}</strong>, quien desempeñó funciones de práctica jurídica pre-profesional y procuración legal en nuestra firma ${lapso}.
+      </p>
+
+      <p style="margin:0 0 10px;">
+        Durante el período de su práctica, ${gen.artPasante} demostró un intachable sentido de responsabilidad, disciplina, probidad y puntualidad en cada una de las diligencias y comisiones asignadas. Destacó de forma sobresaliente por su solvencia doctrinal, criterio jurídico analítico en el estudio de expedientes y un alto rigor técnico en la redacción de memoriales y trámites judiciales y administrativos.
+      </p>
+
+      <p style="margin:0 0 10px;">
+        ${observacionExtra}
+      </p>
+
+      <p style="margin:0 0 10px;">
+        Por las sólidas cualidades éticas, académicas y humanas demostradas a lo largo de su desempeño, nos complace <strong>RECOMENDAR AMPLIA Y PLENAMENTE</strong> a ${gen.artUniv} <strong>${nombre}</strong> para asumir funciones jurídicas o corporativas en instituciones públicas, estudios jurídicos o empresas privadas, con la certeza de que constituirá un valioso aporte técnico y humano para cualquier equipo de trabajo.
+      </p>
+
+      <p style="margin:0 0 12px;">
+        Facilitamos nuestros canales y líneas de contacto institucionales para brindar cualquier referencia o certificación complementaria que sea requerida.
+      </p>
+
+      <p style="margin:0 0 4px;">
+        Atentamente,
+      </p>
+    </div>
+
+    <div style="flex:1 1 auto;min-height:8px;"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:auto;">
+      <div style="display:flex;align-items:center;gap:10px;max-width:55%;">
+        <img src="${qrImgSrc}" alt="QR de verificación" style="width:2.2cm;height:2.2cm;flex-shrink:0;border:1px solid #d9dce1;padding:2px;background:#fff;">
+        <div style="font-size:8pt;color:#5c6675;line-height:1.35;font-family:Arial,sans-serif;">
+          <strong style="color:#0e1b2c;">Validación Oficial:</strong> Escanee este código QR para comprobar la autenticidad y registro institucional de esta carta de recomendación en el sistema de LexFive.
+        </div>
+      </div>
+
+      <div style="text-align:center;min-width:230px;max-width:270px;">
+        <div style="min-height:48px;"></div>
+        <div style="border-top:1.5px solid #0e1b2c;padding-top:4px;font-size:10pt;font-weight:bold;color:#0e1b2c;font-family:Arial,sans-serif;">
+          ${d.tutor_nombre ? esc(d.tutor_nombre) : 'DIRECCIÓN / ABOGADO(A) PATROCINANTE'}
+        </div>
+        <div style="font-size:8.5pt;color:#5c6675;font-family:Arial,sans-serif;margin-top:2px;line-height:1.25;">
+          ${d.tutor_nombre ? (d.tutor_rpa ? `R.P.A. ${esc(d.tutor_rpa)}<br>` : '') + 'TUTOR(A) INSTITUCIONAL' : 'LexFive Bufete de Abogados'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  return `
+  <div class="hoja-carta" style="display:flex;flex-direction:column;width:21.59cm;height:27.94cm;min-height:27.94cm;max-height:27.94cm;margin:0 auto 24px;background:#fff;color:#101820;box-sizing:border-box;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,0.12);page-break-after:always;break-after:page;position:relative;">
+    ${headHTML}
+    <div style="position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:12px 2.1cm 16px;overflow:hidden;box-sizing:border-box;background:transparent !important;">
+      ${wmHTML}
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;flex:1 1 auto;justify-content:flex-start;overflow:hidden;background:transparent !important;">
+        ${contentHTML}
+      </div>
+    </div>
+    ${footHTML}
+  </div>`;
+}
+
+// ----------------------------------------------------------------------
+// 8. EXPORTACIONES A WORD (.DOC) DE EXPERIENCIA Y RECOMENDACIÓN
+// ----------------------------------------------------------------------
+export function buildExperienciaWordDoc(d, logoSrc) {
+  const htmlContent = buildExperienciaHTML(d, logoSrc, 'banda', 0.08);
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<style>
+@page { size: 8.5in 11in; margin: 1in; }
+body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; text-align: justify; }
+</style>
+</head>
+<body>${htmlContent}</body>
+</html>`;
+}
+
+export function buildRecomendacionWordDoc(d, logoSrc) {
+  const htmlContent = buildRecomendacionHTML(d, logoSrc, 'banda', 0.08);
+  return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8">
+<style>
+@page { size: 8.5in 11in; margin: 1in; }
+body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.5; text-align: justify; }
+</style>
+</head>
+<body>${htmlContent}</body>
+</html>`;
+}
+
+export async function descargarExperienciaWordDoc(d, logoSrc) {
+  toast('Preparando Certificado de Experiencia en Word...', 'info');
+  const base64Logo = await getLogoBase64(logoSrc);
+  const html = buildExperienciaWordDoc(d, base64Logo);
+  const nombre = 'certificado-experiencia-' + ((d.nombre || 'pasante').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 35)) + '.doc';
+  descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
+  toast('Certificado de Experiencia descargado en Word.', 'success');
+}
+
+export async function descargarRecomendacionWordDoc(d, logoSrc) {
+  toast('Preparando Carta de Recomendación en Word...', 'info');
+  const base64Logo = await getLogoBase64(logoSrc);
+  const html = buildRecomendacionWordDoc(d, base64Logo);
+  const nombre = 'carta-recomendacion-' + ((d.nombre || 'pasante').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 35)) + '.doc';
+  descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
+  toast('Carta de Recomendación descargada en Word.', 'success');
 }

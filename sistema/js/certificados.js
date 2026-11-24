@@ -36,7 +36,11 @@ import {
   descargarInformeWordDoc,
   normalizarNotaDesig,
   formatearSupervision,
-  formatearModalidadYHorario
+  formatearModalidadYHorario,
+  buildExperienciaHTML,
+  buildRecomendacionHTML,
+  descargarExperienciaWordDoc,
+  descargarRecomendacionWordDoc
 } from './pasantia-docs.js';
 
 export { PASANTIA_CRONOGRAMA_BASE, obtenerTratamiento, calcularJornadasPasantia, extraerHoras, fechaLarga };
@@ -358,6 +362,17 @@ export async function renderCertificados() {
                 <label class="cell-sub" style="display:flex;align-items:center;gap:6px;grid-column:1/-1;margin-top:4px;">
                   <input type="checkbox" id="ce_prellenar_asistencia" checked> Prellenar fechas hábiles reales y actividades en Hoja de Asistencia
                 </label>
+                <div style="grid-column:1/-1;margin-top:6px;">
+                  <details style="border:1px solid var(--line);border-radius:6px;padding:8px 12px;background:var(--card-sub-bg, transparent);">
+                    <summary style="cursor:pointer;font-weight:600;font-size:.85rem;color:var(--primary, #c2a25a);">
+                      ✍️ Observación o cualidad destacada para Carta de Recomendación (opcional)
+                    </summary>
+                    <div style="margin-top:8px;">
+                      <textarea id="ce_observacion_rec" rows="2" placeholder="Ej. Destacada iniciativa y rigurosidad técnica en la revisión de expedientes civiles y asistencia en audiencias..." style="width:100%;font-size:.85rem;font-family:inherit;box-sizing:border-box;"></textarea>
+                      <p class="cell-sub" style="margin:4px 0 0;font-size:.75rem;">Si se llena, este mérito se integrará de forma armónica en el cuerpo de la Carta de Recomendación.</p>
+                    </div>
+                  </details>
+                </div>
               </div>
             </div>
           </div>
@@ -399,12 +414,15 @@ export async function renderCertificados() {
           <div id="ce_preview_tabs" style="display:none;gap:6px;flex-wrap:wrap;">
             <button type="button" class="btn btn--sm btn--primary js-prev-tab" data-tab="cert">Certificado de Pasantía</button>
             <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="asistencia">Hoja de Asistencia</button>
-            <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="informe">Informe Único (Multipágina)</button>
+            <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="informe">Informe Único</button>
+            <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="experiencia">Experiencia Pre-Profesional</button>
+            <button type="button" class="btn btn--sm btn--ghost js-prev-tab" data-tab="recomendacion">Carta de Recomendación</button>
           </div>
         </div>
         <div id="ce_preview_actions" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn--primary btn--sm" id="ce_btn_imprimir_activo" type="button" style="font-weight:bold;background:#b89446;color:#fff;">🖨️ Guardar PDF / Imprimir</button>
-          <button class="btn btn--ghost btn--sm" id="ce_btn_expediente_completo" type="button" style="display:none;font-weight:600;border:1px solid #b89446;color:#b89446;">📑 Todo en 1 PDF</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_expediente_completo" type="button" style="display:none;font-weight:600;border:1px solid #b89446;color:#b89446;">📑 Expediente UMSA (3 en 1)</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_paquete_cv" type="button" style="display:none;font-weight:600;border:1px solid #0e1b2c;color:#0e1b2c;">🎓 Paquete CV (2 en 1)</button>
           <button class="btn btn--ghost btn--sm" id="ce_btn_word_activo" type="button">📄 Word (.doc)</button>
         </div>
       </div>
@@ -495,6 +513,7 @@ export async function renderCertificados() {
     fecha_inicio_larga: val('ce_fecha_inicio') ? fechaLarga(val('ce_fecha_inicio')) : '',
     fecha_fin_larga: val('ce_fecha_fin') ? fechaLarga(val('ce_fecha_fin')) : '',
     customTareas: cronogramaPersonalizado,
+    observacion_rec: val('ce_observacion_rec'),
     abogadoFirma: val('ce_abogado_firma'),
     rpaFirma: val('ce_rpa')
   });
@@ -580,6 +599,8 @@ export async function renderCertificados() {
       if (!previewEl) return;
       const pas = esPasantia();
 
+      const btnPaqCv = $('#ce_btn_paquete_cv');
+
       if (pas) {
         if (prevTabs) {
           prevTabs.style.display = 'flex';
@@ -597,6 +618,7 @@ export async function renderCertificados() {
           });
         }
         if (btnExp) btnExp.style.display = 'inline-flex';
+        if (btnPaqCv) btnPaqCv.style.display = 'inline-flex';
 
         if (vistaPasantiaTab === 'asistencia') {
           if (btnWord) btnWord.style.display = 'none';
@@ -604,6 +626,12 @@ export async function renderCertificados() {
         } else if (vistaPasantiaTab === 'informe') {
           if (btnWord) btnWord.style.display = 'inline-flex';
           previewEl.innerHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+        } else if (vistaPasantiaTab === 'experiencia') {
+          if (btnWord) btnWord.style.display = 'inline-flex';
+          previewEl.innerHTML = buildExperienciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+        } else if (vistaPasantiaTab === 'recomendacion') {
+          if (btnWord) btnWord.style.display = 'inline-flex';
+          previewEl.innerHTML = buildRecomendacionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
         } else {
           if (btnWord) btnWord.style.display = 'inline-flex';
           previewEl.innerHTML = docActual();
@@ -611,6 +639,7 @@ export async function renderCertificados() {
       } else {
         if (prevTabs) prevTabs.style.display = 'none';
         if (btnExp) btnExp.style.display = 'none';
+        if (btnPaqCv) btnPaqCv.style.display = 'none';
         if (btnWord) btnWord.style.display = 'inline-flex';
         previewEl.innerHTML = docActual();
       }
@@ -643,7 +672,8 @@ export async function renderCertificados() {
           docente_guia: docGuia,
           tutor_nombre: tutNom,
           tutor_rpa: tutRpa,
-          genero: genVal
+          genero: genVal,
+          observacion_rec: val('ce_observacion_rec')
         };
         localStorage.setItem('lexfive_cert_extra_' + refActual, JSON.stringify(extraPayload));
       } catch (_) {}
@@ -866,11 +896,13 @@ export async function renderCertificados() {
     const tutNomVal = (c.tutor_nombre !== undefined && c.tutor_nombre !== null) ? c.tutor_nombre : (localExtra.tutor_nombre || '');
     const tutRpaVal = (c.tutor_rpa !== undefined && c.tutor_rpa !== null) ? c.tutor_rpa : (localExtra.tutor_rpa || '');
     const generoVal = (c.genero !== undefined && c.genero !== null) ? c.genero : (localExtra.genero || 'femenino');
+    const obsRecVal = (c.observacion_rec !== undefined && c.observacion_rec !== null) ? c.observacion_rec : (localExtra.observacion_rec || '');
 
     if ($('#ce_docente_guia')) $('#ce_docente_guia').value = docGuiaVal;
     if ($('#ce_tutor_nombre')) $('#ce_tutor_nombre').value = tutNomVal;
     if ($('#ce_tutor_rpa')) $('#ce_tutor_rpa').value = tutRpaVal;
     if ($('#ce_genero')) $('#ce_genero').value = generoVal;
+    if ($('#ce_observacion_rec')) $('#ce_observacion_rec').value = obsRecVal;
     if (typeof c.incluir_sello_digital === 'boolean' && $('#ce_sello')) $('#ce_sello').checked = c.incluir_sello_digital;
     $('#ce_cuerpo').value = cuerpoGuardado || tpl.cuerpo(datos());
     cuerpoEditado = true;
@@ -902,7 +934,7 @@ export async function renderCertificados() {
     if (editorWrap) editorWrap.style.display = 'none';
     ['ce_nombre', 'ce_ci', 'ce_calidad', 'ce_periodo', 'ce_uni', 'ce_carrera', 'ce_horas', 'ce_dest',
      'ce_ru', 'ce_nota_desig', 'ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_horario',
-     'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
+     'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec'].forEach(id => { const el = $('#' + id); if (el) el.value = ''; });
     if ($('#ce_genero')) $('#ce_genero').value = 'femenino';
     if ($('#ce_prellenar_asistencia')) $('#ce_prellenar_asistencia').checked = true;
     if ($('#ce_uni_pas')) $('#ce_uni_pas').value = 'Universidad Mayor de San Andrés (UMSA)';
@@ -936,7 +968,7 @@ export async function renderCertificados() {
     el.oninput = () => { forkSiNecesario(); if (!cuerpoEditado) regenerar(); pintar(); };
   });
   ['ce_fecha_nota', 'ce_fecha_inicio', 'ce_fecha_fin', 'ce_modalidad', 'ce_genero', 'ce_feriados_extra',
-   'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_fecha'].forEach(id => {
+   'ce_docente_guia', 'ce_tutor_nombre', 'ce_tutor_rpa', 'ce_observacion_rec', 'ce_fecha'].forEach(id => {
     const el = $('#' + id); if (!el) return;
     const handler = () => {
       forkSiNecesario();
@@ -958,7 +990,7 @@ export async function renderCertificados() {
       if (!btn) return;
       e.preventDefault();
       const nuevaTab = btn.dataset.tab;
-      if (nuevaTab && ['cert', 'asistencia', 'informe'].includes(nuevaTab)) {
+      if (nuevaTab && ['cert', 'asistencia', 'informe', 'experiencia', 'recomendacion'].includes(nuevaTab)) {
         vistaPasantiaTab = nuevaTab;
         pintar();
       }
@@ -1175,12 +1207,18 @@ export async function renderCertificados() {
       } else if (vistaPasantiaTab === 'informe') {
         tituloDoc = `Informe_Pasantia_${slug}`;
         docHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      } else if (vistaPasantiaTab === 'experiencia') {
+        tituloDoc = `Certificado_Experiencia_PreProfesional_${slug}`;
+        docHTML = buildExperienciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      } else if (vistaPasantiaTab === 'recomendacion') {
+        tituloDoc = `Carta_Recomendacion_${slug}`;
+        docHTML = buildRecomendacionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
       }
       abrirImpresionVectorial(tituloDoc, docHTML);
     };
   }
 
-  // 📑 Todo en 1 PDF (Solo en modo Pasantía: Certificado + Hoja de Asistencia + Informe Único)
+  // 📑 Expediente UMSA (3 en 1: Certificado + Asistencia + Informe Único)
   const btnExpCompleto = $('#ce_btn_expediente_completo');
   if (btnExpCompleto) {
     btnExpCompleto.onclick = () => {
@@ -1188,12 +1226,28 @@ export async function renderCertificados() {
       if (!nom) { toast('Escriba el nombre completo.', 'error'); return; }
       registrarCert();
       const slug = slugNombre(nom);
-      const tituloDoc = `Expediente_Pasantia_${slug}`;
-      toast('Preparando expediente completo (Certificado + Asistencia + Informe)...', 'info');
+      const tituloDoc = `Expediente_UMSA_${slug}`;
+      toast('Preparando Expediente UMSA (3 en 1: Certificado + Asistencia + Informe)...', 'info');
       const certHTML = docActual();
       const asisHTML = buildHojaAsistenciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
       const infHTML = buildPaginasInforme(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
       abrirImpresionVectorial(tituloDoc, certHTML + asisHTML + infHTML);
+    };
+  }
+
+  // 🎓 Paquete CV (2 en 1: Experiencia Pre-Profesional + Carta de Recomendación)
+  const btnPaqCv = $('#ce_btn_paquete_cv');
+  if (btnPaqCv) {
+    btnPaqCv.onclick = () => {
+      const nom = (val('ce_nombre') || '').trim();
+      if (!nom) { toast('Escriba el nombre completo.', 'error'); return; }
+      registrarCert();
+      const slug = slugNombre(nom);
+      const tituloDoc = `Paquete_CV_${slug}`;
+      toast('Preparando Paquete CV (2 en 1: Experiencia + Recomendación)...', 'info');
+      const expHTML = buildExperienciaHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      const recHTML = buildRecomendacionHTML(datos(), logoSrc, modeloMembrete(), wmOpacityActual() / 100);
+      abrirImpresionVectorial(tituloDoc, expHTML + recHTML);
     };
   }
 
@@ -1207,6 +1261,10 @@ export async function renderCertificados() {
       const slug = slugNombre(nom);
       if (esPasantia() && vistaPasantiaTab === 'informe') {
         await descargarInformeWordDoc(datos(), logoSrc);
+      } else if (esPasantia() && vistaPasantiaTab === 'experiencia') {
+        await descargarExperienciaWordDoc(datos(), logoSrc);
+      } else if (esPasantia() && vistaPasantiaTab === 'recomendacion') {
+        await descargarRecomendacionWordDoc(datos(), logoSrc);
       } else {
         const html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body>' + docActual() + '</body></html>';
         const prefijo = catActual() === 'aceptacion' ? 'carta-aceptacion-' : (esPasantia() ? 'certificado-pasantia-' : 'certificado-');
