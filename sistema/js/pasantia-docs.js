@@ -682,7 +682,7 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
         <tr>
           <td style="padding:8px 6px;text-align:center;border-bottom:1px solid #d9dce1;font-weight:bold;">6</td>
           <td style="padding:8px 10px;border-bottom:1px solid #d9dce1;text-align:justify;"><strong>Registro Fotográfico de Prácticas Forenses</strong> (acompañamiento en estrados e instalaciones)</td>
-          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">${fotos.length ? `${fotos.length} fotos adjuntas` : 'Fotografías anexas'}</td>
+          <td style="padding:8px 8px;text-align:center;border-bottom:1px solid #d9dce1;">${fotos.length ? `${fotos.length} fotografías anexas` : 'Fotografías anexas'}</td>
         </tr>
       </tbody>
     </table>
@@ -692,30 +692,67 @@ export function buildPaginasInforme(d, logoSrc, model, wmOp) {
     </div>
   `;
 
-  // --- PÁGINAS FOTOGRÁFICAS ---
+  // --- PÁGINAS FOTOGRÁFICAS (ANEXO FOTOGRÁFICO) ---
+  const layout = String(d.fotos_layout || '4');
+  const perPage = layout === '2' ? 2 : 4;
   const paginasFotos = [];
+
   if (fotos.length) {
-    for (let fIdx = 0; fIdx < fotos.length; fIdx += 2) {
-      const sliceFotos = fotos.slice(fIdx, fIdx + 2);
-      const fotoContent = `
-        <div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:8px;border-bottom:1.5px solid #0e1b2c;padding-bottom:3px;background:transparent !important;">
-          REGISTRO FOTOGRÁFICO DE PRÁCTICAS FORENSES (Fotografías ${fIdx + 1} a ${fIdx + sliceFotos.length})
-        </div>
-        <p style="margin:0 0 10px;font-size:11pt !important;color:#555;">Evidencia gráfica del desarrollo de labores forenses y académicas:</p>
-        <div style="display:flex;flex-direction:column;gap:16px;align-items:center;margin-top:4px;background:transparent !important;">
-          ${sliceFotos.map((foto, idx) => `
-            <div style="border:1px solid #d9dce1;border-radius:6px;padding:6px;background:transparent !important;width:100%;max-width:16cm;text-align:center;">
-              <div style="height:8.5cm;width:100%;display:flex;align-items:center;justify-content:center;background:#000;border-radius:4px;overflow:hidden;">
-                <img src="${foto.src}" style="max-height:100%;max-width:100%;object-fit:contain;" alt="">
-              </div>
-              <div style="font-size:10pt !important;color:#333;margin-top:6px;font-family:Arial,sans-serif !important;">
-                <strong>Fotografía N.º ${fIdx + idx + 1}:</strong> ${esc(foto.pie || 'Práctica jurídica en dependencias del despacho LexFive')}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-      paginasFotos.push(fotoContent);
+    for (let fIdx = 0; fIdx < fotos.length; fIdx += perPage) {
+      const sliceFotos = fotos.slice(fIdx, fIdx + perPage);
+      const isFirstPhotoPage = (fIdx === 0);
+
+      const headerTitle = isFirstPhotoPage
+        ? `<div style="font-weight:bold;font-size:12pt !important;color:#0e1b2c;margin-bottom:6px;border-bottom:1.5px solid #0e1b2c;padding-bottom:3px;background:transparent !important;text-transform:uppercase;letter-spacing:0.5px;">ANEXO FOTOGRÁFICO — REGISTRO DE PRÁCTICA FORENSE</div>
+           <p style="margin:0 0 8px;font-size:10pt !important;color:#555;font-family:Arial,sans-serif;">Evidencia gráfica del desarrollo de labores forenses, diligencias y gestión jurídica:</p>`
+        : `<div style="font-weight:bold;font-size:11.5pt !important;color:#0e1b2c;margin-bottom:8px;border-bottom:1.5px solid #0e1b2c;padding-bottom:3px;background:transparent !important;text-transform:uppercase;letter-spacing:0.5px;">ANEXO FOTOGRÁFICO — REGISTRO DE PRÁCTICA FORENSE (Continuación)</div>`;
+
+      let photosGridHTML = '';
+
+      if (perPage === 4) {
+        // Modo 4 fotos por hoja (2x2)
+        photosGridHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(2, minmax(0, 1fr));gap:10px;flex:1 1 auto;width:100%;height:100%;max-height:19cm;background:transparent !important;box-sizing:border-box;">
+            ${sliceFotos.map((foto, idx) => {
+              const globalIdx = fIdx + idx + 1;
+              const pieTxt = foto.pie && foto.pie.trim() ? `: ${esc(foto.pie.trim())}` : '';
+              return `
+              <div style="border:1px solid rgba(184,148,70,0.45);border-radius:6px;padding:6px;background:transparent !important;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;max-height:9.2cm;box-sizing:border-box;overflow:hidden;">
+                <div style="flex:1 1 auto;width:100%;height:100%;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:transparent !important;">
+                  <img src="${foto.src}" style="max-height:100%;max-width:100%;object-fit:contain;display:block;" alt="">
+                </div>
+                <div style="font-size:9.5pt !important;color:#101820;margin-top:4px;text-align:center;font-family:Arial,sans-serif !important;line-height:1.25;flex-shrink:0;">
+                  <strong>Fotografía N.º ${globalIdx}</strong>${pieTxt}
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        // Modo 2 fotos por hoja (vertical grande)
+        photosGridHTML = `
+          <div style="display:flex;flex-direction:column;gap:12px;flex:1 1 auto;width:100%;height:100%;max-height:19cm;background:transparent !important;box-sizing:border-box;">
+            ${sliceFotos.map((foto, idx) => {
+              const globalIdx = fIdx + idx + 1;
+              const pieTxt = foto.pie && foto.pie.trim() ? `: ${esc(foto.pie.trim())}` : '';
+              return `
+              <div style="border:1px solid rgba(184,148,70,0.45);border-radius:6px;padding:8px;background:transparent !important;flex:1 1 0;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;min-height:0;overflow:hidden;">
+                <div style="flex:1 1 auto;width:100%;height:100%;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:transparent !important;">
+                  <img src="${foto.src}" style="max-height:100%;max-width:100%;object-fit:contain;display:block;" alt="">
+                </div>
+                <div style="font-size:10pt !important;color:#101820;margin-top:6px;text-align:center;font-family:Arial,sans-serif !important;line-height:1.3;flex-shrink:0;">
+                  <strong>Fotografía N.º ${globalIdx}</strong>${pieTxt}
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      paginasFotos.push(`
+        ${headerTitle}
+        ${photosGridHTML}
+      `);
     }
   }
 
@@ -1196,13 +1233,29 @@ ${cronogramaWordHtml}
 
 ${fotos.length ? `
   <div class="page-break"></div>
-  <h2>ANEXO: REGISTRO FOTOGRÁFICO DE ACTIVIDADES</h2>
-  ${fotos.map((f, i) => `
-    <div style="text-align:center;margin-bottom:18pt;page-break-inside:avoid;">
-      <img src="${f.src}" style="max-width:16cm;max-height:9.5cm;" alt=""><br>
-      <span style="font-size:9pt;font-family:Arial,sans-serif;"><strong>Fotografía N.º ${i + 1}:</strong> ${esc(f.pie || 'Práctica forense en LexFive')}</span>
-    </div>
-  `).join('')}
+  <h2 style="font-size:13pt;font-weight:bold;color:#0e1b2c;border-bottom:1.5pt solid #b89446;padding-bottom:3pt;margin:16pt 0 10pt;text-align:center;">ANEXO FOTOGRÁFICO — REGISTRO DE PRÁCTICA FORENSE</h2>
+  <table width="100%" cellspacing="0" cellpadding="6" style="width:100%;border-collapse:collapse;margin-top:8pt;">
+    ${(() => {
+      let rows = '';
+      for (let i = 0; i < fotos.length; i += 2) {
+        const f1 = fotos[i];
+        const f2 = fotos[i + 1];
+        rows += `<tr>
+          <td width="50%" align="center" style="width:50%;text-align:center;padding:8pt;vertical-align:top;border:1pt solid #d9dce1;">
+            <img src="${f1.src}" style="max-width:7.5cm;max-height:6cm;object-fit:contain;" alt=""><br>
+            <div style="font-size:9pt;font-family:Arial,sans-serif;margin-top:4pt;"><strong>Fotografía N.º ${i + 1}</strong>${f1.pie ? `: ${esc(f1.pie)}` : ''}</div>
+          </td>
+          ${f2 ? `
+          <td width="50%" align="center" style="width:50%;text-align:center;padding:8pt;vertical-align:top;border:1pt solid #d9dce1;">
+            <img src="${f2.src}" style="max-width:7.5cm;max-height:6cm;object-fit:contain;" alt=""><br>
+            <div style="font-size:9pt;font-family:Arial,sans-serif;margin-top:4pt;"><strong>Fotografía N.º ${i + 2}</strong>${f2.pie ? `: ${esc(f2.pie)}` : ''}</div>
+          </td>
+          ` : `<td width="50%" style="width:50%;border:none;"></td>`}
+        </tr>`;
+      }
+      return rows;
+    })()}
+  </table>
 ` : ''}
 
 </div>
@@ -1410,7 +1463,28 @@ export function imprimirInformeDocumento(d, logoSrc, model, wmOp) {
       .hoja-carta { box-shadow: none !important; margin: 0 auto !important; width: 21.59cm !important; height: 27.94cm !important; page-break-after: always; break-after: page; }
       ${PRINT_COLOR_CSS}
     </style></head><body>${docHTML}
-    <script>window.addEventListener('load', function(){ setTimeout(function(){ window.print(); }, 450); });<\/script></body></html>`);
+    <script>
+      window.addEventListener('load', function(){
+        var imgs = Array.from(document.images);
+        var pending = imgs.filter(function(img) { return !img.complete; });
+        function disparar() {
+          setTimeout(function(){ window.focus(); window.print(); }, 350);
+        }
+        if (pending.length === 0) {
+          disparar();
+        } else {
+          var loaded = 0;
+          pending.forEach(function(img) {
+            img.addEventListener('load', check);
+            img.addEventListener('error', check);
+          });
+          function check() {
+            loaded++;
+            if (loaded >= pending.length) disparar();
+          }
+        }
+      });
+    <\/script></body></html>`);
   w.document.close();
 }
 
@@ -1691,4 +1765,181 @@ export async function descargarRecomendacionWordDoc(d, logoSrc) {
   const nombre = 'carta-recomendacion-' + ((d.nombre || 'pasante').toLowerCase().replace(/[^\w]+/g, '-').slice(0, 35)) + '.doc';
   descargarArchivo(nombre, '\ufeff' + html, 'application/msword');
   toast('Carta de Recomendación descargada en Word.', 'success');
+}
+
+// ----------------------------------------------------------------------
+// 9. EXTRACTOR NATIVO DE IMÁGENES DESDE DOCX Y OPTIMIZADOR CANVAS
+// ----------------------------------------------------------------------
+export function optimizarImagenBlob(blob, maxDim = 1200, quality = 0.85) {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let w = img.naturalWidth || img.width;
+      let h = img.naturalHeight || img.height;
+
+      if (w <= maxDim && h <= maxDim && blob.size < 500 * 1024) {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+        return;
+      }
+
+      if (w > maxDim || h > maxDim) {
+        if (w >= h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    };
+    img.src = url;
+  });
+}
+
+export async function extraerImagenesDeDocx(file) {
+  const buffer = await file.arrayBuffer();
+  const view = new DataView(buffer);
+  const n = buffer.byteLength;
+
+  let eocdOffset = -1;
+  const maxSearch = Math.min(n, 65557 + 22);
+  for (let i = n - 22; i >= n - maxSearch; i--) {
+    if (view.getUint32(i, true) === 0x06054b50) {
+      eocdOffset = i;
+      break;
+    }
+  }
+
+  const entries = [];
+
+  if (eocdOffset !== -1) {
+    const cdSize = view.getUint32(eocdOffset + 12, true);
+    const cdOffset = view.getUint32(eocdOffset + 16, true);
+
+    let pos = cdOffset;
+    while (pos < cdOffset + cdSize && pos + 46 <= n) {
+      if (view.getUint32(pos, true) !== 0x02014b50) break;
+      const method = view.getUint16(pos + 10, true);
+      const compSize = view.getUint32(pos + 20, true);
+      const uncompSize = view.getUint32(pos + 24, true);
+      const nameLen = view.getUint16(pos + 28, true);
+      const extraLen = view.getUint16(pos + 30, true);
+      const commentLen = view.getUint16(pos + 32, true);
+      const localHeaderOffset = view.getUint32(pos + 42, true);
+
+      const nameBytes = new Uint8Array(buffer, pos + 46, nameLen);
+      const name = new TextDecoder('utf-8').decode(nameBytes);
+
+      const lower = name.toLowerCase();
+      if (lower.startsWith('word/media/') && /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(lower)) {
+        entries.push({ name, method, compSize, uncompSize, localHeaderOffset });
+      }
+
+      pos += 46 + nameLen + extraLen + commentLen;
+    }
+  } else {
+    // Fallback: búsqueda de Local File Headers
+    let pos = 0;
+    while (pos + 30 <= n) {
+      if (view.getUint32(pos, true) !== 0x04034b50) {
+        pos++;
+        continue;
+      }
+      const method = view.getUint16(pos + 8, true);
+      const compSize = view.getUint32(pos + 18, true);
+      const uncompSize = view.getUint32(pos + 22, true);
+      const nameLen = view.getUint16(pos + 26, true);
+      const extraLen = view.getUint16(pos + 28, true);
+
+      if (pos + 30 + nameLen > n) break;
+      const nameBytes = new Uint8Array(buffer, pos + 30, nameLen);
+      const name = new TextDecoder('utf-8').decode(nameBytes);
+
+      const lower = name.toLowerCase();
+      if (lower.startsWith('word/media/') && /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(lower)) {
+        entries.push({ name, method, compSize, uncompSize, localHeaderOffset: pos });
+      }
+
+      pos += 30 + nameLen + extraLen + compSize;
+    }
+  }
+
+  // Orden natural: image1, image2, ..., image10
+  entries.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+
+  const fotos = [];
+
+  for (const entry of entries) {
+    try {
+      const lh = entry.localHeaderOffset;
+      if (lh + 30 > n || view.getUint32(lh, true) !== 0x04034b50) continue;
+      const lhNameLen = view.getUint16(lh + 26, true);
+      const lhExtraLen = view.getUint16(lh + 28, true);
+      const dataOffset = lh + 30 + lhNameLen + lhExtraLen;
+      const compData = new Uint8Array(buffer, dataOffset, entry.compSize);
+
+      let rawBytes;
+      if (entry.method === 0) {
+        rawBytes = compData;
+      } else if (entry.method === 8) {
+        const ds = new DecompressionStream('deflate-raw');
+        const writer = ds.writable.getWriter();
+        writer.write(compData);
+        writer.close();
+        const reader = ds.readable.getReader();
+        const chunks = [];
+        let total = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          total += value.length;
+        }
+        rawBytes = new Uint8Array(total);
+        let cur = 0;
+        for (const ch of chunks) {
+          rawBytes.set(ch, cur);
+          cur += ch.length;
+        }
+      } else {
+        continue;
+      }
+
+      const ext = entry.name.slice(entry.name.lastIndexOf('.')).toLowerCase();
+      let mime = 'image/jpeg';
+      if (ext === '.png') mime = 'image/png';
+      else if (ext === '.webp') mime = 'image/webp';
+      else if (ext === '.gif') mime = 'image/gif';
+      else if (ext === '.bmp') mime = 'image/bmp';
+
+      const blob = new Blob([rawBytes], { type: mime });
+      const optimizedDataUrl = await optimizarImagenBlob(blob, 1200, 0.85);
+
+      fotos.push({
+        src: optimizedDataUrl,
+        pie: ''
+      });
+    } catch (err) {
+      console.warn('Error al descomprimir entrada ' + entry.name, err);
+    }
+  }
+
+  return fotos;
 }

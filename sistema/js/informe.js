@@ -36,7 +36,9 @@ import {
   imprimirInformeDocumento,
   descargarInformeWordDoc,
   generarConclusionesTexto,
-  renderPaginaHoja
+  renderPaginaHoja,
+  extraerImagenesDeDocx,
+  optimizarImagenBlob
 } from './pasantia-docs.js';
 
 export { buildInformeWordDocument };
@@ -274,13 +276,34 @@ export async function renderInforme() {
 
     <!-- 6. REGISTRO FOTOGRÁFICO (ANEXOS) -->
     <div class="card">
-      <div class="card__head"><h3>📷 Anexo Fotográfico (Opcional)</h3></div>
-      <div class="card__body">
-        <p class="cell-sub">Suba fotografías de las prácticas en despacho, juzgados o notarías. Se integran al final del informe en hojas membretadas (2 fotos por página Carta):</p>
-        <div style="margin:10px 0;">
-          <input type="file" id="in_file_fotos" multiple accept="image/*" class="btn btn--ghost">
+      <div class="card__head" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <h3 style="margin:0;">📷 Anexo Fotográfico (Evidencia de Pasantía)</h3>
+          <span id="in_fotos_badge" style="font-size:.75rem;padding:2px 8px;border-radius:12px;background:rgba(184,148,70,0.15);color:#b89446;font-weight:600;display:none;">0 fotos</span>
         </div>
-        <div id="in_fotos_grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:12px;margin-top:10px;"></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <label style="font-size:.78rem;display:flex;align-items:center;gap:4px;">
+            <span>Distribución:</span>
+            <select id="in_fotos_layout" style="font-size:.78rem;padding:3px 6px;border-radius:4px;">
+              <option value="4" ${(V.in_fotos_layout !== '2') ? 'selected' : ''}>4 fotos por hoja (2×2 — recomendado)</option>
+              <option value="2" ${(V.in_fotos_layout === '2') ? 'selected' : ''}>2 fotos grandes por hoja (vertical)</option>
+            </select>
+          </label>
+          <button class="btn btn--ghost btn--sm" id="in_btn_vaciar_fotos" type="button" style="font-size:.75rem;padding:2px 8px;display:none;color:#e11d48;">🗑️ Vaciar fotos</button>
+        </div>
+      </div>
+      <div class="card__body">
+        <div id="in_fotos_dropzone" style="border:2px dashed var(--line);border-radius:6px;padding:16px;text-align:center;cursor:pointer;background:var(--card-sub-bg, rgba(255,255,255,0.02));transition:border-color .2s, background .2s;">
+          <input type="file" id="in_file_fotos" multiple accept="image/*,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+          <div style="font-size:1.8rem;margin-bottom:4px;">📂 📸</div>
+          <div style="font-weight:600;font-size:.85rem;color:var(--primary, #b89446);">
+            Arrastra aquí tus fotos o archivo Word (.docx), o haz clic para explorar
+          </div>
+          <p class="cell-sub" style="margin:4px 0 0;font-size:.78rem;">
+            Puedes subir fotos JPG/PNG o directamente el archivo Word (.docx) con las fotos pegadas; el sistema las extrae automáticamente.
+          </p>
+        </div>
+        <div id="in_fotos_grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));gap:10px;margin-top:12px;"></div>
       </div>
     </div>
 
@@ -426,7 +449,8 @@ export async function renderInforme() {
     actividades: val('in_actividades'),
     conclusiones: val('in_conclusiones'),
     modo_presentacion: val('in_modo_pres') || 'lexfive',
-    fotos: fotosArray
+    fotos: fotosArray,
+    fotos_layout: ($('#in_fotos_layout') ? $('#in_fotos_layout').value : '4')
   });
 
   const pintar = () => {
@@ -436,16 +460,36 @@ export async function renderInforme() {
 
   const pintarFotosGrid = () => {
     const grid = $('#in_fotos_grid');
+    const badge = $('#in_fotos_badge');
+    const btnVaciar = $('#in_btn_vaciar_fotos');
     if (!grid) return;
+
     if (!fotosArray.length) {
-      grid.innerHTML = '<p class="cell-sub" style="grid-column:1/-1;">No hay fotos cargadas aún.</p>';
+      grid.innerHTML = '<p class="cell-sub" style="grid-column:1/-1;margin:0;font-size:.8rem;opacity:.7;">No hay fotos cargadas aún.</p>';
+      if (badge) badge.style.display = 'none';
+      if (btnVaciar) btnVaciar.style.display = 'none';
       return;
     }
+
+    if (badge) {
+      badge.style.display = 'inline-block';
+      badge.textContent = `${fotosArray.length} foto${fotosArray.length > 1 ? 's' : ''}`;
+    }
+    if (btnVaciar) btnVaciar.style.display = 'inline-block';
+
     grid.innerHTML = fotosArray.map((f, i) => `
-      <div style="border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--card-bg, rgba(255,255,255,0.05));position:relative;">
-        <img src="${f.src}" style="width:100%;height:120px;object-fit:cover;border-radius:4px;" alt="">
-        <input class="js-foto-pie" data-i="${i}" value="${esc(f.pie || '')}" placeholder="Pie de foto..." style="width:100%;font-size:.8rem;margin-top:6px;">
-        <button class="btn btn--danger btn--sm js-foto-del" data-i="${i}" style="position:absolute;top:12px;right:12px;padding:2px 6px;" type="button">&times;</button>
+      <div style="border:1px solid var(--line);border-radius:6px;padding:6px;background:var(--card-sub-bg, rgba(255,255,255,0.03));position:relative;display:flex;flex-direction:column;">
+        <div style="position:relative;width:100%;height:115px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;">
+          <img src="${f.src}" style="max-width:100%;max-height:100%;object-fit:cover;" alt="">
+          <span style="position:absolute;top:4px;left:4px;background:rgba(14,27,44,0.75);color:#fff;font-size:10px;padding:1px 5px;border-radius:3px;font-weight:600;">N.º ${i + 1}</span>
+          <button class="btn btn--danger btn--sm js-foto-del" data-i="${i}" style="position:absolute;top:4px;right:4px;padding:2px 6px;line-height:1;font-size:11px;" type="button" title="Eliminar foto">&times;</button>
+        </div>
+        <input class="js-foto-pie" data-i="${i}" value="${esc(f.pie || '')}" placeholder="Pie de foto..." style="width:100%;font-size:.75rem;margin-top:6px;padding:3px 6px;box-sizing:border-box;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+          <button class="btn btn--ghost btn--sm js-foto-prev" data-i="${i}" type="button" style="padding:1px 6px;font-size:11px;" ${i === 0 ? 'disabled' : ''} title="Mover a la izquierda">◀</button>
+          <span style="font-size:10px;color:var(--text-muted, #888);">${i + 1}/${fotosArray.length}</span>
+          <button class="btn btn--ghost btn--sm js-foto-next" data-i="${i}" type="button" style="padding:1px 6px;font-size:11px;" ${i === fotosArray.length - 1 ? 'disabled' : ''} title="Mover a la derecha">▶</button>
+        </div>
       </div>
     `).join('');
 
@@ -455,32 +499,146 @@ export async function renderInforme() {
     grid.querySelectorAll('.js-foto-del').forEach(btn => {
       btn.onclick = () => { fotosArray.splice(Number(btn.dataset.i), 1); pintarFotosGrid(); pintar(); saveDraft(); };
     });
+    grid.querySelectorAll('.js-foto-prev').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.i);
+        if (idx > 0) {
+          const item = fotosArray.splice(idx, 1)[0];
+          fotosArray.splice(idx - 1, 0, item);
+          pintarFotosGrid();
+          pintar();
+          saveDraft();
+        }
+      };
+    });
+    grid.querySelectorAll('.js-foto-next').forEach(btn => {
+      btn.onclick = () => {
+        const idx = Number(btn.dataset.i);
+        if (idx < fotosArray.length - 1) {
+          const item = fotosArray.splice(idx, 1)[0];
+          fotosArray.splice(idx + 1, 0, item);
+          pintarFotosGrid();
+          pintar();
+          saveDraft();
+        }
+      };
+    });
   };
 
-  // Carga de fotografías
-  const fInp = $('#in_file_fotos');
-  if (fInp) {
-    fInp.onchange = (e) => {
-      const files = Array.from(e.target.files || []);
-      if (!files.length) return;
-      let count = 0;
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          fotosArray.push({ src: ev.target.result, pie: `Práctica forense en LexFive (${file.name.slice(0, 20)})` });
-          count++;
-          if (count === files.length) {
-            pintarFotosGrid();
-            pintar();
-            saveDraft();
-            toast(`${count} fotografía(s) agregada(s).`, 'success');
+  const agregarArchivosFotos = async (files) => {
+    if (!files || !files.length) return;
+    toast('Procesando archivos...', 'info');
+    let fotosNuevas = 0;
+    for (const file of files) {
+      const isDocx = file.name.toLowerCase().endsWith('.docx') || file.type.includes('wordprocessingml');
+      if (isDocx) {
+        try {
+          const extraidas = await extraerImagenesDeDocx(file);
+          if (extraidas && extraidas.length) {
+            extraidas.forEach(f => {
+              fotosArray.push({
+                src: f.src,
+                pie: f.pie || ''
+              });
+            });
+            fotosNuevas += extraidas.length;
+            toast(`Se extrajeron ${extraidas.length} fotografías del archivo Word.`, 'success');
+          } else {
+            toast(`No se encontraron imágenes en ${file.name}.`, 'warning');
           }
-        };
-        reader.readAsDataURL(file);
-      });
+        } catch (err) {
+          console.error('Error al extraer imágenes del .docx:', err);
+          toast(`Error al leer archivo Word: ${err.message}`, 'error');
+        }
+      } else if (file.type.startsWith('image/')) {
+        try {
+          const dataUrl = await optimizarImagenBlob(file, 1200, 0.85);
+          fotosArray.push({
+            src: dataUrl,
+            pie: ''
+          });
+          fotosNuevas++;
+        } catch (err) {
+          console.warn('Error al procesar imagen:', err);
+        }
+      }
+    }
+    if (fotosNuevas > 0) {
+      pintarFotosGrid();
+      pintar();
+      saveDraft();
+      toast(`${fotosNuevas} fotografía(s) agregada(s) correctamente.`, 'success');
+    }
+  };
+
+  const dropzoneIn = $('#in_fotos_dropzone');
+  const fInp = $('#in_file_fotos');
+  if (dropzoneIn && fInp) {
+    dropzoneIn.onclick = () => fInp.click();
+
+    dropzoneIn.ondragover = (e) => {
+      e.preventDefault();
+      dropzoneIn.style.borderColor = 'var(--gold, #b89446)';
+      dropzoneIn.style.background = 'rgba(184,148,70,0.08)';
+    };
+
+    dropzoneIn.ondragleave = (e) => {
+      e.preventDefault();
+      dropzoneIn.style.borderColor = 'var(--line)';
+      dropzoneIn.style.background = 'var(--card-sub-bg, rgba(255,255,255,0.02))';
+    };
+
+    dropzoneIn.ondrop = async (e) => {
+      e.preventDefault();
+      dropzoneIn.style.borderColor = 'var(--line)';
+      dropzoneIn.style.background = 'var(--card-sub-bg, rgba(255,255,255,0.02))';
+      const files = Array.from(e.dataTransfer.files || []);
+      await agregarArchivosFotos(files);
+    };
+
+    fInp.onchange = async (e) => {
+      const files = Array.from(e.target.files || []);
+      await agregarArchivosFotos(files);
       fInp.value = '';
     };
   }
+
+  const btnVaciarInFotos = $('#in_btn_vaciar_fotos');
+  if (btnVaciarInFotos) {
+    btnVaciarInFotos.onclick = () => {
+      if (!fotosArray.length) return;
+      fotosArray = [];
+      pintarFotosGrid();
+      pintar();
+      saveDraft();
+      toast('Fotos eliminadas.', 'info');
+    };
+  }
+
+  const selLayoutIn = $('#in_fotos_layout');
+  if (selLayoutIn) {
+    selLayoutIn.onchange = () => {
+      pintar();
+      saveDraft();
+    };
+  }
+
+  // Pegar imágenes con Ctrl + V
+  document.addEventListener('paste', async (e) => {
+    const items = (e.clipboardData || window.clipboardData)?.items;
+    if (!items) return;
+    const imgFiles = [];
+    for (const item of items) {
+      if (item.type.indexOf('image') !== -1) {
+        const file = item.getAsFile();
+        if (file) imgFiles.push(file);
+      }
+    }
+    if (imgFiles.length) {
+      e.preventDefault();
+      await agregarArchivosFotos(imgFiles);
+    }
+  });
 
   function saveDraft() {
     Draft.save('informe', {
@@ -508,6 +666,7 @@ export async function renderInforme() {
       in_actividades: val('in_actividades'),
       in_conclusiones: val('in_conclusiones'),
       in_modo_pres: val('in_modo_pres'),
+      in_fotos_layout: ($('#in_fotos_layout') ? $('#in_fotos_layout').value : '4'),
       in_fotos: fotosArray
     });
   }
