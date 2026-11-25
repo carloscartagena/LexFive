@@ -299,7 +299,7 @@ export async function renderDashboard() {
                 </div>
                 ${c.mensaje ? `<div class="cell-sub" style="margin-top:4px;font-size:0.83rem;">${esc(c.mensaje.slice(0, 85))}${c.mensaje.length > 85 ? '…' : ''}</div>` : ''}
               </div>
-              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+              <div class="priority-item__actions" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
                 ${wa ? `<a href="${wa}" target="_blank" rel="noopener" class="btn btn--sm" style="background:#25d366;color:#fff;border-color:#25d366;padding:4px 8px;font-size:.75rem;" title="Responder por WhatsApp" onclick="event.stopPropagation();">${ICON.whatsapp} WhatsApp</a>` : ''}
                 <button class="btn btn--sm btn--primary js-dash-convert-cli" data-id="${c.id}" type="button" style="padding:4px 8px;font-size:.75rem;white-space:nowrap;" title="Convertir a Cliente">👤 Convertir</button>
                 <button class="btn btn--ghost btn--sm js-dash-ver-consulta" data-id="${c.id}" type="button" style="white-space:nowrap;font-size:.75rem;padding:4px 8px;">Ver</button>

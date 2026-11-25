@@ -1137,9 +1137,33 @@ async function arrancarSesion() {
       }
       const mc = $('#modalClose'); if (mc) mc.onclick = closeModal;
       const mo = $('#modalOverlay'); if (mo) mo.onclick = (e) => { if (e.target === mo) closeModal(); };
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-      const mt = $('#menuToggle'); if (mt) mt.onclick = () => { $('#sidebar').classList.toggle('open'); $('#backdrop').classList.toggle('show'); };
-      const bd = $('#backdrop'); if (bd) bd.onclick = () => { $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show'); };
+      const closeSidebar = () => {
+        const sb = $('#sidebar'); if (sb) sb.classList.remove('open');
+        const bd = $('#backdrop'); if (bd) bd.classList.remove('show');
+        document.body.style.overflow = '';
+      };
+      const openSidebar = () => {
+        const sb = $('#sidebar'); if (sb) sb.classList.add('open');
+        const bd = $('#backdrop'); if (bd) bd.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      };
+      const mt = $('#menuToggle');
+      if (mt) {
+        mt.onclick = (e) => {
+          e.stopPropagation();
+          const sb = $('#sidebar');
+          if (sb && sb.classList.contains('open')) closeSidebar();
+          else openSidebar();
+        };
+      }
+      const bd = $('#backdrop');
+      if (bd) bd.onclick = closeSidebar;
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+          closeSidebar();
+        }
+      });
     } catch (e) { console.warn('Error en listeners de UI:', e); }
 
     // Cierre de sesión por inactividad

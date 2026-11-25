@@ -57,27 +57,73 @@
         var yearEl = document.getElementById('year');
         if (yearEl) { yearEl.textContent = new Date().getFullYear(); }
 
-        /* ---------- Menú móvil ---------- */
+        /* ---------- Menú móvil con backdrop y botón cerrar ✕ ---------- */
         var navToggle = document.getElementById('navToggle');
         var nav = document.getElementById('nav');
 
-        function closeMenu() {
-            if (!nav || !navToggle) return;
-            nav.classList.remove('is-open');
-            navToggle.classList.remove('is-open');
-            navToggle.setAttribute('aria-expanded', 'false');
-            navToggle.setAttribute('aria-label', 'Abrir menú');
-            document.body.style.overflow = '';
-        }
-
         if (navToggle && nav) {
-            navToggle.addEventListener('click', function () {
-                var isOpen = nav.classList.toggle('is-open');
-                navToggle.classList.toggle('is-open', isOpen);
-                navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                navToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
-                document.body.style.overflow = isOpen ? 'hidden' : '';
+            // Asegurar que exista el backdrop semitransparente
+            var navBackdrop = document.getElementById('navBackdrop');
+            if (!navBackdrop) {
+                navBackdrop = document.createElement('div');
+                navBackdrop.id = 'navBackdrop';
+                navBackdrop.className = 'nav-backdrop';
+                document.body.appendChild(navBackdrop);
+            }
+
+            // Asegurar que exista la cabecera con botón ✕ dentro del drawer
+            var navClose = document.getElementById('navClose');
+            if (!navClose) {
+                var navHeader = nav.querySelector('.nav__header');
+                if (!navHeader) {
+                    navHeader = document.createElement('div');
+                    navHeader.className = 'nav__header';
+                    navHeader.innerHTML = '<div class="nav__brand"><strong>LexFive</strong><small>Menú</small></div>' +
+                        '<button type="button" class="nav__close" id="navClose" aria-label="Cerrar menú">&times;</button>';
+                    nav.insertBefore(navHeader, nav.firstChild);
+                }
+                navClose = document.getElementById('navClose');
+            }
+
+            function openMenu() {
+                nav.classList.add('is-open');
+                navToggle.classList.add('is-open');
+                navToggle.setAttribute('aria-expanded', 'true');
+                navToggle.setAttribute('aria-label', 'Cerrar menú');
+                if (navBackdrop) navBackdrop.classList.add('is-active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMenu() {
+                nav.classList.remove('is-open');
+                navToggle.classList.remove('is-open');
+                navToggle.setAttribute('aria-expanded', 'false');
+                navToggle.setAttribute('aria-label', 'Abrir menú');
+                if (navBackdrop) navBackdrop.classList.remove('is-active');
+                document.body.style.overflow = '';
+            }
+
+            navToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (nav.classList.contains('is-open')) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
             });
+
+            if (navClose) {
+                navClose.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    closeMenu();
+                });
+            }
+
+            if (navBackdrop) {
+                navBackdrop.addEventListener('click', function () {
+                    closeMenu();
+                });
+            }
 
             // Cerrar al hacer clic en un enlace
             nav.querySelectorAll('.nav__link').forEach(function (link) {
@@ -86,7 +132,9 @@
 
             // Cerrar con la tecla Escape
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') { closeMenu(); }
+                if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+                    closeMenu();
+                }
             });
 
             // Cerrar al hacer clic fuera del menú

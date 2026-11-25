@@ -196,24 +196,25 @@
     justify-content: center;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     #ai-chatbot-container {
-        right: 20px; /* Over WhatsApp float on mobile or place it on the left */
-        bottom: 80px; /* Above whatsapp button */
-        z-index: 1001; /* Ensure it's above other elements */
+        right: 14px;
+        bottom: 74px;
+        z-index: 1001;
     }
 
     #ai-chatbot-window {
         position: fixed;
-        bottom: 20px;
-        right: 20px;
-        left: 20px;
+        bottom: 14px;
+        right: 14px;
+        left: 14px;
         width: auto;
-        height: 75vh;
+        max-width: calc(100vw - 28px);
+        height: min(75vh, 560px);
         max-height: none;
     }
     
     .ai-chatbot-tooltip {
-        display: none; /* Hide tooltip on small screens if it takes too much space */
+        display: none;
     }
 }
