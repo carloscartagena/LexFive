@@ -403,7 +403,7 @@ export async function renderCertificados() {
                 <div style="grid-column:1/-1;margin-top:10px;">
                   <div class="card" style="margin:0;border:1px solid var(--line);background:var(--card-bg, rgba(255,255,255,0.03));border-radius:8px;">
                     <div class="card__head" style="padding:10px 14px;">
-                      <strong style="font-size:.9rem;color:var(--text, #101820);display:flex;align-items:center;gap:6px;">
+                      <strong style="font-size:.9rem;color:var(--text-primary, var(--ink));display:flex;align-items:center;gap:6px;">
                         <span>📋</span> Nota de Remisión Universitaria (IIST / UMSA)
                       </strong>
                     </div>
@@ -518,7 +518,7 @@ export async function renderCertificados() {
         <div id="ce_preview_actions" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn--primary btn--sm" id="ce_btn_imprimir_activo" type="button" style="font-weight:bold;background:#b89446;color:#fff;">🖨️ Guardar PDF / Imprimir</button>
           <button class="btn btn--ghost btn--sm" id="ce_btn_expediente_completo" type="button" style="display:none;font-weight:600;border:1px solid #b89446;color:#b89446;">📑 Expediente UMSA (4 en 1)</button>
-          <button class="btn btn--ghost btn--sm" id="ce_btn_paquete_cv" type="button" style="display:none;font-weight:600;border:1px solid #0e1b2c;color:#0e1b2c;">🎓 Paquete CV (2 en 1)</button>
+          <button class="btn btn--ghost btn--sm" id="ce_btn_paquete_cv" type="button" style="display:none;font-weight:600;border:1px solid var(--line);color:var(--ink);">🎓 Paquete CV (2 en 1)</button>
           <button class="btn btn--ghost btn--sm" id="ce_btn_word_activo" type="button">📄 Word (.doc)</button>
         </div>
       </div>

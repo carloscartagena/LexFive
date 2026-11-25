@@ -64,7 +64,7 @@ export async function openHonorarios(proc) {
           <span>Progreso de cobro</span>
           <strong>${pct}% completado</strong>
         </div>
-        <div style="height:10px;background:rgba(14,27,44,0.12);border-radius:5px;overflow:hidden;">
+        <div style="height:10px;background:var(--border-color, rgba(14,27,44,0.12));border-radius:5px;overflow:hidden;">
           <div style="width:${pct}%;height:100%;background:${pct >= 100 ? '#10b981' : 'linear-gradient(90deg, #c2a25a, #b89446)'};border-radius:5px;transition:width 0.3s ease;"></div>
         </div>
       </div>

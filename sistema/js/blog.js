@@ -27,7 +27,7 @@ export async function renderBlog() {
             ✨ Asistente IA de Redacción Jurídica
           </span>
           <div style="flex-grow:1;min-width:280px;">
-            <input type="text" id="aiTemaArticulo" placeholder="Ej. Proceso de asistencia familiar en Bolivia según la Ley 603" style="width:100%;margin:0;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--white);">
+            <input type="text" id="aiTemaArticulo" placeholder="Ej. Proceso de asistencia familiar en Bolivia según la Ley 603" style="width:100%;margin:0;padding:8px 12px;border:1px solid var(--input-border, var(--line));border-radius:6px;background:var(--input-bg, var(--white));color:var(--input-text, var(--ink));">
           </div>
           <button class="btn btn--primary" id="btnRedactarAI" type="button" style="white-space:nowrap;padding:8px 16px;">
             ✨ Redactar borrador con IA

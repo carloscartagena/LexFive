@@ -96,8 +96,8 @@ export async function clienteForm(cli = null) {
 
     if (procsList.length > 0) {
       procsHTML = `
-        <div style="margin-top:24px;border-top:2px solid #c2a25a;padding-top:16px;">
-          <h4 style="font-size:1.1rem;color:var(--navy,#0e1b2c);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <div style="margin-top:24px;border-top:2px solid var(--gold);padding-top:16px;">
+          <h4 style="font-size:1.1rem;color:var(--text-primary, var(--navy));margin-bottom:12px;display:flex;align-items:center;gap:8px;">
             <span>⚖️</span> Ficha Procesal y Seguimiento de Causas (${procsList.length})
           </h4>
 
@@ -108,11 +108,11 @@ export async function clienteForm(cli = null) {
             const etapaActual = p.etapa || 'Preparatoria / Demanda';
 
             return `
-              <div class="card" style="margin-bottom:18px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;box-shadow:0 3px 12px rgba(14,27,44,0.04);">
+              <div class="card" style="margin-bottom:18px;border:1px solid var(--border-color, var(--line));border-radius:10px;background:var(--card-bg, #fff);box-shadow:var(--shadow-sm);overflow:hidden;">
                 <!-- Encabezado de la Causa -->
-                <div style="background:#f8fafc;padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <div style="background:var(--card-sub-bg, var(--bg));padding:12px 16px;border-bottom:1px solid var(--border-color, var(--line));display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
                   <div>
-                    <strong style="font-size:1.02rem;color:var(--navy,#0e1b2c);">${esc(p.caratula)}</strong>
+                    <strong style="font-size:1.02rem;color:var(--text-primary, var(--ink));">${esc(p.caratula)}</strong>
                     <div class="cell-sub" style="margin-top:2px;font-size:.82rem;">${esc(p.materia || 'General')} · ${p.tipo === 'administrativo' ? 'Administrativo' : 'Judicial'}</div>
                   </div>
                   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -155,16 +155,16 @@ export async function clienteForm(cli = null) {
                   <!-- Línea de Tiempo de Actuaciones -->
                   <div style="margin-top:16px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-                      <h5 style="margin:0;font-size:.92rem;color:var(--navy,#0e1b2c);font-weight:700;display:flex;align-items:center;gap:6px;">
+                      <h5 style="margin:0;font-size:.92rem;color:var(--text-primary, var(--ink));font-weight:700;display:flex;align-items:center;gap:6px;">
                         <span>⏱️</span> Línea de Tiempo de Actuaciones (${pActs.length})
                       </h5>
-                      <button type="button" class="btn btn--sm btn--ghost js-toggle-act" data-pid="${p.id}" style="font-weight:600;color:var(--navy,#0e1b2c);border:1px solid #cbd5e1;font-size:.78rem;">
+                      <button type="button" class="btn btn--sm btn--ghost js-toggle-act" data-pid="${p.id}" style="font-weight:600;color:var(--text-primary, var(--ink));border:1px solid var(--border-color, var(--line));font-size:.78rem;">
                         + Registrar actuación
                       </button>
                     </div>
 
                     <!-- Formulario desplegable para registrar actuación -->
-                    <div id="form_act_${p.id}" style="display:none;background:#f8fafc;padding:12px 14px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:14px;">
+                    <div id="form_act_${p.id}" style="display:none;background:var(--card-sub-bg, var(--bg));padding:12px 14px;border-radius:8px;border:1px solid var(--border-color, var(--line));margin-bottom:14px;">
                       <div class="field-row" style="margin-bottom:8px;">
                         <div class="field" style="margin-bottom:0;flex:1;">
                           <label style="font-size:.76rem;font-weight:600;">Fecha de la actuación</label>
@@ -205,7 +205,7 @@ export async function clienteForm(cli = null) {
       `;
     } else {
       procsHTML = `
-        <div style="margin-top:20px;border-top:1px dashed #cbd5e1;padding-top:14px;text-align:center;">
+        <div style="margin-top:20px;border-top:1px dashed var(--border-color, #cbd5e1);padding-top:14px;text-align:center;">
           <p class="cell-sub" style="margin-bottom:6px;">Este cliente aún no tiene expedientes o causas asignadas.</p>
         </div>
       `;

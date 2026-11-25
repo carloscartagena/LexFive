@@ -56,7 +56,7 @@ export async function renderAranceles() {
     let out = '';
     for (const [cat, procesos] of Object.entries(agrupado)) {
       out += `
-        <h3 style="margin-top: 24px; margin-bottom: 12px; color: var(--navy); border-bottom: 1px solid var(--border); padding-bottom: 6px;">${esc(cat)}</h3>
+        <h3 style="margin-top: 24px; margin-bottom: 12px; color: var(--text-primary, var(--navy)); border-bottom: 1px solid var(--border-color, var(--line)); padding-bottom: 6px;">${esc(cat)}</h3>
         <div class="table-wrap">
           <table class="data">
             <thead>
