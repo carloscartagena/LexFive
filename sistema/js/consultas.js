@@ -112,7 +112,7 @@ export async function renderConsultas() {
       (!fe || c.estado === fe) &&
       (!q || [c.nombre, c.apellido, c.email, c.telefono, c.area, c.mensaje].some(v => (v || '').toLowerCase().includes(q))));
     const info = paginar(rows, page);
-    $('#consTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data">
+    $('#consTable').innerHTML = rows.length ? `<div class="table-wrap"><table class="data table-consultas">
       <thead><tr><th>Fecha</th><th>Nombre</th><th>Contacto</th><th>Área</th><th>Estado</th><th>Acciones directas</th></tr></thead>
       <tbody>${info.slice.map(c => `
         <tr data-id="${c.id}">
@@ -122,7 +122,7 @@ export async function renderConsultas() {
           <td>${c.area ? `<span class="badge badge-mat">${esc(c.area)}</span>` : '—'}</td>
           <td>${consultaEstadoBadge(c.estado)}</td>
           <td>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <div class="table-consultas__actions" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
               ${c.telefono ? `<a href="${getConsultaWaUrl(c)}" target="_blank" rel="noopener" class="btn btn--sm" style="background:#25d366;color:#fff;border-color:#25d366;padding:4px 8px;font-size:0.75rem;" title="Responder por WhatsApp" onclick="event.stopPropagation();">${ICON.whatsapp} WhatsApp</a>` : ''}
               <button class="btn btn--sm btn--primary js-btn-convert" data-id="${c.id}" type="button" style="padding:4px 8px;font-size:0.75rem;white-space:nowrap;" title="Convertir a Cliente" onclick="event.stopPropagation();">👤 Convertir a Cliente</button>
             </div>
