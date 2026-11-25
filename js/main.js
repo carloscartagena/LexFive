@@ -1218,15 +1218,28 @@
                 fechaStr = d.toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' });
             } catch (e) { fechaStr = a.fecha || ''; }
             var link = 'blog.html?id=' + encodeURIComponent(a.id);
+            var cat = a.categoria || 'General';
+            var coverUrl = a.imagen_url;
+            if (!coverUrl && a.contenido) {
+                var m = a.contenido.match(/<!--cover:(https?:\/\/[^\s>]+)-->/) || a.contenido.match(/!\[(?:portada|cover)\]\((https?:\/\/[^\s)]+)\)/i);
+                if (m) coverUrl = m[1];
+            }
+            var mediaHtml = '';
+            if (coverUrl) {
+                mediaHtml = '<img src="' + esc(coverUrl) + '" alt="' + esc(a.titulo) + '" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-radius:12px 12px 0 0" onerror="this.parentElement.innerHTML=getAreaThemedSvg(\'' + esc(cat).replace(/'/g, "\\'") + '\', \'100%\', \'100%\')">';
+            } else {
+                mediaHtml = '<div style="width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px 12px 0 0;border-bottom:1px solid rgba(212,175,55,0.2)">' + getAreaThemedSvg(cat, '100%', '100%') + '</div>';
+            }
+            var excerpt = (a.resumen || a.contenido || '').replace(/^<!--cover:https?:\/\/[^\s>]+-->\s*/i, '');
             return '<article class="post-card" onclick="window.location.href=\'' + link + '\'">' +
-                '<div class="post-card__media"></div>' +
+                '<div class="post-card__media" style="overflow:hidden">' + mediaHtml + '</div>' +
                 '<div class="post-card__body">' +
                     '<div class="post-card__meta">' +
-                        '<span class="tag">' + esc(a.categoria || 'General') + '</span>' +
+                        '<span class="tag">' + esc(cat) + '</span>' +
                         '<span class="post-card__date">' + esc(fechaStr) + '</span>' +
                     '</div>' +
                     '<h3 class="post-card__title" style="font-size:1.22rem; margin-bottom:10px;">' + esc(a.titulo) + '</h3>' +
-                    '<p class="post-card__excerpt">' + esc(a.resumen || a.contenido || '') + '</p>' +
+                    '<p class="post-card__excerpt">' + esc(excerpt) + '</p>' +
                     '<div style="margin-top:auto; padding-top:14px;">' +
                         '<a href="' + link + '" class="post-card__link" style="font-weight:600; color:var(--gold); display:inline-flex; align-items:center; gap:6px;">' +
                             'Leer artículo completo &rarr;' +
