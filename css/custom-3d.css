@@ -36,21 +36,28 @@
 }
 
 .custom-front {
-    background-color: var(--heading);
+    background: radial-gradient(circle at 50% 20%, #102a52 0%, #06162f 60%, #020a16 100%);
     color: var(--white);
     align-items: center;
     text-align: center;
-    background-size: cover;
-    background-position: center;
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    box-shadow: inset 0 0 25px rgba(212, 175, 55, 0.06), 0 8px 24px rgba(2, 11, 24, 0.35);
+    position: relative;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Overlay to make text readable over the background image */
+.custom-3d-wrapper:hover .custom-front {
+    border-color: rgba(212, 175, 55, 0.55);
+    box-shadow: inset 0 0 35px rgba(212, 175, 55, 0.12), 0 12px 32px rgba(2, 11, 24, 0.5);
+}
+
+/* Overlay con degradado sutil dorado/oscuro */
 .custom-front::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(to bottom, rgba(2, 11, 30, 0.4) 0%, rgba(2, 11, 30, 0.9) 100%);
+    background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+    pointer-events: none;
     z-index: 1;
     border-radius: 12px;
 }
@@ -58,6 +65,22 @@
 .custom-front > * {
     z-index: 2;
     position: relative;
+}
+
+.custom-card-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 16px;
+    color: var(--gold, #d4af37);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 3px 8px rgba(212, 175, 55, 0.3));
+    transition: transform 0.3s ease;
+}
+
+.custom-3d-wrapper:hover .custom-card-icon {
+    transform: translateY(-2px) scale(1.06);
 }
 
 .custom-back {

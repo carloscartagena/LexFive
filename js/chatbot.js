@@ -9,7 +9,43 @@ import { generateContent } from '../sistema/js/ai.js';
             <div class="ai-chatbot-toggle-wrapper">
                 <div class="ai-chatbot-tooltip">¿Qué consulta necesitas?</div>
                 <button id="ai-chatbot-toggle" aria-label="Abrir asistente">
-                    <img src="assets/lex-bot.jpg" alt="Lex Bot" class="ai-chatbot-avatar" onerror="this.src='https://ui-avatars.com/api/?name=Lex&background=041230&color=fff'">
+                    <svg viewBox="0 0 64 64" class="ai-chatbot-avatar" role="img" aria-label="Asistente LexFive">
+                        <defs>
+                            <radialGradient id="lexBotBg" cx="35%" cy="35%" r="65%">
+                                <stop offset="0%" stop-color="#152b47"/>
+                                <stop offset="60%" stop-color="#0a1829"/>
+                                <stop offset="100%" stop-color="#040b15"/>
+                            </radialGradient>
+                            <linearGradient id="lexBotGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#f5e1a4"/>
+                                <stop offset="50%" stop-color="#d4af37"/>
+                                <stop offset="100%" stop-color="#aa8222"/>
+                            </linearGradient>
+                            <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#d4af37" flood-opacity="0.35"/>
+                            </filter>
+                        </defs>
+                        <circle cx="32" cy="32" r="31" fill="url(#lexBotBg)" stroke="url(#lexBotGold)" stroke-width="2"/>
+                        <circle cx="32" cy="32" r="27.5" fill="none" stroke="url(#lexBotGold)" stroke-width="0.75" stroke-dasharray="2 3" opacity="0.6"/>
+                        <g fill="none" stroke="url(#lexBotGold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#goldGlow)">
+                            <path d="M32 16 v26"/>
+                            <path d="M19 22 h26"/>
+                            <path d="M19 22 l-4 9"/>
+                            <path d="M19 22 l4 9"/>
+                            <path d="M13.5 31 q5.5 5 11 0"/>
+                            <path d="M45 22 l-4 9"/>
+                            <path d="M45 22 l4 9"/>
+                            <path d="M39.5 31 q5.5 5 11 0"/>
+                            <path d="M26 42 h12"/>
+                            <path d="M23 45 h18"/>
+                        </g>
+                        <circle cx="32" cy="14" r="2.2" fill="url(#lexBotGold)"/>
+                        <circle cx="19" cy="22" r="1.4" fill="url(#lexBotGold)"/>
+                        <circle cx="45" cy="22" r="1.4" fill="url(#lexBotGold)"/>
+                        <circle cx="32" cy="22" r="1.6" fill="url(#lexBotGold)"/>
+                        <circle cx="21" cy="15" r="1" fill="#f5e1a4" opacity="0.8"/>
+                        <circle cx="43" cy="15" r="1" fill="#f5e1a4" opacity="0.8"/>
+                    </svg>
                 </button>
             </div>
             <div id="ai-chatbot-window">
