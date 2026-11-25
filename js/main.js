@@ -20,6 +20,32 @@
             var SB_KEY = 'sb_publishable_rPll8pRV30EagnHkJ68Kwg_JfoeN6vT';
             var LOGOS_VALIDOS = ['ds1-balanza-codigo', 'ds2-L5-circuito', 'ds3-mazo-pulso', 'ds4-columna-circuito', 'ds5-balanza-chip', 'opcion-6-LF-circuito'];
 
+            // Sincronización única de branding compartido (evita múltiples requests de 3.7MB)
+            window.__lexfive_fetch_branding = window.__lexfive_fetch_branding || function (cb) {
+                if (window.__lexfive_branding_data) {
+                    cb(window.__lexfive_branding_data);
+                    return;
+                }
+                if (!window.__lexfive_branding_promise) {
+                    window.__lexfive_branding_promise = fetch(SB_URL + '/rest/v1/configuracion?clave=eq.branding&select=valor', {
+                        headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+                    })
+                    .then(function (r) { return r.ok ? r.json() : []; })
+                    .then(function (rows) {
+                        if (rows && rows[0] && rows[0].valor) {
+                            window.__lexfive_branding_data = rows[0].valor;
+                            try { localStorage.setItem('lexfive_branding', JSON.stringify(rows[0].valor)); } catch (e) {}
+                            return rows[0].valor;
+                        }
+                        return null;
+                    })
+                    .catch(function () { return null; });
+                }
+                window.__lexfive_branding_promise.then(function (b) {
+                    if (b) cb(b);
+                });
+            };
+
             var aplicarMarca = function (url) {
                 if (!url) return;
                 var st = document.getElementById('lexfiveLogoStyle');
@@ -41,18 +67,9 @@
             } catch (e) {}
 
             // 2) Refresco desde la nube (fuente de verdad para todos los equipos).
-            fetch(SB_URL + '/rest/v1/configuracion?clave=eq.branding&select=valor', {
-                headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
-            })
-            .then(function (r) { return r.ok ? r.json() : []; })
-            .then(function (rows) {
-                if (rows && rows[0] && rows[0].valor) {
-                    var b = rows[0].valor;
-                    try { localStorage.setItem('lexfive_branding', JSON.stringify(b)); } catch (e) {}
-                    aplicarMarca(urlDeMarca(b));
-                }
-            })
-            .catch(function () {});
+            window.__lexfive_fetch_branding(function (b) {
+                aplicarMarca(urlDeMarca(b));
+            });
         } catch (e) {}
 
         /* ---------- Año actual en el footer ---------- */
@@ -728,17 +745,11 @@
 
     // 2) Refresco desde la nube (fuente de verdad para todos los dispositivos).
     try {
-        fetch(SB_URL + '/rest/v1/configuracion?clave=eq.branding&select=valor', {
-            headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
-        })
-        .then(function (r) { return r.ok ? r.json() : []; })
-        .then(function (rows) {
-            if (rows && rows[0] && rows[0].valor) {
-                try { localStorage.setItem('lexfive_branding', JSON.stringify(rows[0].valor)); } catch (e) {}
-                aplicar(rows[0].valor);
-            }
-        })
-        .catch(function () {});
+        if (typeof window.__lexfive_fetch_branding === 'function') {
+            window.__lexfive_fetch_branding(function (b) {
+                aplicar(b);
+            });
+        }
     } catch (e) {}
 })();
 
@@ -877,7 +888,7 @@
         grid.innerHTML = list.map(function (a) {
             var mediaHtml = '';
             if (a.imagen_url) {
-                mediaHtml = '<div class="area-card__media"><img src="' + esc(a.imagen_url) + '" alt="' + esc(a.titulo) + '" loading="lazy" onerror="this.parentElement.remove()"></div>';
+                mediaHtml = '<div class="area-card__media"><img src="' + esc(a.imagen_url) + '" alt="' + esc(a.titulo) + '" loading="lazy" decoding="async" onerror="this.parentElement.remove()"></div>';
             } else {
                 mediaHtml = '<div class="area-card__icon-box">' + ICON_AREA_SVG + '</div>';
             }
@@ -1011,17 +1022,11 @@
 
         // 2. Sincronización en vivo desde Supabase REST
         // Branding
-        fetch(SB_URL + '/rest/v1/configuracion?clave=eq.branding&select=valor', {
-            headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
-        })
-        .then(function (r) { return r.ok ? r.json() : []; })
-        .then(function (rows) {
-            if (rows && rows[0] && rows[0].valor) {
-                var b = rows[0].valor;
-                try { localStorage.setItem('lexfive_branding', JSON.stringify(b)); } catch (e) {}
+        if (typeof window.__lexfive_fetch_branding === 'function') {
+            window.__lexfive_fetch_branding(function (b) {
                 aplicarBranding(b);
-            }
-        }).catch(function () {});
+            });
+        }
 
         // Áreas de práctica
         fetch(SB_URL + '/rest/v1/areas_practica?select=id,titulo,descripcion,imagen_url,orden&activo=eq.true&order=orden.asc', {
