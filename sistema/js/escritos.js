@@ -291,10 +291,10 @@ export async function renderEscritos() {
         </div>
 
         <!-- Tarjeta de vista rápida de datos del cliente -->
-        <div id="esc_cliente_badge" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.84rem;">
+        <div id="esc_cliente_badge" style="display:none;background:var(--card-sub-bg, var(--bg));border:1px solid var(--border-color, var(--line));border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:.84rem;">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-            <div id="esc_badge_info" style="color:#1e293b;line-height:1.5;"></div>
-            <button type="button" class="btn btn--primary btn--sm" id="btn_rellenar_variables" style="font-weight:600;background:#0e1b2c;border:1px solid #c2a25a;color:#c2a25a;display:inline-flex;align-items:center;gap:6px;">
+            <div id="esc_badge_info" style="color:var(--text-primary, var(--ink));line-height:1.5;"></div>
+            <button type="button" class="btn btn--primary btn--sm" id="btn_rellenar_variables" style="font-weight:600;background:var(--primary, #0e1b2c);border:1px solid var(--gold);color:var(--gold-light, #c2a25a);display:inline-flex;align-items:center;gap:6px;">
               <span>⚡</span> Rellenar variables en el escrito
             </button>
           </div>
@@ -317,12 +317,12 @@ export async function renderEscritos() {
     <div class="card">
       <div class="card__head" style="padding:14px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:260px;">
-          <input type="text" id="esc_titulo" placeholder="Título del escrito (ej. Memorial de Apersonamiento)" style="font-size:1.1rem;font-weight:700;padding:6px 10px;border:1px solid #cbd5e1;border-radius:6px;width:100%;font-family:Georgia,serif;color:var(--navy,#0e1b2c);">
+          <input type="text" id="esc_titulo" placeholder="Título del escrito (ej. Memorial de Apersonamiento)" style="font-size:1.1rem;font-weight:700;padding:6px 10px;border:1px solid var(--input-border, var(--line));border-radius:6px;width:100%;font-family:Georgia,serif;color:var(--text-primary, var(--navy));background:var(--input-bg, var(--white));">
         </div>
         
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <!-- Selector rápido de estructuras bolivianas -->
-          <select id="esc_sel_estructura" class="input" style="font-size:.84rem;padding:6px 10px;font-weight:600;border:1.5px solid #c2a25a;max-width:280px;">
+          <select id="esc_sel_estructura" class="input" style="font-size:.84rem;padding:6px 10px;font-weight:600;border:1.5px solid var(--gold);max-width:280px;background:var(--input-bg, var(--white));color:var(--input-text, var(--ink));">
             <option value="">📂 Cargar estructura base boliviana...</option>
             ${estructurasOptions}
           </select>
@@ -336,13 +336,13 @@ export async function renderEscritos() {
 
       <div class="card__body" style="padding:14px 18px;">
         <!-- Textarea con estilo forense -->
-        <textarea id="esc_cuerpo" style="width:100%;min-height:480px;font-family:Arial,sans-serif;font-size:12pt;line-height:1.6;text-align:justify;padding:16px;border:1.5px solid #cbd5e1;border-radius:8px;resize:vertical;color:#1e293b;box-sizing:border-box;" placeholder="Escriba aquí el memorial, minuta o contrato, o cargue una de las 5 estructuras base bolivianas arriba..."></textarea>
+        <textarea id="esc_cuerpo" style="width:100%;min-height:480px;font-family:Arial,sans-serif;font-size:12pt;line-height:1.6;text-align:justify;padding:16px;border:1.5px solid var(--input-border, var(--line));border-radius:8px;resize:vertical;color:var(--input-text, #1e293b);background:var(--input-bg, var(--white));box-sizing:border-box;" placeholder="Escriba aquí el memorial, minuta o contrato, o cargue una de las 5 estructuras base bolivianas arriba..."></textarea>
 
         <!-- Barra inferior de acciones y exportación -->
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border-color, var(--line));">
           <div style="display:flex;align-items:center;gap:14px;">
-            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;color:var(--ink,#1e293b);user-select:none;">
-              <input type="checkbox" id="esc_chk_membrete" style="width:17px;height:17px;accent-color:#0e1b2c;">
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem;color:var(--text-primary, var(--ink));user-select:none;">
+              <input type="checkbox" id="esc_chk_membrete" style="width:17px;height:17px;accent-color:var(--gold, #c2a25a);">
               <span><strong>Incluir papel membretado de LexFive</strong> <span class="cell-sub">(Recomendado para contratos/cartas; desmarcar para memoriales judiciales)</span></span>
             </label>
           </div>
@@ -354,7 +354,7 @@ export async function renderEscritos() {
             <button type="button" class="btn btn--primary" id="btn_export_word" style="background:#2b579a;border-color:#2b579a;font-weight:600;display:inline-flex;align-items:center;gap:6px;">
               <span>📄</span> Descargar Word (.doc)
             </button>
-            <button type="button" class="btn btn--primary" id="btn_export_pdf" style="background:#0e1b2c;border:1px solid #c2a25a;color:#c2a25a;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+            <button type="button" class="btn btn--primary" id="btn_export_pdf" style="background:var(--primary, #0e1b2c);border:1px solid var(--gold);color:var(--gold-light, #c2a25a);font-weight:700;display:inline-flex;align-items:center;gap:6px;">
               <span>🖨️</span> Guardar PDF / Imprimir
             </button>
           </div>

@@ -120,14 +120,14 @@ export function renderTimelineVertical(acts = [], docs = [], cli = null, proc = 
         return `
           <div class="timeline-node" style="position:relative;margin-bottom:20px;">
             <!-- Punto indicador en la línea -->
-            <div style="position:absolute;left:-33px;top:4px;width:14px;height:14px;border-radius:50%;background:#0e1b2c;border:2.5px solid #c2a25a;box-shadow:0 0 0 2px #fff;"></div>
+            <div style="position:absolute;left:-33px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--gold, #c2a25a);border:2.5px solid var(--white, #fff);box-shadow:0 0 0 2px var(--card-bg, #fff);"></div>
             
             <!-- Tarjeta de actuación -->
-            <div style="background:var(--card-bg,#fff);border:1px solid var(--line,#e2e8f0);border-radius:8px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div style="background:var(--card-bg,#fff);border:1px solid var(--border-color, var(--line,#e2e8f0));border-radius:8px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                  <span style="font-size:0.82rem;font-weight:700;color:var(--navy,#0e1b2c);">${fechaLocal}</span>
-                  <span style="font-size:0.75rem;padding:2px 8px;border-radius:12px;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1;font-weight:600;">
+                  <span style="font-size:0.82rem;font-weight:700;color:var(--text-primary, var(--navy,#0e1b2c));">${fechaLocal}</span>
+                  <span style="font-size:0.75rem;padding:2px 8px;border-radius:12px;background:var(--bg-soft2, #f1f5f9);color:var(--text-secondary, #334155);border:1px solid var(--border-color, #cbd5e1);font-weight:600;">
                     ${esc(tipoLabel)}
                   </span>
                 </div>
@@ -141,17 +141,17 @@ export function renderTimelineVertical(acts = [], docs = [], cli = null, proc = 
               </div>
 
               <!-- Descripción de la actividad -->
-              <div style="font-size:0.92rem;color:var(--ink,#1e293b);line-height:1.55;margin-bottom:8px;white-space:pre-wrap;">
+              <div style="font-size:0.92rem;color:var(--text-primary, var(--ink,#1e293b));line-height:1.55;margin-bottom:8px;white-space:pre-wrap;">
                 ${esc(a.descripcion)}
               </div>
 
               <!-- Documentos adjuntos a esta actuación -->
               ${actDocs.length ? `
-                <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line,#e2e8f0);">
+                <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border-color, var(--line,#e2e8f0));">
                   <div style="font-size:0.76rem;color:var(--muted,#64748b);font-weight:600;margin-bottom:4px;">Documentos adjuntos:</div>
                   <div style="display:flex;flex-wrap:wrap;gap:6px;">
                     ${actDocs.map(d => `
-                      <span class="act-file" data-path="${esc(d.storage_path)}" data-id="${d.id}" style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:3px 8px;font-size:0.76rem;color:#0369a1;display:inline-flex;align-items:center;gap:6px;">
+                      <span class="act-file" data-path="${esc(d.storage_path)}" data-id="${d.id}" style="background:var(--bg-soft2, #f8fafc);border:1px solid var(--border-color, #cbd5e1);border-radius:6px;padding:3px 8px;font-size:0.76rem;color:var(--gold-dark, #0369a1);display:inline-flex;align-items:center;gap:6px;">
                         <span>📎</span> <span class="act-file__name">${esc(d.nombre || 'Archivo')}</span>
                         ${d.storage_path ? `<button type="button" class="btn btn--ghost btn--sm js-tl-dl" style="padding:2px 6px;font-size:0.72rem;line-height:1;border-radius:4px;cursor:pointer;" title="Ver archivo">Ver</button>` : ''}
                       </span>

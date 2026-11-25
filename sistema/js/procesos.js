@@ -282,7 +282,7 @@ export async function openProcesoDetail(id, readonly = false) {
       <div>
         <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); font-weight:700;">Etapa procesal actual</div>
         <div style="display:flex; align-items:center; gap:8px; margin-top:2px; flex-wrap:wrap;">
-          <span style="font-size:0.92rem; font-weight:700; color:var(--navy,#0e1b2c); background:#fff; border:1px solid #c2a25a; padding:3px 10px; border-radius:14px;">
+          <span style="font-size:0.92rem; font-weight:700; color:var(--text-primary, var(--ink)); background:var(--card-bg, #fff); border:1px solid var(--gold, #c2a25a); padding:3px 10px; border-radius:14px;">
             ⚖️ ${esc(p.etapa || 'Preparatoria / Demanda')}
           </span>
           <span style="font-size:0.82rem; color:var(--muted);">Código de seguimiento: <strong style="font-family:monospace; color:var(--primary); font-size:0.92rem;">${esc(codSeg)}</strong></span>

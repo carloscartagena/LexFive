@@ -246,7 +246,7 @@ export function renderAlertasPanel(panel) {
           <div class="notif-item js-jump-tareas" style="border-left:3.5px solid #d97706; background:rgba(217,119,6,0.06); margin:3px 8px; border-radius:6px; padding:9px 12px; cursor:pointer;" title="Clic para ir a Tareas y Plazos">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
               <strong class="notif-item__title" style="font-size:0.86rem; color:var(--ink);">${esc(t.titulo)}</strong>
-              <span class="badge" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a; font-size:0.7rem; font-weight:700; white-space:nowrap; padding:2px 6px;">
+              <span class="badge" style="background:rgba(217,119,6,0.18); color:var(--text-primary, #92400e); border:1px solid rgba(217,119,6,0.45); font-size:0.7rem; font-weight:700; white-space:nowrap; padding:2px 6px;">
                 ${esManana ? '⏳ Vence Mañana' : `Vence ${fmtDate(t.vence)}`}
               </span>
             </div>
@@ -275,7 +275,7 @@ export function renderAlertasPanel(panel) {
           <div class="notif-item js-jump-consultas" style="border-left:3.5px solid #0284c7; background:rgba(2,132,199,0.06); margin:3px 8px; border-radius:6px; padding:9px 12px; cursor:pointer;" title="Clic para ir a Consultas">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
               <strong class="notif-item__title" style="font-size:0.86rem; color:var(--ink);">${esc(nom)}</strong>
-              <span class="badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-size:0.7rem; font-weight:600; padding:1px 6px;">
+              <span class="badge" style="background:rgba(2,132,199,0.18); color:var(--text-primary, #0369a1); border:1px solid rgba(2,132,199,0.45); font-size:0.7rem; font-weight:600; padding:1px 6px;">
                 ${esc(c.area || 'General')}
               </span>
             </div>

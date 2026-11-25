@@ -234,7 +234,7 @@ function plantillaForm(pl = null) {
   const estOpts = ESTRUCTURAS_BASE_BOLIVIA.map(e => `<option value="${e.id}">${esc(e.nombre)}</option>`).join('');
 
   const body = `
-    <div style="margin-bottom:12px;background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;">
+    <div style="margin-bottom:12px;background:var(--card-sub-bg, var(--bg));padding:10px 12px;border-radius:8px;border:1px solid var(--border-color, var(--line));">
       <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px;">Cargar estructura base boliviana (opcional)</label>
       <select id="pl_base_sel" class="input" style="font-size:.84rem;">
         <option value="">— Seleccionar estructura legal boliviana —</option>
@@ -328,7 +328,7 @@ async function usarPlantilla(pl) {
     const texto = aplicarCampos(pl.cuerpo, buildMapaCampos(p, cli));
     $('#gen_out').innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
-        <label class="cell-sub" style="font-weight:600;color:var(--ink,#1e293b);">Documento generado (formato forense boliviano):</label>
+        <label class="cell-sub" style="font-weight:600;color:var(--text-primary, var(--ink));">Documento generado (formato forense boliviano):</label>
         <button type="button" class="btn btn--ghost btn--sm" id="btn_gen_ia" style="border:1px solid #8b5cf6;color:#8b5cf6;font-weight:600;">✨ Pulir redacción (IA)</button>
       </div>
       <textarea id="gen_texto" style="min-height:340px;font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;text-align:justify;padding:12px;width:100%;box-sizing:border-box;">${esc(texto)}</textarea>

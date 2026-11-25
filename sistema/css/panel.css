@@ -3,6 +3,7 @@
    Estilos del panel (basados en la identidad de LexFive)
    ============================================================ */
 :root {
+  color-scheme: light;
   --navy: #0e1b2c;
   --navy-700: #16273d;
   --navy-600: #1f3450;
@@ -24,6 +25,26 @@
   --shadow-sm: 0 2px 10px rgba(14,27,44,.06);
   --shadow-md: 0 12px 35px rgba(14,27,44,.12);
   --sidebar-w: 256px;
+
+  /* Variables Semánticas Universales (Modo Claro) */
+  --primary: #0e1b2c;
+  --primary-contrast: #ffffff;
+  --primary-alpha: rgba(14, 27, 44, 0.08);
+  --text-primary: #1a2330;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-sub: #64748b;
+  --border: #e2e8f0;
+  --border-color: #e2e8f0;
+  --card-bg: #ffffff;
+  --card-sub-bg: #f8fafc;
+  --bg-alt: #ffffff;
+  --bg-soft2: #f8fafc;
+  --input-bg: #ffffff;
+  --input-text: #1a2330;
+  --input-border: #cbd5e1;
+  --input-border-focus: #c2a25a;
+  --input-placeholder: #64748b;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font-sans); color: var(--ink); background: var(--bg); line-height: 1.55; -webkit-font-smoothing: antialiased; }
@@ -56,16 +77,93 @@ ul { list-style: none; }
 .login-card h2 { font-family: var(--font-serif); font-size: 1.9rem; color: var(--navy); margin-bottom: 6px; }
 .login-card .sub { color: var(--muted); margin-bottom: 30px; }
 
-/* ---------- Formularios ---------- */
+/* ---------- Formularios y Controles Universales ---------- */
+input, select, textarea {
+  color-scheme: inherit;
+  font-family: inherit;
+}
+
 .field { margin-bottom: 18px; }
 .field label { display: block; font-size: .86rem; font-weight: 500; margin-bottom: 6px; }
-.field input, .field select, .field textarea {
-  width: 100%; padding: 12px 14px; font: inherit; font-size: .95rem; color: var(--ink);
-  border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); transition: border-color .2s, box-shadow .2s;
+
+/* Aplicar universalmente a todos los inputs/selects/textareas fuera de documentos impresos */
+body:not(.print-mode) input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]):not([type="range"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+body:not(.print-mode) select,
+body:not(.print-mode) textarea,
+.field input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]),
+.field select,
+.field textarea,
+.toolbar input,
+.toolbar select,
+.card input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]),
+.card select,
+.card textarea,
+.modal input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="file"]),
+.modal select,
+.modal textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: .95rem;
+  color: var(--input-text);
+  background-color: var(--input-bg);
+  border: 1.5px solid var(--input-border);
+  border-radius: 8px;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(194,162,90,.15); }
+
+body:not(.print-mode) input:focus,
+body:not(.print-mode) select:focus,
+body:not(.print-mode) textarea:focus,
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 3px rgba(194,162,90,.22);
+}
+
 .field textarea { resize: vertical; min-height: 92px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}
+
+select option,
+select optgroup {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled,
+input[readonly],
+textarea[readonly] {
+  opacity: 0.72;
+  cursor: not-allowed;
+  background-color: var(--bg-soft2);
+}
+
+/* Prevenir caja blanca de autofill en navegadores WebKit/Chromium */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+  box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+  -webkit-text-fill-color: var(--input-text) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; font-weight: 600; font-size: .9rem; border: 1.5px solid transparent; border-radius: 7px; transition: .2s; }
 .btn--primary { background: var(--gold); color: var(--navy); border-color: var(--gold); }
@@ -894,6 +992,7 @@ code { background: #f1f2f4; padding: 1px 5px; border-radius: 4px; font-size: .85
    lateral y los acentos dorados se mantienen.
    ============================================================ */
 html[data-theme="dark"] {
+  color-scheme: dark;
   --bg: #0b131e;
   --white: #15212f;
   --ink: #e6ecf3;
@@ -902,6 +1001,26 @@ html[data-theme="dark"] {
   --gold-tint: rgba(194,162,90,.22);
   --shadow-sm: 0 2px 10px rgba(0,0,0,.35);
   --shadow-md: 0 14px 38px rgba(0,0,0,.55);
+
+  /* Variables Semánticas Universales (Modo Oscuro) */
+  --primary: #e7d3a1;
+  --primary-contrast: #0b131e;
+  --primary-alpha: rgba(194, 162, 90, 0.15);
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-sub: #94a3b8;
+  --border: #28384b;
+  --border-color: #28384b;
+  --card-bg: #15212f;
+  --card-sub-bg: #101a26;
+  --bg-alt: #15212f;
+  --bg-soft2: #1b2b3e;
+  --input-bg: #101a26;
+  --input-text: #f1f5f9;
+  --input-border: #2a3f55;
+  --input-border-focus: #c2a25a;
+  --input-placeholder: #7e92a8;
 }
 
 /* Superficies que tenían blanco fijo */
@@ -910,7 +1029,7 @@ html[data-theme="dark"] .card,
 html[data-theme="dark"] .metric,
 html[data-theme="dark"] .modal { background: var(--white); }
 html[data-theme="dark"] .toolbar input,
-html[data-theme="dark"] .toolbar select { background: var(--white); color: var(--ink); }
+html[data-theme="dark"] .toolbar select { background: var(--input-bg); color: var(--input-text); border-color: var(--input-border); }
 html[data-theme="dark"] table.data tbody tr:hover { background: rgba(255,255,255,.05); }
 
 /* Textos que usaban azul marino (ilegible sobre fondo oscuro) */
@@ -926,6 +1045,88 @@ html[data-theme="dark"] .cell-strong { color: #eaf0f7; }
 html[data-theme="dark"] .metric__icon,
 html[data-theme="dark"] .doc-row__icon,
 html[data-theme="dark"] .act-file__icon { color: var(--gold-light); }
+
+/* Tablas con cabeceras de alto contraste en modo oscuro */
+html[data-theme="dark"] table.data th {
+  background: var(--bg-soft2);
+  color: var(--gold-light);
+  border-bottom: 1.5px solid var(--line);
+}
+html[data-theme="dark"] table.data td {
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+
+/* Override automático de textos con azul marino fijo en modo oscuro */
+html[data-theme="dark"] [style*="color:var(--navy)"],
+html[data-theme="dark"] [style*="color: var(--navy)"],
+html[data-theme="dark"] [style*="color:var(--navy,#0e1b2c)"],
+html[data-theme="dark"] [style*="color: var(--navy, #0e1b2c)"] {
+  color: var(--text-primary) !important;
+}
+
+/* Honorarios y Finanzas en modo oscuro */
+html[data-theme="dark"] .fin-summary > div {
+  background: var(--bg-soft2);
+  border: 1px solid var(--border-color);
+}
+html[data-theme="dark"] .fin-summary strong {
+  color: var(--gold-light);
+}
+html[data-theme="dark"] .fin-row {
+  background: var(--bg-soft2);
+  border-color: var(--line);
+}
+html[data-theme="dark"] .fin-monto {
+  color: var(--gold-light);
+}
+html[data-theme="dark"] .bar-row__track {
+  background: #1b2838;
+}
+html[data-theme="dark"] .bar-row__val {
+  color: var(--gold-light);
+}
+html[data-theme="dark"] .bar-row__label {
+  color: var(--ink);
+}
+
+/* Tablero de tareas en modo oscuro */
+html[data-theme="dark"] .tareas-col {
+  background: var(--bg-soft2);
+}
+html[data-theme="dark"] .tareas-col__head {
+  color: var(--gold-light);
+}
+html[data-theme="dark"] .tarea-card {
+  background: var(--card-bg);
+  border-color: var(--line);
+}
+html[data-theme="dark"] .plazo-row {
+  border-color: var(--line);
+}
+html[data-theme="dark"] .plazo-row.is-done {
+  background: var(--bg-soft2);
+}
+html[data-theme="dark"] code {
+  background: #1e2d40;
+  color: var(--gold-light);
+}
+
+/* Novedades y chips en modo oscuro */
+html[data-theme="dark"] .novedad:hover {
+  background: rgba(194,162,90,0.08);
+}
+html[data-theme="dark"] .novedad.is-nuevo {
+  background: rgba(194,162,90,0.12);
+}
+html[data-theme="dark"] .novedad.is-nuevo:hover {
+  background: rgba(194,162,90,0.18);
+}
+html[data-theme="dark"] .chip-campo {
+  background: rgba(194,162,90,0.14);
+  border-color: var(--gold);
+  color: var(--gold-light);
+}
 
 /* Insignia de materia y botones */
 html[data-theme="dark"] .badge-mat { background: rgba(194,162,90,.16); color: var(--gold-light); }
@@ -964,12 +1165,55 @@ html[data-theme="dark"] .cred-saved-item__info strong { color: #eaf0f7; }
 }
 .cred-card, #printRoot .cred-card { color: #1a2330; }
 
+/* ============================================================
+   PROTECCIÓN ESTRICTA DE HOJAS Y DOCUMENTOS IMPRIMIBLES
+   (Carta, Pasantía, Informe, Cotización, Memoriales, Recibos)
+   ============================================================ */
+.hoja-carta,
+.hoja-carta *,
+#printRoot,
+#printRoot * {
+  color-scheme: light !important;
+  box-sizing: border-box;
+}
+
+.hoja-carta {
+  background: #ffffff !important;
+  color: #101820 !important;
+}
+
+/* Lienzo o fondo contenedor detrás de las hojas */
+.cert-preview,
+#inPreview,
+#cot_preview_container,
+#esc_preview,
+#pl_preview {
+  background: #d8dde6;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  transition: background .2s ease;
+}
+.cert-preview > div,
+#inPreview > div,
+#cot_preview_container > div,
+#esc_preview > div,
+#pl_preview > div {
+  box-shadow: 0 6px 24px rgba(0,0,0,.15);
+}
+
+html[data-theme="dark"] .cert-preview,
+html[data-theme="dark"] #inPreview,
+html[data-theme="dark"] #cot_preview_container,
+html[data-theme="dark"] #esc_preview,
+html[data-theme="dark"] #pl_preview {
+  background: #060c14 !important;
+}
+
 
 /* ---------- Certificados (hoja membretada) ---------- */
 .cert-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 640px) { .cert-form { grid-template-columns: 1fr; } }
-.cert-preview { background: #e9ecf1; padding: 16px; border-radius: 8px; overflow-x: auto; }
-.cert-preview > div { box-shadow: 0 6px 24px rgba(0,0,0,.15); }
 
 /* Subbloques de formularios (ej. datos de pasantía) */
 .form-subbox {
