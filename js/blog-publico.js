@@ -120,6 +120,20 @@
     var activeCategory = 'all';
     var searchQuery = '';
 
+        function extractPortadaUrl(art) {
+        if (art && art.imagen_url) return art.imagen_url;
+        var c = (art && art.contenido) || '';
+        var match = c.match(/<!--cover:(https?:\/\/[^\s>]+)-->/) || c.match(/!\[(?:portada|cover)\]\((https?:\/\/[^\s)]+)\)/i);
+        return match ? match[1] : null;
+    }
+
+    function cleanArticleBody(text) {
+        return (text || '')
+            .replace(/^<!--cover:https?:\/\/[^\s>]+-->\s*/i, '')
+            .replace(/^!\[(?:portada|cover)\]\(https?:\/\/[^\s)]+\)\s*/i, '')
+            .trim();
+    }
+
     function esc(s) {
         return (s == null ? '' : String(s)).replace(/[&<>"']/g, function (c) {
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -177,15 +191,23 @@
         grid.innerHTML = items.map(function (a) {
             var cat = a.categoria || 'General';
             var fecha = fmtDate(a.fecha || a.created_at);
+            var coverUrl = extractPortadaUrl(a);
+            var mediaHtml = '';
+            if (coverUrl) {
+                mediaHtml = '<img src="' + esc(coverUrl) + '" alt="' + esc(a.titulo) + '" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border-radius:12px 12px 0 0" onerror="this.parentElement.innerHTML=getAreaThemedSvg(\'' + esc(cat).replace(/'/g, "\\'") + '\', \'100%\', \'100%\')">';
+            } else {
+                mediaHtml = '<div style="width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:12px 12px 0 0;border-bottom:1px solid rgba(212,175,55,0.2)">' + getAreaThemedSvg(cat, '100%', '100%') + '</div>';
+            }
+
             return '<article class="post-card" data-id="' + esc(a.id) + '">' +
-                '<div class="post-card__media"></div>' +
+                '<div class="post-card__media" style="overflow:hidden">' + mediaHtml + '</div>' +
                 '<div class="post-card__body">' +
                     '<div class="post-card__meta">' +
                         '<span class="tag">' + esc(cat) + '</span>' +
                         '<span class="post-card__date">' + esc(fecha) + '</span>' +
                     '</div>' +
                     '<h2 class="post-card__title" style="font-size:1.25rem; margin-bottom:10px;">' + esc(a.titulo) + '</h2>' +
-                    '<p class="post-card__excerpt">' + esc(a.resumen || a.contenido || '') + '</p>' +
+                    '<p class="post-card__excerpt">' + esc(a.resumen || cleanArticleBody(a.contenido) || '') + '</p>' +
                     '<div style="margin-top:auto; padding-top:16px;">' +
                         '<span class="post-card__link" style="color:var(--gold); font-weight:600; display:inline-flex; align-items:center; gap:6px;">' +
                             'Leer artículo completo &rarr;' +
@@ -244,8 +266,33 @@
         if (authorEl) authorEl.textContent = a.autor || 'Equipo Legal LexFive';
         if (readEl) readEl.textContent = calcReadTime(a.contenido || a.resumen);
 
+        // Portada destacada
+        var mediaFeatured = document.getElementById('detailFeaturedMedia');
+        if (mediaFeatured) {
+            var cover = extractPortadaUrl(a);
+            if (cover) {
+                mediaFeatured.innerHTML = '<img src="' + esc(cover) + '" alt="' + esc(a.titulo) + '" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block" onerror="this.parentElement.innerHTML=getAreaThemedSvg(\'' + esc(a.categoria || 'General').replace(/'/g, "\\'") + '\', \'100%\', \'320px\')">';
+                mediaFeatured.style.display = 'block';
+            } else {
+                mediaFeatured.innerHTML = '<div style="width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center">' + getAreaThemedSvg(a.categoria || 'General', '100%', '100%') + '</div>';
+                mediaFeatured.style.display = 'block';
+            }
+        }
+
+        // Enlace a Especialidad en area.html si coincide
+        var areaLinkEl = document.getElementById('detailAreaLink');
+        if (areaLinkEl) {
+            if (a.categoria && a.categoria !== 'General') {
+                areaLinkEl.href = 'area.html?id=' + encodeURIComponent(a.categoria);
+                areaLinkEl.textContent = 'Ver especialidad: ' + a.categoria + ' \u2192';
+                areaLinkEl.style.display = 'inline-block';
+            } else {
+                areaLinkEl.style.display = 'none';
+            }
+        }
+
         if (contentEl) {
-            var text = a.contenido || a.resumen || '';
+            var text = cleanArticleBody(a.contenido || a.resumen || '');
             // Formatear párrafos
             var pars = text.split(/\n\n+/).filter(Boolean);
             if (pars.length > 1) {
@@ -285,7 +332,7 @@
         // Consult Topic Button
         var btnConsult = document.getElementById('btnConsultTopic');
         if (btnConsult) {
-            btnConsult.href = 'index.html#contacto?area=' + encodeURIComponent(a.categoria || '');
+            btnConsult.href = 'index.html?area=' + encodeURIComponent(a.categoria || '') + '#contacto';
         }
 
         if (pushHistory) {
