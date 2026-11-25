@@ -130,7 +130,17 @@ export function snapshotBranding() {
     heroBgImg: (heroBgLS !== null) ? (heroBgLS || null) : (cache.heroBgImg || null),
     aboutBgImg: (aboutBgLS !== null) ? (aboutBgLS || null) : (cache.aboutBgImg || null),
     whyBgImg: (whyBgLS !== null) ? (whyBgLS || null) : (cache.whyBgImg || null),
-    testimonialsBgImg: (testimonialsBgLS !== null) ? (testimonialsBgLS || null) : (cache.testimonialsBgImg || null)
+    testimonialsBgImg: (testimonialsBgLS !== null) ? (testimonialsBgLS || null) : (cache.testimonialsBgImg || null),
+    campana_activa: (cache.campana_activa !== undefined) ? cache.campana_activa : false,
+    campana_texto: cache.campana_texto || null,
+    campana_enlace_texto: cache.campana_enlace_texto || null,
+    campana_enlace_url: cache.campana_enlace_url || null,
+    hero_badge: cache.hero_badge || null,
+    hero_titulo: cache.hero_titulo || null,
+    hero_subtitulo: cache.hero_subtitulo || null,
+    hero_btn_texto: cache.hero_btn_texto || null,
+    sobre_texto: cache.sobre_texto || null,
+    metricas: cache.metricas || null
   };
 }
 
