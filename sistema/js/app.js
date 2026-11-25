@@ -598,6 +598,45 @@ const CLIENT_NAV = [
   { key: 'opinion', label: 'Mi opinión', icon: ICON.estrella }
 ];
 
+export function closeSidebar() {
+  const sb = $('#sidebar'); if (sb) sb.classList.remove('open');
+  const bd = $('#backdrop'); if (bd) bd.classList.remove('show');
+  document.body.style.overflow = '';
+}
+export function openSidebar() {
+  const sb = $('#sidebar'); if (sb) sb.classList.add('open');
+  const bd = $('#backdrop'); if (bd) bd.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+export function initSidebarControls() {
+  const mt = $('#menuToggle');
+  if (mt && !mt.dataset.navBound) {
+    mt.dataset.navBound = '1';
+    mt.onclick = (e) => {
+      e.stopPropagation();
+      const sb = $('#sidebar');
+      if (sb && sb.classList.contains('open')) closeSidebar();
+      else openSidebar();
+    };
+  }
+  const bd = $('#backdrop');
+  if (bd && !bd.dataset.navBound) {
+    bd.dataset.navBound = '1';
+    bd.onclick = closeSidebar;
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeSidebar();
+    }
+  });
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSidebarControls);
+} else {
+  initSidebarControls();
+}
+
 export function navigate(key) {
   const isClient = state.profile.rol === 'cliente';
   if (isClient) {
@@ -607,7 +646,7 @@ export function navigate(key) {
     if (tabsCont) { tabsCont.style.display = 'none'; tabsCont.innerHTML = ''; }
     document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === key));
     $('#pageTitle').textContent = VIEWS[key] ? VIEWS[key].title : 'Portal del Cliente';
-    $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show');
+    closeSidebar();
     runViewRender(key, VIEWS[key].render);
     return;
   }
@@ -691,7 +730,7 @@ export function navigate(key) {
 
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.key === parentKey));
   $('#pageTitle').textContent = pageTitle;
-  $('#sidebar').classList.remove('open'); $('#backdrop').classList.remove('show');
+  closeSidebar();
 
   runViewRender(activeTabKey, renderFn);
 }
@@ -1137,18 +1176,9 @@ async function arrancarSesion() {
       }
       const mc = $('#modalClose'); if (mc) mc.onclick = closeModal;
       const mo = $('#modalOverlay'); if (mo) mo.onclick = (e) => { if (e.target === mo) closeModal(); };
-      const closeSidebar = () => {
-        const sb = $('#sidebar'); if (sb) sb.classList.remove('open');
-        const bd = $('#backdrop'); if (bd) bd.classList.remove('show');
-        document.body.style.overflow = '';
-      };
-      const openSidebar = () => {
-        const sb = $('#sidebar'); if (sb) sb.classList.add('open');
-        const bd = $('#backdrop'); if (bd) bd.classList.add('show');
-        document.body.style.overflow = 'hidden';
-      };
       const mt = $('#menuToggle');
-      if (mt) {
+      if (mt && !mt.dataset.navBound) {
+        mt.dataset.navBound = '1';
         mt.onclick = (e) => {
           e.stopPropagation();
           const sb = $('#sidebar');
@@ -1157,7 +1187,10 @@ async function arrancarSesion() {
         };
       }
       const bd = $('#backdrop');
-      if (bd) bd.onclick = closeSidebar;
+      if (bd && !bd.dataset.navBound) {
+        bd.dataset.navBound = '1';
+        bd.onclick = closeSidebar;
+      }
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeModal();

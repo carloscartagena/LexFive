@@ -4,7 +4,9 @@
 (function () {
     'use strict';
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function initMain() {
+        if (document.body && document.body.dataset.mainInit === '1') return;
+        if (document.body) document.body.dataset.mainInit = '1';
 
         /* ---------- Logo del bufete (compartido vía Supabase) ----------
            El logo se guarda en la nube (tabla "configuracion", clave
@@ -61,7 +63,9 @@
         var navToggle = document.getElementById('navToggle');
         var nav = document.getElementById('nav');
 
-        if (navToggle && nav) {
+        if (navToggle && nav && !navToggle.dataset.navBound) {
+            navToggle.dataset.navBound = '1';
+
             // Asegurar que exista el backdrop semitransparente
             var navBackdrop = document.getElementById('navBackdrop');
             if (!navBackdrop) {
@@ -86,26 +90,28 @@
             }
 
             function openMenu() {
-                nav.classList.add('is-open');
-                navToggle.classList.add('is-open');
+                document.body.classList.add('mobile-menu-open');
+                nav.classList.add('is-open', 'mobile-menu-open');
+                navToggle.classList.add('is-open', 'mobile-menu-open');
                 navToggle.setAttribute('aria-expanded', 'true');
                 navToggle.setAttribute('aria-label', 'Cerrar menú');
-                if (navBackdrop) navBackdrop.classList.add('is-active');
+                if (navBackdrop) navBackdrop.classList.add('is-active', 'mobile-menu-open');
                 document.body.style.overflow = 'hidden';
             }
 
             function closeMenu() {
-                nav.classList.remove('is-open');
-                navToggle.classList.remove('is-open');
+                document.body.classList.remove('mobile-menu-open');
+                nav.classList.remove('is-open', 'mobile-menu-open');
+                navToggle.classList.remove('is-open', 'mobile-menu-open');
                 navToggle.setAttribute('aria-expanded', 'false');
                 navToggle.setAttribute('aria-label', 'Abrir menú');
-                if (navBackdrop) navBackdrop.classList.remove('is-active');
+                if (navBackdrop) navBackdrop.classList.remove('is-active', 'mobile-menu-open');
                 document.body.style.overflow = '';
             }
 
             navToggle.addEventListener('click', function (e) {
                 e.stopPropagation();
-                if (nav.classList.contains('is-open')) {
+                if (nav.classList.contains('is-open') || document.body.classList.contains('mobile-menu-open')) {
                     closeMenu();
                 } else {
                     openMenu();
@@ -132,14 +138,14 @@
 
             // Cerrar con la tecla Escape
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+                if (e.key === 'Escape' && (nav.classList.contains('is-open') || document.body.classList.contains('mobile-menu-open'))) {
                     closeMenu();
                 }
             });
 
             // Cerrar al hacer clic fuera del menú
             document.addEventListener('click', function (e) {
-                if (nav.classList.contains('is-open') &&
+                if ((nav.classList.contains('is-open') || document.body.classList.contains('mobile-menu-open')) &&
                     !nav.contains(e.target) && !navToggle.contains(e.target)) {
                     closeMenu();
                 }
@@ -555,7 +561,13 @@
             });
         }
 
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMain);
+    } else {
+        initMain();
+    }
 })();
 
 
@@ -916,7 +928,7 @@
                 fechaStr = d.toLocaleDateString('es-BO', { day: '2-digit', month: 'short', year: 'numeric' });
             } catch (e) { fechaStr = a.fecha || ''; }
             var link = 'blog.html?id=' + encodeURIComponent(a.id);
-            return '<article class="post-card" onclick="window.location.href='' + link + ''">' +
+            return '<article class="post-card" onclick="window.location.href=\'' + link + '\'">' +
                 '<div class="post-card__media"></div>' +
                 '<div class="post-card__body">' +
                     '<div class="post-card__meta">' +
