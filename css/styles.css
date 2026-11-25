@@ -1224,3 +1224,180 @@ html[data-theme="dark"] .btn-share-consult {
   color: #0e1b2c !important;
   border-color: var(--gold);
 }
+
+/* ============================================================
+   LexFive — Franja de Campaña Superior Dinámica
+   ============================================================ */
+.campaign-banner {
+  background: linear-gradient(90deg, #07152b 0%, #112d55 50%, #07152b 100%);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.4);
+  color: #f8fafc;
+  padding: 8px 16px;
+  position: relative;
+  z-index: 1001;
+  font-size: 0.88rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  animation: slideDownBanner 0.4s ease-out;
+}
+@keyframes slideDownBanner {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.campaign-banner__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.campaign-banner__badge {
+  background: var(--gold, #d4af37);
+  color: #041230;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.campaign-banner__text {
+  font-weight: 500;
+  color: #f1f5f9;
+}
+.campaign-banner__link {
+  color: #38bdf8 !important;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+.campaign-banner__link:hover {
+  color: var(--gold, #d4af37) !important;
+}
+.campaign-banner__close {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 6px;
+  margin-left: 6px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.campaign-banner__close:hover {
+  color: #fff;
+  transform: scale(1.15);
+}
+
+/* ============================================================
+   LexFive — Carrusel Interactivo de Áreas de Práctica
+   ============================================================ */
+.areas__grid-carousel {
+  display: flex !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  gap: 22px;
+  padding: 10px 4px 22px 4px;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.areas__grid-carousel::-webkit-scrollbar {
+  display: none;
+}
+.areas__grid-carousel .area-card {
+  flex: 0 0 calc(33.333% - 15px);
+  min-width: 280px;
+  max-width: 380px;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+}
+@media (max-width: 960px) {
+  .areas__grid-carousel .area-card {
+    flex: 0 0 calc(50% - 12px);
+    min-width: 270px;
+  }
+}
+@media (max-width: 600px) {
+  .areas__grid-carousel .area-card {
+    flex: 0 0 85%;
+    min-width: 250px;
+  }
+}
+.areas-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+.areas-carousel-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--surface, #0f2546);
+  border: 1px solid var(--gold, #d4af37);
+  color: var(--gold, #d4af37);
+  font-size: 1.5rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  user-select: none;
+}
+.areas-carousel-btn:hover {
+  background: var(--gold, #d4af37);
+  color: #041230;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+.areas-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.areas-carousel-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.25);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.areas-carousel-dot.is-active {
+  width: 24px;
+  border-radius: 6px;
+  background: var(--gold, #d4af37);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+}
+
+/* ============================================================
+   LexFive — Animaciones Modernas Ligeras (Scroll Reveal)
+   ============================================================ */
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-section {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

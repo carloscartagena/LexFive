@@ -96,6 +96,15 @@
      theme-charcoal (negro/dorado), theme-emerald (verde/dorado) o theme-burgundy (vino/dorado).
      Ejemplo: <body class="theme-emerald"> -->
 <body>
+    <!-- ===== Franja de Campaña Superior Dinámica ===== -->
+    <div id="topCampaignBanner" class="campaign-banner" style="display: none;" role="region" aria-label="Aviso de campaña">
+        <div class="container campaign-banner__inner">
+            <span class="campaign-banner__badge">Aviso</span>
+            <span class="campaign-banner__text" id="campaignBannerText">Campaña especial de asesoría jurídica</span>
+            <a href="#contacto" class="campaign-banner__link" id="campaignBannerLink">Consultar ahora &rarr;</a>
+            <button class="campaign-banner__close" id="campaignBannerClose" aria-label="Cerrar aviso">&times;</button>
+        </div>
+    </div>
     <!-- Botón flotante de Messenger -->
     <a class="msgr-fab" href="https://m.me/LexFiveAbogados" target="_blank" rel="noopener" aria-label="Escríbenos por Messenger">
         <svg viewBox="0 0 24 24" width="30" height="30" fill="#fff" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.5 2 2 6.13 2 11.2c0 2.89 1.46 5.46 3.74 7.15V22l3.42-1.88c.91.25 1.87.39 2.84.39 5.5 0 10-4.13 10-9.2S17.5 2 12 2zm1.13 12.34l-2.62-2.79-4.93 2.79 5.42-5.76 2.68 2.79 4.87-2.79-5.42 5.76z"/></svg>
@@ -184,11 +193,11 @@
 </svg>
             </div>
             <div class="container hero__content">
-                <p class="hero__eyebrow">Bufete de abogados &middot; Derecho &amp; Tecnología</p>
-                <h1 class="hero__title">Defendemos sus derechos con<br><em>experiencia y compromiso</em></h1>
-                <p class="hero__subtitle">En LexFive ofrecemos soluciones legales claras, estratégicas y a la medida de cada cliente en materia laboral, civil, penal y familiar. Su tranquilidad es nuestra prioridad.</p>
+                <p class="hero__eyebrow" data-brand-hero-badge>Bufete de abogados &middot; Derecho &amp; Tecnología</p>
+                <h1 class="hero__title" data-brand-hero-title>Defendemos sus derechos con<br><em>experiencia y compromiso</em></h1>
+                <p class="hero__subtitle" data-brand-hero-subtitle>En LexFive ofrecemos soluciones legales claras, estratégicas y a la medida de cada cliente en materia laboral, civil, penal y familiar. Su tranquilidad es nuestra prioridad.</p>
                 <div class="hero__actions">
-                    <a href="#contacto" class="btn btn--primary">Solicitar consulta gratis</a>
+                    <a href="#contacto" class="btn btn--primary" data-brand-hero-btn>Solicitar consulta gratis</a>
                     <a href="javascript:document.getElementById('ai-chatbot-toggle').click();" class="btn btn--ghost">Preguntar a la IA</a>
                 </div>
             </div>
@@ -198,26 +207,26 @@
         <section class="stats">
             <div class="container stats__grid">
                 <div class="stat">
-                    <span class="stat__number" data-target="1">0</span>
-                    <p class="stat__label">Año de experiencia</p>
+                    <span class="stat__number" data-target="1" data-stat-num="0">0</span>
+                    <p class="stat__label" data-stat-label="0">Año de experiencia</p>
                 </div>
                 <div class="stat">
-                    <span class="stat__number" data-target="6">0</span>
-                    <p class="stat__label">Abogados especialistas</p>
+                    <span class="stat__number" data-target="6" data-stat-num="1">0</span>
+                    <p class="stat__label" data-stat-label="1">Abogados especialistas</p>
                 </div>
                 <div class="stat">
-                    <span class="stat__number" data-target="25">0</span><span class="stat__plus" style="font-size:2rem; font-weight:700; color:var(--gold);">+</span>
-                    <p class="stat__label">Áreas de práctica</p>
+                    <span class="stat__number" data-target="25" data-stat-num="2">0</span><span class="stat__plus" style="font-size:2rem; font-weight:700; color:var(--gold);">+</span>
+                    <p class="stat__label" data-stat-label="2">Áreas de práctica</p>
                 </div>
                 <div class="stat">
-                    <span class="stat__number" data-target="95">0</span><span class="stat__plus">%</span>
-                    <p class="stat__label">Clientes satisfechos</p>
+                    <span class="stat__number" data-target="95" data-stat-num="3">0</span><span class="stat__plus">%</span>
+                    <p class="stat__label" data-stat-label="3">Clientes satisfechos</p>
                 </div>
             </div>
         </section>
 
         <!-- ===== Áreas de Práctica ===== -->
-        <section class="section areas" id="areas">
+        <section class="section areas fade-in-section" id="areas">
             <div class="container">
                 <header class="section__head">
                     <p class="section__eyebrow">Especialidades</p>
@@ -313,6 +322,12 @@
                             <a href="#contacto" class="btn-area-action btn-area-form" data-select-area="Derecho Constitucional" title="Solicitar consulta en el formulario">Consulta &darr;</a>
                         </div>
                     </article>
+                </div>
+                <!-- Controles interactivos del carrusel de áreas -->
+                <div class="areas-carousel-controls" id="areasCarouselControls" aria-label="Controles del carrusel de áreas">
+                    <button class="areas-carousel-btn" id="areasCarouselPrev" aria-label="Área anterior" type="button">&#8249;</button>
+                    <div class="areas-carousel-dots" id="areasCarouselDots" role="tablist" aria-label="Páginas del carrusel"></div>
+                    <button class="areas-carousel-btn" id="areasCarouselNext" aria-label="Siguiente área" type="button">&#8250;</button>
                 </div>
             </div>
         </section>
@@ -525,7 +540,7 @@
             </section>
 
         <!-- ===== ¿Por qué elegirnos? ===== -->
-        <section class="section why" id="porque">
+        <section class="section why fade-in-section" id="porque">
             <div class="container">
                 <header class="section__head">
                     <p class="section__eyebrow">Por qué LexFive</p>
@@ -690,7 +705,7 @@
         </section>
 
         <!-- ===== Sobre nosotros ===== -->
-        <section class="section about" id="nosotros">
+        <section class="section about fade-in-section" id="nosotros">
             <div class="container about__grid">
                 <div class="about__media">
                     <div class="about__image" role="img" aria-label="Derecho e ingeniería de sistemas">
@@ -732,7 +747,7 @@
                 <div class="about__content">
                     <p class="section__eyebrow">Sobre el bufete</p>
                     <h2 class="section__title">Un equipo comprometido con la excelencia jurídica</h2>
-                    <p>En <strong>LexFive</strong> creemos que cada cliente merece una atención personalizada y una defensa rigurosa. Acompañamos a personas y empresas de El Alto y La Paz en los momentos legales más decisivos, siempre con transparencia y ética profesional. Además, unimos el ejercicio del <strong>derecho</strong> con la <strong>ingeniería de sistemas</strong> y el desarrollo de software, para ofrecer soluciones modernas y a la medida.</p>
+                    <p data-brand-sobre-desc>En <strong>LexFive</strong> creemos que cada cliente merece una atención personalizada y una defensa rigurosa. Acompañamos a personas y empresas de El Alto y La Paz en los momentos legales más decisivos, siempre con transparencia y ética profesional. Además, unimos el ejercicio del <strong>derecho</strong> con la <strong>ingeniería de sistemas</strong> y el desarrollo de software, para ofrecer soluciones modernas y a la medida.</p>
                     <ul class="about__list">
                         <li><span class="check" aria-hidden="true"></span> Atención personalizada y comunicación constante</li>
                         <li><span class="check" aria-hidden="true"></span> Estrategias legales orientadas a resultados</li>
@@ -745,7 +760,7 @@
         </section>
 
         <!-- ===== Equipo ===== -->
-        <section class="section team" id="equipo">
+        <section class="section team fade-in-section" id="equipo">
             <div class="container">
                 <header class="section__head">
                     <p class="section__eyebrow">Nuestros profesionales</p>
@@ -1441,7 +1456,7 @@
             </div>
         </section>
 
-        <section class="section contact" id="contacto">
+        <section class="section contact fade-in-section" id="contacto">
             <div class="container contact__grid">
                 <div class="contact__info">
                     <p class="section__eyebrow">Hablemos</p>

@@ -870,9 +870,196 @@
             document.querySelectorAll('[data-brand-email]').forEach(function (el) { el.textContent = b.email; });
             document.querySelectorAll('a[href^="mailto:"]').forEach(function (a) { a.href = 'mailto:' + b.email; });
         }
+
+        // Franja de Campaña Superior
+        var banner = document.getElementById('topCampaignBanner');
+        if (banner) {
+            if (b && b.campana_activa && b.campana_texto && sessionStorage.getItem('lexfive_banner_closed') !== '1') {
+                var textEl = document.getElementById('campaignBannerText');
+                var linkEl = document.getElementById('campaignBannerLink');
+                if (textEl) textEl.textContent = b.campana_texto;
+                if (linkEl) {
+                    linkEl.textContent = (b.campana_enlace_texto || 'Consultar ahora') + ' →';
+                    linkEl.setAttribute('href', b.campana_enlace_url || '#contacto');
+                }
+                banner.style.display = 'block';
+                var closeBtn = document.getElementById('campaignBannerClose');
+                if (closeBtn && !closeBtn.dataset.bound) {
+                    closeBtn.dataset.bound = '1';
+                    closeBtn.onclick = function () {
+                        banner.style.display = 'none';
+                        sessionStorage.setItem('lexfive_banner_closed', '1');
+                    };
+                }
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+
+        // Textos del Hero Principal
+        if (b && b.hero_badge) {
+            var elBadge = document.querySelector('[data-brand-hero-badge]');
+            if (elBadge) elBadge.textContent = b.hero_badge;
+        }
+        if (b && b.hero_titulo) {
+            var elTit = document.querySelector('[data-brand-hero-title]');
+            if (elTit) elTit.innerHTML = esc(b.hero_titulo).replace(/\n/g, '<br>');
+        }
+        if (b && b.hero_subtitulo) {
+            var elSub = document.querySelector('[data-brand-hero-subtitle]');
+            if (elSub) elSub.textContent = b.hero_subtitulo;
+        }
+        if (b && b.hero_btn_texto) {
+            var elBtn = document.querySelector('[data-brand-hero-btn]');
+            if (elBtn) elBtn.textContent = b.hero_btn_texto;
+        }
+
+        // Texto de Sobre el bufete
+        if (b && b.sobre_texto) {
+            var elSobre = document.querySelector('[data-brand-sobre-desc]');
+            if (elSobre) elSobre.textContent = b.sobre_texto;
+        }
+
+        // 4 Métricas de Impacto con Count-Up
+        if (b && Array.isArray(b.metricas) && b.metricas.length >= 4) {
+            b.metricas.forEach(function (m, idx) {
+                var numEl = document.querySelector('[data-stat-num="' + idx + '"]');
+                var lblEl = document.querySelector('[data-stat-label="' + idx + '"]');
+                if (numEl && m.valor) numEl.setAttribute('data-target', m.valor);
+                if (lblEl && m.etiqueta) lblEl.textContent = m.etiqueta;
+            });
+        }
+        animarMetricas();
     }
 
-    /* ---------- 2. ÁREAS DE PRÁCTICA DINÁMICAS ---------- */
+    /* ---------- ANIMACIÓN NUMÉRICA SUAVE (COUNT-UP) ---------- */
+    function animarMetricas() {
+        var stats = document.querySelectorAll('.stat__number[data-target]');
+        if (!stats.length) return;
+        if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            var obs = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        var el = entry.target;
+                        var rawTarget = el.getAttribute('data-target') || '0';
+                        var targetNum = parseInt(rawTarget.replace(/[^0-9]/g, ''), 10) || 0;
+                        var duration = 1400;
+                        var startTime = null;
+                        function step(timestamp) {
+                            if (!startTime) startTime = timestamp;
+                            var progress = Math.min((timestamp - startTime) / duration, 1);
+                            var ease = 1 - Math.pow(1 - progress, 3);
+                            var current = Math.floor(ease * targetNum);
+                            el.textContent = current;
+                            if (progress < 1) {
+                                window.requestAnimationFrame(step);
+                            } else {
+                                el.textContent = targetNum;
+                            }
+                        }
+                        window.requestAnimationFrame(step);
+                        observer.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.25 });
+            stats.forEach(function (s) { obs.observe(s); });
+        } else {
+            stats.forEach(function (s) {
+                var raw = s.getAttribute('data-target') || '0';
+                s.textContent = raw.replace(/[^0-9]/g, '') || raw;
+            });
+        }
+    }
+
+    /* ---------- ANIMACIÓN DE REVELACIÓN SUAVE EN SCROLL ---------- */
+    function initScrollReveal() {
+        var sections = document.querySelectorAll('.fade-in-section');
+        if (!sections.length) return;
+        if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            var sectionObs = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            sections.forEach(function (sec) { sectionObs.observe(sec); });
+        } else {
+            sections.forEach(function (sec) { sec.classList.add('is-visible'); });
+        }
+    }
+
+
+
+    /* ---------- HELPER PORTADAS VECTORIALES TEMÁTICAS PARA ÁREAS ---------- */
+    function getAreaThemedSvg(titulo, width, height) {
+        var t = (titulo || '').toLowerCase();
+        var iconSvg = '';
+        if (t.indexOf('laboral') !== -1 || t.indexOf('trabaj') !== -1 || t.indexOf('emple') !== -1 || t.indexOf('despid') !== -1 || t.indexOf('finiquit') !== -1) {
+            iconSvg = '<rect x="18" y="24" width="28" height="22" rx="3" fill="none" stroke="#d4af37" stroke-width="2"/>' +
+                      '<path d="M25 24v-4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4" fill="none" stroke="#d4af37" stroke-width="2"/>' +
+                      '<path d="M18 34h28" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2 2"/>' +
+                      '<circle cx="32" cy="34" r="2.5" fill="#d4af37"/>';
+        } else if (t.indexOf('civil') !== -1 || t.indexOf('contrat') !== -1 || t.indexOf('dañ') !== -1 || t.indexOf('deud') !== -1 || t.indexOf('arrend') !== -1) {
+            iconSvg = '<path d="M20 18h18l8 8v22a3 3 0 0 1-3 3H20a3 3 0 0 1-3-3V21a3 3 0 0 1 3-3z" fill="none" stroke="#d4af37" stroke-width="2"/>' +
+                      '<polyline points="38 18 38 26 46 26" fill="none" stroke="#d4af37" stroke-width="1.8"/>' +
+                      '<line x1="23" y1="32" x2="35" y2="32" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round"/>' +
+                      '<line x1="23" y1="38" x2="39" y2="38" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round"/>' +
+                      '<line x1="23" y1="44" x2="31" y2="44" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round"/>';
+        } else if (t.indexOf('penal') !== -1 || t.indexOf('delit') !== -1 || t.indexOf('defens') !== -1 || t.indexOf('libert') !== -1 || t.indexOf('fiscal') !== -1) {
+            iconSvg = '<path d="M32 15l14 5v12c0 10-6.5 16.5-14 19-7.5-2.5-14-9-14-19V20l14-5z" fill="rgba(212,175,55,0.08)" stroke="#d4af37" stroke-width="2"/>' +
+                      '<path d="M26 27l12 12" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>' +
+                      '<path d="M34 23l5 5-3 3-5-5z" fill="#d4af37"/>' +
+                      '<circle cx="32" cy="32" r="1.5" fill="#38bdf8"/>';
+        } else if (t.indexOf('familia') !== -1 || t.indexOf('divorc') !== -1 || t.indexOf('asistenc') !== -1 || t.indexOf('menor') !== -1 || t.indexOf('herenc') !== -1 || t.indexOf('sucesor') !== -1) {
+            iconSvg = '<circle cx="25" cy="24" r="4" fill="none" stroke="#d4af37" stroke-width="1.8"/>' +
+                      '<path d="M18 38v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2" fill="none" stroke="#d4af37" stroke-width="1.8"/>' +
+                      '<circle cx="39" cy="26" r="3.2" fill="none" stroke="#38bdf8" stroke-width="1.8"/>' +
+                      '<path d="M34 38v-1.5a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1.5" fill="none" stroke="#38bdf8" stroke-width="1.8"/>' +
+                      '<path d="M32 42s2 1.5 4 0" stroke="#d4af37" stroke-width="1.5"/>';
+        } else if (t.indexOf('informatic') !== -1 || t.indexOf('tecnolog') !== -1 || t.indexOf('softwar') !== -1 || t.indexOf('digital') !== -1 || t.indexOf('ciber') !== -1) {
+            iconSvg = '<rect x="20" y="26" width="24" height="20" rx="3" fill="none" stroke="#38bdf8" stroke-width="2"/>' +
+                      '<path d="M25 26v-6a7 7 0 0 1 14 0v6" fill="none" stroke="#d4af37" stroke-width="2"/>' +
+                      '<circle cx="32" cy="35" r="2.5" fill="#d4af37"/>' +
+                      '<path d="M32 37.5v4.5" stroke="#d4af37" stroke-width="2"/>' +
+                      '<path d="M15 36h5M44 36h5M32 14v6" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round"/>';
+        } else if (t.indexOf('administrativ') !== -1 || t.indexOf('tributar') !== -1 || t.indexOf('impuest') !== -1 || t.indexOf('fiscal') !== -1 || t.indexOf('aduan') !== -1 || t.indexOf('constitucion') !== -1) {
+            iconSvg = '<path d="M16 48h32M19 44h26M19 23l13-7 13 7" fill="none" stroke="#d4af37" stroke-width="2"/>' +
+                      '<path d="M23 23v21M32 23v21M41 23v21" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>';
+        } else if (t.indexOf('notarial') !== -1 || t.indexOf('inmobiliar') !== -1 || t.indexOf('propiedad') !== -1 || t.indexOf('terren') !== -1 || t.indexOf('inmueble') !== -1 || t.indexOf('usucapion') !== -1) {
+            iconSvg = '<path d="M18 46V28l14-11 14 11v18z" fill="none" stroke="#d4af37" stroke-width="2"/>' +
+                      '<path d="M28 46V35h8v11" fill="none" stroke="#38bdf8" stroke-width="2"/>' +
+                      '<circle cx="32" cy="27" r="2" fill="#d4af37"/>';
+        } else {
+            iconSvg = '<path d="M32 16v28M21 23h22M21 23l-4 8a4 4 0 0 0 8 0l-4-8zM43 23l-4 8a4 4 0 0 0 8 0l-4-8zM26 44h12" fill="none" stroke="#d4af37" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+                      '<circle cx="32" cy="16" r="2" fill="#d4af37"/>';
+        }
+
+        var w = width || '100%';
+        var h = height || '100%';
+        var gradId = 'areaBg_' + Math.abs((titulo || 'gen').split('').reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a;},0));
+
+        return '<svg viewBox="0 0 64 64" width="' + w + '" height="' + h + '" style="display:block;width:100%;height:100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + esc(titulo || 'Área legal') + '">' +
+               '<defs>' +
+               '<linearGradient id="' + gradId + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+               '<stop offset="0%" stop-color="#0f2546"/>' +
+               '<stop offset="60%" stop-color="#07152b"/>' +
+               '<stop offset="100%" stop-color="#020813"/>' +
+               '</linearGradient>' +
+               '<linearGradient id="' + gradId + '_gold" x1="0%" y1="0%" x2="100%" y2="0%">' +
+               '<stop offset="0%" stop-color="#d4af37"/>' +
+               '<stop offset="100%" stop-color="#c8a24a"/>' +
+               '</linearGradient>' +
+               '</defs>' +
+               '<rect width="64" height="64" rx="10" fill="url(#' + gradId + ')"/>' +
+               '<rect x="2" y="2" width="60" height="60" rx="8" fill="none" stroke="url(#' + gradId + '_gold)" stroke-width="1" stroke-opacity="0.3"/>' +
+               '<circle cx="32" cy="32" r="24" fill="none" stroke="#38bdf8" stroke-width="0.5" stroke-dasharray="2 3" opacity="0.25"/>' +
+               iconSvg +
+               '</svg>';
+    }
+
+    /* ---------- 2. ÁREAS DE PRÁCTICA DINÁMICAS (CARRUSEL INTERACTIVO) ---------- */
     function renderAreas(areas) {
         var grid = document.getElementById('areasGrid');
         if (!grid) return;
@@ -885,18 +1072,20 @@
             else if (b.telefono) waPhone = b.telefono.replace(/[^0-9]/g, '');
         } catch (e) {}
 
+        grid.classList.add('areas__grid-carousel');
+
         grid.innerHTML = list.map(function (a) {
             var mediaHtml = '';
             if (a.imagen_url) {
-                mediaHtml = '<div class="area-card__media"><img src="' + esc(a.imagen_url) + '" alt="' + esc(a.titulo) + '" loading="lazy" decoding="async" onerror="this.parentElement.remove()"></div>';
+                mediaHtml = '<div class="area-card__media"><img src="' + esc(a.imagen_url) + '" alt="' + esc(a.titulo) + '" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML=getAreaThemedSvg(\'' + esc(a.titulo).replace(/'/g, "\\'") + '\', \'100%\', \'100%\')"></div>';
             } else {
-                mediaHtml = '<div class="area-card__icon-box">' + ICON_AREA_SVG + '</div>';
+                mediaHtml = '<div class="area-card__media" style="padding:0;overflow:hidden;border:1px solid rgba(212,175,55,0.25)">' + getAreaThemedSvg(a.titulo, '100%', '100%') + '</div>';
             }
-            var waUrl = 'https://wa.me/' + waPhone + '?text=' + encodeURIComponent('Hola LexFive, deseo consultar sobre ' + a.titulo);
+            var waUrl = 'https://wa.me/' + waPhone + '?text=' + encodeURIComponent('Hola LexFive, necesito asesoría en ' + a.titulo);
             return '<article class="area-card" data-area="' + esc(a.titulo) + '">' +
                 '<div>' + mediaHtml +
                 '<h3 class="area-card__title">' + esc(a.titulo) + '</h3>' +
-                '<p class="area-card__text">' + esc(a.descripcion || '') + '</p>' +
+                '<p class="area-card__text">' + esc(a.descripcion || 'Asesoramiento legal riguroso y personalizado para defender sus derechos con la máxima dedicación.') + '</p>' +
                 '</div>' +
                 '<div class="area-card__actions">' +
                     '<a href="' + waUrl + '" target="_blank" rel="noopener" class="btn-area-action btn-area-wa" title="Consultar por WhatsApp">' +
@@ -908,6 +1097,32 @@
                 '</div>' +
             '</article>';
         }).join('');
+
+        // Interacción para botón Consulta: scroll suave a #contacto y autoselección de área
+        grid.querySelectorAll('[data-select-area]').forEach(function (btn) {
+            btn.onclick = function (e) {
+                e.preventDefault();
+                var areaTitle = btn.getAttribute('data-select-area');
+                var sel = document.getElementById('area');
+                if (sel && areaTitle) {
+                    for (var i = 0; i < sel.options.length; i++) {
+                        if (sel.options[i].value.toLowerCase() === areaTitle.toLowerCase() || sel.options[i].text.toLowerCase() === areaTitle.toLowerCase()) {
+                            sel.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+                var contact = document.getElementById('contacto');
+                if (contact) {
+                    contact.scrollIntoView({ behavior: 'smooth' });
+                    var nombreInput = document.getElementById('nombre');
+                    if (nombreInput) setTimeout(function () { nombreInput.focus(); }, 500);
+                }
+            };
+        });
+
+        // Inicializar controles interactivos del carrusel (botones prev/next y dots)
+        initAreasCarousel(grid, list.length);
 
         // Sincronizar select #area en el formulario de contacto
         var selectEl = document.getElementById('area');
@@ -923,6 +1138,59 @@
                     selectEl.appendChild(opt);
                 }
             });
+        }
+    }
+
+    function initAreasCarousel(grid, totalItems) {
+        var prevBtn = document.getElementById('areasCarouselPrev');
+        var nextBtn = document.getElementById('areasCarouselNext');
+        var dotsCont = document.getElementById('areasCarouselDots');
+        if (!grid) return;
+
+        // Ancho de paso por tarjeta
+        function getStep() {
+            var card = grid.querySelector('.area-card');
+            return card ? (card.offsetWidth + 22) : 300;
+        }
+
+        if (prevBtn) {
+            prevBtn.onclick = function () {
+                grid.scrollBy({ left: -getStep(), behavior: 'smooth' });
+            };
+        }
+        if (nextBtn) {
+            nextBtn.onclick = function () {
+                grid.scrollBy({ left: getStep(), behavior: 'smooth' });
+            };
+        }
+
+        if (dotsCont) {
+            var visibleCount = Math.max(1, Math.min(6, totalItems));
+            dotsCont.innerHTML = '';
+            for (var i = 0; i < visibleCount; i++) {
+                var dot = document.createElement('button');
+                dot.className = 'areas-carousel-dot' + (i === 0 ? ' is-active' : '');
+                dot.setAttribute('type', 'button');
+                dot.setAttribute('aria-label', 'Ir a página ' + (i + 1));
+                (function (idx) {
+                    dot.onclick = function () {
+                        grid.scrollTo({ left: idx * getStep(), behavior: 'smooth' });
+                    };
+                })(i);
+                dotsCont.appendChild(dot);
+            }
+
+            var scrollTimer;
+            grid.onscroll = function () {
+                clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(function () {
+                    var activeIndex = Math.round(grid.scrollLeft / getStep());
+                    var dots = dotsCont.querySelectorAll('.areas-carousel-dot');
+                    dots.forEach(function (d, idx) {
+                        d.classList.toggle('is-active', idx === Math.min(activeIndex, dots.length - 1));
+                    });
+                }, 60);
+            };
         }
     }
 
@@ -1018,6 +1286,7 @@
             renderAreas(cachedAreas);
             var cachedBlog = JSON.parse(localStorage.getItem('lexfive_recent_blog') || '[]');
             renderHomeBlog(cachedBlog);
+            initScrollReveal();
         } catch (e) {}
 
         // 2. Sincronización en vivo desde Supabase REST
