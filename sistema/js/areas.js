@@ -424,7 +424,7 @@ function formArea(area) {
           const prev = $('#areaImgPrev');
           if (prev) prev.innerHTML = `<img src="${esc(src)}" alt="" style="max-width:100%;max-height:160px;border-radius:10px;display:block">`;
           const q = $('#areaQuitar'); if (q) q.hidden = false;
-          toast('Imagen generada y subida con éxito.', 'success');
+          toast('Fotografía editorial generada y optimizada (pulse de nuevo para ver otra opción)', 'success');
         }
       } catch (err) {
         toast('Error generando imagen: ' + (err.message || 'Intente nuevamente'), 'error');

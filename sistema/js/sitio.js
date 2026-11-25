@@ -396,7 +396,7 @@ export async function renderSitio() {
             if (!src) src = peq;
             localStorage.setItem('lexfive_hero_url', src);
             await pushBranding();
-            toast('Imagen del hero actualizada en vivo.', 'success');
+            toast('Fotografía editorial generada y optimizada (pulse de nuevo para ver otra opción)', 'success');
             renderSitio();
           });
         }

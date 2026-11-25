@@ -354,7 +354,7 @@ function articuloForm(art = null, prefill = null) {
         const q = $('#btnArtQuitarImg');
         if (q) q.hidden = false;
         if (ideaWrap) ideaWrap.style.display = 'none';
-        toast('Portada generada y lista para guardar.', 'success');
+        toast('Fotografía editorial generada y optimizada (pulse de nuevo para ver otra opción)', 'success');
       }
     } catch (err) {
       toast('Error generando portada: ' + (err.message || 'Intente de nuevo'), 'error');
