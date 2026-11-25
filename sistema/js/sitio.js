@@ -11,7 +11,7 @@ import { loading, toast } from './ui.js';
 import { subirImagenBranding } from './storage.js';
 import { optimizarFotoSitio, ampliarImagenSitio } from './imagenes.js';
 import { Branding, bgOpOf, pushBranding, hydrateBranding } from './branding.js';
-import { generateContent } from './ai.js';
+import { generateContent, generarImagenIa } from './ai.js';
 
 export async function renderSitio() {
   loading();
@@ -49,13 +49,14 @@ export async function renderSitio() {
 
   // Caja reutilizable de vista previa + botones Subir/Ampliar/Quitar para una imagen.
   // Corrige el fondo blanco fijo en modo oscuro usando var(--card-bg, #0b192c)
-  const cajaImg = (url, idSubir, idQuitar, idFile, idAmp) => `
+  const cajaImg = (url, idSubir, idQuitar, idFile, idAmp, idIa = null) => `
     <div class="sello-box">
       <div class="big-preview big-preview--sitio" style="max-width:340px; background:var(--card-bg, #0b192c); border:1px solid var(--line, rgba(212,175,55,0.25)); border-radius:10px; overflow:hidden">
         ${url ? `<img src="${esc(url)}" alt="Vista previa" id="${idAmp}Img" style="width:100%;border-radius:10px;display:block;cursor:zoom-in" title="Toque para ampliar">` : '<p class="cell-sub" style="padding:22px;text-align:center">Sin imagen propia (se usa la ilustración por defecto).</p>'}
       </div>
-      <div class="sello-actions">
+      <div class="sello-actions" style="display:flex;flex-wrap:wrap;gap:6px">
         <button class="btn btn--primary btn--sm" id="${idSubir}" type="button">Subir imagen</button>
+        ${idIa ? `<button class="btn btn--ghost btn--sm" id="${idIa}" type="button" style="color:var(--gold,#d4af37);border-color:rgba(212,175,55,0.3)">✨ Generar con IA</button>` : ''}
         ${url ? `<button class="btn btn--ghost btn--sm" id="${idAmp}" type="button">Ampliar</button>` : ''}
         ${url ? `<button class="btn btn--ghost btn--sm" id="${idQuitar}" type="button">Quitar imagen</button>` : ''}
         <input type="file" id="${idFile}" accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" hidden>
@@ -199,7 +200,7 @@ export async function renderSitio() {
       <div class="card__head"><h3>Imagen principal (hero)</h3></div>
       <div class="card__body">
         <p class="cell-sub" style="margin-bottom:12px">La que aparece al costado del título, como una tarjeta. Horizontal o cuadrada (ideal ~1200×900 px). Si no sube ninguna, se muestra la ilustración por defecto.</p>
-        ${cajaImg(heroActual, 'btnSubirHero', 'btnQuitarHero', 'fileHero', 'ampHero')}
+        ${cajaImg(heroActual, 'btnSubirHero', 'btnQuitarHero', 'fileHero', 'ampHero', 'btnIaHero')}
       </div>
     </div>
 
@@ -374,6 +375,39 @@ export async function renderSitio() {
     const ampImg = $('#' + idAmp + 'Img');
     if (ampImg) ampImg.onclick = () => ampliarImagenSitio(urlActual, titulo);
   };
+
+  
+  const btnIaHero = $('#btnIaHero');
+  if (btnIaHero) {
+    btnIaHero.onclick = async () => {
+      btnIaHero.disabled = true;
+      const prevText = btnIaHero.textContent;
+      btnIaHero.textContent = '✨ Generando imagen con IA...';
+      try {
+        toast('Generando imagen editorial de portada con IA...', 'info');
+        const tit = ($('#sitioHeroTitulo')?.value || 'LexFive Abogados');
+        const desc = ($('#sitioHeroSubtitulo')?.value || 'Defensa jurídica integral en Bolivia');
+        const base64 = await withTimeout(generarImagenIa({ titulo: tit, descripcion: desc, contexto: 'Hero principal de portada' }), 40000, 'Imagen IA');
+        if (base64) {
+          toast('Optimizando y subiendo imagen...', 'info');
+          optimizarFotoSitio(base64, 1200, async (peq) => {
+            let src = null;
+            try { src = await subirImagenBranding(peq, 'sitio'); } catch (e) {}
+            if (!src) src = peq;
+            localStorage.setItem('lexfive_hero_url', src);
+            await pushBranding();
+            toast('Imagen del hero actualizada en vivo.', 'success');
+            renderSitio();
+          });
+        }
+      } catch (err) {
+        toast('Error generando imagen: ' + (err.message || 'Intente nuevamente'), 'error');
+      } finally {
+        btnIaHero.disabled = false;
+        btnIaHero.textContent = prevText;
+      }
+    };
+  }
 
   wireImagen('btnSubirHero', 'btnQuitarHero', 'fileHero', 'ampHero', heroActual, 'Imagen principal (hero)', 'lexfive_hero_url', 'sitio', 1200, 'Imagen del hero guardada. Se verá en la web en unos segundos.', 'Imagen del hero quitada.');
   wireImagen('btnSubirSobre', 'btnQuitarSobre', 'fileSobre', 'ampSobre', sobreActual, 'Imagen de «Sobre el bufete»', 'lexfive_sobre_url', 'sitio', 1000, 'Imagen guardada. Se verá en la web en unos segundos.', 'Imagen quitada.');

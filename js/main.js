@@ -771,14 +771,14 @@
     var ICON_WA_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67Z"/></svg>';
 
     var DEFAULT_AREAS = [
-        { titulo: 'Derecho Laboral', descripcion: 'Despidos, beneficios sociales, finiquitos, reincorporaciones y asesoría laboral patronal y obrera.', orden: 1 },
-        { titulo: 'Derecho Civil', descripcion: 'Contratos, derecho propietario, usucapión, desalojos, recuperación de deudas y responsabilidad civil.', orden: 2 },
-        { titulo: 'Derecho Penal', descripcion: 'Defensa penal técnica y estratégica, querellas, denuncias, medidas cautelares y audiencias de juicio.', orden: 3 },
-        { titulo: 'Derecho de Familia', descripcion: 'Divorcios, asistencia familiar, guarda y custodia de menores, filiación y procesos sucesorios.', orden: 4 },
-        { titulo: 'Derecho Informático', descripcion: 'Protección de datos personales, delitos informáticos, contratos tecnológicos y comercio electrónico.', orden: 5 },
-        { titulo: 'Derecho Minero', descripcion: 'Contratos mineros, autorizaciones transitorias especiales, servidumbres y regulación sectorial.', orden: 6 },
-        { titulo: 'Derecho Agrario', descripcion: 'Saneamiento y titulación de tierras (INRA), conflictos de linderos, avasallamientos y posesión agraria.', orden: 7 },
-        { titulo: 'Derecho Constitucional', descripcion: 'Acciones de libertad, amparos constitucionales, acciones de cumplimiento y defensa de garantías.', orden: 8 }
+        { id: 'laboral', slug: 'derecho-laboral', titulo: 'Derecho Laboral', descripcion: 'Despidos, beneficios sociales, finiquitos, reincorporaciones y asesoría laboral patronal y obrera.', orden: 1 },
+        { id: 'civil', slug: 'derecho-civil', titulo: 'Derecho Civil', descripcion: 'Contratos, derecho propietario, usucapión, desalojos, recuperación de deudas y responsabilidad civil.', orden: 2 },
+        { id: 'penal', slug: 'derecho-penal', titulo: 'Derecho Penal', descripcion: 'Defensa penal técnica y estratégica, querellas, denuncias, medidas cautelares y audiencias de juicio.', orden: 3 },
+        { id: 'familia', slug: 'derecho-de-familia', titulo: 'Derecho de Familia', descripcion: 'Divorcios, asistencia familiar, guarda y custodia de menores, filiación y procesos sucesorios.', orden: 4 },
+        { id: 'informatico', slug: 'derecho-informatico', titulo: 'Derecho Informático', descripcion: 'Protección de datos personales, delitos informáticos, contratos tecnológicos y comercio electrónico.', orden: 5 },
+        { id: 'minero', slug: 'derecho-minero', titulo: 'Derecho Minero', descripcion: 'Contratos mineros, autorizaciones transitorias especiales, servidumbres y regulación sectorial.', orden: 6 },
+        { id: 'agrario', slug: 'derecho-agrario', titulo: 'Derecho Agrario', descripcion: 'Saneamiento y titulación de tierras (INRA), conflictos de linderos, avasallamientos y posesión agraria.', orden: 7 },
+        { id: 'constitucional', slug: 'derecho-constitucional', titulo: 'Derecho Constitucional', descripcion: 'Acciones de libertad, amparos constitucionales, acciones de cumplimiento y defensa de garantías.', orden: 8 }
     ];
 
     var DEFAULT_BLOG_HOME = [
@@ -1073,26 +1073,33 @@
         } catch (e) {}
 
         grid.classList.add('areas__grid-carousel');
+        if (list.length <= 2) {
+            grid.classList.add('is-centered');
+        } else {
+            grid.classList.remove('is-centered');
+        }
 
         grid.innerHTML = list.map(function (a) {
+            var areaId = a.id || a.slug || a.titulo;
+            var areaLink = 'area.html?id=' + encodeURIComponent(areaId);
             var mediaHtml = '';
             if (a.imagen_url) {
-                mediaHtml = '<div class="area-card__media"><img src="' + esc(a.imagen_url) + '" alt="' + esc(a.titulo) + '" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML=getAreaThemedSvg(\'' + esc(a.titulo).replace(/'/g, "\\'") + '\', \'100%\', \'100%\')"></div>';
+                mediaHtml = '<div class="area-card__media"><a href="' + areaLink + '" aria-label="' + esc(a.titulo) + '"><img src="' + esc(a.imagen_url) + '" alt="' + esc(a.titulo) + '" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML=getAreaThemedSvg(\'' + esc(a.titulo).replace(/'/g, "\\'") + '\', \'100%\', \'100%\')"></a></div>';
             } else {
-                mediaHtml = '<div class="area-card__media" style="padding:0;overflow:hidden;border:1px solid rgba(212,175,55,0.25)">' + getAreaThemedSvg(a.titulo, '100%', '100%') + '</div>';
+                mediaHtml = '<div class="area-card__media" style="padding:0;overflow:hidden;border:1px solid rgba(212,175,55,0.25)"><a href="' + areaLink + '" aria-label="' + esc(a.titulo) + '" style="display:block;width:100%;height:100%">' + getAreaThemedSvg(a.titulo, '100%', '100%') + '</a></div>';
             }
             var waUrl = 'https://wa.me/' + waPhone + '?text=' + encodeURIComponent('Hola LexFive, necesito asesoría en ' + a.titulo);
             return '<article class="area-card" data-area="' + esc(a.titulo) + '">' +
                 '<div>' + mediaHtml +
-                '<h3 class="area-card__title">' + esc(a.titulo) + '</h3>' +
+                '<h3 class="area-card__title"><a href="' + areaLink + '" style="text-decoration:none;color:inherit">' + esc(a.titulo) + '</a></h3>' +
                 '<p class="area-card__text">' + esc(a.descripcion || 'Asesoramiento legal riguroso y personalizado para defender sus derechos con la máxima dedicación.') + '</p>' +
                 '</div>' +
                 '<div class="area-card__actions">' +
                     '<a href="' + waUrl + '" target="_blank" rel="noopener" class="btn-area-action btn-area-wa" title="Consultar por WhatsApp">' +
                         ICON_WA_SVG + ' WhatsApp' +
                     '</a>' +
-                    '<a href="#contacto" class="btn-area-action btn-area-form" data-select-area="' + esc(a.titulo) + '" title="Solicitar consulta en el formulario">' +
-                        'Consulta &darr;' +
+                    '<a href="' + areaLink + '" class="btn-area-action btn-area-especialidad" title="Ver especialidad y servicios">' +
+                        'Ver especialidad &rarr;' +
                     '</a>' +
                 '</div>' +
             '</article>';
@@ -1145,6 +1152,10 @@
         var prevBtn = document.getElementById('areasCarouselPrev');
         var nextBtn = document.getElementById('areasCarouselNext');
         var dotsCont = document.getElementById('areasCarouselDots');
+        var controls = document.getElementById('areasCarouselControls');
+        if (controls) {
+            controls.style.display = totalItems <= 2 ? 'none' : 'flex';
+        }
         if (!grid) return;
 
         // Ancho de paso por tarjeta
@@ -1278,6 +1289,40 @@
 
     /* ---------- INICIALIZACIÓN Y CACHÉ LOCAL ---------- */
     function initDynamicFrontend() {
+        // 0. Preselección automática de área si viene en la URL (?area=...)
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var areaParam = params.get('area');
+            if (areaParam) {
+                var selectEl = document.getElementById('area');
+                if (selectEl) {
+                    var found = false;
+                    for (var i = 0; i < selectEl.options.length; i++) {
+                        if (selectEl.options[i].value.toLowerCase() === areaParam.toLowerCase() || selectEl.options[i].text.toLowerCase() === areaParam.toLowerCase()) {
+                            selectEl.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        var opt = document.createElement('option');
+                        opt.value = areaParam;
+                        opt.textContent = areaParam;
+                        selectEl.appendChild(opt);
+                        selectEl.value = areaParam;
+                    }
+                }
+                var contactoSec = document.getElementById('contacto');
+                if (contactoSec) {
+                    setTimeout(function () {
+                        contactoSec.scrollIntoView({ behavior: 'smooth' });
+                        var nom = document.getElementById('nombre');
+                        if (nom) nom.focus();
+                    }, 400);
+                }
+            }
+        } catch (e) {}
+
         // 1. Carga inmediata con copias en caché
         try {
             var cachedBranding = JSON.parse(localStorage.getItem('lexfive_branding') || '{}');

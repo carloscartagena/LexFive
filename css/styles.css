@@ -1401,3 +1401,56 @@ html[data-theme="dark"] .btn-share-consult {
     transition: none !important;
   }
 }
+
+
+/* ============================================================
+   LexFive — Áreas de Práctica Centrado & Botón Especialidad
+   ============================================================ */
+.areas__grid-carousel.is-centered {
+  justify-content: center;
+}
+@media (max-width: 768px) {
+  .areas__grid-carousel.is-centered {
+    justify-content: flex-start;
+  }
+}
+.btn-area-especialidad {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold, #d4af37);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.86rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.btn-area-especialidad:hover {
+  background: var(--gold, #d4af37);
+  color: #041230;
+  border-color: var(--gold, #d4af37);
+  transform: translateY(-1px);
+}
+.area-card__title a {
+  transition: color 0.2s ease;
+}
+.area-card__title a:hover {
+  color: var(--gold, #d4af37);
+}
+.area-card__media a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.area-card__media img {
+  transition: transform 0.3s ease;
+}
+.area-card:hover .area-card__media img {
+  transform: scale(1.04);
+}
